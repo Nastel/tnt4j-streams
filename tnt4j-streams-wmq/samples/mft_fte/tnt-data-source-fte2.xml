@@ -1,54 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
 <tnt-data-source
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
+        xsi:noNamespaceSchemaLocation="tnt-data-source.xsd">
 
-    <parser name="MQFTEParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
+    <!-- completed: SUCCESSFUL, FAILED MFT event -->
+    <parser name="MQFTEParserNormal" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
         <property name="SignatureDelim" value="#!#"/>
+        <property name="RequireDefault" value="true"/>
 
         <field name="EventName" locator="/transaction/action" locator-type="Label"/>
-        <field name="ApplName" separator=":">
-            <field-locator locator="/transaction/sourceAgent/@agent" locator-type="Label"/>
-            <field-locator locator="/transaction/sourceAgent/@QMgr" locator-type="Label"/>
+        <field name="EventType" locator="/transaction/action" locator-type="Label">
+            <field-map source="started" target="START"/>
+            <field-map source="progress" target="SEND"/>
+            <field-map source="completed" target="RECEIVE"/>
+            <field-map source="" target="OTHER"/>
         </field>
-        <field name="ResourceName" locator="/transaction/job/name" locator-type="Label"/>
+        <field name="UserName" locator="/transaction/originator/userID" locator-type="Label"/>
+        <field name="Location" locator="/transaction/originator/hostName" locator-type="Label"/>
 
-        <field name="ReasonCode" separator="">
-            <field-locator locator="/transaction/transferSet/item/status/@resultCode" locator-type="Label" datatype="Number"/>
-            <field-locator locator="/transaction/status/@resultCode" locator-type="Label" datatype="Number"/>
+        <field name="ApplName" separator=":">
+            <field-locator value="JOB"/>
+            <field-locator locator="/transaction/job/name" locator-type="Label" required="false"/>
         </field>
+
+        <field name="ResourceMgr" locator="/transaction/sourceAgent/@QMgr" locator-type="Label"/>
+        <field name="ResMgrType" value="MESSAGING_SERVER"/>
+
+        <field name="ResourceName" separator=".">
+            <field-locator locator="/transaction/sourceAgent/@QMgr" locator-type="Label" required="false"/>
+            <field-locator locator="/transaction/sourceAgent/@agent" locator-type="Label" required="false"/>
+            <field-locator locator="/transaction/destinationAgent/@QMgr" locator-type="Label" required="false"/>
+            <field-locator locator="/transaction/destinationAgent/@agent" locator-type="Label" required="false"/>
+        </field>
+
+        <field name="ResType" value="FILE"/>
+
+        <!-- Map fields from mft_trf status "completed"-->
+        <field name="Message" separator="">
+            <field-locator locator="/transaction/status/supplement" locator-type="Label" required="false"/>
+        </field>
+
         <field name="ServerName" locator="/transaction/originator/hostName" locator-type="Label"/>
+        <field name="ServerOs" locator="/transaction/sourceAgent/systemInfo/@name" locator-type="Label"/>
         <field name="StartTime" locator="/transaction/action/@time" locator-type="Label" datatype="DateTime"
                format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT"/>
-        <field name="CompCode" separator="">
-            <field-locator locator="/transaction/transferSet/item/status/@resultCode" locator-type="Label"
-                           datatype="Number"/>
-            <field-locator locator="/transaction/status/@resultCode" locator-type="Label" datatype="Number"/>
 
+        <field name="ReasonCode" separator="">
+            <field-locator locator="/transaction/status/@resultCode" locator-type="Label" datatype="Number"/>
+        </field>
+
+        <field name="CompCode" locator="/transaction/status/@resultCode" locator-type="Label">
             <field-map source="0" target="SUCCESS"/>
             <field-map source="40" target="WARNING"/>
             <field-map source="" target="ERROR"/>
         </field>
-        <field name="Correlator" locator="/transaction/@ID" locator-type="Label" datatype="String" format="string"/>
-        <field name="Exception" separator="">
-            <field-locator locator="/transaction/transferSet/item/status/supplement" locator-type="Label"/>
-            <field-locator locator="/transaction/status/supplement" locator-type="Label"/>
+        <field name="CompCode2" locator="/transaction/status/@resultCode" locator-type="Label">
+            <field-map source="0" target="SUCCESS"/>
+            <field-map source="40" target="WARNING"/>
+            <field-map source="1" target="FAILURE"/>
+            <field-map source="" target="ERROR"/>
         </field>
-        <field name="Location" locator="substring-before(string(/transaction/@xsi:noNamespaceSchemaLocation),'.xsd')"
-               locator-type="Label"/>
-        <field name="EventType" value="EVENT"/>
+        <field name="Exception" separator="">
+            <field-locator locator="/transaction/status/supplement" locator-type="Label" required="false"/>
+        </field>
 
+        <field name="Correlator" locator="/transaction/@ID" locator-type="Label" datatype="String" format="string"/>
+
+        <field name="MFT_SOURCE_AGNT" locator="/transaction/sourceAgent/@agent" locator-type="Label" required="false"/>
+        <field name="MFT_DEST_AGNT" locator="/transaction/destinationAgent/@agent" locator-type="Label" required="false"/>
+        <field name="MFT_TFR_ID" locator="/transaction/transferSet/metaDataSet/metaData[@key=&quot;account&quot;]" locator-type="Label"
+               required="false"/>
+        <field name="MFT_TRF_FILE_SIZE" locator="/transaction/transferSet/@bytesSent" locator-type="Label" required="false"/>
     </parser>
 
-    <!--<stream name="WmqStream" class="com.jkoolcloud.tnt4j.streams.inputs.WmqStream">-->
-    <!--<property name="QueueManager" value="MB8QMGR"/>-->
-    <!--<property name="Queue" value="NASTEL.FTE.EVENTS"/>-->
-    <!--<parser-ref name="MQFTEParser"/>-->
-    <!--</stream>-->
+    <!-- STARTED and PROGRESS MFT event -->
+    <parser name="MQFTEParserProgress" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
+        <property name="SignatureDelim" value="#!#"/>
+        <property name="RequireDefault" value="false"/>
 
-    <stream name="WmqStream" class="com.jkoolcloud.tnt4j.streams.inputs.CharacterStream">
-        <property name="FileName" value="./tnt4j-streams-wmq/samples/mft_fte/message.xml"/>
+        <field name="EventName" locator="/transaction/action" locator-type="Label"/>
+        <field name="EventType" locator="/transaction/action" locator-type="Label">
+            <field-map source="started" target="START"/>
+            <field-map source="progress" target="SEND"/>
+            <field-map source="completed" target="RECEIVE"/>
+            <field-map source="" target="OTHER"/>
+        </field>
+        <field name="UserName" locator="/transaction/originator/userID" locator-type="Label"/>
+        <field name="Location" locator="/transaction/originator/hostName" locator-type="Label"/>
 
-        <parser-ref name="MQFTEParser"/>
+        <field name="ApplName" separator=":">
+            <field-locator value="JOB"/>
+            <field-locator locator="/transaction/job/name" locator-type="Label" required="false"/>
+        </field>
+
+        <field name="ResourceMgr" locator="/transaction/sourceAgent/@QMgr" locator-type="Label"/>
+        <field name="ResMgrType" value="MESSAGING_SERVER"/>
+
+        <field name="ResourceName" separator=".">
+            <field-locator locator="/transaction/sourceAgent/@QMgr" locator-type="Label" required="false"/>
+            <field-locator locator="/transaction/sourceAgent/@agent" locator-type="Label" required="false"/>
+            <field-locator locator="/transaction/destinationAgent/@QMgr" locator-type="Label" required="false"/>
+            <field-locator locator="/transaction/destinationAgent/@agent" locator-type="Label" required="false"/>
+        </field>
+
+        <field name="ResType" value="FILE"/>
+
+        <!-- Map fields from mft_trf status "progress" -->
+        <field name="Message" separator="">
+            <field-locator locator="/transaction/transferSet/item/status/supplement" locator-type="Label" required="false"/>
+        </field>
+
+        <field name="ServerName" locator="/transaction/originator/hostName" locator-type="Label"/>
+        <field name="ServerOs" locator="/transaction/sourceAgent/systemInfo/@name" locator-type="Label"/>
+        <field name="StartTime" locator="/transaction/action/@time" locator-type="Label" datatype="DateTime"
+               format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT"/>
+
+        <!-- Map fields from mft_trf status "progress" -->
+        <field name="ReasonCode" separator="">
+            <field-locator locator="/transaction/transferSet/item/status/@resultCode" locator-type="Label" datatype="Number"/>
+        </field>
+
+        <field name="CompCode" locator="/transaction/transferSet/item/status/@resultCode" locator-type="Label">
+            <field-map source="0" target="SUCCESS"/>
+            <field-map source="40" target="WARNING"/>
+            <field-map source="" target="ERROR"/>
+        </field>
+        <field name="CompCode2" locator="/transaction/transferSet/item/status/@resultCode" locator-type="Label">
+            <field-map source="0" target="SUCCESS"/>
+            <field-map source="40" target="WARNING"/>
+            <field-map source="1" target="FAILURE"/>
+            <field-map source="" target="ERROR"/>
+        </field>
+        <field name="Exception" separator="">
+            <field-locator locator="/transaction/transferSet/item/status/supplement" locator-type="Label" required="false"/>
+        </field>
+
+        <field name="Correlator" locator="/transaction/@ID" locator-type="Label" datatype="String" format="string"/>
+
+        <field name="MFT_SRC_FILE_NAME" locator="/transaction/transferSet/item/source/file" locator-type="Label">
+            <field-transform name="fileName" lang="xpath">
+                ts:getFileName($fieldValue)
+            </field-transform>
+        </field>
+        <field name="MFT_DST_FILE_NAME" locator="/transaction/transferSet/item/destination/file" locator-type="Label">
+            <field-transform name="fileName" lang="xpath">
+                ts:getFileName($fieldValue)
+            </field-transform>
+        </field>
+
+        <field name="MFT_SOURCE_AGNT" locator="/transaction/sourceAgent/@agent" locator-type="Label" required="false"/>
+        <field name="MFT_DEST_AGNT" locator="/transaction/destinationAgent/@agent" locator-type="Label" required="false"/>
+        <field name="MFT_TRF_FILE_SIZE" locator="/transaction/transferSet/@bytesSent" locator-type="Label" required="false"/>
+    </parser>
+
+    <stream name="WmqStream" class="com.jkoolcloud.tnt4j.streams.inputs.WmqStream">
+		<property name="Host" value="<HOST|IP>"/>
+		<property name="Port" value="<PORT>"/>
+		<property name="Channel" value="<SVRCONN>"/>
+		<property name="QueueManager" value="<CORD_QMGR>"/>
+		<property name="Queue" value="<QNAME ex:FTE.TRANSFER.LOG>"/>
+		<parser-ref name="MQFTEParserNormal"/>
+		<parser-ref name="MQFTEParserProgress"/>
     </stream>
+   
 </tnt-data-source>
