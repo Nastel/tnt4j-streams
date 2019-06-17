@@ -7,4 +7,4 @@ IF ["%1"] EQU [""] (
 )
 
 @echo on
-..\..\bin\tnt4j-streams.bat -p:%PARSERS_CFG%
+..\..\bin\tnt4j-streams.bat -p -f:%PARSERS_CFG%

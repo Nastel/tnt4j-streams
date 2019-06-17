@@ -4302,7 +4302,7 @@ validation use system property `com.jkoolcloud.tnt4j.streams.validate.config.exp
     -Dcom.jkoolcloud.tnt4j.streams.validate.config.exp=false
 ```
 
-Program argument `-p:` is used in common with `PipedStream` and only parsers configuration from `<tnt-data-source/>` definition is used. See 
+Program argument `-p` is used in common with `PipedStream` and only parsers configuration from `<tnt-data-source/>` definition is used. See 
 [OS piped stream](#os-piped-stream).
 
 Program argument `-z:` is used to define configuration file for ZooKeeper based TNT4J-Streams configuration. 

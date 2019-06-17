@@ -48,9 +48,9 @@ public final class StreamsAgent {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(StreamsAgent.class);
 
 	private static final String PARAM_STREAM_CFG = "-f:"; // NON-NLS
-	private static final String PARAM_PARSER_CFG = "-p:"; // NON-NLS
 	private static final String PARAM_ZOOKEEPER_CFG = "-z:"; // NON-NLS
 	private static final String PARAM_ZOOKEEPER_STREAM_ID = "-sid:"; // NON-NLS
+	private static final String PARAM_OS_PIPE_INPUT = "-p"; // NON-NLS
 	private static final String PARAM_SKIP_UNPARSED = "-s"; // NON-NLS
 	private static final String PARAM_HELP1 = "-h"; // NON-NLS
 	private static final String PARAM_HELP2 = "-?"; // NON-NLS
@@ -58,7 +58,7 @@ public final class StreamsAgent {
 	private static String cfgFileName = null;
 	private static String zookeeperCfgFile = null;
 	private static String zookeeperStreamId = null;
-	private static boolean noStreamConfig = false;
+	private static boolean osPipeInput = false;
 	private static boolean haltOnUnparsed = true;
 
 	private static ThreadGroup streamThreads;
@@ -80,8 +80,8 @@ public final class StreamsAgent {
 	 *            </tr>
 	 *            <tr>
 	 *            <td>&nbsp;&nbsp;</td>
-	 *            <td>&nbsp;-p:&lt;cfg_file_name&gt;</td>
-	 *            <td>(optional) Load parsers configuration from &lt;cfg_file_name&gt;</td>
+	 *            <td>&nbsp;-p</td>
+	 *            <td>(optional) Flag indicating to use OS piping as stream input</td>
 	 *            </tr>
 	 *            <tr>
 	 *            <td>&nbsp;&nbsp;</td>
@@ -327,7 +327,7 @@ public final class StreamsAgent {
 		}
 
 		Collection<TNTInputStream<?, ?>> streams;
-		if (noStreamConfig) {
+		if (osPipeInput) {
 			streams = initPiping(cfg);
 		} else {
 			streams = cfg.getStreams();
@@ -576,7 +576,7 @@ public final class StreamsAgent {
 			if (StringUtils.isEmpty(arg)) {
 				continue;
 			}
-			if (arg.startsWith(PARAM_STREAM_CFG) || arg.startsWith(PARAM_PARSER_CFG)) {
+			if (arg.startsWith(PARAM_STREAM_CFG)) {
 				if (StringUtils.isNotEmpty(cfgFileName)) {
 					System.out.println(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
 							"StreamsAgent.invalid.args"));
@@ -591,8 +591,6 @@ public final class StreamsAgent {
 					printUsage();
 					return false;
 				}
-
-				noStreamConfig = arg.startsWith(PARAM_PARSER_CFG);
 			} else if (arg.startsWith(PARAM_ZOOKEEPER_CFG)) {
 				if (StringUtils.isNotEmpty(zookeeperCfgFile)) {
 					System.out.println(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
@@ -623,6 +621,8 @@ public final class StreamsAgent {
 					printUsage();
 					return false;
 				}
+			} else if (arg.startsWith(PARAM_OS_PIPE_INPUT)) {
+				osPipeInput = true;
 			} else if (PARAM_SKIP_UNPARSED.equals(arg)) {
 				haltOnUnparsed = false;
 			} else if (PARAM_HELP1.equals(arg) || PARAM_HELP2.equals(arg)) {
