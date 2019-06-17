@@ -32,10 +32,12 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * @version $Revision: 2 $
  */
 public class WsRequest<T> {
+	private String id;
 	private String[] tags;
 	private T data;
 	private T sentData;
 	private Map<String, Parameter> parameters = new HashMap<>();
+	private WsScenarioStep scenarioStep;
 
 	/**
 	 * Constructs a new WsRequest. Defines request data and tag as {@code null}.
@@ -61,6 +63,25 @@ public class WsRequest<T> {
 	}
 
 	/**
+	 * Returns request identifier
+	 * 
+	 * @return request identifier
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * Sets request identifier.
+	 * 
+	 * @param id
+	 *            request identifier
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	/**
 	 * Returns request tag strings array.
 	 *
 	 * @return request tag strings array
@@ -70,9 +91,9 @@ public class WsRequest<T> {
 	}
 
 	/**
-	 * Returns data package.
+	 * Returns request data package.
 	 *
-	 * @return data package
+	 * @return request data package
 	 */
 	public T getData() {
 		return data;
@@ -153,6 +174,25 @@ public class WsRequest<T> {
 	 */
 	public void addParameter(String id, String value, String type, String format) {
 		addParameter(new Parameter(id, value, type, format));
+	}
+
+	/**
+	 * Returns scenario step bound to this request.
+	 * 
+	 * @return scenario step bound to this request
+	 */
+	public WsScenarioStep getScenarioStep() {
+		return scenarioStep;
+	}
+
+	/**
+	 * Sets scenario step bound to this request.
+	 * 
+	 * @param scenarioStep
+	 *            scenario step to bind to this request
+	 */
+	public void setScenarioStep(WsScenarioStep scenarioStep) {
+		this.scenarioStep = scenarioStep;
 	}
 
 	/**

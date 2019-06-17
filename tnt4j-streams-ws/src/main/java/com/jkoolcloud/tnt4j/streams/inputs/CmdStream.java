@@ -16,6 +16,8 @@
 
 package com.jkoolcloud.tnt4j.streams.inputs;
 
+import java.util.concurrent.Semaphore;
+
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 
@@ -119,9 +121,11 @@ public class CmdStream extends AbstractWsStream<String> {
 
 			if (!scenarioStep.isEmpty()) {
 				String respStr;
+				Semaphore acquiredSemaphore = null;
 				for (WsRequest<String> request : scenarioStep.getRequests()) {
 					respStr = null;
 					try {
+						acquiredSemaphore = acquireSemaphore(stream, request);
 						String processedRequest = stream.fillInRequestData(request.getData());
 						request.setSentData(processedRequest);
 						respStr = executeCommand(processedRequest);
@@ -133,6 +137,8 @@ public class CmdStream extends AbstractWsStream<String> {
 
 					if (StringUtils.isNotEmpty(respStr)) {
 						stream.addInputToBuffer(new WsReqResponse<>(respStr, request));
+					} else {
+						releaseSemaphore(acquiredSemaphore, stream, scenarioStep.getName(), request);
 					}
 				}
 			}

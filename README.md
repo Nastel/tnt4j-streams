@@ -5054,6 +5054,9 @@ request/invocation/execution parameters and scheduler. Steps are invoked/execute
  * `scenario` tag has required attribute - `name` (any string).
     * `step` tag has required attribute - `name` (any string) and optional attributes `url` (service request URL),
     `method` (`GET`/`POST` - default value `GET`).
+        * `property` tag has attributes:
+            * `name` - scenario step configuration property name
+            * `value` - scenario step configuration property value
         * `schedule-cron` tag has attributes:
             * `expression` - Cron expression. (Required)
             * `startDelay` - schedule start delay interval as positive integer (zero valid) numeric value. Default value - `0`. (Optional) 
@@ -5150,11 +5153,20 @@ request/invocation/execution parameters and scheduler. Steps are invoked/execute
     </scenario>
 ```
 
+Generic configuration properties:
+* `SynchronizeRequests` - flag indicating that stream issued requests shall be synchronized and handled in configuration defined sequence - 
+waiting for prior request to complete before issuing next one. This property can be defined under `stream` or scenario `step` tags and 
+synchronize requests under according scope. Default value - `false`. (Optional)
+
+    sample:
+```xml
+    <property name="SynchronizeRequests" value="true"/>
+    ...
+```
+
 ##### WsStream parameters
 
  * `DisableSSL` - flag indicating that stream should disable SSL context verification. Default value - `false`. (Optional)
- * `SynchronizeRequests` - flag indicating that stream issued WebService requests shall be synchronized and handled in configuration 
- defined sequence - waiting for prior request to complete before issuing next. Default value - `false`. (Optional)
  * List of custom WS Stream requests configuration properties. Put variable placeholder in request/step configuration (e.g. `${WsEndpoint}`) 
  and put property with same name into stream properties list (e.g. `<property name="WsEndpoint" value="https://192.168.3.3/ws"/>`) to have 
  value mapped into request data. (Optional)
@@ -5162,7 +5174,6 @@ request/invocation/execution parameters and scheduler. Steps are invoked/execute
     sample:
 ```xml
     <property name="DisableSSL" value="true"/>
-    <property name="SynchronizeRequests" value="true"/>
     <!-- Custom WS request properties -->
     <property name="WsEndpoint" value="https://192.168.3.3/ws"/>
     ...

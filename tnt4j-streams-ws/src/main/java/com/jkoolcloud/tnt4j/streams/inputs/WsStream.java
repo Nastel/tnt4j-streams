@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
@@ -43,7 +42,6 @@ import org.xml.sax.SAXException;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.WsStreamProperties;
-import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
 import com.jkoolcloud.tnt4j.streams.scenario.*;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
@@ -66,9 +64,6 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  * <ul>
  * <li>DisableSSL - flag indicating that stream should disable SSL context verification. Default value - {@code false}.
  * (Optional)</li>
- * <li>SynchronizeRequests - flag indicating that stream issued WebService requests shall be synchronized and handled in
- * configuration defined sequence - waiting for prior request to complete before issuing next. Default value -
- * {@code false}. (Optional)</li>
  * <li>List of custom WS Stream requests configuration properties. Put variable placeholder in request/step
  * configuration (e.g. {@code ${WsEndpoint}}) and put property with same name into stream properties list (e.g.
  * {@code "<property name="WsEndpoint" value="https://192.168.3.3/ws"/>"}) to have value mapped into request data.
@@ -83,15 +78,7 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
 public class WsStream extends AbstractWsStream<String> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(WsStream.class);
 
-	/**
-	 * Constant for name of built-in scheduler job property {@value}.
-	 */
-	protected static final String JOB_PROP_SEMAPHORE = "semaphoreObj"; // NON-NLS
-
-	private Semaphore semaphore;
-
 	private boolean disableSSL = false;
-	private boolean synchronizeRequests = false;
 
 	/**
 	 * Contains custom WS Stream requests configuration properties.
@@ -121,8 +108,6 @@ public class WsStream extends AbstractWsStream<String> {
 
 		if (WsStreamProperties.PROP_DISABLE_SSL.equalsIgnoreCase(name)) {
 			disableSSL = Utils.toBoolean(value);
-		} else if (WsStreamProperties.PROP_SYNCHRONIZE_REQUESTS.equalsIgnoreCase(name)) {
-			synchronizeRequests = Utils.toBoolean(value);
 		} else {
 			wsProperties.put(name, value);
 		}
@@ -132,10 +117,6 @@ public class WsStream extends AbstractWsStream<String> {
 	public Object getProperty(String name) {
 		if (WsStreamProperties.PROP_DISABLE_SSL.equalsIgnoreCase(name)) {
 			return disableSSL;
-		}
-
-		if (WsStreamProperties.PROP_SYNCHRONIZE_REQUESTS.equalsIgnoreCase(name)) {
-			return synchronizeRequests;
 		}
 
 		return super.getProperty(name);
@@ -148,16 +129,10 @@ public class WsStream extends AbstractWsStream<String> {
 		if (disableSSL) {
 			disableSslVerification();
 		}
-
-		if (synchronizeRequests) {
-			semaphore = new Semaphore(1);
-		}
 	}
 
 	@Override
 	protected JobDetail buildJob(String jobId, JobDataMap jobAttrs) {
-		jobAttrs.put(JOB_PROP_SEMAPHORE, semaphore);
-
 		return JobBuilder.newJob(WsCallJob.class).withIdentity(jobId).usingJobData(jobAttrs).build();
 	}
 
@@ -397,17 +372,6 @@ public class WsStream extends AbstractWsStream<String> {
 		throw new RuntimeException(fault.getFaultString());
 	}
 
-	@Override
-	protected ActivityInfo applyParsers(Object data) throws IllegalStateException, ParseException {
-		try {
-			return super.applyParsers(data);
-		} finally {
-			if (semaphore != null) {
-				semaphore.release();
-			}
-		}
-	}
-
 	/**
 	 * Returns custom WS Stream requests configuration properties stored in {@link #wsProperties} map.
 	 * 
@@ -435,20 +399,16 @@ public class WsStream extends AbstractWsStream<String> {
 
 			WsStream stream = (WsStream) dataMap.get(JOB_PROP_STREAM_KEY);
 			WsScenarioStep scenarioStep = (WsScenarioStep) dataMap.get(JOB_PROP_SCENARIO_STEP_KEY);
-			Semaphore semaphore = (Semaphore) dataMap.get(JOB_PROP_SEMAPHORE);
 
 			if (!scenarioStep.isEmpty()) {
 				String reqStr;
 				String respStr;
+				Semaphore aquiredSemaphore = null;
 				for (WsRequest<String> request : scenarioStep.getRequests()) {
 					reqStr = null;
 					respStr = null;
 					try {
-						if (semaphore != null) {
-							while (semaphore.tryAcquire()) {
-								Thread.sleep(50);
-							}
-						}
+						aquiredSemaphore = acquireSemaphore(stream, request);
 						reqStr = stream.fillInRequestData(request.getData());
 						request.setSentData(reqStr);
 						respStr = callWebService(stream.fillInRequestData(scenarioStep.getUrlStr()), reqStr, stream,
@@ -461,9 +421,7 @@ public class WsStream extends AbstractWsStream<String> {
 						if (StringUtils.isNotEmpty(respStr)) {
 							stream.addInputToBuffer(new WsReqResponse<>(respStr, request));
 						} else {
-							if (semaphore != null && semaphore.availablePermits() < 1) {
-								semaphore.release();
-							}
+							releaseSemaphore(aquiredSemaphore, stream, scenarioStep.getName(), request);
 						}
 					}
 				}

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-ws/config/tnt-data-source-ws.xsd">
+
+    <parser name="ResponseParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityRegExParser">
+        <!--This is a dummy parser-->
+        <property name="Pattern" value=".*"/>
+
+        <field name="EventType" value="EVENT"/>
+        <field name="ProcessorTime" value="1"/>
+    </parser>
+
+    <stream name="WinCmdStream" class="com.jkoolcloud.tnt4j.streams.inputs.CmdStream">
+        <property name="HaltIfNoParser" value="false"/>
+
+        <parser-ref name="ResponseParser"/>
+
+        <scenario name="Sample Win Cmd stream scenario">
+            <step name="Step Windows">
+                <schedule-simple interval="1" units="Seconds" repeatCount="2"/>
+
+                <!--Property "SynchronizeRequests" synchronizes requests from start to end of parsing; -->
+                <property name="SynchronizeRequests" value="true"/>
+                <request>ping 127.0.0.1 -n 6</request>
+                <request>ping 127.0.0.1 -n 3</request>
+            </step>
+            <step name="Step Windows2">
+                <schedule-simple interval="1" units="Seconds" repeatCount="2"/>
+                <property name="SynchronizeRequests" value="false"/>
+                <request>ping 127.0.0.1 -n 12</request>
+            </step>
+        </scenario>
+    </stream>
+</tnt-data-source>

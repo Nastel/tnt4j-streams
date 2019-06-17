@@ -18,6 +18,7 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Semaphore;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -342,10 +343,12 @@ public class RestStream extends AbstractWsStream<String> {
 			if (!scenarioStep.isEmpty()) {
 				String reqDataStr;
 				String respStr;
+				Semaphore aquiredSemaphore = null;
 				for (WsRequest<String> request : scenarioStep.getRequests()) {
 					reqDataStr = null;
 					respStr = null;
 					try {
+						aquiredSemaphore = acquireSemaphore(stream, request);
 						reqDataStr = stream.preProcess(request.getData());
 						request.setSentData(reqDataStr);
 						respStr = stream.executePOST(stream.client, scenarioStep.getUrlStr(), reqDataStr,
@@ -358,6 +361,8 @@ public class RestStream extends AbstractWsStream<String> {
 
 					if (StringUtils.isNotEmpty(respStr)) {
 						stream.addInputToBuffer(new WsReqResponse<>(respStr, request));
+					} else {
+						releaseSemaphore(aquiredSemaphore, stream, scenarioStep.getName(), request);
 					}
 				}
 			}
@@ -373,7 +378,7 @@ public class RestStream extends AbstractWsStream<String> {
 		 */
 		protected void runGET(WsScenarioStep scenarioStep, RestStream stream) {
 			if (scenarioStep.isEmpty()) {
-				scenarioStep.addRequest(scenarioStep.getUrlStr());
+				scenarioStep.addRequest(null, scenarioStep.getUrlStr());
 			}
 
 			String reqUrl;

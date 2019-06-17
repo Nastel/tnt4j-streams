@@ -162,29 +162,33 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 		}
 
 		while (true) {
-			// Buffer is empty and producer input is ended. No more items going to
-			// be available.
+			// Buffer is empty and producer input is ended. No more items going to be available.
 			if (inputBuffer.isEmpty() && isInputEnded()) {
 				return null;
 			}
 
-			T item = currentItem.get();
+			T item = getCurrentItem();
 			if (item == null || isItemConsumed(item)) {
-				Object qe = inputBuffer.take();
+				Object qe = getItemFromBuffer();
 
-				// Producer input was slower than consumer, but was able to put "DIE"
-				// marker object to queue. No more items going to be available.
+				// Producer input was slower than consumer, but was able to put "DIE" marker object
+				// to queue. No more items going to be available.
 				if (DIE_MARKER.equals(qe)) {
 					return null;
 				}
 
 				item = (T) qe;
-				currentItem.set(item);
+				setCurrentItem(item);
+
+				if (item == null) {
+					continue;
+				}
+
 				addStreamedBytesCount(getActivityItemByteSize(item));
 				boolean hasParsableData = initItemForParsing(item);
 
 				if (!hasParsableData) {
-					currentItem.set(null);
+					setCurrentItem(null);
 					continue;
 				}
 			}
@@ -216,6 +220,36 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 	 */
 	protected boolean initItemForParsing(T item) {
 		return true;
+	}
+
+	/**
+	 * Picks activity data item from buffer to be processed by parsers.
+	 * 
+	 * @return activity data item from buffer to be processed
+	 * @throws InterruptedException
+	 *             if interrupted while waiting for activity item data to get available in the buffer
+	 */
+	protected Object getItemFromBuffer() throws InterruptedException {
+		return inputBuffer.take();
+	}
+
+	/**
+	 * Return currently processed activity item data.
+	 * 
+	 * @return currently processed activity item data
+	 */
+	protected T getCurrentItem() {
+		return currentItem.get();
+	}
+
+	/**
+	 * Sets currently processed activity item data.
+	 * 
+	 * @param item
+	 *            activity item data to be currently processed
+	 */
+	protected void setCurrentItem(T item) {
+		currentItem.set(item);
 	}
 
 	/**

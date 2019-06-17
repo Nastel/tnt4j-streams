@@ -545,7 +545,7 @@
         <scenario name="Sample DB2-JDBC stream scenario" url="jdbc:db2://[HOST]:50000/SB2BIDB" username="[USER_NAME]" password="[USER_PASS]">
             <step name="B2Bi arrived files query">
                 <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="0" startDelayUnits="Seconds"/>
-                <request>
+                <request id="AFile_Data_Req">
                     <![CDATA[
                         SELECT RTRIM(FAF.ARRIVEDFILE_KEY) AS AFILE_KEY
                           , FAF.MESSAGE_ID AS AFILE_MESSAGE_ID
@@ -583,8 +583,9 @@
                 </request>
             </step>
             <step name="B2Bi events query">
-                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="10" startDelayUnits="Seconds"/>
-                <request>
+                <property name="SynchronizeRequests" value="true"/>
+                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="20" startDelayUnits="Seconds"/>
+                <request id="FG_Events_Data_Req">
                     <![CDATA[
                         SELECT FE.EVENT_KEY AS EVENT_EVENT_KEY
                           , FE.ENTITY_KEY AS EVENT_ENTITY_KEY
@@ -633,10 +634,7 @@
 
                     <parser-ref name="B2BiFGEventsResultSetParser"/>
                 </request>
-            </step>
-            <step name="B2Bi application name query">
-                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="20" startDelayUnits="Seconds"/>
-                <request>
+                <request id="FG_Events_Appl_Data_Req">
                     <![CDATA[
                         SELECT FE.EVENT_KEY AS EVENT_EVENT_KEY
                           , FE.ENTITY_KEY AS EVENT_ENTITY_KEY
@@ -691,9 +689,10 @@
                     <parser-ref name="B2BiFGEventsApplResultSetParser"/>
                 </request>
             </step>
-            <step name="B2Bi routes query">
+            <step name="B2Bi routes and deliveries query">
+                <property name="SynchronizeRequests" value="true"/>
                 <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="30" startDelayUnits="Seconds"/>
-                <request>
+                <request id="FG_Routes_Data_Req">
                     <![CDATA[
                         SELECT RTRIM(FR.ROUTE_KEY) AS ROUTE_KEY
                           , FR.DATA_FLOW_ID AS ROUTE_DATA_FLOW_ID
@@ -723,10 +722,7 @@
 
                     <parser-ref name="B2BiRoutesResultSetParser"/>
                 </request>
-            </step>
-            <step name="B2Bi deliveries query">
-                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="40" startDelayUnits="Seconds"/>
-                <request>
+                <request id="FG_Deliveries_Data_Req">
                     <![CDATA[
                         SELECT RTRIM(FD.DELIVERY_KEY) AS DELIVERY_KEY
                           , RTRIM(FD.ROUTE_KEY) AS DELIVERY_ROUTE_KEY
@@ -761,8 +757,8 @@
                 </request>
             </step>
             <step name="B2Bi correlation sets query">
-                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="45" startDelayUnits="Seconds"/>
-                <request>
+                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="35" startDelayUnits="Seconds"/>
+                <request id="Correl_Set_Data_Req">
                     <![CDATA[
                         SELECT CS.CORRELATION_ID AS CORRELATION_ID
                           , CS.NAME AS CORRELATION_NAME
@@ -791,8 +787,8 @@
                 </request>
             </step>
             <step name="B2Bi workflow context query">
-                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="45" startDelayUnits="Seconds"/>
-                <request>
+                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="35" startDelayUnits="Seconds"/>
+                <request id="Workflow_Data_Req">
                     <![CDATA[
                         SELECT WC.WFC_ID AS WORKFLOW_WFC_ID
                           , WC.WFD_ID AS WORKFLOW_WFD_ID

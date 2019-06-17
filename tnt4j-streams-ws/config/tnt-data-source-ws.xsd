@@ -254,6 +254,14 @@
                 </xs:annotation>
             </xs:element>
         </xs:sequence>
+
+        <xs:attribute name="id" use="optional" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    Request identifier.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
 
     <!-- Element <req-param> definition-->

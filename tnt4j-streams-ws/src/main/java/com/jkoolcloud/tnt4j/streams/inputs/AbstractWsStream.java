@@ -20,6 +20,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -31,6 +32,7 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.core.UsecTimestamp;
+import com.jkoolcloud.tnt4j.streams.configure.WsStreamProperties;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.scenario.*;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsCache;
@@ -45,8 +47,13 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  * This activity stream requires parsers that can support {@link String} data to parse
  * {@link com.jkoolcloud.tnt4j.streams.scenario.WsResponse#getData()} provided string.
  * <p>
- * This activity stream supports configuration properties from
- * {@link com.jkoolcloud.tnt4j.streams.inputs.AbstractBufferedStream} (and higher hierarchy streams).
+ * This activity stream supports the following configuration properties (in addition to those supported by
+ * {@link com.jkoolcloud.tnt4j.streams.inputs.AbstractBufferedStream}):
+ * <ul>
+ * <li>SynchronizeRequests - flag indicating that stream issued WebService requests shall be synchronized and handled in
+ * configuration defined sequence - waiting for prior request to complete before issuing next. Default value -
+ * {@code false}. (Optional)</li>
+ * </ul>
  *
  * @param <T>
  *            type of handled response data
@@ -65,29 +72,55 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	 * Constant for name of built-in scheduler job property {@value}.
 	 */
 	protected static final String JOB_PROP_SCENARIO_STEP_KEY = "scenarioStepObj"; // NON-NLS
+	/**
+	 * Constant for name of built-in scheduler job property {@value}.
+	 */
+	protected static final String JOB_PROP_SEMAPHORE = "semaphoreObj"; // NON-NLS
+
+	/**
+	 * Semaphore for synchronizing stream requests.
+	 */
+	private Semaphore semaphore;
+	private boolean itemPicked = false;
 
 	private List<WsScenario> scenarioList;
 
 	private static Scheduler scheduler;
 	private static final ReentrantLock schedInitLock = new ReentrantLock();
+	private boolean synchronizeRequests = false;
 
-	// @Override
-	// public void setProperties(Collection<Map.Entry<String, String>> props) {
-	// super.setProperties(props);
-	//
-	// if (CollectionUtils.isNotEmpty(props)) {
-	// for (Map.Entry<String, String> prop : props) {
-	// String name = prop.getKey();
-	// String value = prop.getValue();
-	//
-	// }
-	// }
-	// }
-	//
-	// @Override
-	// public Object getProperty(String name) {
-	// return super.getProperty(name);
-	// }
+	@Override
+	public void setProperties(Collection<Map.Entry<String, String>> props) {
+		super.setProperties(props);
+
+		if (CollectionUtils.isNotEmpty(props)) {
+			for (Map.Entry<String, String> prop : props) {
+				String name = prop.getKey();
+				String value = prop.getValue();
+				if (WsStreamProperties.PROP_SYNCHRONIZE_REQUESTS.equalsIgnoreCase(name)) {
+					synchronizeRequests = Utils.toBoolean(value);
+				}
+			}
+		}
+	}
+
+	@Override
+	protected void applyProperties() throws Exception {
+		super.applyProperties();
+
+		if (synchronizeRequests) {
+			semaphore = new Semaphore(1);
+		}
+	}
+
+	@Override
+	public Object getProperty(String name) {
+		if (WsStreamProperties.PROP_SYNCHRONIZE_REQUESTS.equalsIgnoreCase(name)) {
+			return synchronizeRequests;
+		}
+
+		return super.getProperty(name);
+	}
 
 	@Override
 	protected void initialize() throws Exception {
@@ -161,6 +194,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 		JobDataMap jobAttrs = new JobDataMap();
 		jobAttrs.put(JOB_PROP_STREAM_KEY, this);
 		jobAttrs.put(JOB_PROP_SCENARIO_STEP_KEY, step);
+		jobAttrs.put(JOB_PROP_SEMAPHORE, semaphore);
 
 		String jobId = step.getScenario().getName() + ':' + step.getName();
 
@@ -330,6 +364,57 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	}
 
 	/**
+	 * Marks stream state for picked item from buffer and performs post parsing actions for provided activity data item.
+	 * 
+	 * @param item
+	 *            processed activity data item
+	 *
+	 * @see #postParse(com.jkoolcloud.tnt4j.streams.scenario.WsResponse)
+	 */
+	protected void pickAndPostParseItem(WsResponse<T> item) {
+		if (itemPicked) {
+			postParse(item);
+		} else {
+			itemPicked = true;
+		}
+	}
+
+	@Override
+	protected void setCurrentItem(WsResponse<T> item) {
+		pickAndPostParseItem(getCurrentItem());
+
+		super.setCurrentItem(item);
+	}
+
+	/**
+	 * Performs post parsing actions for provided activity data item.
+	 * <p>
+	 * Generic post parsing case is to release all acquired requests synchronization semaphores.
+	 * 
+	 * @param item
+	 *            processed activity data item
+	 */
+	protected void postParse(WsResponse<T> item) {
+		if (item instanceof WsReqResponse) {
+			WsReqResponse<?, ?> resp = (WsReqResponse<?, ?>) item;
+
+			if (semaphore != null) {
+				releaseSemaphore(semaphore, this, getName(), resp.getOriginalRequest());
+			}
+
+			Semaphore reqSemaphore = resp.getSemaphore();
+
+			if (reqSemaphore != null) {
+				releaseSemaphore(reqSemaphore, this, resp.getScenarioStep().getName(), resp.getOriginalRequest());
+			}
+		} else {
+			if (semaphore != null) {
+				releaseSemaphore(semaphore, this, getName(), null);
+			}
+		}
+	}
+
+	/**
 	 * Performs pre-processing of request/command/query body data: it can be expressions evaluation, filling in variable
 	 * values and so on.
 	 *
@@ -480,5 +565,70 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 		}
 
 		return Utils.toString(cValue);
+	}
+
+	/**
+	 * Acquires semaphore to be used for requests synchronization. Semaphore can be bound to stream or scenario step.
+	 * Stream semaphore has preference against scenario step semaphore.
+	 * <p>
+	 * To synchronize stream or scenario step requests use flag ({@code true}/{@code false}) type stream/scenario step
+	 * configuration property
+	 * {@value com.jkoolcloud.tnt4j.streams.configure.WsStreamProperties#PROP_SYNCHRONIZE_REQUESTS}.
+	 * 
+	 * @param stream
+	 *            stream instance used
+	 * @param request
+	 *            request semaphore is obtained for
+	 * @return acquired semaphore instance or {@code null} if no semaphore was acquired
+	 * @throws InterruptedException
+	 *             if current thread got interrupted when acquiring semaphore
+	 */
+	protected static Semaphore acquireSemaphore(AbstractWsStream<?> stream, WsRequest<?> request)
+			throws InterruptedException {
+		WsScenarioStep scenarioStep = request.getScenarioStep();
+		Semaphore stepSemaphore = scenarioStep.getSemaphore();
+
+		if (stream.semaphore != null) {
+			while (!stream.semaphore.tryAcquire()) {
+				Thread.sleep(50);
+			}
+			stream.logger().log(OpLevel.DEBUG, StreamsResources.getString(WsStreamConstants.RESOURCE_BUNDLE_NAME,
+					"AbstractWsStream.semaphore.acquired.stream"), stream.getName(), request.getId());
+			return stream.semaphore;
+		}
+
+		if (stepSemaphore != null) {
+			while (!stepSemaphore.tryAcquire()) {
+				Thread.sleep(50);
+			}
+			stream.logger().log(OpLevel.DEBUG, StreamsResources.getString(WsStreamConstants.RESOURCE_BUNDLE_NAME,
+					"AbstractWsStream.semaphore.acquired.step"), scenarioStep.getName(), request.getId());
+			return stepSemaphore;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Releases provided semaphore to continue next request execution.
+	 * 
+	 * @param acquiredSemaphore
+	 *            requests semaphore to release
+	 * @param stream
+	 *            stream instance used
+	 * @param lockName
+	 *            locker object name
+	 * @param request
+	 *            request semaphore was obtained for
+	 */
+	protected static void releaseSemaphore(Semaphore acquiredSemaphore, AbstractWsStream<?> stream, String lockName,
+			WsRequest<?> request) {
+		if (acquiredSemaphore != null && acquiredSemaphore.availablePermits() < 1) {
+			stream.logger().log(OpLevel.DEBUG,
+					StreamsResources.getString(WsStreamConstants.RESOURCE_BUNDLE_NAME,
+							"AbstractWsStream.semaphore.release"),
+					lockName, request == null ? "UNKNOWN" : request.getId()); // NON-NLS
+			acquiredSemaphore.release();
+		}
 	}
 }

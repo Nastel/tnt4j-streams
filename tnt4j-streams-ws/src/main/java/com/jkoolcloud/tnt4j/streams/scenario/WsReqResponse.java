@@ -16,6 +16,8 @@
 
 package com.jkoolcloud.tnt4j.streams.scenario;
 
+import java.util.concurrent.Semaphore;
+
 /**
  * This class defines TNT4J-Streams-WS response data container having original request bound.
  *
@@ -31,7 +33,7 @@ public class WsReqResponse<O, T> extends WsResponse<T> {
 
 	/**
 	 * Constructs a new WsReqResponse. Defines response and original request data.
-	 *
+	 * 
 	 * @param responseData
 	 *            response data package
 	 * @param request
@@ -49,5 +51,26 @@ public class WsReqResponse<O, T> extends WsResponse<T> {
 	 */
 	public WsRequest<O> getOriginalRequest() {
 		return originalRequest;
+	}
+
+	/**
+	 * Returns scenario step bound to this request over original request.
+	 * 
+	 * @return scenario step bound to this request
+	 */
+	@Override
+	public WsScenarioStep getScenarioStep() {
+		return originalRequest.getScenarioStep();
+	}
+
+	/**
+	 * Returns semaphore instance for this response from bound scenario step.
+	 * 
+	 * @return semaphore instance for this response from bound scenario step
+	 */
+	public Semaphore getSemaphore() {
+		WsScenarioStep step = getScenarioStep();
+
+		return step == null ? null : step.getSemaphore();
 	}
 }

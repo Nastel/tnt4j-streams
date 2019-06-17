@@ -272,10 +272,20 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 
 		currRequest = new RequestData();
 
-		// for (int i = 0; i < attrs.getLength(); i++) {
-		// String attName = attrs.getQName(i);
-		// String attValue = attrs.getValue(i);
-		// }
+		String id = null;
+		for (int i = 0; i < attrs.getLength(); i++) {
+			String attName = attrs.getQName(i);
+			String attValue = attrs.getValue(i);
+			if (ID_ATTR.equals(attName)) {
+				id = attValue;
+			} else {
+				unknownAttribute(REQ_PARAM_ELMT, attName);
+			}
+		}
+
+		// notEmpty(id, REQ_ELMT, ID_ATTR);
+
+		currRequest.setId(id);
 
 		elementData = new StringBuilder();
 	}
@@ -365,7 +375,7 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 				currStep = null;
 			} else if (REQ_ELMT.equals(qName)) {
 				if (elementData != null) {
-					WsRequest<?> currReq = currStep.addRequest(getElementData(), currRequest.getTags());
+					WsRequest<?> currReq = currStep.addRequest(currRequest.id, getElementData(), currRequest.getTags());
 					elementData = null;
 
 					for (WsRequest.Parameter param : currRequest.params) {
@@ -398,8 +408,13 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 	}
 
 	private static class RequestData {
+		private String id;
 		private List<WsRequest.Parameter> params = new ArrayList<>();
 		private List<ParserRefData> parserRefs = new ArrayList<>();
+
+		void setId(String id) {
+			this.id = id;
+		}
 
 		void addParameter(String id, String value, String type, String format) {
 			params.add(new WsRequest.Parameter(id, value, type, format));

@@ -17,8 +17,13 @@
 package com.jkoolcloud.tnt4j.streams.scenario;
 
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import com.jkoolcloud.tnt4j.streams.configure.WsStreamProperties;
+import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
  * This class defines TNT4J-Streams-WS configuration scenario step.
@@ -32,6 +37,8 @@ public class WsScenarioStep extends WsScenarioEntity {
 	private SchedulerData schedulerData;
 
 	private WsScenario scenario;
+
+	private Semaphore semaphore = null;
 
 	/**
 	 * Constructs a new WsScenarioStep. Defines scenario step name.
@@ -55,31 +62,37 @@ public class WsScenarioStep extends WsScenarioEntity {
 	/**
 	 * Adds request/command data for this step. Request tag is set to {@code null}.
 	 *
+	 * @param id
+	 *            request identifier
 	 * @param request
 	 *            request data
 	 * @return constructed request instance
 	 *
-	 * @see #addRequest(String, String...)
+	 * @see #addRequest(String, String, String...)
 	 */
-	public WsRequest<String> addRequest(String request) {
-		return addRequest(request, null);
+	public WsRequest<String> addRequest(String id, String request) {
+		return addRequest(id, request, null);
 	}
 
 	/**
 	 * Adds request/command data and tag for this step.
 	 *
+	 * @param id
+	 *            request identifier
 	 * @param request
 	 *            request data
 	 * @param tags
 	 *            request tags
 	 * @return constructed request instance
 	 */
-	public WsRequest<String> addRequest(String request, String... tags) {
+	public WsRequest<String> addRequest(String id, String request, String... tags) {
 		if (requests == null) {
 			requests = new ArrayList<>();
 		}
 
 		WsRequest<String> req = new WsRequest<>(request, tags);
+		req.setId(StringUtils.isEmpty(id) ? String.valueOf(requests.size()) : id);
+		req.setScenarioStep(this);
 		requests.add(req);
 
 		return req;
@@ -158,6 +171,13 @@ public class WsScenarioStep extends WsScenarioEntity {
 		}
 
 		properties.put(name, value);
+
+		if (WsStreamProperties.PROP_SYNCHRONIZE_REQUESTS.equalsIgnoreCase(name)) {
+			boolean sync = Utils.toBoolean(value);
+			if (sync) {
+				this.semaphore = new Semaphore(1);
+			}
+		}
 	}
 
 	/**
@@ -167,14 +187,20 @@ public class WsScenarioStep extends WsScenarioEntity {
 	 *            collection of properties to set for this step
 	 */
 	public void setProperties(Collection<Map.Entry<String, String>> props) {
-		if (properties == null) {
-			properties = new HashMap<>();
-		}
-
 		if (CollectionUtils.isNotEmpty(props)) {
 			for (Map.Entry<String, String> prop : props) {
-				properties.put(prop.getKey(), prop.getValue());
+				setProperty(prop.getKey(), prop.getValue());
 			}
 		}
+	}
+
+	/**
+	 * Returns requests synchronization semaphore instance for this step.
+	 * 
+	 * @return step requests synchronization semaphore instance, or {@code null} is step requests does not require
+	 *         synchronization
+	 */
+	public Semaphore getSemaphore() {
+		return semaphore;
 	}
 }

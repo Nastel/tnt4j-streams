@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Queue;
+import java.util.concurrent.Semaphore;
 
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
@@ -475,11 +476,12 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 				String dbQuery;
 				ResultSet respRs;
 				int stepIdx = 0;
+				Semaphore acquiredSemaphore = null;
 				for (WsRequest<String> request : scenarioStep.getRequests()) {
 					dbQuery = null;
 					respRs = null;
-
 					try {
+						acquiredSemaphore = acquireSemaphore(stream, request);
 						dbQuery = stream.fillInRequestData(request.getData());
 						request.setSentData(dbQuery);
 						respRs = executeJdbcCall(scenarioStep.getUrlStr(), scenarioStep.getUsername(),
@@ -494,6 +496,8 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 							resp.addParameter(new WsRequest.Parameter(QUERY_NAME_PROP,
 									(stepIdx++) + ":" + scenarioStep.getName())); // NON-NLS
 							stream.addInputToBuffer(resp);
+						} else {
+							releaseSemaphore(acquiredSemaphore, stream, scenarioStep.getName(), request);
 						}
 					}
 				}
