@@ -18,14 +18,15 @@
         <field name="TransValue">  <!-- offsets 70-89 inclusive, field length=15, ck line length > starting offset, expected value: AMT_TEST3B_USD123.45   ok -->
             <field-locator locator="70:90" locator-type="Range"/>
         </field>
-        <field name="UserData">  <!-- offsets 123-145 inclusive, length=23, ck line length > starting offset, expected value: TEST3B_Model iSeries123   ok -->
-            <field-locator locator="123:146" locator-type="Range"/>
+        <field name="UserData">  <!-- offsets 121-143 inclusive, length=23, ck line length > starting offset, expected value: TEST3B_Model iSeries123   ok -->
+            <field-locator locator="121:144" locator-type="Range"/>
         </field>
     </parser>
 
-    <stream name="FileStream" class="com.jkoolcloud.tnt4j.streams.inputs.CharacterStream">
+    <stream name="FileStream" class="com.jkoolcloud.tnt4j.streams.inputs.FileLineStream">
         <property name="HaltIfNoParser" value="false"/>
         <property name="FileName" value="./tnt4j-streams-core/samples/string-ranges/strings.txt"/>
+        <property name="ActivityDelim" value="----"/>
 
         <parser-ref name="StrRangesParser"/>
     </stream>
