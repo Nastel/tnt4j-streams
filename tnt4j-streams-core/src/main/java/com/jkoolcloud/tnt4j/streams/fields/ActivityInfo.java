@@ -51,6 +51,8 @@ import com.jkoolcloud.tnt4j.uuid.DefaultUUIDFactory;
 public class ActivityInfo {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(ActivityInfo.class);
 
+	private static final TimeTracker ACTIVITY_TIME_TRACKER = TimeTracker.newTracker(1000, TimeUnit.HOURS.toMillis(8));
+
 	private static final Pattern CHILD_FIELD_PATTERN = Pattern.compile("child\\[(?<child>\\S+)\\]\\.(?<field>\\S+)"); // NON-NLS
 
 	private static final Map<String, String> HOST_CACHE = new ConcurrentHashMap<>();
@@ -96,8 +98,6 @@ public class ActivityInfo {
 
 	private boolean filteredOut = false;
 	private boolean complete = false;
-
-	private static final TimeTracker ACTIVITY_TIME_TRACKER = TimeTracker.newTracker(1000, TimeUnit.HOURS.toMillis(8));
 
 	private Map<String, Property> activityProperties;
 	private Map<String, List<ActivityInfo>> children;
@@ -726,7 +726,11 @@ public class ActivityInfo {
 	 */
 	public String determineTrackingId() {
 		if (StringUtils.isEmpty(trackingId)) {
-			trackingId = DefaultUUIDFactory.getInstance().newUUID();
+			if (StringUtils.isNotEmpty(guid)) {
+				trackingId = guid;
+			} else {
+				trackingId = DefaultUUIDFactory.getInstance().newUUID();
+			}
 		}
 		return trackingId;
 	}
@@ -778,8 +782,8 @@ public class ActivityInfo {
 		event.setParentId(parentId);
 		if (StringUtils.isNotEmpty(guid)) {
 			event.setGUID(guid);
+			event.setCorrelator(guid);
 		}
-		// event.setCorrelator(CollectionUtils.isEmpty(correlator) ? Collections.singletonList(trackId) : correlator);
 		if (CollectionUtils.isNotEmpty(correlator)) {
 			event.setCorrelator(correlator);
 		}
@@ -881,9 +885,8 @@ public class ActivityInfo {
 		activity.setParentId(parentId);
 		if (StringUtils.isNotEmpty(guid)) {
 			activity.setGUID(guid);
+			activity.setCorrelator(guid);
 		}
-		// activity.setCorrelator(CollectionUtils.isEmpty(correlator) ? Collections.singletonList(trackId) :
-		// correlator);
 		if (CollectionUtils.isNotEmpty(correlator)) {
 			activity.setCorrelator(correlator);
 		}
@@ -1101,10 +1104,9 @@ public class ActivityInfo {
 		snapshot.setParentId(parentId);
 		if (StringUtils.isNotEmpty(guid)) {
 			snapshot.setGUID(guid);
+			snapshot.setCorrelator(guid);
 		}
 		snapshot.setSeverity(severity == null ? OpLevel.INFO : severity);
-		// snapshot.setCorrelator(CollectionUtils.isEmpty(correlator) ? Collections.singletonList(trackId) :
-		// correlator);
 		if (CollectionUtils.isNotEmpty(correlator)) {
 			snapshot.setCorrelator(correlator);
 		}

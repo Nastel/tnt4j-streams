@@ -35,17 +35,17 @@
             <field-locator id="Filename" locator="AFILE_FILE_NAME" locator-type="Label" required="false"/>
         </field>
         <field name="ResourceName" locator="ResourceNameTemp" locator-type="Activity" formattingPattern="FILE={0}"/>
-        <field name="Correlator" separator=".">
-            <field-locator id="DocumentId" locator="AFILE_DOCUMENT_ID" locator-type="Label" required="false"/>
-        </field>
         <field name="Correlator" separator="/">
             <field-locator id="MailBox" locator="AFILE_MAILBOX_PATH" locator-type="Label" required="false"/>
             <field-locator id="FileName" locator="AFILE_FILE_NAME" locator-type="Label" required="false"/>
         </field>
-        <field name="Correlator" formattingPattern="AFile_{0}">
-            <field-locator id="AFileKey" locator="AFILE_KEY" locator-type="Label"/>
-        </field>
+        <!--<field name="Correlator" formattingPattern="AFile_{0}">-->
+        <!--<field-locator id="AFileKey" locator="AFILE_KEY" locator-type="Label"/>-->
+        <!--</field>-->
         <field name="Correlator" formattingPattern="CorrelatorsSet_{0}">
+            <field-locator id="DocumentId" locator="AFILE_DOCUMENT_ID" locator-type="Label"/>
+        </field>
+        <field name="Correlator" formattingPattern="Document_{0}">
             <field-locator id="DocumentId" locator="AFILE_DOCUMENT_ID" locator-type="Label"/>
         </field>
 
@@ -168,9 +168,9 @@
             <field-locator id="DataFlowId" locator="DataFlowId" locator-type="Activity"/>
         </field>
 
-        <field name="Correlator" formattingPattern="FGEvent_{0}">
-            <field-locator id="EventKey" locator="EVENT_EVENT_KEY" locator-type="Label"/>
-        </field>
+        <!--<field name="Correlator" formattingPattern="FGEvent_{0}">-->
+        <!--<field-locator id="EventKey" locator="EVENT_EVENT_KEY" locator-type="Label"/>-->
+        <!--</field>-->
         <field name="Correlator" formattingPattern="Workflow_Context_{0}">
             <field-locator id="WorkflowId" locator="FG_E_Attr_WorkflowId" locator-type="Activity"/>
         </field>
@@ -268,9 +268,9 @@
             <field-locator id="DataFlowId" locator="DataFlowId" locator-type="Activity"/>
         </field>
 
-        <field name="Correlator" formattingPattern="FGEvent_{0}">
-            <field-locator id="EventKey" locator="EVENT_EVENT_KEY" locator-type="Label"/>
-        </field>
+        <!--<field name="Correlator" formattingPattern="FGEvent_{0}">-->
+        <!--<field-locator id="EventKey" locator="EVENT_EVENT_KEY" locator-type="Label"/>-->
+        <!--</field>-->
         <field name="Correlator" formattingPattern="Workflow_Context_{0}">
             <field-locator id="WorkflowId" locator="FG_E_Attr_WorkflowId" locator-type="Activity"/>
         </field>
@@ -296,9 +296,9 @@
         <field name="Correlator" formattingPattern="AFile_{0}">
             <field-locator id="AFileKey" locator="ROUTE_AFILE_KEY" locator-type="Label"/>
         </field>
-        <field name="Correlator" formattingPattern="Route_{0}">
-            <field-locator id="RouteKey" locator="ROUTE_KEY" locator-type="Label"/>
-        </field>
+        <!--<field name="TrackingId" formattingPattern="Route_{0}">-->
+        <!--<field-locator id="RouteKey" locator="ROUTE_KEY" locator-type="Label"/>-->
+        <!--</field>-->
         <field name="EventName" separator=".">
             <field-locator id="DataFlowId" locator="ROUTE_DATA_FLOW_ID" locator-type="Label"/>
             <field-locator id="ConsOrgKey" locator="ROUTE_CONS_ORG_KEY" locator-type="Label"/>
@@ -342,11 +342,14 @@
             <field-locator id="DeliveryKey" locator="DELIVERY_KEY" locator-type="Label"/>
         </field>
         <field name="EventType" value="EVENT"/>
-        <field name="Correlator" formattingPattern="Delivery_{0}">
-            <field-locator id="DeliveryKey" locator="DELIVERY_KEY" locator-type="Label"/>
-        </field>
+        <!--<field name="TrackingId" formattingPattern="Delivery_{0}">-->
+        <!--<field-locator id="DeliveryKey" locator="DELIVERY_KEY" locator-type="Label"/>-->
+        <!--</field>-->
         <field name="Correlator" formattingPattern="Route_{0}">
             <field-locator id="RouteKey" locator="DELIVERY_ROUTE_KEY" locator-type="Label"/>
+        </field>
+        <field name="Correlator" formattingPattern="Document_{0}">
+            <field-locator id="WorkflowId" locator="DELIVERY_CONSUMER_DOCID" locator-type="Label"/>
         </field>
         <field name="EventName" separator=".">
             <field-locator id="DataFlowId" locator="DELIVERY_DATA_FLOW_ID" locator-type="Label"/>
@@ -390,9 +393,9 @@
             <field-locator id="CorrelId" locator="CORRELATION_ID" locator-type="Label"/>
         </field>
         <field name="EventType" value="EVENT"/>
-        <field name="Correlator" formattingPattern="Correlation_{0}">
-            <field-locator id="CorrelId" locator="CORRELATION_ID" locator-type="Label"/>
-        </field>
+        <!--<field name="TrackingId" formattingPattern="Correlation_{0}">-->
+        <!--<field-locator id="CorrelId" locator="CORRELATION_ID" locator-type="Label"/>-->
+        <!--</field>-->
         <field name="Correlator" formattingPattern="CorrelatorsSet_{0}">
             <field-locator id="ObjectId" locator="CORRELATION_OBJECT_ID" locator-type="Label"/>
         </field>
@@ -435,11 +438,14 @@
             <field-locator id="WorkflowWFCId" locator="WORKFLOW_WFC_ID" locator-type="Label"/>
         </field>
         <field name="EventType" value="EVENT"/>
-        <field name="Correlator" formattingPattern="Workflow_{0}">
-            <field-locator id="WorkflowWFCId" locator="WORKFLOW_WFC_ID" locator-type="Label"/>
-        </field>
+        <!--<field name="TrackingId" formattingPattern="Workflow_{0}">-->
+        <!--<field-locator id="WorkflowWFCId" locator="WORKFLOW_WFC_ID" locator-type="Label"/>-->
+        <!--</field>-->
         <field name="Correlator" formattingPattern="Workflow_Context_{0}">
             <field-locator id="WorkflowId" locator="WORKFLOW_ID" locator-type="Label"/>
+        </field>
+        <field name="Correlator" formattingPattern="Document_{0}">
+            <field-locator id="WorkflowId" locator="WORKFLOW_DOC_ID" locator-type="Label"/>
         </field>
         <field name="EventName" separator=":">
             <field-locator id="ServiceName" locator="WORKFLOW_SERVICE_NAME" locator-type="Label"/>
@@ -480,6 +486,57 @@
 
         <!-- Store latest value to cache -->
         <field name="WC_StartTime" locator="WORKFLOW_START_TIME" locator-type="Label" transparent="true"/>
+
+        <!-- TODO: filtering if needed -->
+    </parser>
+    <parser name="B2BiDocumentsResultSetParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJDBCResultSetParser">
+        <field name="Guid" formattingPattern="Document_{0}">
+            <field-locator id="WorkflowWFCId" locator="DOCUMENT_ID" locator-type="Label"/>
+        </field>
+        <field name="EventType" value="EVENT"/>
+        <!--<field name="TrackingId" formattingPattern="Document_{0}">-->
+        <!--<field-locator id="DocumentId" locator="DOCUMENT_ID" locator-type="Label"/>-->
+        <!--</field>-->
+        <field name="Correlator" formattingPattern="File_{0}_{1}">
+            <field-locator id="DocumentName" locator="DOCUMENT_DOC_NAME" locator-type="Label"/>
+            <field-locator id="DocumentSize" locator="DOCUMENT_DOCUMENT_SIZE" locator-type="Label" datatype="Number" format="long"/>
+        </field>
+        <field name="Correlator" formattingPattern="CorrelatorsSet_{0}">
+            <field-locator id="DocumentId" locator="DOCUMENT_ID" locator-type="Label"/>
+        </field>
+        <field name="EventName" separator=":">
+            <field-locator id="DocumentName" locator="DOCUMENT_DOC_NAME" locator-type="Label"/>
+            <field-locator id="DataFlowId" locator="DATA_FLOW_DATA_FLOW_ID" locator-type="Label"/>
+        </field>
+        <field name="StartTime" locator="DOCUMENT_CREATE_TIME" locator-type="Label"/>
+        <field name="EndTime" locator="DOCUMENT_MODIFYTS" locator-type="Label"/>
+
+        <field name="DocumentId" locator="DOCUMENT_ID" locator-type="Label"/>
+        <field name="Subject" locator="DOCUMENT_SUBJECT" locator-type="Label"/>
+        <field name="ContentType" locator="DOCUMENT_CONT_TYPE" locator-type="Label"/>
+        <field name="ContentSubtype" locator="DOCUMENT_CONT_SUBTYPE" locator-type="Label"/>
+        <field name="PrevDocId" locator="DOCUMENT_PREV_DOC_ID" locator-type="Label"/>
+        <!--<field name="BodyName" locator="DOCUMENT_BODY_NAME" locator-type="Label"/>-->
+        <!--<field name="Body" locator="DOCUMENT_BODY" locator-type="Label"/>-->
+        <field name="CharEncoding" locator="DOCUMENT_CHAR_ENCODING" locator-type="Label"/>
+        <field name="DocumentName" locator="DOCUMENT_DOC_NAME" locator-type="Label"/>
+        <field name="WFId" locator="DOCUMENT_WORKFLOW_ID" locator-type="Label" datatype="Number" format="int"/>
+        <field name="PurgeAfter" locator="DOCUMENT_PURGE_AFTER" locator-type="Label" datatype="Timestamp"/>
+        <field name="ArchiveFlag" locator="DOCUMENT_ARCHIVE_FLAG" locator-type="Label" datatype="Number" format="int"/>
+        <field name="ArchiveDate" locator="DOCUMENT_ARCHIVE_DATE" locator-type="Label" datatype="Timestamp"/>
+        <field name="DocumentSize" locator="DOCUMENT_DOCUMENT_SIZE" locator-type="Label" datatype="Number" format="long"/>
+        <field name="StorageType" locator="DOCUMENT_STORAGE_TYPE" locator-type="Label" datatype="Number" format="int"/>
+        <field name="EncodingAlg" locator="DOCUMENT_ENC_ALG" locator-type="Label"/>
+        <field name="EncodingIv" locator="DOCUMENT_ENC_IV" locator-type="Label"/>
+        <field name="EncodingKey" locator="DOCUMENT_ENC_KEY" locator-type="Label"/>
+        <field name="DataFlowId" locator="DATA_FLOW_DATA_FLOW_ID" locator-type="Label" datatype="Number" format="int"/>
+        <field name="DataFlowState" locator="DATA_FLOW_STATE" locator-type="Label"/>
+        <field name="DataFlowCreateTime" locator="DATA_FLOW_CREATE_TIME" locator-type="Label" datatype="Timestamp"/>
+        <field name="DataFlowDocName" locator="DATA_FLOW_ROOT_DOC_NAME" locator-type="Label"/>
+        <field name="DataFlowDocSize" locator="DATA_FLOW_ROOT_DOC_SIZE" locator-type="Label" datatype="Number" format="int"/>
+
+        <!-- Store latest value to cache -->
+        <field name="Doc_ModifyTs" locator="DOCUMENT_MODIFYTS" locator-type="Label" transparent="true"/>
 
         <!-- TODO: filtering if needed -->
     </parser>
@@ -525,6 +582,11 @@
         <entry id="LastWorkflowContextRecordMDate">
             <key>LastWorkflowContextRecordMDate</key>
             <value>${WC_StartTime}</value>
+            <default>1970-01-01 00:00:00.000</default>
+        </entry>
+        <entry id="LastDocumentsRecordMDate">
+            <key>LastDocumentsRecordMDate</key>
+            <value>${Doc_ModifyTs}</value>
             <default>1970-01-01 00:00:00.000</default>
         </entry>
         <entry id="CachedApplName">
@@ -837,6 +899,48 @@
                     <req-param value="${LastWorkflowContextRecordMDate}" type="TIMESTAMP"/>
 
                     <parser-ref name="B2BiWorkflowContextResultSetParser"/>
+                </request>
+            </step>
+            <step name="B2Bi documents query">
+                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="35" startDelayUnits="Seconds"/>
+                <request id="Documents_Req">
+                    <![CDATA[
+                      SELECT D.DOC_ID AS DOCUMENT_ID
+                           , D.SUBJECT AS DOCUMENT_SUBJECT
+                           , D.CONTENT_TYPE AS DOCUMENT_CONT_TYPE
+                           , D.CONTENT_SUBTYPE AS DOCUMENT_CONT_SUBTYPE
+                           , D.CREATE_TIME AS DOCUMENT_CREATE_TIME
+                           , D.PREV_DOC_ID AS DOCUMENT_PREV_DOC_ID
+                           , D.BODY_NAME AS DOCUMENT_BODY_NAME
+                           , D.BODY AS DOCUMENT_BODY
+                           , D.CHAR_ENCODING AS DOCUMENT_CHAR_ENCODING
+                           , D.DOC_NAME AS DOCUMENT_DOC_NAME
+                           , D.WORKFLOW_ID AS DOCUMENT_WORKFLOW_ID
+                           , D.PURGE_AFTER AS DOCUMENT_PURGE_AFTER
+                           , D.ARCHIVE_FLAG AS DOCUMENT_ARCHIVE_FLAG
+                           , D.ARCHIVE_DATE AS DOCUMENT_ARCHIVE_DATE
+                           , D.DOCUMENT_SIZE AS DOCUMENT_DOCUMENT_SIZE
+                           , D.STORAGE_TYPE AS DOCUMENT_STORAGE_TYPE
+                           , D.ENC_ALG AS DOCUMENT_ENC_ALG
+                           , D.ENC_IV AS DOCUMENT_ENC_IV
+                           , D.ENC_KEY AS DOCUMENT_ENC_KEY
+                           , D.MODIFYTS AS DOCUMENT_MODIFYTS
+                           , DF.DATA_FLOW_ID AS DATA_FLOW_DATA_FLOW_ID
+                           , DF.CREATE_TIME AS DATA_FLOW_CREATE_TIME
+                           , DF.STATE AS DATA_FLOW_STATE
+                           , DF.ROOT_DOCUMENT AS DATA_FLOW_ROOT_DOCUMENT
+                           , DF.DOC_TRAK_ID AS DATA_FLOW_DOC_TRAK_ID
+                           , DF.ROOT_DOC_NAME AS DATA_FLOW_ROOT_DOC_NAME
+                           , DF.ROOT_DOC_SIZE AS DATA_FLOW_ROOT_DOC_SIZE
+                      FROM DOCUMENT D
+                       INNER JOIN DATA_FLOW DF ON (D.DOC_ID = DF.ROOT_DOCUMENT)
+                      WHERE D.MODIFYTS > ?
+                       ORDER BY D.CREATE_TIME, D.DOC_ID ASC
+                    ]]>
+                    <!-- parameter index is incremented automatically -->
+                    <req-param value="${LastDocumentsRecordMDate}" type="TIMESTAMP"/>
+
+                    <parser-ref name="B2BiDocumentsResultSetParser"/>
                 </request>
             </step>
         </scenario>
