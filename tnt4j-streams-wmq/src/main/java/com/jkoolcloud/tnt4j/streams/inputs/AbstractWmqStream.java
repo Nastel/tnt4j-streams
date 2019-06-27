@@ -207,7 +207,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 							}
 
 							if (cVal == null) {
-								cVal = String.valueOf(cVal);
+								cVal = String.valueOf(value);
 							}
 						}
 
