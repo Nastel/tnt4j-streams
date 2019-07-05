@@ -20,7 +20,7 @@ rem ### When x64 preferred to use ###
 rem set OS_ARC=win64
 set /p NAME=Enter your service name ([TNT4JSteams]): 
 IF ["%NAME%"] EQU [""] set NAME=TNT4JSteams
-set DESCRIPTION=TNT4J-streams data stream service
+set DESCRIPTION=TNT4J-Streams data stream service
 set RUNDIR=%~dp0
 set FILE_PATH=%RUNDIR%..\..
 set LOG_PATH=%FILE_PATH%\logs

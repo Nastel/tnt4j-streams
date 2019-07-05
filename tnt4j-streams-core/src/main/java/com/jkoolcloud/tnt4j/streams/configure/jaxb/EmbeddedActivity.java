@@ -37,12 +37,12 @@ import javax.xml.bind.annotation.*;
  * &lt;complexType name="EmbeddedActivity">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
+ *       &lt;choice maxOccurs="unbounded">
  *         &lt;element name="field-locator" type="{}FieldLocator" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element name="field-transform" type="{}FieldTransform" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element name="parser-ref" type="{}FieldParserReference" maxOccurs="unbounded"/>
  *         &lt;element name="filter" type="{}Filter" minOccurs="0"/>
- *       &lt;/sequence>
+ *       &lt;/choice>
  *       &lt;attGroup ref="{}EmbeddedActivityLocatorAttributes"/>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>

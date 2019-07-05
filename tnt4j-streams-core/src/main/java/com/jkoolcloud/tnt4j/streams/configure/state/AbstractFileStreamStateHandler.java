@@ -464,6 +464,7 @@ public abstract class AbstractFileStreamStateHandler<T> {
 
 		JAXBContext jaxb = JAXBContext.newInstance(FileAccessState.class);
 		Marshaller marshaller = jaxb.createMarshaller();
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
 		File fasFile = null;
 		String fileName = getFileName(streamName);

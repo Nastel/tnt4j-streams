@@ -644,7 +644,7 @@ public class MetricsReporter implements InterceptionsReporter {
 	 */
 	public static Property getSnapshotPropIgnoreCase(Snapshot snap, String key) {
 		if (snap != null) {
-			for (Property property : snap.getSnapshot()) {
+			for (Property property : snap.getProperties()) {
 				if (property.getKey().equalsIgnoreCase(key)) {
 					return property;
 				}
