@@ -971,7 +971,7 @@ public class ActivityInfo {
 				continue;
 			}
 
-			Trackable cTrackable = buildChild(tracker, child, pTrackable.getTrackingId());
+			Trackable cTrackable = buildChild(tracker, child, pTrackable);
 			boolean consumed = addTrackableChild(pTrackable, cTrackable);
 
 			if (!consumed && chTrackables != null) {
@@ -1069,13 +1069,12 @@ public class ActivityInfo {
 		}
 	}
 
-	private static Trackable buildChild(Tracker tracker, ActivityInfo child, String parentId) {
+	private static Trackable buildChild(Tracker tracker, ActivityInfo child, Trackable parent) {
 		if (StringUtils.isEmpty(child.parentId)) {
-			child.parentId = parentId;
+			if (parent.getType() != OpType.NOOP) {
+				child.parentId = parent.getTrackingId();
+			}
 		}
-
-		// child.resolveServer(false);
-		// child.determineTimes();
 
 		return child.buildTrackable(tracker);
 	}
