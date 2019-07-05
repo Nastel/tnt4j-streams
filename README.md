@@ -5119,9 +5119,13 @@ Also see ['Generic streams parameters'](#generic-streams-parameters).
 All WS streams have a special configuration section, called a `scenario`. Streaming scenarios allow for defining steps. A `step` defines 
 request/invocation/execution parameters and scheduler. Steps are invoked/executed independently of each other.
 
- * `scenario` tag has required attribute - `name` (any string).
-    * `step` tag has required attribute - `name` (any string) and optional attributes `url` (service request URL),
-    `method` (`GET`/`POST` - default value `GET`).
+ * `scenario` tag has required attribute - `name` (any string) and optional attributes: `url` (service request URL), `username` (service 
+ authentication user), `password` (service authentication password) and `method` (`GET`/`POST` - default value `GET`). These service access 
+ attributes are applied for all scenario steps if scenario does not define individual values of attributes.
+    * `step` tag has required attribute - `name` (any string) and optional attributes: `url` (service request URL), `username` (service 
+    authentication user), `password` (service authentication password) and `method` (`GET`/`POST` - default value `GET`). Attributes `url` 
+    , `username`, `password` and `method` overrides values defined for corresponding `scenario` tag attributes. That way some scenario steps 
+    can have individual service access configurations.
         * `property` tag has attributes:
             * `name` - scenario step configuration property name
             * `value` - scenario step configuration property value
@@ -5136,8 +5140,11 @@ request/invocation/execution parameters and scheduler. Steps are invoked/execute
             * `startDelay` - schedule start delay interval as positive integer (zero valid) numeric value. Default value - `0`. (Optional) 
             * `startDelayUnits` - schedule start delay time units name. Default value - `SECONDS`. (Optional)
         * `request` is XML tag to define string represented request data (e.g., system command with parameters). To
-        define XML contents it is recommended to use `<![CDATA[]]>`. It has optional attribute `parser-ref` to map received response data 
-        and parser to parse it.
+        define XML contents it is recommended to use `<![CDATA[]]>`. It has optional attribute `id` to define request identifier string 
+        used to identify request when i.e. example formatting log messages. 
+            * `parser-ref`  tag is used to map received response data and parser to parse it. This tag has attributes:
+                * `name` - referenced parser name
+                * `tags` - parser tags set, used to map parser with parser activity data by some particular values
 
     sample:
 ```xml
