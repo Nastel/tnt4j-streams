@@ -472,4 +472,168 @@ public class ActivityInfoTest {
 		System.out.printf("The result: %s \n", startTime);
 		assertEquals(Long.parseLong(TEST_VALUE) * 1000, ((UsecTimestamp) startTime).getTimeUsec());
 	}
+
+	@Test
+	public void testGetFieldValueAll() throws ParseException {
+		ActivityField en = new ActivityField("EventName");
+		ActivityField f1 = new ActivityField("Field1");
+		ActivityField f2 = new ActivityField("Field2");
+
+		ActivityInfo pai = new ActivityInfo();
+		pai.setFieldValue(en, "Parent Activity");
+		pai.setFieldValue(f1, "pValue1");
+		pai.setFieldValue(f2, "pValue2");
+
+		ActivityInfo ai1 = new ActivityInfo();
+		ai1.setFieldValue(en, "Free Activity");
+		ai1.setFieldValue(f1, "f1Value1");
+
+		// 1. Direct entity field value get over instance call
+		assertEquals("Parent Activity", pai.getFieldValue(en.getFieldTypeName()));
+		assertEquals("pValue1", pai.getFieldValue(f1.getFieldTypeName()));
+		assertEquals("pValue2", pai.getFieldValue(f2.getFieldTypeName()));
+		// 2. Direct entity field value get over static call
+		assertEquals("Parent Activity", ActivityInfo.getFieldValue(en.getFieldTypeName(), pai));
+		assertEquals("pValue1", ActivityInfo.getFieldValue(f1.getFieldTypeName(), pai));
+		assertEquals("pValue2", ActivityInfo.getFieldValue(f2.getFieldTypeName(), pai));
+
+		// 3. Parent entity field value get over static call
+		assertEquals("Parent Activity", ActivityInfo.getParentFieldValue(en.getFieldTypeName(), null, ai1, pai));
+		assertEquals("pValue1", ActivityInfo.getParentFieldValue(f1.getFieldTypeName(), null, ai1, pai));
+		assertEquals("pValue2", ActivityInfo.getParentFieldValue(f2.getFieldTypeName(), null, ai1, pai));
+
+		// 4. Parent entity field value get over static call having only parent instance referred - entity having no
+		// parent shall not resolve any value
+		assertEquals(null, ActivityInfo.getParentFieldValue(en.getFieldTypeName(), null, pai));
+		assertEquals(null, ActivityInfo.getParentFieldValue(f1.getFieldTypeName(), null, pai));
+		assertEquals(null, ActivityInfo.getParentFieldValue(f2.getFieldTypeName(), null, pai));
+		// 5. Parent entity field value get over static call having only child instance no parent referred - entity
+		// having no parent shall not resolve any value
+		assertEquals(null, ActivityInfo.getParentFieldValue(en.getFieldTypeName(), null, ai1));
+		assertEquals(null, ActivityInfo.getParentFieldValue(f1.getFieldTypeName(), null, ai1));
+		assertEquals(null, ActivityInfo.getParentFieldValue(f2.getFieldTypeName(), null, ai1));
+
+		pai.addChild("G1", ai1);
+
+		// 6. Parent entity field value get over child instance call
+		assertEquals("Parent Activity", ai1.getFieldValue("^." + en.getFieldTypeName()));
+		assertEquals("pValue1", ai1.getFieldValue("^." + f1.getFieldTypeName()));
+		assertEquals("pValue2", ai1.getFieldValue("^." + f2.getFieldTypeName()));
+		// 7. Parent entity field value get over parent instance call - entity having no parent shall not resolve any
+		// value
+		assertEquals(null, pai.getFieldValue("^." + en.getFieldTypeName()));
+		assertEquals(null, pai.getFieldValue("^." + f1.getFieldTypeName()));
+		assertEquals(null, pai.getFieldValue("^." + f2.getFieldTypeName()));
+
+		ActivityInfo ai2 = new ActivityInfo();
+		ai2.setFieldValue(en, "Another Free Activity");
+		ai2.setFieldValue(f2, "f2Value2");
+
+		// 8. Parent entity field value get over static call
+		assertEquals("Parent Activity", ActivityInfo.getParentFieldValue(en.getFieldTypeName(), null, ai2, pai));
+		assertEquals("pValue1", ActivityInfo.getParentFieldValue(f1.getFieldTypeName(), null, ai2, pai));
+		assertEquals("pValue2", ActivityInfo.getParentFieldValue(f2.getFieldTypeName(), null, ai2, pai));
+
+		ai2.setOrdinal(pai.getChildCount("G1") + 1);
+
+		// 9. Another child (by index) entity field value get over static call
+		assertEquals("Free Activity",
+				ActivityInfo.getParentFieldValue("^.child[0]." + en.getFieldTypeName(), "G1", ai2, pai));
+		assertEquals("f1Value1",
+				ActivityInfo.getParentFieldValue("^.child[0]." + f1.getFieldTypeName(), "G1", ai2, pai));
+		assertEquals(null, ActivityInfo.getParentFieldValue("^.child[0]." + f2.getFieldTypeName(), "G1", ai2, pai));
+		// 10. Another child (by group and index) entity field value get over static call
+		assertEquals("Free Activity",
+				ActivityInfo.getParentFieldValue("^.child[G1.0]." + en.getFieldTypeName(), null, ai2, pai));
+		assertEquals("f1Value1",
+				ActivityInfo.getParentFieldValue("^.child[G1.0]." + f1.getFieldTypeName(), null, ai2, pai));
+		assertEquals(null, ActivityInfo.getParentFieldValue("^.child[G1.0]." + f2.getFieldTypeName(), null, ai2, pai));
+		// 11. Another child (by group and index auto-mapping) entity field value get over static call - same group
+		// shall not auto-map
+		assertEquals(null, ActivityInfo.getParentFieldValue("^.child[G1]." + en.getFieldTypeName(), null, ai2, pai));
+		assertEquals(null, ActivityInfo.getParentFieldValue("^.child[G1]." + f1.getFieldTypeName(), null, ai2, pai));
+		assertEquals(null, ActivityInfo.getParentFieldValue("^.child[G1]." + f2.getFieldTypeName(), null, ai2, pai));
+
+		pai.addChild("G2", ai2);
+
+		// 12. Parent entity field value get over child instance call
+		assertEquals("Parent Activity", ai2.getFieldValue("^." + en.getFieldTypeName()));
+		assertEquals("pValue1", ai2.getFieldValue("^." + f1.getFieldTypeName()));
+		assertEquals("pValue2", ai2.getFieldValue("^." + f2.getFieldTypeName()));
+		// 13. Another child (by index) entity field value get over instance call
+		assertEquals("Free Activity", ActivityInfo.getFieldValue("^.child[0]." + en.getFieldTypeName(), "G1", ai2));
+		assertEquals("f1Value1", ActivityInfo.getFieldValue("^.child[0]." + f1.getFieldTypeName(), "G1", ai2));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[0]." + f2.getFieldTypeName(), "G1", ai2));
+		// 14. Another child (by group and index) entity field value get over instance call
+		assertEquals("Free Activity",
+				ActivityInfo.getFieldValue("^.child[G1.0]." + en.getFieldTypeName(), (String) null, ai2));
+		assertEquals("f1Value1",
+				ActivityInfo.getFieldValue("^.child[G1.0]." + f1.getFieldTypeName(), (String) null, ai2));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[G1.0]." + f2.getFieldTypeName(), (String) null, ai2));
+		// 15. Another child (by group and index auto-mapping) entity field value get over instance call
+		assertEquals("Free Activity",
+				ActivityInfo.getFieldValue("^.child[G1]." + en.getFieldTypeName(), (String) null, ai2));
+		assertEquals("f1Value1",
+				ActivityInfo.getFieldValue("^.child[G1]." + f1.getFieldTypeName(), (String) null, ai2));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[G1]." + f2.getFieldTypeName(), (String) null, ai2));
+		// 16. Another child (by index) entity field value get over instance call
+		assertEquals("Another Free Activity",
+				ActivityInfo.getFieldValue("^.child[0]." + en.getFieldTypeName(), "G2", ai1));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[0]." + f1.getFieldTypeName(), "G2", ai1));
+		assertEquals("f2Value2", ActivityInfo.getFieldValue("^.child[0]." + f2.getFieldTypeName(), "G2", ai1));
+		// 17. Another child (by group and index) entity field value get over instance call
+		assertEquals("Another Free Activity",
+				ActivityInfo.getFieldValue("^.child[G2.0]." + en.getFieldTypeName(), (String) null, ai1));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[G2.0]." + f1.getFieldTypeName(), (String) null, ai1));
+		assertEquals("f2Value2",
+				ActivityInfo.getFieldValue("^.child[G2.0]." + f2.getFieldTypeName(), (String) null, ai1));
+		// 18. Another child (by group and index auto-mapping) entity field value get over instance call
+		assertEquals("Another Free Activity",
+				ActivityInfo.getFieldValue("^.child[G2]." + en.getFieldTypeName(), (String) null, ai1));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[G2]." + f1.getFieldTypeName(), (String) null, ai1));
+		assertEquals("f2Value2",
+				ActivityInfo.getFieldValue("^.child[G2]." + f2.getFieldTypeName(), (String) null, ai1));
+
+		// 19. Another child (by index) entity field value get over instance call - referring same group shall resolve
+		// self values
+		assertEquals("Free Activity", ActivityInfo.getFieldValue("^.child[0]." + en.getFieldTypeName(), "G1", ai1));
+		assertEquals("f1Value1", ActivityInfo.getFieldValue("^.child[0]." + f1.getFieldTypeName(), "G1", ai1));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[0]." + f2.getFieldTypeName(), "G1", ai1));
+		// 20. Another child (by group and index) entity field value get over instance call - shall pick values from G2
+		// group child
+		assertEquals("Another Free Activity",
+				ActivityInfo.getFieldValue("^.child[G2.0]." + en.getFieldTypeName(), (String) null, ai1));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[G2.0]." + f1.getFieldTypeName(), (String) null, ai1));
+		assertEquals("f2Value2",
+				ActivityInfo.getFieldValue("^.child[G2.0]." + f2.getFieldTypeName(), (String) null, ai1));
+
+		// 21. Another child (by index) entity field value get over instance call - referring out of bounds child
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[1]." + en.getFieldTypeName(), "G1", ai1));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[1]." + f1.getFieldTypeName(), "G1", ai1));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[1]." + f2.getFieldTypeName(), "G1", ai1));
+
+		ActivityInfo ai3 = new ActivityInfo();
+		ai3.setFieldValue(en, "Yet Another Free Activity");
+		ai3.setFieldValue(f1, "f3Value1");
+		ai3.setFieldValue(f2, "f3Value2");
+
+		pai.addChild("G2", ai3);
+
+		// 22. Another child (by group and index auto-mapping) entity field value get over instance call - referring out
+		// of bounds child
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[G1]." + en.getFieldTypeName(), (String) null, ai3));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[G1]." + f1.getFieldTypeName(), (String) null, ai3));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[G1]." + f2.getFieldTypeName(), (String) null, ai3));
+
+		ActivityInfo ai4 = new ActivityInfo();
+		ai4.setFieldValue(en, "Another Deep Free Activity");
+		ai4.setFieldValue(f1, "f4Value1");
+		ai4.setFieldValue(f2, "f4Value2");
+
+		assertEquals("Yet Another Free Activity",
+				ActivityInfo.getParentFieldValue(en.getFieldTypeName(), null, ai4, ai3));
+		assertEquals("f3Value1", ActivityInfo.getParentFieldValue(f1.getFieldTypeName(), null, ai4, ai3));
+		assertEquals("f3Value2", ActivityInfo.getParentFieldValue(f2.getFieldTypeName(), null, ai4, ai3));
+
+	}
 }

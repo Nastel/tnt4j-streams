@@ -109,7 +109,8 @@ public final class StreamsConstants {
 	 * @return field name without parent activity entity reference prefix
 	 */
 	public static String getParentFieldName(String fieldName) {
-		return fieldName.substring(PARENT_REFERENCE_PREFIX.length());
+		return fieldName.startsWith(PARENT_REFERENCE_PREFIX) ? fieldName.substring(PARENT_REFERENCE_PREFIX.length())
+				: fieldName;
 	}
 
 	/**

@@ -748,6 +748,9 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 
 		ActivityInfo ai = new ActivityInfo();
 		cData.setActivity(ai);
+		if (cData.getParentActivity() != null) {
+			ai.setOrdinal(cData.getParentActivity().getChildCount(getName()) + 1);
+		}
 
 		ActivityField.FieldParserReference parserRef = cData.getParserRef();
 		if (parserRef != null && parserRef.getAggregationType().isRelate()) {
@@ -1173,10 +1176,10 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		String locStr = locator.getLocator();
 		if (StringUtils.isNotEmpty(locStr)) {
 			if (StreamsConstants.isParentEntityRef(locStr)) {
-				ActivityInfo pai = cData.getParentActivity();
-				value = pai == null ? null : pai.getFieldValue(StreamsConstants.getParentFieldName(locStr), getName());
+				value = ActivityInfo.getParentFieldValue(locStr, getName(), cData.getActivity(),
+						cData.getParentActivity());
 			} else {
-				value = cData.getActivity().getFieldValue(locStr);
+				value = ActivityInfo.getFieldValue(locStr, getName(), cData.getActivity());
 			}
 		}
 

@@ -1927,6 +1927,36 @@ public class ActivityInfo {
 	}
 
 	/**
+	 * Checks whether this activity entity has any child activity entities added into defined group.
+	 * <p>
+	 * When {@code groupName} is null, acts same as {@link #hasChildren()}.
+	 *
+	 * @param groupName
+	 *            children group name
+	 * @return {@code false} if group children list is {@code null} or empty, {@code true} - otherwise
+	 */
+	public boolean hasChildren(String groupName) {
+		return hasChildren() && (groupName == null || CollectionUtils.isNotEmpty(children.get(groupName)));
+	}
+
+	/**
+	 * Returns child activity entities count for defined group.
+	 * 
+	 * @param groupName
+	 *            children group name
+	 * @return count of group child activity entities, or {@code 0} if there is no child activity entities
+	 */
+	public int getChildCount(String groupName) {
+		if (hasChildren()) {
+			List<ActivityInfo> cl = children.get(groupName);
+
+			return cl == null ? 0 : cl.size();
+		}
+
+		return 0;
+	}
+
+	/**
 	 * Sets parent activity entity instance.
 	 *
 	 * @param parent
@@ -1946,7 +1976,7 @@ public class ActivityInfo {
 	 *            ordinal index of this data entity
 	 * @return instance of this activity data entity
 	 */
-	protected ActivityInfo setOrdinal(int ordinalIdx) {
+	public ActivityInfo setOrdinal(int ordinalIdx) {
 		this.ordinalIdx = ordinalIdx;
 
 		return this;
@@ -2004,10 +2034,27 @@ public class ActivityInfo {
 	 *            field name value to get
 	 * @return field contained value
 	 *
-	 * @see #getFieldValue(String, String)
+	 * @see #getFieldValue(String, ActivityInfo...)
 	 */
 	public Object getFieldValue(String fieldName) {
-		return getFieldValue(fieldName, null);
+		return getFieldValue(fieldName, this);
+	}
+
+	/**
+	 * Returns activity field value.
+	 * <p>
+	 * {@code fieldName} can also be as some expression variable having {@code "${FIELD_NAME}"} format.
+	 *
+	 * @param fieldName
+	 *            field name value to get
+	 * @param ais
+	 *            set of referred (child-parent) activity entities
+	 * @return field contained value
+	 *
+	 * @see #getFieldValue(String, String, ActivityInfo...)
+	 */
+	public static Object getFieldValue(String fieldName, ActivityInfo... ais) {
+		return getFieldValue(fieldName, null, ais);
 	}
 
 	/**
@@ -2019,25 +2066,35 @@ public class ActivityInfo {
 	 *            field name value to get
 	 * @param groupName
 	 *            children group name, actual only then resolving child entity field value
+	 * @param ais
+	 *            set of referred (child-parent) activity entities
 	 * @return field contained value, or {@code null} if field is not found
 	 * @throws java.lang.IllegalArgumentException
 	 *             if field name does not match expected pattern
 	 * 
-	 * @see #getChildFieldValue(java.util.regex.Matcher, String, String)
+	 * @see #getParentFieldValue(String, String, ActivityInfo...)
+	 * @see #getChildFieldValue(java.util.regex.Matcher, String, String, ActivityInfo...)
 	 */
-	public Object getFieldValue(String fieldName, String groupName) throws IllegalArgumentException {
+	public static Object getFieldValue(String fieldName, String groupName, ActivityInfo... ais)
+			throws IllegalArgumentException {
+		if (ArrayUtils.isEmpty(ais)) {
+			return null;
+		}
+
+		ActivityInfo ai = last(ais);
+
 		try {
 			if (StreamsConstants.isParentEntityRef(fieldName)) {
-				return getParentFieldValue(fieldName);
+				return getParentFieldValue(fieldName, groupName, ais);
 			}
 
 			Matcher fnMatcher = CHILD_FIELD_PATTERN.matcher(fieldName);
 			if (fnMatcher.matches()) {
-				return getChildFieldValue(fnMatcher, fieldName, groupName);
+				return getChildFieldValue(fnMatcher, fieldName, groupName, ais);
 			}
 
 			if (StreamsConstants.CHILD_ORDINAL_INDEX.equals(fieldName)) {
-				return ordinalIdx;
+				return ai.ordinalIdx;
 			}
 
 			if (fieldName.startsWith(Utils.VAR_EXP_START_TOKEN)) {
@@ -2047,73 +2104,73 @@ public class ActivityInfo {
 			StreamFieldType sft = Utils.valueOfIgnoreCase(StreamFieldType.class, fieldName);
 			switch (sft) {
 			case ApplName:
-				return applName;
+				return ai.applName;
 			case Category:
-				return category;
+				return ai.category;
 			case CompCode:
-				return compCode;
+				return ai.compCode;
 			case Correlator:
-				return correlator;
+				return ai.correlator;
 			case ElapsedTime:
-				return elapsedTime;
+				return ai.elapsedTime;
 			case EndTime:
-				return endTime;
+				return ai.endTime;
 			case EventName:
-				return eventName;
+				return ai.eventName;
 			case EventStatus:
-				return eventStatus;
+				return ai.eventStatus;
 			case EventType:
-				return eventType;
+				return ai.eventType;
 			case Exception:
-				return exception;
+				return ai.exception;
 			case Location:
-				return location;
+				return ai.location;
 			case Message:
-				return message;
+				return ai.message;
 			case MsgCharSet:
-				return msgCharSet;
+				return ai.msgCharSet;
 			case MsgEncoding:
-				return msgEncoding;
+				return ai.msgEncoding;
 			case MsgLength:
-				return msgLength;
+				return ai.msgLength;
 			case MsgMimeType:
-				return msgMimeType;
+				return ai.msgMimeType;
 			case MessageAge:
-				return msgAge;
+				return ai.msgAge;
 			case TTL:
-				return ttl;
+				return ai.ttl;
 			case ParentId:
-				return parentId;
+				return ai.parentId;
 			case ProcessId:
-				return processId;
+				return ai.processId;
 			case ReasonCode:
-				return reasonCode;
+				return ai.reasonCode;
 			case ResourceName:
-				return resourceName;
+				return ai.resourceName;
 			case ServerIp:
-				return serverIp;
+				return ai.serverIp;
 			case ServerName:
-				return serverName;
+				return ai.serverName;
 			case Severity:
-				return severity;
+				return ai.severity;
 			case StartTime:
-				return startTime;
+				return ai.startTime;
 			case Tag:
-				return tag;
+				return ai.tag;
 			case ThreadId:
-				return threadId;
+				return ai.threadId;
 			case TrackingId:
-				return determineTrackingId();
+				return ai.determineTrackingId();
 			case UserName:
-				return userName;
+				return ai.userName;
 			case Guid:
-				return guid;
+				return ai.guid;
 			default:
 				throw new IllegalArgumentException(StreamsResources.getStringFormatted(
 						StreamsResources.RESOURCE_BUNDLE_NAME, "ActivityInfo.unrecognized.field", fieldName));
 			}
 		} catch (IllegalArgumentException exc) {
-			Property p = activityProperties == null ? null : activityProperties.get(fieldName);
+			Property p = ai.activityProperties == null ? null : ai.activityProperties.get(fieldName);
 
 			return p == null ? null : p.getValue();
 		}
@@ -2126,20 +2183,28 @@ public class ActivityInfo {
 	 * 
 	 * @param fieldName
 	 *            field name value to get
+	 * @param groupName
+	 *            children group name, actual only then resolving child entity field value
+	 * @param ais
+	 *            set of referred (child-parent) activity entities
 	 * @return field contained value, or {@code null} if field is not found
 	 */
-	protected Object getParentFieldValue(String fieldName) {
-		if (parent == null) {
+	public static Object getParentFieldValue(String fieldName, String groupName, ActivityInfo... ais) {
+		// no activity entities to refer
+		if (ArrayUtils.isEmpty(ais)) {
 			return null;
 		}
 
-		Object pVal = parent.getFieldValue(StreamsConstants.getParentFieldName(fieldName));
+		if (ais.length == 1) {
+			// no parent entity to refer
+			if (ais[0].parent == null) {
+				return null;
+			}
 
-		if (pVal == null) {
-			return parent.getFieldValue(fieldName);
+			ais = addParent(ais);
 		}
 
-		return pVal;
+		return getFieldValue(StreamsConstants.getParentFieldName(fieldName), groupName, ais);
 	}
 
 	/**
@@ -2150,6 +2215,9 @@ public class ActivityInfo {
 	 * <li>{@code 'child[childIndex].fieldName'} - where {@code 'child'} is predefined value to resolve child entity,
 	 * {@code 'childIndex'} is child index in group named by {@code defaultGroupName} parameter, {@code 'fieldName'} is
 	 * child entity field name</li>
+	 * <li>{@code 'child[groupName].fieldName'} - where {@code 'child'} is predefined value to resolve child entity,
+	 * {@code 'groupName'} is activity children group name having child identified by {@code ai} defined activity entity
+	 * ordinal index attribute, {@code 'fieldName'} is child entity field name</li>
 	 * <li>{@code 'child[groupName.childIndex].fieldName'} - where {@code 'child'} is predefined value to resolve child
 	 * entity, {@code 'groupName'} is activity children group name, {@code 'childIndex'} is child index in that group,
 	 * {@code 'fieldName'} is child entity field name</li>
@@ -2161,12 +2229,14 @@ public class ActivityInfo {
 	 *            field name value to get
 	 * @param defaultGroupName
 	 *            default group name, when {@code fieldName} does not define one
+	 * @param ais
+	 *            set of referred (child-parent) activity entities
 	 * @return field contained value, or {@code null} if field is not found
 	 * @throws IllegalArgumentException
-	 *             if child field name does not match expected pattern
+	 *             if child field name does not match expected pattern or parent activity is not found
 	 */
-	protected Object getChildFieldValue(Matcher fnMatcher, String fieldName, String defaultGroupName)
-			throws IllegalArgumentException {
+	protected static Object getChildFieldValue(Matcher fnMatcher, String fieldName, String defaultGroupName,
+			ActivityInfo... ais) throws IllegalArgumentException {
 		String fName = null;
 		String groupName = null;
 		int chIndex = -1;
@@ -2178,8 +2248,13 @@ public class ActivityInfo {
 			String[] chTokens = chLocator == null ? null : chLocator.split("\\."); // NON-NLS
 			chtLength = ArrayUtils.getLength(chTokens);
 			if (chtLength == 1) {
-				groupName = defaultGroupName;
-				chIndex = Integer.parseInt(chTokens[0]);
+				if (StringUtils.isNumeric(chTokens[0])) {
+					groupName = defaultGroupName;
+					chIndex = Integer.parseInt(chTokens[0]);
+				} else {
+					groupName = chTokens[0];
+					chIndex = ais[0].ordinalIdx > 0 ? ais[0].ordinalIdx - 1 : -1;
+				}
 			} else if (chtLength > 1) {
 				groupName = chTokens[0];
 				chIndex = Integer.parseInt(chTokens[1]);
@@ -2190,11 +2265,53 @@ public class ActivityInfo {
 		if (StringUtils.isEmpty(fName) || StringUtils.isEmpty(groupName) || chIndex < 0) {
 			throw new IllegalArgumentException(StreamsResources.getStringFormatted(
 					StreamsResources.RESOURCE_BUNDLE_NAME, "ActivityInfo.invalid.child.field.locator",
-					chtLength == 1 ? "child[childIndex].fieldName" : "child[groupName.childIndex].fieldName", // NON-NLS
+					chtLength == 1 ? "child[childIndex].fieldName or child[groupName].fieldName" // NON-NLS
+							: "child[groupName.childIndex].fieldName", // NON-NLS
 					fieldName));
 		}
 
-		List<ActivityInfo> children = this.children == null ? null : this.children.get(groupName);
+		ActivityInfo ai = last(ais);
+
+		if (ai == null) {
+			LOGGER.log(OpLevel.TRACE, StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+					"ActivityInfo.child.field.locator.parent.not.found"), fieldName);
+		}
+
+		Map<String, List<ActivityInfo>> childMap = ai == null ? null : ai.children;
+		List<ActivityInfo> children = childMap == null ? null : childMap.get(groupName);
+
+		if (children == null || chIndex >= children.size()) {
+			LOGGER.log(OpLevel.TRACE,
+					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+							"ActivityInfo.child.field.locator.children.bounds"),
+					groupName, chIndex, fieldName, children == null ? null : children.size());
+		}
+
 		return children == null || chIndex >= children.size() ? null : children.get(chIndex).getFieldValue(fName);
+	}
+
+	private static ActivityInfo[] addParent(ActivityInfo[] ais) {
+		if (ArrayUtils.isEmpty(ais)) {
+			return ais;
+		}
+
+		ActivityInfo pai = last(ais).parent;
+
+		if (pai == null) {
+			return ais;
+		}
+
+		ActivityInfo[] aisp = new ActivityInfo[ais.length + 1];
+
+		System.arraycopy(ais, 0, aisp, 0, ais.length);
+		aisp[aisp.length - 1] = pai;
+
+		return aisp;
+
+		// return ArrayUtils.add(ais, last(ais).parent);
+	}
+
+	private static <T> T last(T[] a) {
+		return a[a.length - 1];
 	}
 }
