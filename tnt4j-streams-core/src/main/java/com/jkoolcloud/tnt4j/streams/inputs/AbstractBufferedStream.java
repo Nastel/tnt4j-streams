@@ -18,6 +18,7 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
@@ -163,8 +164,12 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 
 		while (true) {
 			// Buffer is empty and producer input is ended. No more items going to be available.
-			if (inputBuffer.isEmpty() && isInputEnded()) {
-				return null;
+			if (inputBuffer.isEmpty()) {
+				boolean end = isInputEnded();
+				// in case something appeared in buffer while checking.
+				if (end && inputBuffer.isEmpty()) {
+					return null;
+				}
 			}
 
 			T item = getCurrentItem();
@@ -230,7 +235,7 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 	 *             if interrupted while waiting for activity item data to get available in the buffer
 	 */
 	protected Object getItemFromBuffer() throws InterruptedException {
-		return inputBuffer.take();
+		return inputBuffer.poll(20, TimeUnit.SECONDS);
 	}
 
 	/**
