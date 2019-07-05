@@ -6274,8 +6274,11 @@ Download the above libraries and place into the `tnt4j-streams/tnt4j-streams-ela
 (O) marked libraries are optional
 
 ## Building
-   * to build project and make release assemblies run maven goals `clean package`
-   * to build project, make release assemblies and install to local repo run maven goals `clean install`
+* To build the project, run maven goals `clean package`
+* To build the project and install to local repo, run maven goals `clean install`
+* To make distributable release assemblies use one of profiles: `pack-bin` or `pack-all`:
+    * containing only binary distribution: run `mvn -P pack-bin`
+    * containing binary, source and javadoc distribution: run `mvn -P pack-all`
 
 By default maven will build all modules defined in `tnt4j-streams/pom.xml` file.
 
@@ -6283,11 +6286,11 @@ If you do not want to build some of optional modules, comment those out like `WM
 preferred set of modules using `-pl, --projects` argument (comma separated modules list) together with `-am, --also-make` argument, e.g.:
 
 ```cmd
-mvn -pl tnt4j-streams-core,tnt4j-streams-samples,tnt4j-streams--distribution -am clean install
+mvn -pl tnt4j-streams-core,tnt4j-streams-samples,tnt4j-streams--distribution -am clean install -P pack-bin
 ``` 
 or
 ```cmd
-mvn --projects tnt4j-streams-core,tnt4j-streams-samples,tnt4j-streams--distribution --also-make clean install
+mvn --projects tnt4j-streams-core,tnt4j-streams-samples,tnt4j-streams--distribution --also-make clean install -P pack-bin
 ```
 
 **NOTE:** modules list should be without spaces after comma!
