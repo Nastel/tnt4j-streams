@@ -253,20 +253,64 @@ public final class StreamsAgent {
 		run(Arrays.asList(streams), streamListener, streamTasksListener);
 	}
 
+	/**
+	 * Loads stream configuration from provided file path and runs configuration defined streams.
+	 *
+	 * @param cfgFileName
+	 *            streams configuration file path
+	 *
+	 * @see #loadConfigAndRun(String, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
+	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
+	 */
 	protected static void loadConfigAndRun(String cfgFileName) {
 		loadConfigAndRun(cfgFileName, null, null);
 	}
 
+	/**
+	 * Loads stream configuration from provided file path and runs configuration defined streams.
+	 *
+	 * @param cfgFileName
+	 *            streams configuration file path
+	 * @param streamListener
+	 *            input stream listener
+	 * @param streamTasksListener
+	 *            stream tasks listener
+	 *
+	 * @see #loadConfigAndRun(java.io.File, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
+	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
+	 */
 	protected static void loadConfigAndRun(String cfgFileName, InputStreamListener streamListener,
 			StreamTasksListener streamTasksListener) {
 		loadConfigAndRun(StringUtils.isEmpty(cfgFileName) ? null : new File(cfgFileName), streamListener,
 				streamTasksListener);
 	}
 
+	/**
+	 * Loads stream configuration from provided {@link java.io.File} and runs configuration defined streams.
+	 *
+	 * @param cfgFile
+	 *            streams configuration file
+	 *
+	 * @see #loadConfigAndRun(java.io.File, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
+	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
+	 */
 	protected static void loadConfigAndRun(File cfgFile) {
 		loadConfigAndRun(cfgFile, null, null);
 	}
 
+	/**
+	 * Loads stream configuration from provided {@link java.io.File} and runs configuration defined streams.
+	 *
+	 * @param cfgFile
+	 *            streams configuration file
+	 * @param streamListener
+	 *            input stream listener
+	 * @param streamTasksListener
+	 *            stream tasks listener
+	 *
+	 * @see #loadConfigAndRun(java.io.Reader, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
+	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
+	 */
 	protected static void loadConfigAndRun(File cfgFile, InputStreamListener streamListener,
 			StreamTasksListener streamTasksListener) {
 		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
@@ -278,19 +322,64 @@ public final class StreamsAgent {
 		}
 	}
 
+	/**
+	 * Loads stream configuration from provided {@link java.io.InputStream} and runs configuration defined streams.
+	 *
+	 * @param is
+	 *            stream configuration input stream
+	 *
+	 * @see #loadConfigAndRun(java.io.InputStream, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
+	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
+	 */
 	protected static void loadConfigAndRun(InputStream is) {
 		loadConfigAndRun(is, null, null);
 	}
 
+	/**
+	 * Loads stream configuration from provided {@link java.io.InputStream} and runs configuration defined streams.
+	 *
+	 * @param is
+	 *            stream configuration input stream
+	 * @param streamListener
+	 *            input stream listener
+	 * @param streamTasksListener
+	 *            stream tasks listener
+	 *
+	 * @see #loadConfigAndRun(java.io.Reader, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
+	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
+	 */
 	protected static void loadConfigAndRun(InputStream is, InputStreamListener streamListener,
 			StreamTasksListener streamTasksListener) {
 		loadConfigAndRun(new InputStreamReader(is), streamListener, streamTasksListener);
 	}
 
+	/**
+	 * Loads stream configuration from provided {@link java.io.Reader} and runs configuration defined streams.
+	 *
+	 * @param reader
+	 *            stream configuration reader
+	 *
+	 * @see #loadConfigAndRun(java.io.Reader, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
+	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
+	 */
 	protected static void loadConfigAndRun(Reader reader) {
 		loadConfigAndRun(reader, null, null);
 	}
 
+	/**
+	 * Loads stream configuration from provided {@link java.io.Reader} and runs configuration defined streams.
+	 *
+	 * @param reader
+	 *            stream configuration reader
+	 * @param streamListener
+	 *            input stream listener
+	 * @param streamTasksListener
+	 *            stream tasks listener
+	 *
+	 * @see #initAndRun(com.jkoolcloud.tnt4j.streams.configure.StreamsConfigLoader,
+	 *      com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
+	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
+	 */
 	protected static void loadConfigAndRun(Reader reader, InputStreamListener streamListener,
 			StreamTasksListener streamTasksListener) {
 		try {
@@ -314,6 +403,12 @@ public final class StreamsAgent {
 	 *            input stream listener
 	 * @param streamTasksListener
 	 *            stream tasks listener
+	 * @throws Exception
+	 *             if configuration is malformed or streams can't be initiated
+	 * 
+	 * @see #initPiping(com.jkoolcloud.tnt4j.streams.configure.StreamsConfigLoader)
+	 * @see #run(java.util.Collection, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
+	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
 	 */
 	protected static void initAndRun(StreamsConfigLoader cfg, InputStreamListener streamListener,
 			StreamTasksListener streamTasksListener) throws Exception {
@@ -340,6 +435,15 @@ public final class StreamsAgent {
 		run(streams, streamListener, streamTasksListener);
 	}
 
+	/**
+	 * Loads streams data source configuration from ZooKeeper node.
+	 *
+	 * @param zookeeperCfgFile
+	 *            ZooKeeper configuration file path
+	 * @param zookeeperStreamId
+	 *            ZooKeeper stream identifier
+	 * @return {@code true} if stream configuration was loaded from ZooKeeper node, {@code false} - otherwise
+	 */
 	protected static boolean loadZKConfig(String zookeeperCfgFile, String zookeeperStreamId) {
 		Properties zooProps = ZKConfigManager.readStreamsZKConfig(zookeeperCfgFile);
 
@@ -427,6 +531,12 @@ public final class StreamsAgent {
 		return false;
 	}
 
+	/**
+	 * Checks if there are active stream threads running on runner JVM.
+	 *
+	 * @return {@code true} if streams threads group is not {@code null} and has active treads running, {@code false} -
+	 *         otherwise
+	 */
 	protected static boolean isStreamsRunning() {
 		return streamThreads != null && streamThreads.activeCount() > 0;
 	}
@@ -485,7 +595,13 @@ public final class StreamsAgent {
 						"StreamsAgent.streams.stop.complete", sd.duration());
 			}
 		}
+	}
 
+	/**
+	 * Performs actions on agent process completion.
+	 */
+	public static void complete() {
+		new StreamStatisticsReporter(TNTInputStreamStatistics.getMetrics(), null, LOGGER).report();
 		DefaultEventSinkFactory.shutdownAll();
 	}
 
@@ -511,11 +627,10 @@ public final class StreamsAgent {
 		});
 
 		if (streamThreads == null) {
-			streamThreads = new ThreadGroup(StreamsAgent.class.getName() + "Threads"); // NON-NLS
+			streamThreads = new StreamThreadGroup(StreamsAgent.class.getName() + "Threads"); // NON-NLS
 		}
 
 		StreamThread ft;
-		// final CountDownLatch streamsCompletionSignal = new CountDownLatch(streams.size());
 		for (TNTInputStream<?, ?> stream : streams) {
 			if (streamListener != null) {
 				stream.addStreamListener(streamListener);
@@ -532,16 +647,19 @@ public final class StreamsAgent {
 
 			ft = new StreamThread(streamThreads, stream,
 					String.format("%s:%s", stream.getClass().getSimpleName(), stream.getName())); // NON-NLS
-			// ft.addCompletionLatch(streamsCompletionSignal);
 			ft.start();
 		}
-
-		// try {
-		// streamsCompletionSignal.await();
-		// } catch (InterruptedException exc) {
-		// }
 	}
 
+	/**
+	 * Creates and initiates OS piped input streams for provided parsers configuration.
+	 *
+	 * @param cfg
+	 *            piped data parsers configuration file path
+	 * @return collection of created OS piped input streams
+	 * @throws Exception
+	 *             if parsers configuration is malformed, or OS piped input streams initiation failed
+	 */
 	protected static Collection<TNTInputStream<?, ?>> initPiping(StreamsConfigLoader cfg) throws Exception {
 		Collection<TNTInputStream<?, ?>> streams = new ArrayList<>(1);
 

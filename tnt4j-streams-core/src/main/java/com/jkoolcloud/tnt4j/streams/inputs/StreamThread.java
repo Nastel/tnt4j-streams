@@ -20,12 +20,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
+import com.jkoolcloud.tnt4j.streams.StreamsAgent;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsThread;
 
 /**
  * Base class for threads running an TNTInputStream.
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  *
  * @see TNTInputStream
  */
@@ -37,6 +38,7 @@ public class StreamThread extends StreamsThread {
 	protected final TNTInputStream<?, ?> target;
 
 	private final Set<CountDownLatch> completionLatchSet = new HashSet<>(5);
+	private static final Set<StreamThread> instances = new HashSet<>(5);
 
 	/**
 	 * Creates thread to run specified TNTInputStream.
@@ -49,6 +51,7 @@ public class StreamThread extends StreamsThread {
 		super(target);
 		this.target = target;
 		target.setOwnerThread(this);
+		instances.add(this);
 	}
 
 	/**
@@ -64,6 +67,7 @@ public class StreamThread extends StreamsThread {
 		super(target, name);
 		this.target = target;
 		target.setOwnerThread(this);
+		instances.add(this);
 	}
 
 	/**
@@ -81,6 +85,7 @@ public class StreamThread extends StreamsThread {
 		super(group, target, name);
 		this.target = target;
 		target.setOwnerThread(this);
+		instances.add(this);
 	}
 
 	/**
@@ -96,6 +101,7 @@ public class StreamThread extends StreamsThread {
 		super(group, target);
 		this.target = target;
 		target.setOwnerThread(this);
+		instances.add(this);
 	}
 
 	/**
@@ -133,6 +139,15 @@ public class StreamThread extends StreamsThread {
 				cl.countDown();
 			}
 			completionLatchSet.clear();
+		}
+
+		instances.remove(this);
+
+		if (instances.isEmpty()) {
+			StreamsAgent.complete();
+			if (getThreadGroup() instanceof StreamThreadGroup) {
+				((StreamThreadGroup) getThreadGroup()).stopPendingJunkThreads();
+			}
 		}
 	}
 }
