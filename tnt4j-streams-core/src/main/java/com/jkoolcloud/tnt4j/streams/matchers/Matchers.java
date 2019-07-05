@@ -74,8 +74,10 @@ public class Matchers {
 		case "XPATH": // NON-NLS
 			return validateAndProcess(XPathMatcher.getInstance(), evalExpression, data);
 		case "REGEX": // NON-NLS
+		case "REGEXP": // NON-NLS
 			return validateAndProcess(RegExMatcher.getInstance(), evalExpression, data);
 		case "JPATH": // NON-NLS
+		case "JSONPATH": // NON-NLS
 			return validateAndProcess(JsonPathMatcher.getInstance(), evalExpression, data);
 		case "STRING": // NON-NLS
 			return validateAndProcess(StringMatcher.getInstance(), evalExpression, data);
