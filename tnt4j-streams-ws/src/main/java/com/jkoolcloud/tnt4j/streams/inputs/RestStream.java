@@ -383,11 +383,12 @@ public class RestStream extends AbstractWsStream<String> {
 
 			String reqUrl;
 			String respStr;
+			boolean emptyStepURL = StringUtils.isEmpty(scenarioStep.getUrlStr());
 			for (WsRequest<String> request : scenarioStep.getRequests()) {
 				reqUrl = null;
 				respStr = null;
 				try {
-					reqUrl = stream.preProcessURL(scenarioStep.getUrlStr());
+					reqUrl = stream.preProcessURL(emptyStepURL ? request.getData() : scenarioStep.getUrlStr());
 					request.setSentData(reqUrl);
 					respStr = stream.executeGET(stream.client, reqUrl, scenarioStep.getUsername(),
 							scenarioStep.getPassword());
