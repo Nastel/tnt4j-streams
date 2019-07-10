@@ -107,7 +107,7 @@ public final class StreamsAgent {
 	 */
 	public static void main(String... args) {
 		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"StreamsAgent.start.main", pkgVersion(), System.getProperty("java.version"));
+				"StreamsAgent.start.main", pkgVersion(), runEnv());
 		boolean argsValid = processArgs(args);
 		if (argsValid) {
 			boolean loadedZKConfig = loadZKConfig(zookeeperCfgFile, zookeeperStreamId);
@@ -136,6 +136,31 @@ public final class StreamsAgent {
 	}
 
 	/**
+	 * Returns jKool LLC TNT4J-Streams runtime environment properties string.
+	 * 
+	 * @return runtime environment properties string
+	 */
+	static String runEnv() {
+		String[] envProps = new String[] { // set of interesting runtime environment properties
+				"java.version", "java.vendor", "java.vm.name", "java.vm.version", // JVM props
+				"os.name", "os.version" // OS props
+		};
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("\n");
+		sb.append("------------------------------------------------------------------------\n");
+		for (String property : envProps) {
+			sb.append(String.format("%20s: %s",
+					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, property),
+					System.getProperty(property)));
+			sb.append("\n");
+		}
+		sb.append("------------------------------------------------------------------------\n");
+
+		return sb.toString();
+	}
+
+	/**
 	 * Returns jKool LLC TNT4J-Streams package version.
 	 *
 	 * @return the version of the implementation, {@code null} is returned if it is not known
@@ -153,7 +178,7 @@ public final class StreamsAgent {
 	 */
 	public static void runFromAPI() {
 		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"StreamsAgent.start.api", pkgVersion(), System.getProperty("java.version"));
+				"StreamsAgent.start.api", pkgVersion(), runEnv());
 		loadConfigAndRun((Reader) null);
 	}
 
@@ -170,7 +195,7 @@ public final class StreamsAgent {
 	 */
 	public static void runFromAPI(InputStreamListener streamListener, StreamTasksListener streamTasksListener) {
 		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"StreamsAgent.start.api", pkgVersion(), System.getProperty("java.version"));
+				"StreamsAgent.start.api", pkgVersion(), runEnv());
 		loadConfigAndRun((Reader) null, streamListener, streamTasksListener);
 	}
 
@@ -197,7 +222,7 @@ public final class StreamsAgent {
 	public static void runFromAPI(String cfgFileName, InputStreamListener streamListener,
 			StreamTasksListener streamTasksListener) {
 		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"StreamsAgent.start.api", pkgVersion(), System.getProperty("java.version"));
+				"StreamsAgent.start.api", pkgVersion(), runEnv());
 		loadConfigAndRun(cfgFileName, streamListener, streamTasksListener);
 	}
 
@@ -224,7 +249,7 @@ public final class StreamsAgent {
 	public static void runFromAPI(File cfgFile, InputStreamListener streamListener,
 			StreamTasksListener streamTasksListener) {
 		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"StreamsAgent.start.api", pkgVersion(), System.getProperty("java.version"));
+				"StreamsAgent.start.api", pkgVersion(), runEnv());
 		loadConfigAndRun(cfgFile, streamListener, streamTasksListener);
 	}
 

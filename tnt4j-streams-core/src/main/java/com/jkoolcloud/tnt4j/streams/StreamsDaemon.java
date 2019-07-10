@@ -124,7 +124,7 @@ public class StreamsDaemon implements Daemon {
 	public static void main(String... args) {
 		LOGGER.log(OpLevel.INFO,
 				StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsDaemon.start.main"),
-				StreamsAgent.pkgVersion(), System.getProperty("java.version"));
+				StreamsAgent.pkgVersion(), StreamsAgent.runEnv());
 		try {
 			String cmd = START_COMMAND;
 			if (args.length > 0) {
