@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
@@ -85,6 +86,12 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * key3=value3
  * </pre>
  * <p>
+ * Parser supported functions:
+ * <ul>
+ * <li>{@code .size()} or {@code .length()} - returns size of prefix locator expression resolved value: array,
+ * collection or map. Example: {@code events.size()} will return size of events list.</li>
+ * </ul>
+ * <p>
  * This parser supports the following configuration properties (in addition to those supported by
  * {@link GenericActivityParser}):
  * <ul>
@@ -101,7 +108,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Activity}</li>
  * </ul>
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  */
 public abstract class AbstractActivityMapParser extends GenericActivityParser<Map<String, ?>> {
 	/**
@@ -114,6 +121,15 @@ public abstract class AbstractActivityMapParser extends GenericActivityParser<Ma
 	public static final String RAW_ACTIVITY_STRING_KEY = "RAW_ACTIVITY_STRING_ENTRY"; // NON-NLS
 
 	private static final String ACCESSED_PATHS_KEY = "ACCESSED_MAP_PATHS"; // NON-NLS
+
+	/**
+	 * Constant defining locator "size" function to get size of prefix locator expression resolved value.
+	 */
+	protected static final String SIZE_FUNCTION = ".size()"; // NON-NLS
+	/**
+	 * Constant defining locator "length" function. Stands as alias for {@link #SIZE_FUNCTION}.
+	 */
+	protected static final String LENGTH_FUNCTION = ".length()"; // NON-NLS
 
 	/**
 	 * Constructs a new AbstractActivityMapParser.
@@ -223,7 +239,18 @@ public abstract class AbstractActivityMapParser extends GenericActivityParser<Ma
 		Object val = null;
 		String locStr = locator.getLocator();
 		Set<String[]> accessedPaths = (Set<String[]>) cData.get(ACCESSED_PATHS_KEY);
-		val = Utils.getMapValueByPath(locStr, nodePathDelim, cData.getData(), accessedPaths);
+
+		if (locStr.endsWith(SIZE_FUNCTION) || locStr.endsWith(LENGTH_FUNCTION)) {
+			locStr = locStr.substring(0, locStr.lastIndexOf('.'));
+			val = Utils.getMapValueByPath(locStr, nodePathDelim, cData.getData(), accessedPaths);
+			try {
+				val = CollectionUtils.size(val);
+			} catch (Throwable exc) {
+				val = 0;
+			}
+		} else {
+			val = Utils.getMapValueByPath(locStr, nodePathDelim, cData.getData(), accessedPaths);
+		}
 
 		return val;
 	}

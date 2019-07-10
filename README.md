@@ -5647,6 +5647,10 @@ key3=value3
 ```
 Using `#` locator without any manual map entry mapping is equivalent to `*` locator.
 
+##### Functional Locators
+* `.size()` (or `.lenght()`) - returns size of prefix locator expression resolved value being of type: `array`, `collection` or `map`. 
+  Example: `events.size()` will return size of `events` list.
+
 #### Activity JSON parser
 
  * `ReadLines` - indicates that complete JSON data package is single line. Default value - `true`. (Optional, deprecated - use `ActivityDelim`
