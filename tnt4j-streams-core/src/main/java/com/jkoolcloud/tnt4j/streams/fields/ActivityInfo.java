@@ -43,8 +43,8 @@ import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
 import com.jkoolcloud.tnt4j.uuid.DefaultUUIDFactory;
 
 /**
- * This class represents an {@link com.jkoolcloud.tnt4j.core.Trackable} entity (e.g. activity/event/snapshot) to record
- * to jKoolCloud.
+ * This class represents an {@link com.jkoolcloud.tnt4j.core.Trackable} entity (e.g. activity/event/snapshot/dataset) to
+ * record to jKoolCloud.
  *
  * @version $Revision: 3 $
  */
@@ -686,8 +686,9 @@ public class ActivityInfo {
 
 	/**
 	 * Creates the appropriate data package {@link com.jkoolcloud.tnt4j.tracker.TrackingActivity},
-	 * {@link com.jkoolcloud.tnt4j.tracker.TrackingEvent} or {@link com.jkoolcloud.tnt4j.core.PropertySnapshot} using
-	 * the specified tracker for this activity data entity to be sent to jKoolCloud.
+	 * {@link com.jkoolcloud.tnt4j.tracker.TrackingEvent}, {@link com.jkoolcloud.tnt4j.core.PropertySnapshot} or
+	 * {@link com.jkoolcloud.tnt4j.core.Dataset} using the specified tracker for this activity data entity to be sent to
+	 * jKoolCloud.
 	 *
 	 * @param tracker
 	 *            {@link com.jkoolcloud.tnt4j.tracker.Tracker} instance to be used to build
@@ -714,6 +715,8 @@ public class ActivityInfo {
 			return buildActivity(tracker, eventName, trackingId, chTrackables);
 		} else if (eventType == OpType.SNAPSHOT) {
 			return buildSnapshot(tracker, eventName, trackingId);
+		} else if (eventType == OpType.DATASET) {
+			return buildDataset(tracker, eventName, trackingId);
 		} else {
 			return buildEvent(tracker, eventName, trackingId, chTrackables);
 		}
@@ -737,8 +740,9 @@ public class ActivityInfo {
 
 	/**
 	 * Creates the appropriate data package {@link com.jkoolcloud.tnt4j.tracker.TrackingActivity},
-	 * {@link com.jkoolcloud.tnt4j.tracker.TrackingEvent} or {@link com.jkoolcloud.tnt4j.core.PropertySnapshot} using
-	 * the specified tracker for this activity data entity to be sent to jKoolCloud.
+	 * {@link com.jkoolcloud.tnt4j.tracker.TrackingEvent}, {@link com.jkoolcloud.tnt4j.core.PropertySnapshot} or
+	 * {@link com.jkoolcloud.tnt4j.core.Dataset} using the specified tracker for this activity data entity to be sent to
+	 * jKoolCloud.
 	 * <p>
 	 * Does same as {@link #buildTrackable(com.jkoolcloud.tnt4j.tracker.Tracker, java.util.Map)} where
 	 * {@code chTrackables} list is {@code null}.
@@ -1050,6 +1054,8 @@ public class ActivityInfo {
 			return OpType.ACTIVITY.name();
 		} else if (trackable instanceof TrackingEvent) {
 			return OpType.EVENT.name();
+		} else if (trackable instanceof Dataset) {
+			return OpType.DATASET.name();
 		} else if (trackable instanceof Snapshot) {
 			return OpType.SNAPSHOT.name();
 		} else {
@@ -1059,9 +1065,9 @@ public class ActivityInfo {
 
 	private static String resolveChildTypesFor(Trackable trackable) {
 		if (trackable instanceof Activity) {
-			return "ACTIVITY, EVENT, SNAPSHOT"; // NON-NLS
+			return "ACTIVITY, EVENT, SNAPSHOT, DATASET"; // NON-NLS
 		} else if (trackable instanceof TrackingEvent) {
-			return "SNAPSHOT"; // NON-NLS
+			return "SNAPSHOT, DATASET"; // NON-NLS
 		} else if (trackable instanceof Snapshot) {
 			return "NONE"; // NON-NLS
 		} else {
@@ -1097,8 +1103,38 @@ public class ActivityInfo {
 					"ActivityInfo.activity.has.no.name", PropertySnapshot.class.getSimpleName(), trackName);
 		}
 
-		PropertySnapshot snapshot = category != null ? (PropertySnapshot) tracker.newSnapshot(category, trackName)
-				: (PropertySnapshot) tracker.newSnapshot(trackName);
+		PropertySnapshot snapshot = (PropertySnapshot) (category != null ? tracker.newSnapshot(category, trackName)
+				: tracker.newSnapshot(trackName));
+		fillSnapshot(snapshot, trackId);
+
+		return snapshot;
+	}
+
+	/**
+	 * Builds {@link com.jkoolcloud.tnt4j.core.Dataset} for activity data recording.
+	 *
+	 * @param tracker
+	 *            communication gateway to use to record dataset
+	 * @param trackName
+	 *            name of dataset
+	 * @param trackId
+	 *            identifier (signature) of dataset
+	 * @return dataset instance
+	 */
+	protected Dataset buildDataset(Tracker tracker, String trackName, String trackId) {
+		if (StringUtils.isEmpty(trackName)) {
+			trackName = "_UNNAMED_DATASET_"; // NON-NLS
+			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+					"ActivityInfo.activity.has.no.name", Dataset.class.getSimpleName(), trackName);
+		}
+
+		Dataset dataset = category != null ? tracker.newDataset(category, trackName) : tracker.newDataset(trackName);
+		fillSnapshot(dataset, trackId);
+
+		return dataset;
+	}
+
+	private void fillSnapshot(PropertySnapshot snapshot, String trackId) {
 		snapshot.setTrackingId(trackId);
 		snapshot.setParentId(parentId);
 		if (StringUtils.isNotEmpty(guid)) {
@@ -1177,8 +1213,6 @@ public class ActivityInfo {
 				snapshot.add(ap);
 			}
 		}
-
-		return snapshot;
 	}
 
 	/**
