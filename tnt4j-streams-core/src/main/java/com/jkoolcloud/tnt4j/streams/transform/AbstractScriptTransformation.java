@@ -152,7 +152,9 @@ public abstract class AbstractScriptTransformation<V> extends AbstractValueTrans
 		}
 
 		Phase phase = null;
-		if (StringUtils.isNotEmpty(phaseName)) {
+		if (StringUtils.isEmpty(phaseName)) {
+			phase = Phase.FORMATTED;
+		} else {
 			try {
 				phase = Phase.valueOf(phaseName.toUpperCase());
 			} catch (Exception exc) {

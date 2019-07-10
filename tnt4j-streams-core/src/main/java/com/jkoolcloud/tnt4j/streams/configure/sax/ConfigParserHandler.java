@@ -2186,7 +2186,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	private boolean isLocalTransformation(ValueTransformation<?, ?> vt) {
 		return vt.getPhase() == ValueTransformation.Phase.RAW //
 				|| vt.getPhase() == ValueTransformation.Phase.FORMATTED //
-				|| (vt.getPhase() == null && !vt.hasActivityReferences());
+				|| (vt.getPhase() == null);
 	}
 
 	private void handleJavaObject(JavaObjectData javaObjectData) throws Exception {
@@ -2389,6 +2389,10 @@ public class ConfigParserHandler extends DefaultHandler {
 		} else {
 			transform = AbstractScriptTransformation.createScriptTransformation(currTransformData.name,
 					currTransformData.scriptLang, currTransformData.scriptCode, currTransformData.phase);
+		}
+
+		if (transform.getPhase() == null) {
+			transform.setPhase(ValueTransformation.Phase.FORMATTED);
 		}
 
 		if (currLocatorData != null) {

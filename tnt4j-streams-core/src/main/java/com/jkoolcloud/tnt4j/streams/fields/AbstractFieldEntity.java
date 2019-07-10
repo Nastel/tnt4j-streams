@@ -143,8 +143,7 @@ public abstract class AbstractFieldEntity {
 		}
 
 		if (transformation.getPhase() == null) {
-			transformation.setPhase(transformation.hasActivityReferences() ? ValueTransformation.Phase.AGGREGATED
-					: ValueTransformation.Phase.FORMATTED);
+			transformation.setPhase(ValueTransformation.Phase.FORMATTED);
 		}
 
 		logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
