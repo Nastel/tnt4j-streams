@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2019 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,15 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collection;
+import java.util.ArrayDeque;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import com.ibm.mq.*;
 import com.ibm.mq.constants.CMQC;
@@ -35,7 +36,10 @@ import com.ibm.msg.client.commonservices.trace.Trace;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.configure.WmqStreamProperties;
-import com.jkoolcloud.tnt4j.streams.utils.*;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
+import com.jkoolcloud.tnt4j.streams.utils.Utils;
+import com.jkoolcloud.tnt4j.streams.utils.WmqStreamConstants;
+import com.jkoolcloud.tnt4j.streams.utils.WmqUtils;
 
 /**
  * Base class for WebSphere MQ activity stream, where activity data containing {@link MQMessage} is read from the
@@ -53,7 +57,8 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>Subscription - Subscription name. (Required - at least one of 'Queue', 'Topic', 'Subscription',
  * 'TopicString')</li>
  * <li>TopicString - Topic string. (Required - at least one of 'Queue', 'Topic', 'Subscription', 'TopicString')</li>
- * <li>Host - WMQ connection host name. Default value - {@code null}. (Optional)</li>
+ * <li>Host - WMQ connection host name. In addition supports WMQ connection format - HOST(PORT) and HOST:PORT. Also can
+ * have multiple values delimited using {@code ","} symbol. Default value - {@code null}. (Optional)</li>
  * <li>Port - WMQ connection port number. Default value - {@code 1414}. (Optional)</li>
  * <li>UserName - WMQ user identifier. Default value - {@code null}. (Optional)</li>
  * <li>Password - WMQ user password. Default value - {@code null}. (Optional)</li>
@@ -106,6 +111,23 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 	protected static final String FORCE_OPEN_OPTION = "!"; // NON-NLS
 
 	/**
+	 * QM connections (hosts) delimiter symbol.
+	 */
+	protected static final String CONN_DELIM = ","; // NON-NLS
+	/**
+	 * QM connection host and port delimiter symbol.
+	 */
+	protected static final String PORT_DELIM = ":"; // NON-NLS
+	/**
+	 * QM connection port definition start symbol.
+	 */
+	protected static final String PORT_S = "("; // NON-NLS
+	/**
+	 * QM connection port definition end symbol.
+	 */
+	protected static final String PORT_E = ")"; // NON-NLS
+
+	/**
 	 * Represents Queue Manager connected to
 	 */
 	protected MQQueueManager qmgr = null;
@@ -134,6 +156,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 	private String subName = null;
 	private String topicString = null;
 	private boolean stripHeaders = true;
+	private String connectionStr = null;
 	// QM connection parameters
 	private Hashtable<String, Object> mqConnProps = new Hashtable<>(6);
 
@@ -143,6 +166,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 	private boolean forceOpenOptions;
 
 	private MQMessage mqMsg;
+	private Queue<Pair<String, Integer>> connections = new ArrayDeque<>(5);
 
 	protected AbstractWmqStream() {
 		mqConnProps.put(CMQC.PORT_PROPERTY, 1414);
@@ -151,69 +175,63 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 	}
 
 	@Override
-	public void setProperties(Collection<Map.Entry<String, String>> props) {
-		super.setProperties(props);
+	public void setProperty(String name, String value) {
+		super.setProperty(name, value);
 
-		if (CollectionUtils.isNotEmpty(props)) {
-			for (Map.Entry<String, String> prop : props) {
-				String name = prop.getKey();
-				String value = prop.getValue();
-				if (WmqStreamProperties.PROP_QMGR_NAME.equalsIgnoreCase(name)) {
-					qmgrName = value;
-				} else if (WmqStreamProperties.PROP_QUEUE_NAME.equalsIgnoreCase(name)) {
-					queueName = value;
-				} else if (WmqStreamProperties.PROP_TOPIC_NAME.equalsIgnoreCase(name)) {
-					topicName = value;
-				} else if (WmqStreamProperties.PROP_SUB_NAME.equalsIgnoreCase(name)) {
-					subName = value;
-				} else if (WmqStreamProperties.PROP_TOPIC_STRING.equalsIgnoreCase(name)) {
-					topicString = value;
-				} else if (WmqStreamProperties.PROP_HOST.equalsIgnoreCase(name)) {
-					if (StringUtils.isNotEmpty(value)) {
-						mqConnProps.put(CMQC.HOST_NAME_PROPERTY, value);
+		if (WmqStreamProperties.PROP_QMGR_NAME.equalsIgnoreCase(name)) {
+			qmgrName = value;
+		} else if (WmqStreamProperties.PROP_QUEUE_NAME.equalsIgnoreCase(name)) {
+			queueName = value;
+		} else if (WmqStreamProperties.PROP_TOPIC_NAME.equalsIgnoreCase(name)) {
+			topicName = value;
+		} else if (WmqStreamProperties.PROP_SUB_NAME.equalsIgnoreCase(name)) {
+			subName = value;
+		} else if (WmqStreamProperties.PROP_TOPIC_STRING.equalsIgnoreCase(name)) {
+			topicString = value;
+		} else if (WmqStreamProperties.PROP_HOST.equalsIgnoreCase(name)) {
+			if (StringUtils.isNotEmpty(value)) {
+				mqConnProps.put(CMQC.HOST_NAME_PROPERTY, value);
+			}
+		} else if (WmqStreamProperties.PROP_PORT.equalsIgnoreCase(name)) {
+			if (StringUtils.isNotEmpty(value)) {
+				mqConnProps.put(CMQC.PORT_PROPERTY, Integer.decode(value));
+			}
+		} else if (WmqStreamProperties.PROP_CHANNEL_NAME.equalsIgnoreCase(name)) {
+			if (StringUtils.isNotEmpty(value)) {
+				mqConnProps.put(CMQC.CHANNEL_PROPERTY, value);
+			}
+		} else if (WmqStreamProperties.PROP_STRIP_HEADERS.equalsIgnoreCase(name)) {
+			stripHeaders = Utils.toBoolean(value);
+		} else if (StreamProperties.PROP_USERNAME.equalsIgnoreCase(name)) {
+			if (StringUtils.isNotEmpty(value)) {
+				mqConnProps.put(CMQC.USER_ID_PROPERTY, value);
+			}
+		} else if (StreamProperties.PROP_PASSWORD.equalsIgnoreCase(name)) {
+			if (StringUtils.isNotEmpty(value)) {
+				mqConnProps.put(CMQC.PASSWORD_PROPERTY, value);
+			}
+		} else if (StreamProperties.PROP_RECONNECT_DELAY.equalsIgnoreCase(name)) {
+			reconnectDelay = Integer.decode(value);
+		} else if (WmqStreamProperties.OPEN_OPTIONS.equalsIgnoreCase(name)) {
+			openOptions = initOpenOptions(value);
+		} else {
+			String[] mqcNameTokens = name.split("\\.");
+			String mqcName = mqcNameTokens[mqcNameTokens.length - 1];
+			Object mqcVal = MQConstants.getValue(mqcName);
+			if (mqcVal != null) {
+				Object cVal = Utils.getBoolean(value);
+				if (cVal == null) {
+					try {
+						cVal = Integer.parseInt(value);
+					} catch (Exception exc) {
 					}
-				} else if (WmqStreamProperties.PROP_PORT.equalsIgnoreCase(name)) {
-					if (StringUtils.isNotEmpty(value)) {
-						mqConnProps.put(CMQC.PORT_PROPERTY, Integer.valueOf(value));
-					}
-				} else if (WmqStreamProperties.PROP_CHANNEL_NAME.equalsIgnoreCase(name)) {
-					if (StringUtils.isNotEmpty(value)) {
-						mqConnProps.put(CMQC.CHANNEL_PROPERTY, value);
-					}
-				} else if (WmqStreamProperties.PROP_STRIP_HEADERS.equalsIgnoreCase(name)) {
-					stripHeaders = Utils.toBoolean(value);
-				} else if (StreamProperties.PROP_USERNAME.equalsIgnoreCase(name)) {
-					if (StringUtils.isNotEmpty(value)) {
-						mqConnProps.put(CMQC.USER_ID_PROPERTY, value);
-					}
-				} else if (StreamProperties.PROP_PASSWORD.equalsIgnoreCase(name)) {
-					if (StringUtils.isNotEmpty(value)) {
-						mqConnProps.put(CMQC.PASSWORD_PROPERTY, value);
-					}
-				} else if (StreamProperties.PROP_RECONNECT_DELAY.equalsIgnoreCase(name)) {
-					reconnectDelay = Integer.valueOf(value);
-				} else if (WmqStreamProperties.OPEN_OPTIONS.equalsIgnoreCase(name)) {
-					openOptions = initOpenOptions(value);
-				} else {
-					String[] mqcNameTokens = name.split("\\.");
-					String mqcName = mqcNameTokens[mqcNameTokens.length - 1];
-					Object mqcVal = MQConstants.getValue(mqcName);
-					if (mqcVal != null) {
-						Object cVal = Utils.getBoolean(value);
-						if (cVal == null) {
-							try {
-								cVal = Integer.parseInt(value);
-							} catch (Exception exc) {
-							}
 
-							if (cVal == null) {
-								cVal = String.valueOf(value);
-							}
-						}
-
-						mqConnProps.put(String.valueOf(mqcVal), cVal);
+					if (cVal == null) {
+						cVal = String.valueOf(value);
 					}
 				}
+
+				mqConnProps.put(String.valueOf(mqcVal), cVal);
 			}
 		}
 	}
@@ -275,6 +293,72 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 		return openOptions;
 	}
 
+	/**
+	 * Initiates QM connections. {@code connection} can define one or multiple QM connections delimited using
+	 * {@code ","} symbol. Single connection definition can be: HOST, HOST(PORT) or HOST:PORT. When multiple HOST values
+	 * are defined without dedicated port definition, port value is taken from
+	 * {@link com.jkoolcloud.tnt4j.streams.configure.WmqStreamProperties#PROP_PORT} property definition.
+	 * 
+	 * @param connection
+	 *            QM connection(s) definition string
+	 * @return QM connections definition string, or {@code null} if {@code connection} defines single QM connection host
+	 *         name
+	 */
+	protected String initConnections(String connection) {
+		connections.clear();
+
+		if (StringUtils.isNotEmpty(connection)) {
+			String[] connStrs = connection.split(CONN_DELIM);
+
+			for (String connStr : connStrs) {
+				Pair<String, Integer> conn;
+				if (connStr.contains(PORT_DELIM)) {
+					String[] ct = connStr.split(PORT_DELIM);
+					conn = new ImmutablePair<>(ct[0], Integer.decode(ct[1]));
+				} else if (connStr.contains(PORT_S)) {
+					String[] ct = new String[2];
+
+					int bi = 0;
+					int ei = connStr.indexOf(PORT_S);
+					ct[0] = connStr.substring(bi, ei);
+					bi = ei + 1;
+					ei = connStr.indexOf(PORT_E);
+					if (ei == -1) {
+						ei = connStr.length();
+					}
+					ct[1] = connStr.substring(bi, ei);
+
+					conn = new ImmutablePair<>(ct[0], Integer.decode(ct[1]));
+				} else {
+					conn = new ImmutablePair<>(connStr, (int) mqConnProps.get(CMQC.PORT_PROPERTY));
+				}
+
+				connections.add(conn);
+			}
+		}
+
+		if (!connections.isEmpty()) {
+			swapConnection();
+
+			return connection;
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Swaps QM connection credentials (host and port) to next available connections list item.
+	 */
+	protected void swapConnection() {
+		Pair<String, Integer> conn = connections.poll();
+		if (conn != null) {
+			connections.add(conn);
+
+			mqConnProps.put(CMQC.HOST_NAME_PROPERTY, conn.getKey());
+			mqConnProps.put(CMQC.PORT_PROPERTY, conn.getValue());
+		}
+	}
+
 	@Override
 	public Object getProperty(String name) {
 		if (WmqStreamProperties.PROP_QMGR_NAME.equalsIgnoreCase(name)) {
@@ -293,7 +377,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 			return topicString;
 		}
 		if (WmqStreamProperties.PROP_HOST.equalsIgnoreCase(name)) {
-			return mqConnProps.get(CMQC.HOST_NAME_PROPERTY);
+			return connectionStr == null ? mqConnProps.get(CMQC.HOST_NAME_PROPERTY) : connectionStr;
 		}
 		if (WmqStreamProperties.PROP_PORT.equalsIgnoreCase(name)) {
 			return mqConnProps.get(CMQC.PORT_PROPERTY);
@@ -321,8 +405,8 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 	}
 
 	@Override
-	protected void initialize() throws Exception {
-		super.initialize();
+	protected void applyProperties() throws Exception {
+		super.applyProperties();
 
 		if (StringUtils.isEmpty(queueName) && StringUtils.isEmpty(topicString) && StringUtils.isEmpty(topicName)
 				&& StringUtils.isEmpty(subName)) {
@@ -330,6 +414,9 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 					"WmqStream.must.specify.one", StreamProperties.PROP_QUEUE_NAME, StreamProperties.PROP_TOPIC_NAME,
 					StreamProperties.PROP_TOPIC_STRING, WmqStreamProperties.PROP_SUB_NAME));
 		}
+
+		connectionStr = initConnections((String) mqConnProps.get(CMQC.HOST_NAME_PROPERTY));
+
 		// Prevents WMQ library from writing exceptions to stderr
 		MQException.log = null;
 		gmo = new MQGetMessageOptions();
@@ -473,7 +560,10 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 					logger().log(OpLevel.ERROR, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
 							"WmqStream.failed.to.connect", formatMqException(mqe));
 					if (!isHalted()) {
-						sleep(reconnectDelay);
+						if (connections.isEmpty()) {
+							sleep(reconnectDelay);
+						}
+						swapConnection();
 					}
 				}
 			}

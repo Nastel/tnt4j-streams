@@ -5029,7 +5029,8 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
  * `Topic` - Topic name. (Required - at least one of `Queue`, `Topic`, `Subscription`, `TopicString`)
  * `Subscription` - Subscription name. (Required - at least one of `Queue`, `Topic`, `Subscription`, `TopicString`)
  * `TopicString` - Topic string. (Required - at least one of `Queue`, `Topic`, `Subscription`, `TopicString`)
- * `Host` - WMQ connection host name. Alias for `CMQC.HOST_NAME_PROPERTY` Queue Manager connection property. (Optional)
+ * `Host` - WMQ connection host name. In addition supports WMQ connection format - `HOST(PORT)` and `HOST:PORT`. Also can have multiple 
+ values delimited using `,` symbol. Alias for `CMQC.HOST_NAME_PROPERTY` Queue Manager connection property. (Optional)
  * `Port` - WMQ connection port number. Alias for `CMQC.PORT_PROPERTY` Queue Manager connection property. Default value - `1414`. (Optional)
  * `UserName` - WMQ user identifier. Alias for `CMQC.USER_ID_PROPERTY` Queue Manager connection property. (Optional)
  * `Password` - WMQ user password. Alias for `CMQC.PASSWORD_PROPERTY` Queue Manager connection property. (Optional)
@@ -5073,6 +5074,13 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
     <property name="OpenOptions" value="!MQSO_FAIL_IF_QUIESCING|MQSO_CREATE|MQSO_MANAGED|MQSO_WILDCARD_CHAR"/>
     <property name="CMQC.USE_MQCSP_AUTHENTICATION_PROPERTY" value="true"/>
     <property name="CMQC.THREAD_AFFINITY_PROPERTY" value="false"/>
+    ...
+    <!-- MULTIPLE INSTANCES (MI) host configurations -->
+    <property name="Host" value="wmq.sample1.com(1420),wmq.sample2.com(1421)"/>    
+    <property name="Host" value="wmq.sample1.com:1420,wmq.sample2.com:1421"/>
+    <property name="Host" value="wmq.sample1.com,wmq.sample2.com"/>
+    <property name="Port" value="1420"/>
+    ...
 ```
 
 Also see ['Generic streams parameters'](#generic-streams-parameters).
