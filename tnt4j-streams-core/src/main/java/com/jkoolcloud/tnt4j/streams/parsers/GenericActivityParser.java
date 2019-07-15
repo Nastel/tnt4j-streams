@@ -724,7 +724,9 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		}
 
 		if (ai.isDeliverable()) {
-			ai.determineTrackingId();
+			if (cData.getParentActivity() == null) {
+				ai.determineTrackingId();
+			}
 			StreamsCache.cacheValues(ai, getName());
 		}
 	}
