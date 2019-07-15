@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2019 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,14 @@
 
 package com.jkoolcloud.tnt4j.streams.custom.inputs;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.ibm.mq.constants.MQConstants;
@@ -66,6 +70,7 @@ public class WmqTraceStream extends WmqStreamPCF {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(WmqTraceStream.class);
 
 	private PCFContent pcfMessage;
+	private final Lock msgAccessLock = new ReentrantLock();
 
 	private String opName = null;
 	private Pattern opNameMatcher = null;
@@ -90,45 +95,39 @@ public class WmqTraceStream extends WmqStreamPCF {
 	}
 
 	@Override
-	public void setProperties(Collection<Map.Entry<String, String>> props) {
-		super.setProperties(props);
+	public void setProperty(String name, String value) {
+		super.setProperty(name, value);
 
-		if (CollectionUtils.isNotEmpty(props)) {
-			for (Map.Entry<String, String> prop : props) {
-				String name = prop.getKey();
-				String value = prop.getValue();
-				if (WmqStreamProperties.PROP_TRACE_OPERATIONS.equalsIgnoreCase(name)) {
-					opName = value;
+		if (WmqStreamProperties.PROP_TRACE_OPERATIONS.equalsIgnoreCase(name)) {
+			opName = value;
 
-					if (StringUtils.isNotEmpty(value)) {
-						opNameMatcher = Pattern.compile(Utils.wildcardToRegex2(opName));
+			if (StringUtils.isNotEmpty(value)) {
+				opNameMatcher = Pattern.compile(Utils.wildcardToRegex2(opName));
+			}
+		} else if (WmqStreamProperties.PROP_EXCLUDED_REASON_CODES.equalsIgnoreCase(name)) {
+			rcExclude = value;
+
+			if (StringUtils.isNotEmpty(value)) {
+				String[] erca = Utils.splitValue(rcExclude);
+
+				excludedRCs = new HashSet<>(erca.length);
+
+				Integer eRC;
+				for (String erc : erca) {
+					try {
+						eRC = WmqUtils.getParamId(erc);
+					} catch (NoSuchElementException exc) {
+						logger().log(OpLevel.WARNING,
+								StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+								"WmqTraceStream.invalid.rc", erc);
+						continue;
 					}
-				} else if (WmqStreamProperties.PROP_EXCLUDED_REASON_CODES.equalsIgnoreCase(name)) {
-					rcExclude = value;
 
-					if (StringUtils.isNotEmpty(value)) {
-						String[] erca = Utils.splitValue(rcExclude);
-
-						excludedRCs = new HashSet<>(erca.length);
-
-						Integer eRC;
-						for (String erc : erca) {
-							try {
-								eRC = WmqUtils.getParamId(erc);
-							} catch (NoSuchElementException exc) {
-								logger().log(OpLevel.WARNING,
-										StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
-										"WmqTraceStream.invalid.rc", erc);
-								continue;
-							}
-
-							excludedRCs.add(eRC);
-						}
-					}
-				} else if (WmqStreamProperties.PROP_SUPPRESS_BROWSE_GETS.equalsIgnoreCase(name)) {
-					suppressBrowseGets = Utils.toBoolean(value);
+					excludedRCs.add(eRC);
 				}
 			}
+		} else if (WmqStreamProperties.PROP_SUPPRESS_BROWSE_GETS.equalsIgnoreCase(name)) {
+			suppressBrowseGets = Utils.toBoolean(value);
 		}
 	}
 
@@ -152,20 +151,25 @@ public class WmqTraceStream extends WmqStreamPCF {
 	@Override
 	public PCFContent getNextItem() throws Exception {
 		while (true) {
-			if (isPCFMessageConsumed(pcfMessage)) {
-				pcfMessage = super.getNextItem();
+			msgAccessLock.lock();
+			try {
+				if (isPCFMessageConsumed(pcfMessage)) {
+					pcfMessage = super.getNextItem();
 
-				if (pcfMessage != null) {
-					boolean hasMatchingTraces = initTrace(pcfMessage);
+					if (pcfMessage != null) {
+						boolean hasMatchingTraces = initTrace(pcfMessage);
 
-					if (!hasMatchingTraces) {
-						pcfMessage = null;
-						continue;
+						if (!hasMatchingTraces) {
+							pcfMessage = null;
+							continue;
+						}
 					}
 				}
-			}
 
-			return strip(pcfMessage);
+				return strip(pcfMessage);
+			} finally {
+				msgAccessLock.unlock();
+			}
 		}
 	}
 
