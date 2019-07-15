@@ -313,7 +313,10 @@ public class NumericFormatter {
 		}
 
 		if (formatter != null && !formatter.isFormatDefined()) {
-			numValue = castNumber(numValue, formatter.pattern);
+			Number cNumValue = castNumber(numValue, formatter.pattern);
+			if (cNumValue != null) {
+				numValue = cNumValue;
+			}
 		}
 
 		return scaleNumber(numValue, scale);
@@ -361,9 +364,49 @@ public class NumericFormatter {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Number> T castNumber(Number num, Class<T> clazz) {
+		if (num == null) {
+			return null;
+		}
+
 		Number cNum = null;
 
-		if (num != null && !clazz.isAssignableFrom(num.getClass())) {
+		if (num instanceof BigInteger) {
+			BigInteger bNum = (BigInteger) num;
+
+			try {
+				if (clazz.isAssignableFrom(Long.class)) {
+					cNum = bNum.longValueExact();
+				} else if (clazz.isAssignableFrom(Integer.class)) {
+					cNum = bNum.intValueExact();
+				} else if (clazz.isAssignableFrom(Byte.class)) {
+					cNum = bNum.byteValueExact();
+				} else if (clazz.isAssignableFrom(Short.class)) {
+					cNum = bNum.shortValueExact();
+				}
+			} catch (ArithmeticException exc) {
+				return null;
+			}
+		}
+
+		if (num instanceof BigDecimal) {
+			BigDecimal bNum = (BigDecimal) num;
+
+			try {
+				if (clazz.isAssignableFrom(Long.class)) {
+					cNum = bNum.longValueExact();
+				} else if (clazz.isAssignableFrom(Integer.class)) {
+					cNum = bNum.intValueExact();
+				} else if (clazz.isAssignableFrom(Byte.class)) {
+					cNum = bNum.byteValueExact();
+				} else if (clazz.isAssignableFrom(Short.class)) {
+					cNum = bNum.shortValueExact();
+				}
+			} catch (ArithmeticException exc) {
+				return null;
+			}
+		}
+
+		if (!clazz.isAssignableFrom(num.getClass())) {
 			if (clazz.isAssignableFrom(Long.class)) {
 				cNum = num.longValue();
 			} else if (clazz.isAssignableFrom(Integer.class)) {

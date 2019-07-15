@@ -122,6 +122,8 @@ public class NumericFormatterTest {
 	@Test
 	public void testCast() {
 		assertEquals((Long) 20L, NumericFormatter.castNumber(20L, Long.class));
+		assertEquals((Long) 20L, NumericFormatter.castNumber(20.3, Long.class));
+		assertEquals((Long) 20L, NumericFormatter.castNumber(20.9, Long.class));
 		assertEquals(20L, NumericFormatter.castNumber(20L, Number.class));
 		assertEquals((Long) 20L, NumericFormatter.castNumber(20.0, Long.class));
 		assertEquals((Long) 20L, NumericFormatter.castNumber(20, Long.class));
@@ -130,5 +132,26 @@ public class NumericFormatterTest {
 		assertEquals(BigDecimal.valueOf(20.0), NumericFormatter.castNumber(20L, BigDecimal.class));
 		assertEquals(0, new BigDecimal("15445512248522412556325202").compareTo(
 				NumericFormatter.castNumber(new BigInteger("15445512248522412556325202"), BigDecimal.class)));
+		assertEquals(1.2345678901234568E29,
+				NumericFormatter.castNumber(new BigInteger("123456789012345678901234567890"), Double.class), 0.0001);
+		assertEquals(new BigInteger("123456789012345678901234567890"),
+				NumericFormatter.castNumber(new BigInteger("123456789012345678901234567890"), BigInteger.class));
+		assertEquals(new BigDecimal("123456789012345678901234567890"),
+				NumericFormatter.castNumber(new BigInteger("123456789012345678901234567890"), BigDecimal.class));
+		assertEquals(new BigInteger("123456789012345678901234567890"),
+				NumericFormatter.castNumber(new BigDecimal("123456789012345678901234567890.123"), BigInteger.class));
+	}
+
+	@Test
+	public void testCastFail() {
+		assertEquals(null, NumericFormatter.castNumber(new BigInteger("123456789012345678901234567890"), Long.class));
+		assertEquals(null, NumericFormatter.castNumber(new BigInteger("12345678901234567890"), Integer.class));
+		assertEquals(null, NumericFormatter.castNumber(new BigInteger("1234567890"), Short.class));
+		assertEquals(null, NumericFormatter.castNumber(new BigInteger("12345"), Byte.class));
+
+		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("123456789012345678901234567890"), Long.class));
+		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("12345678901234567890"), Integer.class));
+		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("1234567890"), Short.class));
+		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("12345"), Byte.class));
 	}
 }
