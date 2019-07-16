@@ -314,7 +314,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 				Pair<String, Integer> conn;
 				if (connStr.contains(PORT_DELIM)) {
 					String[] ct = connStr.split(PORT_DELIM);
-					conn = new ImmutablePair<>(ct[0], Integer.decode(ct[1]));
+					conn = new ImmutablePair<>(ct[0].trim(), Integer.decode(ct[1].trim()));
 				} else if (connStr.contains(PORT_S)) {
 					String[] ct = new String[2];
 
@@ -328,9 +328,9 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 					}
 					ct[1] = connStr.substring(bi, ei);
 
-					conn = new ImmutablePair<>(ct[0], Integer.decode(ct[1]));
+					conn = new ImmutablePair<>(ct[0].trim(), Integer.decode(ct[1].trim()));
 				} else {
-					conn = new ImmutablePair<>(connStr, (int) mqConnProps.get(CMQC.PORT_PROPERTY));
+					conn = new ImmutablePair<>(connStr.trim(), (int) mqConnProps.get(CMQC.PORT_PROPERTY));
 				}
 
 				connections.add(conn);
