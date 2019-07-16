@@ -33,12 +33,22 @@
                         </includes>
                         <excludes>
                             <exclude>**/*.bat</exclude>
+                            <exclude>**/*.cmd</exclude>
                             <exclude>**/*.sh</exclude>
+                            <!-- binary content -->
                             <exclude>**/*.zip</exclude>
                             <exclude>**/*.gz</exclude>
                             <exclude>**/*.jar</exclude>
+                            <exclude>**/*.7z</exclude>
                             <exclude>**/*.xls</exclude>
                             <exclude>**/*.xlsx</exclude>
+                            <exclude>**/*.msg</exclude>
+                            <exclude>**/*.mp</exclude>
+                            <exclude>**/*.mmf</exclude>
+                            <exclude>**/*.dump</exclude>
+                            <exclude>**/*.dat</exclude>
+                            <exclude>**/*.bin</exclude>
+                            <exclude>**/*.exe</exclude>
                         </excludes>
                         <directory>samples</directory>
                         <lineEnding>unix</lineEnding>
@@ -47,6 +57,7 @@
                         <outputDirectory>samples</outputDirectory>
                         <includes>
                             <include>**/*.bat</include>
+                            <include>**/*.cmd</include>
                         </includes>
                         <directory>samples</directory>
                         <lineEnding>crlf</lineEnding>
@@ -60,14 +71,23 @@
                         <fileMode>0777</fileMode>
                         <lineEnding>unix</lineEnding>
                     </fileSet>
+                    <!-- binary content -->
                     <fileSet>
                         <outputDirectory>samples</outputDirectory>
                         <includes>
                             <include>**/*.zip</include>
                             <include>**/*.gz</include>
                             <include>**/*.jar</include>
+                            <include>**/*.7z</include>
                             <include>**/*.xls</include>
                             <include>**/*.xlsx</include>
+                            <include>**/*.msg</include>
+                            <include>**/*.mp</include>
+                            <include>**/*.mmf</include>
+                            <include>**/*.dump</include>
+                            <include>**/*.dat</include>
+                            <include>**/*.bin</include>
+                            <include>**/*.exe</include>
                         </includes>
                         <directory>samples</directory>
                     </fileSet>
@@ -100,7 +120,9 @@
             </includes>
             <excludes>
                 <exclude>**/*.bat</exclude>
+                <exclude>**/*.cmd</exclude>
                 <exclude>**/*.sh</exclude>
+                <exclude>**/*.exe</exclude>
             </excludes>
             <outputDirectory>bin</outputDirectory>
             <lineEnding>unix</lineEnding>
@@ -109,6 +131,7 @@
             <directory>../bin</directory>
             <includes>
                 <include>**/*.bat</include>
+                <include>**/*.cmd</include>
             </includes>
             <outputDirectory>bin</outputDirectory>
             <lineEnding>crlf</lineEnding>
@@ -121,6 +144,13 @@
             <outputDirectory>bin</outputDirectory>
             <fileMode>0777</fileMode>
             <lineEnding>unix</lineEnding>
+        </fileSet>
+        <fileSet>
+            <directory>../bin</directory>
+            <includes>
+                <include>**/*.exe</include>
+            </includes>
+            <outputDirectory>bin</outputDirectory>
         </fileSet>
         <!-- user defined property files -->
         <fileSet>
