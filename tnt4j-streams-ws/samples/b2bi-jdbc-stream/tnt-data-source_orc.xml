@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-ws/config/tnt-data-source-ws.xsd">
+
+    <resource-ref id="B2BiParsers" type="Parser" uri="b2bi-parsers.xml"/>
+
+    <stream name="B2BiDb2JDBCStream" class="com.jkoolcloud.tnt4j.streams.inputs.JDBCStream">
+        <property name="HaltIfNoParser" value="false"/>
+        <property name="DropRecurrentResultSets" value="true"/>
+
+        <tnt4j-properties>
+            <property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://test.jkoolcloud.com:6585"/>
+            <property name="event.sink.factory.EventSinkFactory.prod.Token" value="YOUR_REPO_TOKEN"/>
+        </tnt4j-properties>
+
+        <scenario name="Sample DB2-JDBC stream scenario" url="jdbc:oracle:thin:@//[HOST]:1521/SB2BIDB" username="[USER_NAME]"
+                  password="[USER_PASS]">
+            <step name="B2Bi arrived files query">
+                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="0" startDelayUnits="Seconds"/>
+                <request id="AFile_Data_Req">
+                    <![CDATA[
+                        SELECT RTRIM(FAF.ARRIVEDFILE_KEY) AS AFILE_KEY
+                          , FAF.MESSAGE_ID AS AFILE_MESSAGE_ID
+                          , FAF.USER_ID AS AFILE_USER_ID
+                          , FAF.FILE_NAME AS AFILE_FILE_NAME
+                          , FAF.FILE_SIZE AS AFILE_FILE_SIZE
+                          , FAF.MAILBOX_PATH AS AFILE_MAILBOX_PATH
+                          , FAF.DATA_FLOW_ID AS AFILE_DATA_FLOW_ID
+                          , RTRIM(FAF.PROD_ORG_KEY) AS AFILE_PROD_ORG_KEY
+                          , FAF.PROD_ORG_NAME AS AFILE_PROD_ORG_NAME
+                          , FAF.STATE AS AFILE_STATE
+                          , FAF.DOCUMENT_ID AS AFILE_DOCUMENT_ID
+                          , FAF.WFID AS AFILE_WFID
+                          , FAF.REVIEWED AS AFILE_REVIEWED
+                          , RTRIM(FAF.REPLAY_AF_KEY) AS AFILE_REPLAY_AF_KEY
+                          , FAF.REPLAY_COMMENT AS AFILE_REPLAY_COMMENT
+                          , FAF.ROUTES_REMAIN AS AFILE_ROUTES_REMAIN
+                          , FAF.LOCKID AS AFILE_LOCKID
+                          , FAF.CREATETS AS AFILE_CREATETS
+                          , FAF.MODIFYTS AS AFILE_MODIFYTS
+                          , FAF.CREATEUSERID AS AFILE_CREATEUSERID
+                          , FAF.MODIFYUSERID AS AFILE_MODIFYUSERID
+                          , FAF.CREATEPROGID AS AFILE_CREATEPROGID
+                          , FAF.MODIFYPROGID AS AFILE_MODIFYPROGID
+                          , FAF.DELIVERY_STATE AS AFILE_DELIVERY_STATE
+                          , FAF.DIST_MSG_ID AS AFILE_DIST_MSG_ID
+                        FROM FG_ARRIVEDFILE FAF
+                        WHERE FAF.MODIFYTS > ?
+                        ORDER BY FAF.CREATETS, FAF.DATA_FLOW_ID ASC
+                    ]]>
+                    <!-- parameter index is incremented automatically -->
+                    <req-param value="${LastAFileRecordMDate}" type="TIMESTAMP"/>
+
+                    <parser-ref name="B2BiAFilesResultSetParser"/>
+                </request>
+            </step>
+            <step name="B2Bi events query">
+                <property name="SynchronizeRequests" value="true"/>
+                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="20" startDelayUnits="Seconds"/>
+                <request id="FG_Events_Data_Req">
+                    <![CDATA[
+                        SELECT FE.EVENT_KEY AS EVENT_EVENT_KEY
+                          , FE.ENTITY_KEY AS EVENT_ENTITY_KEY
+                          , RTRIM(FE.ARRIVEDFILE_KEY) AS EVENT_ARRIVED_FILE_KEY
+                          , FE.ENTITY_TYPE AS EVENT_ENTITY_TYPE
+                          , FE.DATA_FLOW_ID AS EVENT_DATA_FLOW_ID
+                          , FE.TIME AS EVENT_TIME
+                          , FAF.CREATETS AS AF_CREATE_TS
+                          , FAF.MODIFYTS AS AF_MODIFY_TS
+                          , FE.COUNTER AS EVENT_COUNTER
+                          , FE.EVENT_CODE AS EVENT_EVENT_CODE
+                          , FE.LOCKID AS EVENT_LOCKID
+                          , FE.CREATETS AS EVENT_CREATETS
+                          , FE.MODIFYTS AS EVENT_MODIFYTS
+                          , FE.CREATEUSERID AS EVENT_CREATEUSERID
+                          , FE.MODIFYUSERID AS EVENT_MODIFYUSERID
+                          , FE.CREATEPROGID AS EVENT_CREATEPROGID
+                          , FE.MODIFYPROGID AS EVENT_MODIFYPROGID
+                          , (SELECT xmlserialize(
+                                      content xmlelement("attributes",
+                                        xmlagg(
+                                          xmlelement("attr",
+                                            xmlforest(
+                                              EAT.ORDINAL as "EVENTATTR_ORDIINAL"
+                                              , EAT.NAME as "EVENTATTR_NAME"
+                                              , EAT.VALUE as "EVENTATTR_VALUE"
+                                              -- , EAT.CREATETS as "EVENTATTR_CREATETS"
+                                              -- , EAT.MODIFYTS as "EVENTATTR_MODIFYTS"
+                                            )
+                                          )
+                                        )
+                                      ) AS CLOB VERSION '1.0" encoding="utf-8' no indent
+                                    ) AS EVT_ATTRS
+                             FROM FG_EVENTATTR EAT
+                             WHERE FE.EVENT_KEY = EAT.EVENT_KEY
+                            )
+                        FROM FG_EVENT FE
+                            LEFT OUTER JOIN FG_ARRIVEDFILE FAF ON (FAF.ARRIVEDFILE_KEY = FE.ARRIVEDFILE_KEY)
+                        WHERE FE.MODIFYTS > ?
+                        ORDER BY FE.CREATETS, FE.COUNTER ASC
+                    ]]>
+                    <!-- parameter index is incremented automatically -->
+                    <req-param value="${LastEventRecordMDate}" type="TIMESTAMP"/>
+
+                    <parser-ref name="B2BiFGEventsResultSetParser"/>
+                </request>
+                <request id="FG_Events_Appl_Data_Req">
+                    <![CDATA[
+                        SELECT FE.EVENT_KEY AS EVENT_EVENT_KEY
+                          , FE.ENTITY_KEY AS EVENT_ENTITY_KEY
+                          , RTRIM(FE.ARRIVEDFILE_KEY) AS EVENT_ARRIVED_FILE_KEY
+                          , FE.ENTITY_TYPE AS EVENT_ENTITY_TYPE
+                          , FE.DATA_FLOW_ID AS EVENT_DATA_FLOW_ID
+                          , FE.TIME AS EVENT_TIME
+                          , FAF.CREATETS AS AF_CREATE_TS
+                          , FAF.MODIFYTS AS AF_MODIFY_TS
+                          , FE.COUNTER AS EVENT_COUNTER
+                          , FE.EVENT_CODE AS EVENT_EVENT_CODE
+                          , FE.LOCKID AS EVENT_LOCKID
+                          , FE.CREATETS AS EVENT_CREATETS
+                          , FE.MODIFYTS AS EVENT_MODIFYTS
+                          , FE.CREATEUSERID AS EVENT_CREATEUSERID
+                          , FE.MODIFYUSERID AS EVENT_MODIFYUSERID
+                          , FE.CREATEPROGID AS EVENT_CREATEPROGID
+                          , FE.MODIFYPROGID AS EVENT_MODIFYPROGID
+                          , (SELECT xmlserialize(
+                                      content xmlelement("attributes",
+                                        xmlagg(
+                                          xmlelement("attr",
+                                            xmlforest(
+                                              EAT.ORDINAL as "EVENTATTR_ORDIINAL"
+                                              , EAT.NAME as "EVENTATTR_NAME"
+                                              , EAT.VALUE as "EVENTATTR_VALUE"
+                                              -- , EAT.CREATETS as "EVENTATTR_CREATETS"
+                                              -- , EAT.MODIFYTS as "EVENTATTR_MODIFYTS"
+                                            )
+                                          )
+                                        )
+                                      ) AS CLOB VERSION '1.0" encoding="utf-8' no indent
+                                    ) AS EVT_ATTRS
+                             FROM FG_EVENTATTR EAT
+                             WHERE FE.EVENT_KEY = EAT.EVENT_KEY
+                            )
+                          , FER.MODIFYTS REF_EVENT_MODIFYTS
+                          , FEA.VALUE AS APPL_NAME
+                        FROM FG_EVENT FE
+                            LEFT OUTER JOIN FG_EVENT FER ON (FER.EVENT_CODE = 'FG_0503' AND FER.ARRIVEDFILE_KEY = FE.ARRIVEDFILE_KEY)
+                            LEFT OUTER JOIN FG_EVENTATTR FEA on (FER.EVENT_KEY = FEA.EVENT_KEY AND FEA.NAME = 'RoutingChannelTemplateName')
+                            LEFT OUTER JOIN FG_ARRIVEDFILE FAF ON (FAF.ARRIVEDFILE_KEY = FE.ARRIVEDFILE_KEY)
+                        WHERE FE.EVENT_CODE = 'FG_0425'
+                          AND FER.MODIFYTS > ?
+                        ORDER BY FE.CREATETS, FE.COUNTER ASC
+                    ]]>
+                    <!-- parameter index is incremented automatically -->
+                    <req-param value="${LastEventApplRecordMDate}" type="TIMESTAMP"/>
+
+                    <parser-ref name="B2BiFGEventsApplResultSetParser"/>
+                </request>
+            </step>
+            <step name="B2Bi routes and deliveries query">
+                <property name="SynchronizeRequests" value="true"/>
+                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="30" startDelayUnits="Seconds"/>
+                <request id="FG_Routes_Data_Req">
+                    <![CDATA[
+                        SELECT RTRIM(FR.ROUTE_KEY) AS ROUTE_KEY
+                          , FR.DATA_FLOW_ID AS ROUTE_DATA_FLOW_ID
+                          , RTRIM(FR.ARRIVEDFILE_KEY) AS ROUTE_AFILE_KEY
+                          , RTRIM(FR.ROUTCHAN_KEY) AS ROUTE_ROUTCHAN_KEY
+                          , FR.CONS_ORG_KEY AS ROUTE_CONS_ORG_KEY
+                          , FR.CONS_ORG_NAME AS ROUTE_CONS_ORG_NAME
+                          , RTRIM(FR.P_FSTRUCT_KEY) AS ROUTE_P_FSTRUCT_KEY
+                          , FR.STATE AS ROUTE_STATE
+                          , FR.START_TIME AS ROUTE_START_TIME
+                          , FR.COMPLETE_TIME AS ROUTE_COMPLETE_TIME
+                          , FR.DELIVS_REMAIN AS ROUTE_DELIVS_REMAIN
+                          , FR.LOCKID AS ROUTE_LOCKID
+                          , FR.CREATETS AS ROUTE_CREATETS
+                          , FR.MODIFYTS AS ROUTE_MODIFYTS
+                          , FR.CREATEUSERID AS ROUTE_CREATEUSERID
+                          , FR.MODIFYUSERID AS ROUTE_MODIFYUSERID
+                          , FR.CREATEPROGID AS ROUTE_CREATEPROGID
+                          , FR.MODIFYPROGID AS ROUTE_MODIFYPROGID
+                        FROM FG_ROUTE FR
+                        WHERE FR.MODIFYTS > ?
+                          AND FR.ROUTCHAN_KEY IS NOT NULL  -- exclude all routes having no channel key defined
+                        ORDER BY FR.CREATETS, FR.DATA_FLOW_ID ASC
+                    ]]>
+                    <!-- parameter index is incremented automatically -->
+                    <req-param value="${LastRouteRecordMDate}" type="TIMESTAMP"/>
+
+                    <parser-ref name="B2BiRoutesResultSetParser"/>
+                </request>
+                <request id="FG_Deliveries_Data_Req">
+                    <![CDATA[
+                        SELECT RTRIM(FD.DELIVERY_KEY) AS DELIVERY_KEY
+                          , RTRIM(FD.ROUTE_KEY) AS DELIVERY_ROUTE_KEY
+                          , FD.DATA_FLOW_ID AS DELIVERY_DATA_FLOW_ID
+                          , FD.STATE AS DELIVERY_STATE
+                          , RTRIM(FD.DELIVCHAN_KEY) AS DELIVERY_DELIVCHAN_KEY
+                          , FD.CONSUMER_DOCID AS DELIVERY_CONSUMER_DOCID
+                          , FD.CONTENT_TYPE AS DELIVERY_CONTENT_TYPE
+                          , FD.FILENAME AS DELIVERY_FILENAME
+                          , FD.CONSDOC_TYPE AS DELIVERY_CONSDOC_TYPE
+                          , FD.MAILBOX_PATH AS DELIVERY_MAILBOX_PATH
+                          , FD.LATE_CREATE_MBX AS DELIVERY_LATE_CREATE_MBX
+                          , FD.CONSUMER_MSGID AS DELIVERY_CONSUMER_MSGID
+                          , FD.ASYNC_XFER_ID AS DELIVERY_ASYNC_XFER_ID
+                          , FD.LOCKID AS DELIVERY_LOCKID
+                          , FD.CREATETS AS DELIVERY_CREATETS
+                          , FD.MODIFYTS AS DELIVERY_MODIFYTS
+                          , FD.CREATEUSERID AS DELIVERY_CREATEUSERID
+                          , FD.MODIFYUSERID AS DELIVERY_MODIFYUSERID
+                          , FD.CREATEPROGID AS DELIVERY_CREATEPROGID
+                          , FD.MODIFYPROGID AS DELIVERY_MODIFYPROGID
+                          , FD.DIST_CONSUMER_MSGID AS DELIVERY_DIST_CONSUMER_MSGID
+                        FROM FG_DELIVERY FD
+                        WHERE FD.MODIFYTS > ?
+                          AND FD.FILENAME IS NOT NULL  -- exclude all deliveries not bound to particular file transfer
+                        ORDER BY FD.CREATETS, FD.DATA_FLOW_ID ASC
+                    ]]>
+                    <!-- parameter index is incremented automatically -->
+                    <req-param value="${LastDeliveryRecordMDate}" type="TIMESTAMP"/>
+
+                    <parser-ref name="B2BiDeliveriesResultSetParser"/>
+                </request>
+            </step>
+            <step name="B2Bi correlation sets query">
+                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="35" startDelayUnits="Seconds"/>
+                <request id="Correl_Set_Data_Req">
+                    <![CDATA[
+                        SELECT CS.CORRELATION_ID AS CORRELATION_ID
+                          , CS.NAME AS CORRELATION_NAME
+                          , CS.VALUE AS CORRELATION_VALUE
+                          , CS.TYPE AS CORRELATION_TYPE
+                          , CS.OBJECT_ID AS CORRELATION_OBJECT_ID
+                          , CS.ARCHIVE_FLAG AS CORRELATION_ARCHIVE_FLAG
+                          , CS.ARCHIVE_DATE AS CORRELATION_ARCHIVE_DATE
+                          , CS.WF_ID AS CORRELATION_WF_ID
+                          , CS.REC_TIME AS CORRELATION_REC_TIME
+                          , CS.KEY_ID AS CORRELATION_KEY_ID
+                          , CS.VALUE_UPPER AS CORRELATION_VALUE_UPPER
+                          , CK.NAME CORR_KEY_NAME
+                          , CK.SCOPE CORR_KEY_SCOPE
+                          , CK.TYPE CORR_KEY_TYPE
+                          , CK.LABEL CORR_KEY_LABEL
+                        FROM CORRELATION_SET CS
+                            INNER JOIN CORREL_KEY CK ON (CS.KEY_ID = CK.ID)
+                        WHERE CS.REC_TIME > ?
+                        ORDER BY CS.REC_TIME, CS.OBJECT_ID ASC
+                    ]]>
+                    <!-- parameter index is incremented automatically -->
+                    <req-param value="${LastCorrelationSetRecordMDate}" type="TIMESTAMP"/>
+
+                    <parser-ref name="B2BiCorrelationSetResultSetParser"/>
+                </request>
+            </step>
+            <step name="B2Bi workflow context query">
+                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="35" startDelayUnits="Seconds"/>
+                <request id="Workflow_Data_Req">
+                    <![CDATA[
+                        SELECT WC.WFC_ID AS WORKFLOW_WFC_ID
+                          , WC.WFD_ID AS WORKFLOW_WFD_ID
+                          , WC.WFD_VERSION AS WORKFLOW_WFD_VERSION
+                          , WC.WORKFLOW_ID AS WORKFLOW_ID
+                          , WC.ACTIVITYINFO_ID AS WORKFLOW_ACTIVITYINFO_ID
+                          , WC.NEXT_AI_ID AS WORKFLOW_NEXT_AI_ID
+                          , WC.ORIG_WFC_ID AS WORKFLOW_ORIG_WFC_ID
+                          , WC.PREV_WFC_ID AS WORKFLOW_PREV_WFC_ID
+                          , WC.PARENT_WFD_ID AS WORKFLOW_PARENT_WFD_ID
+                          , WC.PARENT_WFD_VERSION AS WORKFLOW_PARENT_WFD_VERSION
+                          , WC.BRANCH_ID AS WORKFLOW_BRANCH_ID
+                          , WC.STEP_ID AS WORKFLOW_STEP_ID
+                          , WC.SERVICE_NAME AS WORKFLOW_SERVICE_NAME
+                          , WC.DOC_ID AS WORKFLOW_DOC_ID
+                          , WC.BASIC_STATUS AS WORKFLOW_BASIC_STATUS
+                          , WC.ADV_STATUS AS WORKFLOW_ADV_STATUS
+                          , WC.START_TIME AS WORKFLOW_START_TIME
+                          , WC.END_TIME AS WORKFLOW_END_TIME
+                          , WC.STATUS_RPT AS WORKFLOW_STATUS_RPT
+                          , WC.CONTENT AS WORKFLOW_CONTENT
+                          , WC.WFE_STATUS AS WORKFLOW_WFE_STATUS
+                          , WC.WFE_STATUS_RPT AS WORKFLOW_WFE_STATUS_RPT
+                          , WC.SVC_PARM_VER AS WORKFLOW_SVC_PARM_VER
+                          , WC.LIFE_SPAN AS WORKFLOW_LIFE_SPAN
+                          , WC.PERSISTENCE_LEVEL AS WORKFLOW_PERSISTENCE_LEVEL
+                          , WC.ARCHIVE_FLAG AS WORKFLOW_ARCHIVE_FLAG
+                          , WC.ARCHIVE_DATE AS WORKFLOW_ARCHIVE_DATE
+                          , WC.ENTERQ AS WORKFLOW_ENTERQ
+                          , WC.EXITQ AS WORKFLOW_EXITQ
+                          , WC.DEADLINE AS WORKFLOW_DEADLINE
+                          , WC.CONTRACT_ID AS WORKFLOW_CONTRACT_ID
+                          , WC.NODEEXECUTED AS WORKFLOW_NODEEXECUTED
+                          , WC.EVENT_LEVEL AS WORKFLOW_EVENT_LEVEL
+                        FROM WORKFLOW_CONTEXT WC
+                        WHERE WC.START_TIME > ?
+                          AND EXISTS (SELECT DL.WORKFLOW_ID
+                                        FROM WORKFLOW_LINKAGE WL
+                                            INNER JOIN DOCUMENT_LIFESPAN DL ON (WL.C_WF_ID = DL.WORKFLOW_ID)
+                                        WHERE WL.ROOT_WF_ID = WC.WORKFLOW_ID
+                                           OR DL.WORKFLOW_ID = WC.WORKFLOW_ID
+                                     )  -- pick only document related workflow events
+                        ORDER BY WC.START_TIME, WC.WORKFLOW_ID ASC
+                    ]]>
+                    <!-- parameter index is incremented automatically -->
+                    <req-param value="${LastWorkflowContextRecordMDate}" type="TIMESTAMP"/>
+
+                    <parser-ref name="B2BiWorkflowContextResultSetParser"/>
+                </request>
+            </step>
+            <step name="B2Bi documents query">
+                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="35" startDelayUnits="Seconds"/>
+                <request id="Documents_Req">
+                    <![CDATA[
+                      SELECT D.DOC_ID AS DOCUMENT_ID
+                           , D.SUBJECT AS DOCUMENT_SUBJECT
+                           , D.CONTENT_TYPE AS DOCUMENT_CONT_TYPE
+                           , D.CONTENT_SUBTYPE AS DOCUMENT_CONT_SUBTYPE
+                           , D.CREATE_TIME AS DOCUMENT_CREATE_TIME
+                           , D.PREV_DOC_ID AS DOCUMENT_PREV_DOC_ID
+                           , D.BODY_NAME AS DOCUMENT_BODY_NAME
+                           , D.BODY AS DOCUMENT_BODY
+                           , D.CHAR_ENCODING AS DOCUMENT_CHAR_ENCODING
+                           , D.DOC_NAME AS DOCUMENT_DOC_NAME
+                           , D.WORKFLOW_ID AS DOCUMENT_WORKFLOW_ID
+                           , D.PURGE_AFTER AS DOCUMENT_PURGE_AFTER
+                           , D.ARCHIVE_FLAG AS DOCUMENT_ARCHIVE_FLAG
+                           , D.ARCHIVE_DATE AS DOCUMENT_ARCHIVE_DATE
+                           , D.DOCUMENT_SIZE AS DOCUMENT_DOCUMENT_SIZE
+                           , D.STORAGE_TYPE AS DOCUMENT_STORAGE_TYPE
+                           , D.ENC_ALG AS DOCUMENT_ENC_ALG
+                           , D.ENC_IV AS DOCUMENT_ENC_IV
+                           , D.ENC_KEY AS DOCUMENT_ENC_KEY
+                           , D.MODIFYTS AS DOCUMENT_MODIFYTS
+                           , DF.DATA_FLOW_ID AS DATA_FLOW_DATA_FLOW_ID
+                           , DF.CREATE_TIME AS DATA_FLOW_CREATE_TIME
+                           , DF.STATE AS DATA_FLOW_STATE
+                           , DF.ROOT_DOCUMENT AS DATA_FLOW_ROOT_DOCUMENT
+                           , DF.DOC_TRAK_ID AS DATA_FLOW_DOC_TRAK_ID
+                           , DF.ROOT_DOC_NAME AS DATA_FLOW_ROOT_DOC_NAME
+                           , DF.ROOT_DOC_SIZE AS DATA_FLOW_ROOT_DOC_SIZE
+                      FROM DOCUMENT D
+                       INNER JOIN DATA_FLOW DF ON (D.DOC_ID = DF.ROOT_DOCUMENT)
+                      WHERE D.MODIFYTS > ?
+                       ORDER BY D.CREATE_TIME, D.DOC_ID ASC
+                    ]]>
+                    <!-- parameter index is incremented automatically -->
+                    <req-param value="${LastDocumentsRecordMDate}" type="TIMESTAMP"/>
+
+                    <parser-ref name="B2BiDocumentsResultSetParser"/>
+                </request>
+            </step>
+        </scenario>
+    </stream>
+</tnt-data-source>
