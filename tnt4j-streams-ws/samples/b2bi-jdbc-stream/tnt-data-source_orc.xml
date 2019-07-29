@@ -14,7 +14,10 @@
             <property name="event.sink.factory.EventSinkFactory.prod.Token" value="YOUR_REPO_TOKEN"/>
         </tnt4j-properties>
 
-        <scenario name="Sample Oracle-JDBC stream scenario" url="jdbc:oracle:thin:@//[HOST]:1521/SB2BIDB" username="[USER_NAME]"
+        <!-- SID URL -->
+        <!--<scenario name="Sample Oracle-JDBC stream scenario" url="jdbc:oracle:thin:@[HOST]:1521:[SID]" username="[USER_NAME]" password="[USER_PASS]">-->
+        <!-- SERVICE NAME URL-->
+        <scenario name="Sample Oracle-JDBC stream scenario" url="jdbc:oracle:thin:@//[HOST]:1521/[SERVICE_NAME]" username="[USER_NAME]"
                   password="[USER_PASS]">
             <step name="B2Bi arrived files query">
                 <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="0" startDelayUnits="Seconds"/>
