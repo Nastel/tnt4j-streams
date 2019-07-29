@@ -413,7 +413,7 @@ public final class StreamsAgent {
 		} catch (SAXException | IllegalStateException e) {
 			LOGGER.log(OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"StreamsAgent.cfg.error", Utils.getExceptionMessages(e));
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			Utils.logThrowable(LOGGER, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"StreamsAgent.start.failed", e);
 		}
@@ -546,7 +546,7 @@ public final class StreamsAgent {
 					});
 					return true;
 				}
-			} catch (Exception exc) {
+			} catch (Throwable exc) {
 				Utils.logThrowable(LOGGER, OpLevel.ERROR,
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "StreamsAgent.zk.cfg.failed",
 						exc);

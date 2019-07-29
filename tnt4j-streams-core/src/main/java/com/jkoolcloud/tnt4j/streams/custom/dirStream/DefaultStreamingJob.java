@@ -127,7 +127,7 @@ public class DefaultStreamingJob implements StreamingJob {
 			}
 		} catch (SAXException | IllegalStateException e) {
 			LOGGER.log(OpLevel.ERROR, Utils.getExceptionMessages(e));
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			Utils.logThrowable(LOGGER, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"StreamsAgent.start.failed", e);
 		}
