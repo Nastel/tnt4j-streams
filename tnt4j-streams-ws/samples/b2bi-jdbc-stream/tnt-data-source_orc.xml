@@ -5,7 +5,7 @@
 
     <resource-ref id="B2BiParsers" type="Parser" uri="b2bi-parsers.xml"/>
 
-    <stream name="B2BiDb2JDBCStream" class="com.jkoolcloud.tnt4j.streams.inputs.JDBCStream">
+    <stream name="B2BiOracleJDBCStream" class="com.jkoolcloud.tnt4j.streams.inputs.JDBCStream">
         <property name="HaltIfNoParser" value="false"/>
         <property name="DropRecurrentResultSets" value="true"/>
 
@@ -14,7 +14,7 @@
             <property name="event.sink.factory.EventSinkFactory.prod.Token" value="YOUR_REPO_TOKEN"/>
         </tnt4j-properties>
 
-        <scenario name="Sample DB2-JDBC stream scenario" url="jdbc:oracle:thin:@//[HOST]:1521/SB2BIDB" username="[USER_NAME]"
+        <scenario name="Sample Oracle-JDBC stream scenario" url="jdbc:oracle:thin:@//[HOST]:1521/SB2BIDB" username="[USER_NAME]"
                   password="[USER_PASS]">
             <step name="B2Bi arrived files query">
                 <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="0" startDelayUnits="Seconds"/>
