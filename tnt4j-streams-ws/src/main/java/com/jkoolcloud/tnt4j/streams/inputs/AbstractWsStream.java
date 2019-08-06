@@ -22,13 +22,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.triggers.AbstractTrigger;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.core.UsecTimestamp;
@@ -333,32 +333,53 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 
 	@Override
 	protected boolean isInputEnded() {
-		try {
-			List<JobExecutionContext> runningJobs = scheduler.getCurrentlyExecutingJobs();
-			if (CollectionUtils.isNotEmpty(runningJobs)) {
-				return false;
+		if (scheduler != null) {
+			try {
+				List<JobExecutionContext> runningJobs = scheduler.getCurrentlyExecutingJobs();
+				logger().log(OpLevel.TRACE, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+						"AbstractWsStream.currently.executing", runningJobs.size());
+				if (CollectionUtils.isNotEmpty(runningJobs)) {
+					return false;
+				}
+			} catch (SchedulerException exc) {
 			}
-		} catch (SchedulerException exc) {
-		}
 
-		try {
-			Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(null);
-			if (CollectionUtils.isNotEmpty(triggerKeys)) {
-				for (TriggerKey tKey : triggerKeys) {
-					try {
-						Trigger t = scheduler.getTrigger(tKey);
-						if (t != null && t.mayFireAgain()) {
-							return false;
+			try {
+				Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(null);
+				logger().log(OpLevel.TRACE, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+						"AbstractWsStream.scheduler.triggers", triggerKeys.size());
+				if (CollectionUtils.isNotEmpty(triggerKeys)) {
+					for (TriggerKey tKey : triggerKeys) {
+						try {
+							Trigger t = scheduler.getTrigger(tKey);
+							logger().log(OpLevel.TRACE,
+									StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+									"AbstractWsStream.scheduler.trigger", t instanceof AbstractTrigger
+											? ((AbstractTrigger<?>) t).getFullName() : t.getClass().getName(),
+									t.getPreviousFireTime(), t.getNextFireTime());
+							if (t != null && isActiveTrigger(t)) {
+								return false;
+							}
+						} catch (SchedulerException exc) {
 						}
-					} catch (SchedulerException exc) {
 					}
 				}
+			} catch (SchedulerException exc) {
 			}
-		} catch (SchedulerException exc) {
+
+			try {
+				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+						"AbstractWsStream.inactive.scheduler", scheduler.getMetaData());
+			} catch (SchedulerException exc) {
+			}
 		}
 
 		offerDieMarker();
 		return true;
+	}
+
+	private static boolean isActiveTrigger(Trigger t) {
+		return t.mayFireAgain() || t.getPreviousFireTime() == null;
 	}
 
 	@Override
@@ -373,7 +394,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 
 	/**
 	 * Marks stream state for picked item from buffer and performs post parsing actions for provided activity data item.
-	 * 
+	 *
 	 * @param item
 	 *            processed activity data item
 	 *
@@ -398,7 +419,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	 * Performs post parsing actions for provided activity data item.
 	 * <p>
 	 * Generic post parsing case is to release all acquired requests synchronization semaphores.
-	 * 
+	 *
 	 * @param item
 	 *            processed activity data item
 	 */
@@ -582,7 +603,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	 * To synchronize stream or scenario step requests use flag ({@code true}/{@code false}) type stream/scenario step
 	 * configuration property
 	 * {@value com.jkoolcloud.tnt4j.streams.configure.WsStreamProperties#PROP_SYNCHRONIZE_REQUESTS}.
-	 * 
+	 *
 	 * @param stream
 	 *            stream instance used
 	 * @param request
@@ -619,7 +640,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 
 	/**
 	 * Releases provided semaphore to continue next request execution.
-	 * 
+	 *
 	 * @param acquiredSemaphore
 	 *            requests semaphore to release
 	 * @param stream
