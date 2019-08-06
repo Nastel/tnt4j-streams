@@ -4958,7 +4958,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
  * `Topic` - topic destination name or names delimited using `,` char. (Required - at least one of `Queue` or `Topic`)
  * `java.naming.factory.initial` - JNDI context factory name. (Required)
  * `JMSConnFactory` - JMS connection factory name. (Required)
- * list of JNDI context configuration properties supported by JMS server implementation. See `javax.naming.Context` for more details. 
+ * List of JNDI context configuration properties supported by JMS server implementation. See `javax.naming.Context` for more details. 
  (Optional)
 
     sample:
@@ -5240,10 +5240,15 @@ Generic configuration properties:
 * `SynchronizeRequests` - flag indicating that stream issued requests shall be synchronized and handled in configuration defined sequence - 
 waiting for prior request to complete before issuing next one. This property can be defined under `stream` or scenario `step` tags and 
 synchronize requests under according scope. Default value - `false`. (Optional)
+* List of Quartz configuration properties. See [Quartz Configuration Reference](http://www.quartz-scheduler.org/documentation/quartz-2.3.0/configuration/) 
+for details. (Optional)
 
     sample:
 ```xml
     <property name="SynchronizeRequests" value="true"/>
+    <!-- Quartz configuration -->
+    <property name="org.quartz.scheduler.instanceName" value="MyStreamScheduler"/>
+    <property name="org.quartz.threadPool.threadCount" value="5"/>
     ...
 ```
 

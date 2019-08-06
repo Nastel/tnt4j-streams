@@ -53,6 +53,9 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  * <li>SynchronizeRequests - flag indicating that stream issued WebService requests shall be synchronized and handled in
  * configuration defined sequence - waiting for prior request to complete before issuing next. Default value -
  * {@code false}. (Optional)</li>
+ * <li>List of Quartz configuration properties. See
+ * <a href= "http://www.quartz-scheduler.org/documentation/quartz-2.3.0/configuration/">Quartz Configuration
+ * Reference</a> for details.</li>
  * </ul>
  *
  * @param <T>
@@ -85,22 +88,16 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 
 	private List<WsScenario> scenarioList;
 
-	private static Scheduler scheduler;
-	private static final ReentrantLock schedInitLock = new ReentrantLock();
+	private Scheduler scheduler;
 	private boolean synchronizeRequests = false;
+	private Properties quartzProperties = new Properties();
 
 	@Override
-	public void setProperties(Collection<Map.Entry<String, String>> props) {
-		super.setProperties(props);
-
-		if (CollectionUtils.isNotEmpty(props)) {
-			for (Map.Entry<String, String> prop : props) {
-				String name = prop.getKey();
-				String value = prop.getValue();
-				if (WsStreamProperties.PROP_SYNCHRONIZE_REQUESTS.equalsIgnoreCase(name)) {
-					synchronizeRequests = Utils.toBoolean(value);
-				}
-			}
+	public void setProperty(String name, String value) {
+		if (WsStreamProperties.PROP_SYNCHRONIZE_REQUESTS.equalsIgnoreCase(name)) {
+			synchronizeRequests = Utils.toBoolean(value);
+		} else if (name.startsWith("org.quartz.")) { // NON-NLS
+			quartzProperties.setProperty(name, value);
 		}
 	}
 
@@ -122,18 +119,29 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 		return super.getProperty(name);
 	}
 
+	/**
+	 * Initiates required Quartz configuration properties, if not set over streams configuration:
+	 * 
+	 * <ul>
+	 * <li>{@code org.quartz.scheduler.instanceName} - name of stream appended by {@code "Scheduler"} suffix.</li>
+	 * <li>{@code org.quartz.threadPool.threadCount=2}</li>
+	 * </ul>
+	 */
+	protected void initQuartzProperties() {
+		Utils.setPropertyIfAbsent(quartzProperties, "org.quartz.scheduler.instanceName", getName() + "Scheduler"); // NON-NLS
+		Utils.setPropertyIfAbsent(quartzProperties, "org.quartz.threadPool.threadCount", "2"); // NON-NLS
+	}
+
 	@Override
 	protected void initialize() throws Exception {
 		super.initialize();
 
-		schedInitLock.lock();
-		try {
-			if (scheduler == null) {
-				scheduler = StdSchedulerFactory.getDefaultScheduler();
-				scheduler.start();
-			}
-		} finally {
-			schedInitLock.unlock();
+		if (scheduler == null) {
+			initQuartzProperties();
+
+			StdSchedulerFactory schf = new StdSchedulerFactory(quartzProperties);
+			scheduler = schf.getScheduler();
+			scheduler.start();
 		}
 
 		logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
