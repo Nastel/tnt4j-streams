@@ -27,6 +27,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.*;
 import java.nio.file.FileSystem;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1571,6 +1572,23 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
+	 * Sleeps current running thread and silently consumes thrown {@link InterruptedException}.
+	 *
+	 * @param tUnit
+	 *            time units to sleep
+	 * @param timeout
+	 *            sleep time value
+	 *
+	 * @see java.util.concurrent.TimeUnit#sleep(long)
+	 */
+	public static void sleep(TimeUnit tUnit, long timeout) {
+		try {
+			tUnit.sleep(timeout);
+		} catch (InterruptedException exc) {
+		}
+	}
+
+	/**
 	 * Loads properties from file referenced by provided system property.
 	 *
 	 * @param propKey
@@ -1656,6 +1674,26 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		}
 
 		return rProps;
+	}
+
+	/**
+	 * Sets property {@code propName} value {@code propValue}, if it is absent in provided properties set {@code props}.
+	 * 
+	 * @param props
+	 *            properties set to check and alter
+	 * @param propName
+	 *            property name
+	 * @param propValue
+	 *            property value
+	 */
+	public static void setPropertyIfAbsent(Properties props, String propName, String propValue) {
+		if (props == null) {
+			return;
+		}
+
+		if (StringUtils.isEmpty(props.getProperty(propName))) {
+			props.setProperty(propName, propValue);
+		}
 	}
 
 	/**
