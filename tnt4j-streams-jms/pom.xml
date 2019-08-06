@@ -104,7 +104,7 @@
         <dependency>
             <groupId>com.solacesystems</groupId>
             <artifactId>sol-jms</artifactId>
-            <version>10.6.0</version>
+            <version>10.6.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

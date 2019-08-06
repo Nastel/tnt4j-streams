@@ -14,7 +14,7 @@
     <artifactId>tnt4j-streams-wmq</artifactId>
 
     <properties>
-        <ibm.mq.version>9.1.2.0</ibm.mq.version>
+        <ibm.mq.version>9.1.3.0</ibm.mq.version>
     </properties>
 
     <build>
@@ -96,6 +96,11 @@
         <!--<artifactId>javax.resource-api</artifactId>-->
         <!--<version>1.7.1</version>-->
         <!--</dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.slf4j</groupId>-->
+        <!--            <artifactId>jul-to-slf4j</artifactId>-->
+        <!--            <version>1.7.26</version>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>com.jkoolcloud.tnt4j.streams</groupId>

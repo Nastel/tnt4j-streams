@@ -15,18 +15,17 @@
 
     <properties>
         <commons.lang3.version>3.8</commons.lang3.version>
-        <commons.collections.version>4.3</commons.collections.version>
+        <commons.collections.version>4.4</commons.collections.version>
         <commons.io.version>2.6</commons.io.version>
-        <commons.daemon.version>1.1.0</commons.daemon.version>
+        <commons.daemon.version>1.2.0</commons.daemon.version>
         <gson.version>2.8.5</gson.version>
         <json.path.version>2.4.0</json.path.version>
-        <jaxb.version>2.3.0</jaxb.version>
+        <jaxb.version>2.3.1</jaxb.version>
 
         <jesl.version>0.10-SNAPSHOT</jesl.version>
 
-        <httpcomponents.version>4.5.8</httpcomponents.version>
-
-        <msgpack.version>0.8.16</msgpack.version>
+        <httpcomponents.version>4.5.9</httpcomponents.version>
+        <zookeeper.version>3.5.5</zookeeper.version>
 
         <groovy.version>2.5.7</groovy.version>
 
@@ -159,11 +158,11 @@
             </exclusions>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>org.msgpack</groupId>
             <artifactId>msgpack-core</artifactId>
             <version>${msgpack.version}</version>
-        </dependency>
+        </dependency-->
         <!--<dependency>-->
         <!--<groupId>org.apache.storm</groupId>-->
         <!--<artifactId>storm-core</artifactId>-->
@@ -211,7 +210,7 @@
         <dependency>
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>
-            <version>3.4.14</version>
+            <version>${zookeeper.version}</version>
             <!--<optional>true</optional>-->
             <exclusions>
                 <exclusion>
@@ -236,14 +235,10 @@
             <version>${jaxb.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
             <version>${jaxb.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>${jaxb.version}</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- used by HTTP stream and required by JESL anyway -->
