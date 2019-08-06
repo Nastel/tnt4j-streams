@@ -16,7 +16,6 @@
 
 package com.jkoolcloud.tnt4j.streams.inputs;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -350,7 +349,7 @@ public class KafkaStream extends TNTParseableInputStream<Map<String, ?>> {
 		sc.parse(System.getProperty(ZK_PROP_FILE_KEY));
 
 		ZooKeeperServer zkServer = new ZooKeeperServer();
-		zLog = new FileTxnSnapLog(new File(sc.getDataLogDir()), new File(sc.getDataDir()));
+		zLog = new FileTxnSnapLog(sc.getDataLogDir(), sc.getDataDir());
 		zkServer.setTxnLogFactory(zLog);
 		zkServer.setTickTime(sc.getTickTime());
 		zkServer.setMinSessionTimeout(sc.getMinSessionTimeout());
