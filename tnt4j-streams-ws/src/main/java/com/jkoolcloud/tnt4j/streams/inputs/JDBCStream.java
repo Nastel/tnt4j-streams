@@ -69,7 +69,12 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  */
 public class JDBCStream extends AbstractWsStream<ResultSet> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(JDBCStream.class);
+
 	private static final String QUERY_NAME_PROP = "QueryName"; // NON-NLS
+
+	private static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd"; // NON-NLS
+	private static final String DEFAULT_TIME_PATTERN = "HH:mm:ss"; // NON-NLS
+	private static final String DEFAULT_TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS"; // NON-NLS
 
 	/**
 	 * Contains custom JDBC configuration properties.
@@ -334,7 +339,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 									"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
 						}
 						break;
-					case "BIGINT":// NON-NLS
+					case "BIGINT": // NON-NLS
 						value = stream.fillInRequestData(value, format);
 						if ("null".equalsIgnoreCase(value)) {
 							setNullParameter(statement, pIdx, Types.BIGINT, type.toUpperCase());
@@ -345,7 +350,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 									"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
 						}
 						break;
-					case "FLOAT":// NON-NLS
+					case "FLOAT": // NON-NLS
 						value = stream.fillInRequestData(value, format);
 						if ("null".equalsIgnoreCase(value)) {
 							setNullParameter(statement, pIdx, Types.FLOAT, type.toUpperCase());
@@ -356,7 +361,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 									"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
 						}
 						break;
-					case "DOUBLE":// NON-NLS
+					case "DOUBLE": // NON-NLS
 					case "REAL": // NON-NLS
 					case "DECIMAL": // NON-NLS
 						value = stream.fillInRequestData(value, format);
@@ -369,8 +374,9 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 									"JDBCStream.set.query.parameter", pIdx, value, "DOUBLE"); // NON-NLS
 						}
 						break;
-					case "DATE":// NON-NLS
-						value = stream.fillInRequestData(value, format);
+					case "DATE": // NON-NLS
+						value = stream.fillInRequestData(value,
+								StringUtils.isEmpty(format) ? DEFAULT_DATE_PATTERN : format);
 						if ("null".equalsIgnoreCase(value)) {
 							setNullParameter(statement, pIdx, Types.DATE, type.toUpperCase());
 						} else {
@@ -380,8 +386,9 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 									"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
 						}
 						break;
-					case "TIME":// NON-NLS
-						value = stream.fillInRequestData(value, format);
+					case "TIME": // NON-NLS
+						value = stream.fillInRequestData(value,
+								StringUtils.isEmpty(format) ? DEFAULT_TIME_PATTERN : format);
 						if ("null".equalsIgnoreCase(value)) {
 							setNullParameter(statement, pIdx, Types.TIME, type.toUpperCase());
 						} else {
@@ -391,9 +398,10 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 									"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
 						}
 						break;
-					case "TIMESTAMP":// NON-NLS
+					case "TIMESTAMP": // NON-NLS
+					case "DATETIME": // NON-NLS
 						value = stream.fillInRequestData(value,
-								StringUtils.isEmpty(format) ? "yyyy-MM-dd HH:mm:ss.SSS" : format); // NON-NLS
+								StringUtils.isEmpty(format) ? DEFAULT_TIMESTAMP_PATTERN : format);
 						if ("null".equalsIgnoreCase(value)) {
 							setNullParameter(statement, pIdx, Types.TIMESTAMP, type.toUpperCase());
 						} else {
