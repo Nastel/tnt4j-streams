@@ -793,7 +793,8 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 						if (streamExecutorService == null) {
 							processActivityItem_(item, failureFlag);
 						} else {
-							streamExecutorService.submit(new ActivityItemProcessingTask(item, failureFlag, getActivityPosition()));
+							streamExecutorService
+									.submit(new ActivityItemProcessingTask(item, failureFlag, getActivityPosition()));
 						}
 					}
 				} catch (IllegalStateException ise) {
@@ -829,7 +830,6 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 		}
 	}
 
-	private boolean isShotDown() {
 	/**
 	 * Checks if stream has been started shot down process.
 	 * 
