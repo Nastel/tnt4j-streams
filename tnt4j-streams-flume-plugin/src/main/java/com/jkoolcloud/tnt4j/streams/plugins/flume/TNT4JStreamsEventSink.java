@@ -30,6 +30,7 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.StreamsAgent;
 import com.jkoolcloud.tnt4j.streams.configure.StreamsConfigLoader;
+import com.jkoolcloud.tnt4j.streams.configure.build.CfgStreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.utils.FlumeConstants;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
@@ -145,7 +146,7 @@ public class TNT4JStreamsEventSink extends AbstractSink implements Configurable 
 		if (StringUtils.isEmpty(hostname) || hostname.equals(DEFAULT_HOST)) {
 			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(FlumeConstants.RESOURCE_BUNDLE_NAME),
 					"TNT4JStreamsEventSink.streams.starting");
-			StreamsAgent.runFromAPI(streamConfig);
+			StreamsAgent.runFromAPI(new CfgStreamsBuilder().setConfig(streamConfig));
 		}
 		try {
 			openSocket();

@@ -19,6 +19,8 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Test;
 
 import com.jkoolcloud.tnt4j.sink.EventSink;
@@ -69,7 +71,7 @@ public class AbstractBufferedStreamTest {
 			}
 		});
 		thread.start();
-		Thread.sleep(1000);
+		TimeUnit.SECONDS.sleep(1);
 		assertEquals(Thread.State.WAITING, thread.getState());
 		thread.interrupt();
 	}
@@ -119,7 +121,7 @@ public class AbstractBufferedStreamTest {
 			}
 		});
 		thread.start();
-		Thread.sleep(1000);
+		TimeUnit.SECONDS.sleep(1);
 		if (overflowRecordCount >= 2) {
 			Thread.sleep(30);
 			assertEquals(Thread.State.WAITING, thread.getState());

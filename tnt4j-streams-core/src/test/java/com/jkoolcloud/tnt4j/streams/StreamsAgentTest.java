@@ -29,6 +29,7 @@ import java.util.Set;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.Test;
 
+import com.jkoolcloud.tnt4j.streams.configure.build.CfgStreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
@@ -87,7 +88,7 @@ public class StreamsAgentTest {
 	@Test
 	public void testRunFromAPI() throws Exception {
 		String testStreamName = "TestStream"; // NON-NLS
-		File tempConfFile = File.createTempFile("testConfigutarion", ".xml");
+		File tempConfFile = File.createTempFile("testConfiguration", ".xml");
 		FileWriter fw = new FileWriter(tempConfFile);
 		String sb = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + Utils.NEW_LINE + "<tnt-data-source" + Utils.NEW_LINE // NON-NLS
 				+ "        xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" + Utils.NEW_LINE // NON-NLS
@@ -100,7 +101,7 @@ public class StreamsAgentTest {
 		fw.write(sb);
 		fw.flush();
 		Utils.close(fw);
-		StreamsAgent.runFromAPI(tempConfFile.getAbsolutePath());
+		StreamsAgent.runFromAPI(new CfgStreamsBuilder().setConfig(tempConfFile.getAbsolutePath()));
 		Thread.sleep(500);
 		tempConfFile.delete();
 		Set<Thread> threads = Thread.getAllStackTraces().keySet();

@@ -82,7 +82,7 @@ Running TNT4J-Streams
      add `java` command parameter `--add-modules java.xml.bind` to add JAXB classes to java classpath.
 * As API integrated into your product
     * Write streams configuration file. See ['Streams configuration'](#streams-configuration) chapter for more details
-    * use `StreamsAgent.runFromAPI(configFileName)` in your code
+    * use `StreamsAgent.runFromAPI(new CfgStreamsBuilder().setConfig(configFileName))` in your code
 * As system daemon service. See ['TNT4J-Streams as System Service configuration'](./bin/service/readmeServices.md) for details how to run 
 TNT4J-Streams as your system service.
 

@@ -31,10 +31,7 @@ import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.StreamsAgent;
 import com.jkoolcloud.tnt4j.streams.configure.OutputProperties;
 import com.jkoolcloud.tnt4j.streams.configure.StreamsConfigLoader;
-import com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener;
-import com.jkoolcloud.tnt4j.streams.inputs.StreamStatus;
-import com.jkoolcloud.tnt4j.streams.inputs.StreamThread;
-import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
+import com.jkoolcloud.tnt4j.streams.inputs.*;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
@@ -93,7 +90,7 @@ public class DefaultStreamingJob implements StreamingJob {
 	 */
 	@Override
 	public void run() {
-		// StreamsAgent.runFromAPI(streamCfgFile);
+		// StreamsAgent.runFromAPI(new CfgStreamsBuilder().setConfig(streamCfgFile));
 
 		// TODO: configuration from ZooKeeper
 

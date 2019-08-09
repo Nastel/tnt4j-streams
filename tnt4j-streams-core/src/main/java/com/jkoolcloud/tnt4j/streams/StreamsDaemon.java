@@ -25,6 +25,7 @@ import org.apache.commons.daemon.DaemonInitException;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
+import com.jkoolcloud.tnt4j.streams.configure.build.CfgStreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
@@ -64,7 +65,7 @@ public class StreamsDaemon implements Daemon {
 	public void start() throws Exception {
 		LOGGER.log(OpLevel.INFO,
 				StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsDaemon.starting"));
-		StreamsAgent.loadConfigAndRun(StreamsAgent.getCfgFileName());
+		StreamsAgent.loadConfigAndRun(new CfgStreamsBuilder().setConfig(StreamsAgent.getCfgFileName()));
 		LOGGER.log(OpLevel.INFO,
 				StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsDaemon.streams.started"));
 		while (StreamsAgent.isStreamsRunning()) {

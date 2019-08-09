@@ -20,6 +20,7 @@ import static org.mockito.Mockito.*;
 
 import java.io.FileReader;
 import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -31,6 +32,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Test;
 
 import com.jkoolcloud.tnt4j.streams.StreamsAgent;
+import com.jkoolcloud.tnt4j.streams.configure.build.CfgStreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener;
 import com.jkoolcloud.tnt4j.streams.inputs.StreamStatus;
 import com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener;
@@ -54,9 +56,10 @@ public class ActivityCacheTest {
 	public void runStreams() throws Exception {
 		InputStreamListener streamListener = mock(InputStreamListener.class);
 		StreamTasksListener streamTasksListener = mock(StreamTasksListener.class);
-		StreamsAgent.runFromAPI(cfgFile, streamListener, streamTasksListener);
+		StreamsAgent.runFromAPI(new CfgStreamsBuilder().setConfig(cfgFile).setStreamListener(streamListener)
+				.setTaskListener(streamTasksListener));
 
-		Thread.sleep(3000);
+		TimeUnit.SECONDS.sleep(3);
 
 		HttpClientBuilder builder = HttpClientBuilder.create();
 		HttpClient client = builder.build();
@@ -66,7 +69,7 @@ public class ActivityCacheTest {
 		sendRequest(client, PROGRESS_FILE);
 		sendRequest(client, START_FILE);
 
-		Thread.sleep(50000);
+		TimeUnit.SECONDS.sleep(50);
 
 		verify(streamListener, times(2)).onStatusChange(any(TNTInputStream.class), (StreamStatus) any());
 	}

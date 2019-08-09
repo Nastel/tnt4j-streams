@@ -16,12 +16,13 @@
 
 package com.jkoolcloud.tnt4j.streams;
 
-import java.io.*;
+import java.io.Reader;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.SAXException;
 
@@ -29,11 +30,10 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.DefaultEventSinkFactory;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.OutputProperties;
-import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
-import com.jkoolcloud.tnt4j.streams.configure.StreamsConfigLoader;
+import com.jkoolcloud.tnt4j.streams.configure.build.CfgStreamsBuilder;
+import com.jkoolcloud.tnt4j.streams.configure.build.StreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.configure.zookeeper.ZKConfigManager;
 import com.jkoolcloud.tnt4j.streams.inputs.*;
-import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
 import com.jkoolcloud.tnt4j.streams.utils.Duration;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
@@ -42,7 +42,9 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
 /**
  * Main class for jKool LLC TNT4J-Streams standalone application.
  *
- * @version $Revision: 2 $
+ * @version $Revision: 3 $
+ * 
+ * @see com.jkoolcloud.tnt4j.streams.configure.build.StreamsBuilder
  */
 public final class StreamsAgent {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(StreamsAgent.class);
@@ -113,9 +115,10 @@ public final class StreamsAgent {
 			boolean loadedZKConfig = loadZKConfig(zookeeperCfgFile, zookeeperStreamId);
 
 			if (!loadedZKConfig) {
-				loadConfigAndRun(cfgFileName);
-				// DefaultTNTStreamListener dsl = new DefaultTNTStreamListener (LOGGER);
-				// loadConfigAndRun(cfgFileName, dsl, dsl);
+				loadConfigAndRun(new CfgStreamsBuilder().setConfig(cfgFileName));
+				// DefaultTNTStreamListener dsl = new DefaultTNTStreamListener(LOGGER);
+				// loadConfigAndRun(new
+				// CfgStreamsBuilder().setConfig(cfgFileName).setStreamListener(dsl).setTaskListener(dsl));
 			}
 
 			if (streamThreads != null) {
@@ -147,15 +150,15 @@ public final class StreamsAgent {
 		};
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("\n");
-		sb.append("------------------------------------------------------------------------\n");
+		sb.append("\n"); // NON-NLS
+		sb.append("------------------------------------------------------------------------\n"); // NON-NLS
 		for (String property : envProps) {
-			sb.append(String.format("%20s: %s",
+			sb.append(String.format("%20s: %s", // NON-NLS
 					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, property),
 					System.getProperty(property)));
-			sb.append("\n");
+			sb.append("\n"); // NON-NLS
 		}
-		sb.append("------------------------------------------------------------------------\n");
+		sb.append("------------------------------------------------------------------------\n"); // NON-NLS
 
 		return sb.toString();
 	}
@@ -172,244 +175,29 @@ public final class StreamsAgent {
 
 	/**
 	 * Main entry point for running as a API integration.
-	 * <p>
-	 * Requires streams data source configuration to be referenced over system property
-	 * {@value com.jkoolcloud.tnt4j.streams.configure.StreamsConfigLoader#STREAMS_CONFIG_KEY}.
+	 *
+	 * @param builder
+	 *            streams builder to build streams context
+	 * 
+	 * @see #run(com.jkoolcloud.tnt4j.streams.configure.build.StreamsBuilder)
 	 */
-	public static void runFromAPI() {
+	public static void runFromAPI(StreamsBuilder builder) {
 		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 				"StreamsAgent.start.api", pkgVersion(), runEnv());
-		loadConfigAndRun((Reader) null);
-	}
-
-	/**
-	 * Main entry point for running as a API integration.
-	 * <p>
-	 * Requires streams data source configuration to be referenced over system property
-	 * {@value com.jkoolcloud.tnt4j.streams.configure.StreamsConfigLoader#STREAMS_CONFIG_KEY}.
-	 *
-	 * @param streamListener
-	 *            input stream listener
-	 * @param streamTasksListener
-	 *            stream tasks listener
-	 */
-	public static void runFromAPI(InputStreamListener streamListener, StreamTasksListener streamTasksListener) {
-		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"StreamsAgent.start.api", pkgVersion(), runEnv());
-		loadConfigAndRun((Reader) null, streamListener, streamTasksListener);
-	}
-
-	/**
-	 * Main entry point for running as a API integration.
-	 *
-	 * @param cfgFileName
-	 *            stream data source configuration file name
-	 */
-	public static void runFromAPI(String cfgFileName) {
-		runFromAPI(cfgFileName, null, null);
-	}
-
-	/**
-	 * Main entry point for running as a API integration.
-	 *
-	 * @param cfgFileName
-	 *            stream data source configuration file name
-	 * @param streamListener
-	 *            input stream listener
-	 * @param streamTasksListener
-	 *            stream tasks listener
-	 */
-	public static void runFromAPI(String cfgFileName, InputStreamListener streamListener,
-			StreamTasksListener streamTasksListener) {
-		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"StreamsAgent.start.api", pkgVersion(), runEnv());
-		loadConfigAndRun(cfgFileName, streamListener, streamTasksListener);
-	}
-
-	/**
-	 * Main entry point for running as a API integration.
-	 *
-	 * @param cfgFile
-	 *            stream data source configuration file
-	 */
-	public static void runFromAPI(File cfgFile) {
-		runFromAPI(cfgFile, null, null);
-	}
-
-	/**
-	 * Main entry point for running as a API integration.
-	 *
-	 * @param cfgFile
-	 *            stream data source configuration file
-	 * @param streamListener
-	 *            input stream listener
-	 * @param streamTasksListener
-	 *            stream tasks listener
-	 */
-	public static void runFromAPI(File cfgFile, InputStreamListener streamListener,
-			StreamTasksListener streamTasksListener) {
-		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"StreamsAgent.start.api", pkgVersion(), runEnv());
-		loadConfigAndRun(cfgFile, streamListener, streamTasksListener);
-	}
-
-	/**
-	 * Main entry point for running as a API integration without using stream data source configuration XML file.
-	 *
-	 * @param streams
-	 *            streams to run
-	 */
-	public static void runFromAPI(TNTInputStream<?, ?>... streams) {
-		runFromAPI(null, null, streams);
-	}
-
-	/**
-	 * Main entry point for running as a API integration without using stream data source configuration XML file.
-	 *
-	 * @param streamListener
-	 *            input stream listener
-	 * @param streamTasksListener
-	 *            stream tasks listener
-	 * @param streams
-	 *            streams to run
-	 */
-	public static void runFromAPI(InputStreamListener streamListener, StreamTasksListener streamTasksListener,
-			TNTInputStream<?, ?>... streams) {
-		run(Arrays.asList(streams), streamListener, streamTasksListener);
+		run(builder);
 	}
 
 	/**
 	 * Loads stream configuration from provided file path and runs configuration defined streams.
 	 *
-	 * @param cfgFileName
-	 *            streams configuration file path
-	 *
-	 * @see #loadConfigAndRun(String, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
-	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
+	 * @param builder
+	 *            streams builder to build streams context
+	 * 
+	 * @see #run(com.jkoolcloud.tnt4j.streams.configure.build.StreamsBuilder)
 	 */
-	protected static void loadConfigAndRun(String cfgFileName) {
-		loadConfigAndRun(cfgFileName, null, null);
-	}
-
-	/**
-	 * Loads stream configuration from provided file path and runs configuration defined streams.
-	 *
-	 * @param cfgFileName
-	 *            streams configuration file path
-	 * @param streamListener
-	 *            input stream listener
-	 * @param streamTasksListener
-	 *            stream tasks listener
-	 *
-	 * @see #loadConfigAndRun(java.io.File, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
-	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
-	 */
-	protected static void loadConfigAndRun(String cfgFileName, InputStreamListener streamListener,
-			StreamTasksListener streamTasksListener) {
-		loadConfigAndRun(StringUtils.isEmpty(cfgFileName) ? null : new File(cfgFileName), streamListener,
-				streamTasksListener);
-	}
-
-	/**
-	 * Loads stream configuration from provided {@link java.io.File} and runs configuration defined streams.
-	 *
-	 * @param cfgFile
-	 *            streams configuration file
-	 *
-	 * @see #loadConfigAndRun(java.io.File, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
-	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
-	 */
-	protected static void loadConfigAndRun(File cfgFile) {
-		loadConfigAndRun(cfgFile, null, null);
-	}
-
-	/**
-	 * Loads stream configuration from provided {@link java.io.File} and runs configuration defined streams.
-	 *
-	 * @param cfgFile
-	 *            streams configuration file
-	 * @param streamListener
-	 *            input stream listener
-	 * @param streamTasksListener
-	 *            stream tasks listener
-	 *
-	 * @see #loadConfigAndRun(java.io.Reader, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
-	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
-	 */
-	protected static void loadConfigAndRun(File cfgFile, InputStreamListener streamListener,
-			StreamTasksListener streamTasksListener) {
-		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"StreamsAgent.loading.config.file", cfgFile == null ? StreamsConfigLoader.getDefaultFile() : cfgFile);
+	protected static void loadConfigAndRun(CfgStreamsBuilder builder) {
 		try {
-			loadConfigAndRun(cfgFile == null ? null : new FileReader(cfgFile), streamListener, streamTasksListener);
-		} catch (FileNotFoundException e) {
-			LOGGER.log(OpLevel.ERROR, Utils.getExceptionMessages(e));
-		}
-	}
-
-	/**
-	 * Loads stream configuration from provided {@link java.io.InputStream} and runs configuration defined streams.
-	 *
-	 * @param is
-	 *            stream configuration input stream
-	 *
-	 * @see #loadConfigAndRun(java.io.InputStream, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
-	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
-	 */
-	protected static void loadConfigAndRun(InputStream is) {
-		loadConfigAndRun(is, null, null);
-	}
-
-	/**
-	 * Loads stream configuration from provided {@link java.io.InputStream} and runs configuration defined streams.
-	 *
-	 * @param is
-	 *            stream configuration input stream
-	 * @param streamListener
-	 *            input stream listener
-	 * @param streamTasksListener
-	 *            stream tasks listener
-	 *
-	 * @see #loadConfigAndRun(java.io.Reader, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
-	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
-	 */
-	protected static void loadConfigAndRun(InputStream is, InputStreamListener streamListener,
-			StreamTasksListener streamTasksListener) {
-		loadConfigAndRun(new InputStreamReader(is), streamListener, streamTasksListener);
-	}
-
-	/**
-	 * Loads stream configuration from provided {@link java.io.Reader} and runs configuration defined streams.
-	 *
-	 * @param reader
-	 *            stream configuration reader
-	 *
-	 * @see #loadConfigAndRun(java.io.Reader, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
-	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
-	 */
-	protected static void loadConfigAndRun(Reader reader) {
-		loadConfigAndRun(reader, null, null);
-	}
-
-	/**
-	 * Loads stream configuration from provided {@link java.io.Reader} and runs configuration defined streams.
-	 *
-	 * @param reader
-	 *            stream configuration reader
-	 * @param streamListener
-	 *            input stream listener
-	 * @param streamTasksListener
-	 *            stream tasks listener
-	 *
-	 * @see #initAndRun(com.jkoolcloud.tnt4j.streams.configure.StreamsConfigLoader,
-	 *      com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
-	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
-	 */
-	protected static void loadConfigAndRun(Reader reader, InputStreamListener streamListener,
-			StreamTasksListener streamTasksListener) {
-		try {
-			initAndRun(reader == null ? new StreamsConfigLoader() : new StreamsConfigLoader(reader), streamListener,
-					streamTasksListener);
+			builder.loadConfig(osPipeInput, haltOnUnparsed);
 		} catch (SAXException | IllegalStateException e) {
 			LOGGER.log(OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"StreamsAgent.cfg.error", Utils.getExceptionMessages(e));
@@ -417,47 +205,8 @@ public final class StreamsAgent {
 			Utils.logThrowable(LOGGER, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"StreamsAgent.start.failed", e);
 		}
-	}
 
-	/**
-	 * Configure streams and parsers, and run each stream in its own thread.
-	 *
-	 * @param cfg
-	 *            stream data source configuration
-	 * @param streamListener
-	 *            input stream listener
-	 * @param streamTasksListener
-	 *            stream tasks listener
-	 * @throws Exception
-	 *             if configuration is malformed or streams can't be initiated
-	 * 
-	 * @see #initPiping(com.jkoolcloud.tnt4j.streams.configure.StreamsConfigLoader)
-	 * @see #run(java.util.Collection, com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener,
-	 *      com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener)
-	 */
-	protected static void initAndRun(StreamsConfigLoader cfg, InputStreamListener streamListener,
-			StreamTasksListener streamTasksListener) throws Exception {
-		if (cfg == null) {
-			return;
-		}
-
-		if (cfg.isErroneous()) {
-			throw new IllegalStateException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
-					"StreamsAgent.erroneous.configuration"));
-		}
-
-		Collection<TNTInputStream<?, ?>> streams;
-		if (osPipeInput) {
-			streams = initPiping(cfg);
-		} else {
-			streams = cfg.getStreams();
-		}
-		if (CollectionUtils.isEmpty(streams)) {
-			throw new IllegalStateException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
-					"StreamsAgent.no.activity.streams"));
-		}
-
-		run(streams, streamListener, streamTasksListener);
+		run(builder);
 	}
 
 	/**
@@ -480,7 +229,7 @@ public final class StreamsAgent {
 					public void run() {
 						ZKConfigManager.close();
 					}
-				}));
+				}, "ZKConfigManagerShutdownHookThread"));
 
 				String path = zooProps.getProperty(ZKConfigManager.PROP_CONF_PATH_STREAM);
 				if (StringUtils.isEmpty(path) && StringUtils.isNotEmpty(zookeeperStreamId)) {
@@ -529,19 +278,7 @@ public final class StreamsAgent {
 					ZKConfigManager.handleZKStoredConfiguration(path, new ZKConfigManager.ZKConfigChangeListener() {
 						@Override
 						public void applyConfigurationData(byte[] data) {
-							if (isStreamsRunning()) {
-								restarting = false;
-								stopStreams();
-								restarting = true;
-							}
-
-							try {
-								loadConfigAndRun(Utils.bytesReader(data));
-							} catch (Exception exc) {
-								synchronized (streamThreads) {
-									streamThreads.notifyAll();
-								}
-							}
+							restartStreams(Utils.bytesReader(data));
 						}
 					});
 					return true;
@@ -574,15 +311,28 @@ public final class StreamsAgent {
 	}
 
 	/**
-	 * Stops all running streams within provided <tt>streamThreads</tt> group.
+	 * Stops running streams identified by {@code streamNames} defined names within default streams thread group.
+	 * 
+	 * @param streamNames
+	 *            names of the stream to stop
+	 */
+	public static void stopStreams(String... streamNames) {
+		stopStreams(streamThreads, streamNames);
+	}
+
+	/**
+	 * Stops running streams identified by {@code streamNames} defined names within provided {@code streamThreads}
+	 * group. When {@code streamNames} is {@code null} - all group streams are stopped.
 	 *
 	 * @param streamThreads
 	 *            thread group running all streams threads
+	 * @param streamNames
+	 *            names of the streams to stop
 	 */
-	public static void stopStreams(ThreadGroup streamThreads) {
+	public static void stopStreams(ThreadGroup streamThreads, String... streamNames) {
 		if (streamThreads != null) {
 			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"StreamsAgent.stopping.streams", streamThreads.getName());
+					"StreamsAgent.stopping.streams", streamThreads.getName(), Arrays.toString(streamNames));
 			Thread[] atl = new Thread[streamThreads.activeCount()];
 			streamThreads.enumerate(atl, false);
 
@@ -590,7 +340,10 @@ public final class StreamsAgent {
 
 			for (Thread t : atl) {
 				if (t instanceof StreamThread) {
-					stl.add((StreamThread) t);
+					StreamThread st = (StreamThread) t;
+					if (ArrayUtils.isEmpty(streamNames) || ArrayUtils.contains(streamNames, st.getTarget().getName())) {
+						stl.add(st);
+					}
 				}
 			}
 
@@ -623,24 +376,54 @@ public final class StreamsAgent {
 	}
 
 	/**
+	 * Restarts all streams within default streams thread group.
+	 */
+	public static void restartStreams() {
+		restartStreams(null);
+	}
+
+	public static void restartStreams(String... streamNames) {
+		restartStreams(null, streamNames);
+	}
+
+	public static void restartStreams(Reader reader, String... streamNames) {
+		if (isStreamsRunning()) {
+			restarting = false;
+			stopStreams(streamNames);
+			restarting = true;
+		}
+
+		try {
+			loadConfigAndRun(new CfgStreamsBuilder().setConfig(reader).setNames(streamNames));
+		} catch (Throwable exc) {
+			synchronized (streamThreads) {
+				streamThreads.notifyAll();
+			}
+		}
+	}
+
+	/**
 	 * Performs actions on agent process completion.
 	 */
 	public static void complete() {
+		new StreamStatisticsReporter(TNTInputStreamStatistics.getMetrics(), null, LOGGER).report();
 		DefaultEventSinkFactory.shutdownAll();
 	}
 
 	/**
-	 * Adds listeners to provided streams and runs streams on separate threads.
+	 * Builds streams instances to be run, adds listeners and runs streams on separate threads.
 	 *
-	 * @param streams
-	 *            streams to run
-	 * @param streamListener
-	 *            input stream listener
-	 * @param streamTasksListener
-	 *            stream tasks listener
+	 * @param builder
+	 *            streams builder to build streams context
 	 */
-	protected static void run(Collection<TNTInputStream<?, ?>> streams, InputStreamListener streamListener,
-			StreamTasksListener streamTasksListener) {
+	protected static void run(StreamsBuilder builder) {
+		Collection<TNTInputStream<?, ?>> streams = builder.getStreams();
+
+		if (CollectionUtils.isEmpty(streams)) {
+			throw new IllegalStateException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+					"StreamsAgent.no.activity.streams"));
+		}
+
 		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread t, Throwable exc) {
@@ -654,6 +437,9 @@ public final class StreamsAgent {
 			streamThreads = new StreamThreadGroup(StreamsAgent.class.getName() + "Threads"); // NON-NLS
 		}
 
+		InputStreamListener streamListener = builder.getStreamListener();
+		StreamTasksListener streamTasksListener = builder.getTasksListener();
+
 		StreamThread ft;
 		for (TNTInputStream<?, ?> stream : streams) {
 			if (streamListener != null) {
@@ -666,6 +452,8 @@ public final class StreamsAgent {
 
 			stream.output().setProperty(OutputProperties.PROP_TNT4J_CONFIG_ZK_NODE,
 					ZKConfigManager.getZKCfgProperty(ZKConfigManager.PROP_CONF_PATH_TNT4J));
+			stream.output().setProperty(OutputProperties.PROP_TNT4J_CONFIG_ZK_NODE,
+					ZKConfigManager.getZKCfgProperty(ZKConfigManager.PROP_CONF_PATH_TNT4J));
 			// TODO: tnt4j-kafka settings
 			// ZKConfigManager.getZKCfgProperty(ZKConfigManager.PROP_CONF_PATH_TNT4J_KAFKA);
 
@@ -673,37 +461,6 @@ public final class StreamsAgent {
 					String.format("%s:%s", stream.getClass().getSimpleName(), stream.getName())); // NON-NLS
 			ft.start();
 		}
-	}
-
-	/**
-	 * Creates and initiates OS piped input streams for provided parsers configuration.
-	 *
-	 * @param cfg
-	 *            piped data parsers configuration file path
-	 * @return collection of created OS piped input streams
-	 * @throws Exception
-	 *             if parsers configuration is malformed, or OS piped input streams initiation failed
-	 */
-	protected static Collection<TNTInputStream<?, ?>> initPiping(StreamsConfigLoader cfg) throws Exception {
-		Collection<TNTInputStream<?, ?>> streams = new ArrayList<>(1);
-
-		Map<String, String> props = new HashMap<>(1);
-		props.put(StreamProperties.PROP_HALT_ON_PARSER, String.valueOf(haltOnUnparsed));
-
-		PipedStream pipeStream = new PipedStream();
-		pipeStream.setName("DefaultSystemPipeStream"); // NON-NLS
-		pipeStream.setProperties(props.entrySet());
-
-		Collection<ActivityParser> parsers = cfg.getParsers();
-		if (CollectionUtils.isEmpty(parsers)) {
-			throw new IllegalStateException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
-					"StreamsAgent.no.piped.activity.parsers"));
-		}
-		pipeStream.addParsers(parsers);
-
-		streams.add(pipeStream);
-
-		return streams;
 	}
 
 	/**
@@ -795,5 +552,28 @@ public final class StreamsAgent {
 	 */
 	static String getCfgFileName() {
 		return cfgFileName;
+	}
+
+	/**
+	 * Returns list of running stream names.
+	 * 
+	 * @return list of running stream names.
+	 */
+	public static Collection<String> getRunningStreamNames() {
+		List<String> runningStreamNames = new ArrayList<>();
+
+		if (streamThreads != null) {
+			Thread[] atl = new Thread[streamThreads.activeCount()];
+			streamThreads.enumerate(atl, false);
+
+			for (Thread t : atl) {
+				if (t instanceof StreamThread) {
+					StreamThread st = (StreamThread) t;
+					runningStreamNames.add(st.getTarget().getName());
+				}
+			}
+		}
+
+		return runningStreamNames;
 	}
 }

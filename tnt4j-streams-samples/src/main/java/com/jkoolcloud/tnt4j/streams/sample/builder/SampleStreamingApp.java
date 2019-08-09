@@ -24,6 +24,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import com.jkoolcloud.tnt4j.streams.StreamsAgent;
 import com.jkoolcloud.tnt4j.streams.configure.ParserProperties;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
+import com.jkoolcloud.tnt4j.streams.configure.build.POJOStreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityField;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocator;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType;
@@ -121,6 +122,6 @@ public class SampleStreamingApp {
 		// fls.setDefaultStreamOutput();
 		// }
 
-		StreamsAgent.runFromAPI(fls);
+		StreamsAgent.runFromAPI(new POJOStreamsBuilder().addStreams(fls));
 	}
 }

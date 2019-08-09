@@ -43,6 +43,7 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.core.OpType;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.StreamsAgent;
+import com.jkoolcloud.tnt4j.streams.configure.build.POJOStreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.configure.sax.ConfigParserHandler;
 import com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.InterceptionsManager;
 import com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.TNTKafkaCInterceptor;
@@ -128,7 +129,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 *            messages tracing options set
 	 */
 	public MsgTraceReporter(Properties interceptorProperties, Set<String> traceOpts) {
-		this(new KafkaObjTraceStream<ActivityInfo>(), interceptorProperties, true, traceOpts);
+		this(new KafkaObjTraceStream<>(), interceptorProperties, true, traceOpts);
 	}
 
 	/**
@@ -178,7 +179,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 				DEFAULT_PARSER_CONFIG_FILE + PARSER_DELIM + DEFAULT_PARSER_NAME);
 		mainParser = getParser(parserCfg);
 
-		StreamsAgent.runFromAPI(stream);
+		StreamsAgent.runFromAPI(new POJOStreamsBuilder().addStream(stream));
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 				"MsgTraceReporter.stream.started", stream.getName());
 
