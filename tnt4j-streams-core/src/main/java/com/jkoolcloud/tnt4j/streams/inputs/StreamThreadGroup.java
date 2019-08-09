@@ -16,7 +16,11 @@
 
 package com.jkoolcloud.tnt4j.streams.inputs;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
@@ -27,12 +31,15 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 /**
  * Base class for threads running an TNTInputStream.
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  *
  * @see TNTInputStream
  */
 public class StreamThreadGroup extends ThreadGroup {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(StreamThreadGroup.class);
+
+	private static Collection<Runnable> staticShutdownHooks = new ArrayList<>();
+	private static final Lock staticHooksLock = new ReentrantLock();
 
 	/**
 	 * Constructs a new streams runner threads group.
@@ -66,7 +73,7 @@ public class StreamThreadGroup extends ThreadGroup {
 
 		Duration tsd;
 		for (Thread t : atl) {
-			if (!(t instanceof StreamThread)) {
+			if (!isStreamThread(t)) {
 				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"StreamThreadGroup.stopping.thread", t);
 				tsd = Duration.arm();
@@ -90,6 +97,40 @@ public class StreamThreadGroup extends ThreadGroup {
 							"StreamThreadGroup.killed.thread", t, tsd.duration());
 				}
 			}
+		}
+	}
+
+	private static boolean isStreamThread(Thread t) {
+		return t instanceof StreamThread;
+	}
+
+	/**
+	 * Adds statics cleanup runner to be executed on streaming process completion.
+	 * 
+	 * @param sht
+	 *            statics cleanup shutdown hook runner instance
+	 */
+	public static void addStaticsShutdownHook(Runnable sht) {
+		staticHooksLock.lock();
+		try {
+			staticShutdownHooks.add(sht);
+		} finally {
+			staticHooksLock.unlock();
+		}
+	}
+
+	/**
+	 * Runs statics cleanup runners on streaming process completion.
+	 */
+	static void shutdownStatics() {
+		staticHooksLock.lock();
+		try {
+			for (Runnable sht : staticShutdownHooks) {
+				sht.run();
+			}
+			staticShutdownHooks.clear();
+		} finally {
+			staticHooksLock.unlock();
 		}
 	}
 }

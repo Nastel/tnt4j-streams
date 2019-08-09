@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -54,7 +55,7 @@ public class MqttStreamTest {
 	public void testInitialize() throws Exception {
 		testProperties();
 		input.startStream();
-		Thread.sleep(3000);
+		TimeUnit.SECONDS.sleep(3);
 		assertTrue("MQTT stream input has to be ended", input.isInputEnded());
 	}
 

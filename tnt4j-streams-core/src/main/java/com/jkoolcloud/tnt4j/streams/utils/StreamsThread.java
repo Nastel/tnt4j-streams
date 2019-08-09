@@ -248,6 +248,6 @@ public class StreamsThread extends Thread {
 		} catch (InterruptedException e) {
 		}
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"StreamsThread.wait.for", wd.duration());
+				"StreamsThread.wait.for", getName(), wd.duration());
 	}
 }

@@ -367,7 +367,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 			public void run() {
 				stop();
 			}
-		});
+		}, getName() + "_ShutdownHookThread");
 		Runtime.getRuntime().addShutdownHook(sh);
 	}
 
@@ -387,7 +387,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 		stf.addThreadFactoryListener(new StreamsThreadFactoryListener());
 
 		ThreadPoolExecutor tpe = new ThreadPoolExecutor(threadsQty, threadsQty, 0L, TimeUnit.MILLISECONDS,
-				new LinkedBlockingQueue<Runnable>(), stf);
+				new LinkedBlockingQueue<>(), stf);
 
 		return tpe;
 	}
@@ -421,12 +421,12 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *
 	 * @see ThreadPoolExecutor#ThreadPoolExecutor(int, int, long, TimeUnit, BlockingQueue, ThreadFactory)
 	 */
-	private ExecutorService getBoundedExecutorService(int threadsQty, final int offerTimeout) {
+	private ExecutorService getBoundedExecutorService(int threadsQty, int offerTimeout) {
 		StreamsThreadFactory stf = new StreamsThreadFactory("StreamBoundedExecutorThread-"); // NON-NLS
 		stf.addThreadFactoryListener(new StreamsThreadFactoryListener());
 
 		ThreadPoolExecutor tpe = new ThreadPoolExecutor(threadsQty, threadsQty, 0L, TimeUnit.MILLISECONDS,
-				new LinkedBlockingQueue<Runnable>(threadsQty * 2), stf);
+				new LinkedBlockingQueue<>(threadsQty * 2), stf);
 
 		tpe.setRejectedExecutionHandler(new RejectedExecutionHandler() {
 			@Override
@@ -830,6 +830,12 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	}
 
 	private boolean isShotDown() {
+	/**
+	 * Checks if stream has been started shot down process.
+	 * 
+	 * @return {@code true} if stream already has end time set, {@code false} - otherwise
+	 */
+	protected boolean isShotDown() {
 		return endTime != -1;
 	}
 
@@ -881,9 +887,16 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 	private AtomicInteger cai = new AtomicInteger(0);
 	private long lastLogTime = System.currentTimeMillis();
+	private AtomicInteger processingCount = new AtomicInteger();
 
 	private void processActivityItem_(T item, AtomicBoolean failureFlag) throws Exception {
 		processActivityItem(item, failureFlag);
+		startProcessingTask();
+		try {
+			processActivityItem(item, failureFlag);
+		} finally {
+			endProcessingTask();
+		}
 		lastActivityTime = System.currentTimeMillis();
 
 		// TODO: make ping logger class running separate thread.
@@ -894,6 +907,68 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"TNTInputStream.stream.statistics", name, getStreamStatistics());
 		}
+	}
+
+	/**
+	 * Marks start of some stream processing task, e.g. parsing, data polling, etc.
+	 * 
+	 * @see #endProcessingTask()
+	 */
+	protected void startProcessingTask() {
+		processingCount.incrementAndGet();
+	}
+
+	/**
+	 * Marks end of some stream processing task.
+	 * 
+	 * @see #startProcessingTask()
+	 */
+	protected void endProcessingTask() {
+		processingCount.decrementAndGet();
+	}
+
+	/**
+	 * Returns flag indicating if stream has any pending tasks on executor service queue.
+	 * 
+	 * @return {@code true} if executor service is running and executor tasks queue is not empty, {@code false} -
+	 *         otherwise
+	 */
+	protected boolean hasPendingExecutions() {
+		return streamExecutorService != null && !((ThreadPoolExecutor) streamExecutorService).getQueue().isEmpty();
+	}
+
+	/**
+	 * Returns flag indicating if there are some currently running stream processing tasks.
+	 * 
+	 * @return {@code true} if stream has running any processing tasks, {@code false} - otherwise.
+	 * 
+	 * @see #processingCount()
+	 */
+	protected boolean isProcessing() {
+		return processingCount.get() > 0;
+	}
+
+	/**
+	 * Returns number of currently running stream processing tasks.
+	 * 
+	 * @return number of currently running stream processing tasks
+	 */
+	protected int processingCount() {
+		return processingCount.get();
+	}
+
+	/**
+	 * Returns flag indicating if stream has no currently running stream processing tasks and pending executor service
+	 * tasks.
+	 * 
+	 * @return {@code true} if stream has no currently running stream processing tasks and pending executor service
+	 *         tasks, {@code false} - otherwise
+	 * 
+	 * @see #isProcessing()
+	 * @see #hasPendingExecutions()
+	 */
+	protected boolean isIdling() {
+		return !isProcessing() && !hasPendingExecutions();
 	}
 
 	/**
@@ -910,6 +985,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 			}
 
 			notifyStatusChange(StreamStatus.STOP);
+
+			if (!isShotDown()) {
+				shutdownStream();
+			}
 		}
 
 		if (sh != null) {
@@ -1175,7 +1254,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 		 */
 		@Override
 		public String toString() {
-			return "ActivityItemProcessingTask{" + "item=" + item + '}'; // NON-NLS
+			return ActivityItemProcessingTask.class.getSimpleName() + " {item=" + item + '}'; // NON-NLS
 		}
 	}
 

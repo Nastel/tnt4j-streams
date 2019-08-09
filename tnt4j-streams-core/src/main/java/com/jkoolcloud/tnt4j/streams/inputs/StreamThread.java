@@ -132,6 +132,8 @@ public class StreamThread extends StreamsThread {
 
 	/**
 	 * Notifies this thread, that running stream has completed.
+	 * 
+	 * @see StreamThreadGroup#shutdownStatics()
 	 */
 	public void notifyCompleted() {
 		synchronized (completionLatchSet) {
@@ -146,7 +148,9 @@ public class StreamThread extends StreamsThread {
 		if (instances.isEmpty()) {
 			StreamsAgent.complete();
 			if (getThreadGroup() instanceof StreamThreadGroup) {
-				((StreamThreadGroup) getThreadGroup()).stopPendingJunkThreads();
+				StreamThreadGroup stg = (StreamThreadGroup) getThreadGroup();
+				stg.shutdownStatics();
+				stg.stopPendingJunkThreads();
 			}
 		}
 	}

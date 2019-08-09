@@ -51,6 +51,8 @@ public class MsgTraceReporterTest {
 	@Test
 	public void pollConfigQueue() throws Exception {
 		HashMap<String, String> config = new HashMap<String, String>() {
+			private static final long serialVersionUID = 964697684935570302L;
+
 			{
 				put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 				put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
@@ -65,8 +67,7 @@ public class MsgTraceReporterTest {
 			HashMap<String, TraceCommandDeserializer.TopicTraceCommand> traceConfig = new HashMap<>();
 			MsgTraceReporter.pollConfigQueue(config, new Properties(), traceConfig);
 			System.out.println("Control records for " + traceConfig.size());
-			Thread.sleep(3000);
-
+			TimeUnit.SECONDS.sleep(3);
 		}
 
 	}
@@ -303,7 +304,7 @@ public class MsgTraceReporterTest {
 	}
 
 	private ConsumerRecords<Object, Object> getConsumerRecords() {
-		ConsumerRecord<Object, Object> cr = new ConsumerRecord<Object, Object>(TOPIC, PARTITION, OFFSET, TIMESTAMP,
+		ConsumerRecord<Object, Object> cr = new ConsumerRecord<>(TOPIC, PARTITION, OFFSET, TIMESTAMP,
 				TimestampType.CREATE_TIME, CHECKSUM, KEY.length(), MESSAGE.length(), KEY, MESSAGE);
 		Map<TopicPartition, List<ConsumerRecord<Object, Object>>> map = Collections.singletonMap(getTopicPartition(),
 				Collections.singletonList(cr));

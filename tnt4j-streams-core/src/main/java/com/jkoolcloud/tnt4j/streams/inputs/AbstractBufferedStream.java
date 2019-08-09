@@ -109,7 +109,7 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 	 */
 	@Override
 	protected void stopInternals() {
-		offerDieMarker();
+		offerDieMarker(true);
 	}
 
 	/**
@@ -165,7 +165,7 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 		while (true) {
 			// Buffer is empty and producer input is ended. No more items going to be available.
 			if (inputBuffer.isEmpty()) {
-				boolean end = isInputEnded();
+				boolean end = canStop();
 				// in case something appeared in buffer while checking.
 				if (end && inputBuffer.isEmpty()) {
 					return null;
@@ -322,6 +322,24 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 	 * @return {@code true} if stream input ended, {@code false} - otherwise
 	 */
 	protected abstract boolean isInputEnded();
+
+	/**
+	 * Returns flag indicating if stream is idling and stream input has ended.
+	 * 
+	 * @return {@code true} if stream is idling and stream input has ended, {@code false} - otherwise
+	 * 
+	 * @see #isIdling()
+	 * @see #isInputEnded()
+	 */
+	protected boolean canStop() {
+		boolean idling = isIdling();
+		boolean ended = isInputEnded();
+
+		logger().log(OpLevel.TRACE, StreamsResources.RESOURCE_BUNDLE_NAME, "AbstractBufferedStream.can.stop", getName(),
+				idling, ended, processingCount());
+
+		return idling && ended;
+	}
 
 	/**
 	 * Base class containing common features for stream input processor thread.

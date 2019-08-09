@@ -261,7 +261,7 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 				ended = true;
 				offerDieMarker();
 			}
-		});
+		}, getName() + "FileReaderThread");
 		excelFileReader.start();
 	}
 

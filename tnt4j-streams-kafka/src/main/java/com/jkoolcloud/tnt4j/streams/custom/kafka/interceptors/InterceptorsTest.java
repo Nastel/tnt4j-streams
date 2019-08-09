@@ -100,14 +100,14 @@ public class InterceptorsTest {
 					exc.printStackTrace();
 				}
 			}
-		});
+		}, "InterceptProducerThread");
 
 		Thread ct = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				consume(consumer);
 			}
-		});
+		}, "InterceptConsumerThread");
 		ct.start();
 
 		pt.start();
