@@ -34,7 +34,9 @@ import javax.xml.soap.*;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.quartz.*;
+import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -385,7 +387,7 @@ public class WsStream extends AbstractWsStream<String> {
 	/**
 	 * Scheduler job to execute JAX-WS call.
 	 */
-	public static class WsCallJob implements Job {
+	public static class WsCallJob extends CallJob {
 
 		/**
 		 * Constructs a new WsCallJob.
@@ -394,21 +396,19 @@ public class WsStream extends AbstractWsStream<String> {
 		}
 
 		@Override
-		public void execute(JobExecutionContext context) throws JobExecutionException {
-			JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-
+		public void executeCalls(JobDataMap dataMap) {
 			WsStream stream = (WsStream) dataMap.get(JOB_PROP_STREAM_KEY);
 			WsScenarioStep scenarioStep = (WsScenarioStep) dataMap.get(JOB_PROP_SCENARIO_STEP_KEY);
 
 			if (!scenarioStep.isEmpty()) {
 				String reqStr;
 				String respStr;
-				Semaphore aquiredSemaphore = null;
+				Semaphore acquiredSemaphore = null;
 				for (WsRequest<String> request : scenarioStep.getRequests()) {
 					reqStr = null;
 					respStr = null;
 					try {
-						aquiredSemaphore = acquireSemaphore(stream, request);
+						acquiredSemaphore = acquireSemaphore(stream, request);
 						reqStr = stream.fillInRequestData(request.getData());
 						request.setSentData(reqStr);
 						respStr = callWebService(stream.fillInRequestData(scenarioStep.getUrlStr()), reqStr, stream,
@@ -421,7 +421,7 @@ public class WsStream extends AbstractWsStream<String> {
 						if (StringUtils.isNotEmpty(respStr)) {
 							stream.addInputToBuffer(new WsReqResponse<>(respStr, request));
 						} else {
-							releaseSemaphore(aquiredSemaphore, stream, scenarioStep.getName(), request);
+							releaseSemaphore(acquiredSemaphore, stream, scenarioStep.getName(), request);
 						}
 					}
 				}

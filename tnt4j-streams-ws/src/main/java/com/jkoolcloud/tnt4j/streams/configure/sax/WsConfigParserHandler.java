@@ -164,10 +164,9 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 		notEmpty(name, STEP_ELMT, NAME_ATTR);
 
 		currStep = new WsScenarioStep(name);
-		currStep.setUrlStr(url == null ? currScenario.getUrlStr() : url);
-		currStep.setMethod(method == null ? currScenario.getMethod() : method);
-		currStep.setCredentials(username == null ? currScenario.getUsername() : username,
-				password == null ? currScenario.getPassword() : password);
+		currStep.setUrlStr(url);
+		currStep.setMethod(method);
+		currStep.setCredentials(username, password);
 	}
 
 	private void processCronScheduler(Attributes attrs) throws SAXException {

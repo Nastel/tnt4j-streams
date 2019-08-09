@@ -16,10 +16,13 @@
 
 package com.jkoolcloud.tnt4j.streams.inputs;
 
+import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 import org.apache.commons.lang3.StringUtils;
-import org.quartz.*;
+import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
@@ -104,7 +107,7 @@ public class CmdStream extends AbstractWsStream<String> {
 	/**
 	 * Scheduler job to execute system command call.
 	 */
-	public static class CmdCallJob implements Job {
+	public static class CmdCallJob extends CallJob {
 
 		/**
 		 * Constructs a new CmdCallJob.
@@ -113,9 +116,7 @@ public class CmdStream extends AbstractWsStream<String> {
 		}
 
 		@Override
-		public void execute(JobExecutionContext context) throws JobExecutionException {
-			JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-
+		public void executeCalls(JobDataMap dataMap) {
 			CmdStream stream = (CmdStream) dataMap.get(JOB_PROP_STREAM_KEY);
 			WsScenarioStep scenarioStep = (WsScenarioStep) dataMap.get(JOB_PROP_SCENARIO_STEP_KEY);
 
@@ -126,7 +127,10 @@ public class CmdStream extends AbstractWsStream<String> {
 					respStr = null;
 					try {
 						acquiredSemaphore = acquireSemaphore(stream, request);
-						String processedRequest = stream.fillInRequestData(request.getData());
+						String processedRequest = request.getData();
+						for (Map.Entry<String, WsRequest.Parameter> req : request.getParameters().entrySet()) {
+							processedRequest = stream.fillInRequestData(processedRequest, req.getValue().getFormat());
+						}
 						request.setSentData(processedRequest);
 						respStr = executeCommand(processedRequest);
 					} catch (Throwable exc) {

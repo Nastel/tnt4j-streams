@@ -98,6 +98,35 @@ public class WsScenarioStep extends WsScenarioEntity {
 		return req;
 	}
 
+	@Override
+	public String getUrlStr() {
+		String url = super.getUrlStr();
+
+		return url == null ? scenario == null ? null : scenario.getUrlStr() : url;
+	}
+
+	@Override
+	public String getMethod() {
+		String method = super.getMethod();
+
+		return method == null ? scenario == null ? null : scenario.getMethod() : method;
+	}
+
+	@Override
+	public String getUsername() {
+		String username = super.getUsername();
+
+		return username == null ? scenario == null ? null : scenario.getUsername() : username;
+	}
+
+	@Override
+	public String getPassword() {
+		String username = super.getUsername();
+		String password = super.getPassword();
+
+		return username == null ? scenario == null ? null : scenario.getPassword() : password;
+	}
+
 	/**
 	 * Checks if scenario step has no requests defined.
 	 *

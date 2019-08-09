@@ -315,7 +315,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 					for (TriggerKey tKey : triggerKeys) {
 						try {
 							Trigger t = scheduler.getTrigger(tKey);
-							if (t != null && !t.mayFireAgain()) {
+							if (t != null && isInactiveTrigger(t)) {
 								scheduler.deleteJob(t.getJobKey());
 								rCount++;
 							}
@@ -334,6 +334,15 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	@Override
 	protected boolean isInputEnded() {
 		if (scheduler != null) {
+			// Check if scheduler has any jobs executed - WS streams does not allow void schedulers.
+			try {
+				if (scheduler.getMetaData().getNumberOfJobsExecuted() == 0) {
+					return false;
+				}
+			} catch (SchedulerException exc) {
+			}
+
+			// Check if scheduler is executing some jobs
 			try {
 				List<JobExecutionContext> runningJobs = scheduler.getCurrentlyExecutingJobs();
 				logger().log(OpLevel.TRACE, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -344,6 +353,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 			} catch (SchedulerException exc) {
 			}
 
+			// Check scheduler triggers - have they been fired and may fire again
 			try {
 				Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(null);
 				logger().log(OpLevel.TRACE, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -367,6 +377,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 			} catch (SchedulerException exc) {
 			}
 
+			// Looks like this scheduler already has done it's job...
 			try {
 				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 						"AbstractWsStream.inactive.scheduler", scheduler.getMetaData());
@@ -374,12 +385,15 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 			}
 		}
 
-		offerDieMarker();
 		return true;
 	}
 
 	private static boolean isActiveTrigger(Trigger t) {
-		return t.mayFireAgain() || t.getPreviousFireTime() == null;
+		return t.getPreviousFireTime() == null || t.mayFireAgain();
+	}
+
+	private static boolean isInactiveTrigger(Trigger t) {
+		return t.getPreviousFireTime() != null && !t.mayFireAgain();
 	}
 
 	@Override
@@ -578,7 +592,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	 *            format pattern of the value
 	 * @return formatted value string
 	 */
-	protected String formattedValue(Object cValue, String format) {
+	protected static String formattedValue(Object cValue, String format) {
 		if (StringUtils.isNotEmpty(format)) {
 			if (cValue instanceof UsecTimestamp) {
 				return ((UsecTimestamp) cValue).toString(format);
@@ -659,5 +673,31 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 					lockName, request == null ? "UNKNOWN" : request.getId()); // NON-NLS
 			acquiredSemaphore.release();
 		}
+	}
+
+	/**
+	 * Base scheduler job class to be executing implementing stream calls.
+	 */
+	protected static abstract class CallJob implements Job {
+		@Override
+		public void execute(JobExecutionContext context) throws JobExecutionException {
+			JobDataMap dataMap = context.getJobDetail().getJobDataMap();
+			AbstractWsStream<?> stream = (AbstractWsStream<?>) dataMap.get(JOB_PROP_STREAM_KEY);
+
+			stream.startProcessingTask();
+			try {
+				executeCalls(dataMap);
+			} finally {
+				stream.endProcessingTask();
+			}
+		}
+
+		/**
+		 * Executes dedicated endpoint (e.g. JAX-RS, JAX-WS, JDBC, etc.) calls.
+		 * 
+		 * @param dataMap
+		 *            job data map instance
+		 */
+		protected abstract void executeCalls(JobDataMap dataMap);
 	}
 }

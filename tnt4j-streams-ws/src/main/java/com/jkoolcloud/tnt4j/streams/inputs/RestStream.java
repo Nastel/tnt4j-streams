@@ -18,27 +18,31 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
+import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
-import org.quartz.*;
+import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
@@ -83,6 +87,9 @@ public class RestStream extends AbstractWsStream<String> {
 	private int maxTotalPoolConnections = 5;
 	private int defaultMaxPerRouteConnections = 2;
 
+	/**
+	 * HTTP client instance used to execute JAX-RS calls.
+	 */
 	protected CloseableHttpClient client;
 
 	/**
@@ -314,16 +321,18 @@ public class RestStream extends AbstractWsStream<String> {
 	 *
 	 * @param requestData
 	 *            URL string having request/command/query data
+	 * @param escape
+	 *            flag indicating whether to escape URL
 	 * @return preprocessed request/command/query data URL string
 	 */
-	protected String preProcessURL(String requestData) {
+	protected String preProcessURL(String requestData, boolean escape) {
 		return preProcess(requestData);
 	}
 
 	/**
 	 * Scheduler job to execute JAX-RS call.
 	 */
-	public static class RestCallJob implements Job {
+	public static class RestCallJob extends CallJob {
 
 		/**
 		 * Constructs a new RestCallJob.
@@ -343,12 +352,12 @@ public class RestStream extends AbstractWsStream<String> {
 			if (!scenarioStep.isEmpty()) {
 				String reqDataStr;
 				String respStr;
-				Semaphore aquiredSemaphore = null;
+				Semaphore acquiredSemaphore = null;
 				for (WsRequest<String> request : scenarioStep.getRequests()) {
 					reqDataStr = null;
 					respStr = null;
 					try {
-						aquiredSemaphore = acquireSemaphore(stream, request);
+						acquiredSemaphore = acquireSemaphore(stream, request);
 						reqDataStr = stream.preProcess(request.getData());
 						request.setSentData(reqDataStr);
 						respStr = stream.executePOST(stream.client, scenarioStep.getUrlStr(), reqDataStr,
@@ -362,7 +371,7 @@ public class RestStream extends AbstractWsStream<String> {
 					if (StringUtils.isNotEmpty(respStr)) {
 						stream.addInputToBuffer(new WsReqResponse<>(respStr, request));
 					} else {
-						releaseSemaphore(aquiredSemaphore, stream, scenarioStep.getName(), request);
+						releaseSemaphore(acquiredSemaphore, stream, scenarioStep.getName(), request);
 					}
 				}
 			}
@@ -383,12 +392,12 @@ public class RestStream extends AbstractWsStream<String> {
 
 			String reqUrl;
 			String respStr;
-			boolean emptyStepURL = StringUtils.isEmpty(scenarioStep.getUrlStr());
+			String urlStr = scenarioStep.getUrlStr();
 			for (WsRequest<String> request : scenarioStep.getRequests()) {
 				reqUrl = null;
 				respStr = null;
 				try {
-					reqUrl = stream.preProcessURL(emptyStepURL ? request.getData() : scenarioStep.getUrlStr());
+					reqUrl = stream.preProcessURL(stream.uriForGET(urlStr, request), true);
 					request.setSentData(reqUrl);
 					respStr = stream.executeGET(stream.client, reqUrl, scenarioStep.getUsername(),
 							scenarioStep.getPassword());
@@ -405,8 +414,7 @@ public class RestStream extends AbstractWsStream<String> {
 		}
 
 		@Override
-		public void execute(JobExecutionContext context) throws JobExecutionException {
-			JobDataMap dataMap = context.getJobDetail().getJobDataMap();
+		public void executeCalls(JobDataMap dataMap) {
 			RestStream stream = (RestStream) dataMap.get(JOB_PROP_STREAM_KEY);
 			WsScenarioStep scenarioStep = (WsScenarioStep) dataMap.get(JOB_PROP_SCENARIO_STEP_KEY);
 			String reqMethod = scenarioStep.getMethod();
@@ -421,6 +429,50 @@ public class RestStream extends AbstractWsStream<String> {
 				runGET(scenarioStep, stream);
 			}
 		}
+	}
+
+	/**
+	 * Appends JAX-RS endpoint URL with query parameter values from request data.
+	 *
+	 * @param stepUrl
+	 *            scenario step bound call endpoint URL string
+	 * @param request
+	 *            request data package
+	 *
+	 * @return URL string appended with query parameter values
+	 */
+	protected String uriForGET(String stepUrl, WsRequest<String> request) {
+		if (StringUtils.isNotEmpty(stepUrl)) {
+			return stepUrl;
+		}
+
+		String uri = preProcessURL(request.getData(), false);
+
+		StringBuilder uriBuilder = new StringBuilder();
+		uriBuilder.append(uri);
+
+		int i = uri.indexOf('?');
+
+		if (i == -1) {
+			uriBuilder.append('?');
+		} else if (i == uri.length() - 1) {
+		} else {
+			uriBuilder.append('&');
+		}
+
+		List<NameValuePair> params = new ArrayList<>(request.getParameters().size());
+
+		for (Map.Entry<String, WsRequest.Parameter> param : request.getParameters().entrySet()) {
+			params.add(new BasicNameValuePair(param.getKey(), preProcessURL(param.getValue().getValue(), false)));
+		}
+
+		String paramsStr = URLEncodedUtils.format(params, StandardCharsets.UTF_8);
+
+		if (StringUtils.isNotEmpty(paramsStr)) {
+			uriBuilder.append(paramsStr);
+		}
+
+		return uriBuilder.toString();
 	}
 
 	/**

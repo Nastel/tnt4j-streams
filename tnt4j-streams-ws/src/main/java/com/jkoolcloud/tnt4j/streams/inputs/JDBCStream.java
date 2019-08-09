@@ -24,7 +24,9 @@ import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 import org.apache.commons.lang3.StringUtils;
-import org.quartz.*;
+import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
@@ -465,7 +467,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	/**
 	 * Scheduler job to execute JDBC call.
 	 */
-	public static class JdbcCallJob implements Job {
+	public static class JdbcCallJob extends CallJob {
 
 		/**
 		 * Constructs a new JdbcCallJob.
@@ -474,9 +476,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 		}
 
 		@Override
-		public void execute(JobExecutionContext context) throws JobExecutionException {
-			JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-
+		public void executeCalls(JobDataMap dataMap) {
 			JDBCStream stream = (JDBCStream) dataMap.get(JOB_PROP_STREAM_KEY);
 			WsScenarioStep scenarioStep = (WsScenarioStep) dataMap.get(JOB_PROP_SCENARIO_STEP_KEY);
 
