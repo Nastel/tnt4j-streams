@@ -94,10 +94,10 @@
                                           )
                                         )
                                       ) AS CLOB VERSION '1.0" encoding="utf-8' no indent
-                                    ) AS EVT_ATTRS
+                                    )
                              FROM FG_EVENTATTR EAT
                              WHERE FE.EVENT_KEY = EAT.EVENT_KEY
-                            )
+                            ) AS EVT_ATTRS
                         FROM FG_EVENT FE
                             LEFT OUTER JOIN FG_ARRIVEDFILE FAF ON (FAF.ARRIVEDFILE_KEY = FE.ARRIVEDFILE_KEY)
                         WHERE FE.MODIFYTS > ?
@@ -141,11 +141,11 @@
                                           )
                                         )
                                       ) AS CLOB VERSION '1.0" encoding="utf-8' no indent
-                                    ) AS EVT_ATTRS
+                                    )
                              FROM FG_EVENTATTR EAT
                              WHERE FE.EVENT_KEY = EAT.EVENT_KEY
-                            )
-                          , FER.MODIFYTS REF_EVENT_MODIFYTS
+                            ) AS EVT_ATTRS
+                          , FER.MODIFYTS AS REF_EVENT_MODIFYTS
                           , FEA.VALUE AS APPL_NAME
                         FROM FG_EVENT FE
                             LEFT OUTER JOIN FG_EVENT FER ON (FER.EVENT_CODE = 'FG_0503' AND FER.ARRIVEDFILE_KEY = FE.ARRIVEDFILE_KEY)

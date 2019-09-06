@@ -125,7 +125,7 @@
                              WHERE FE.EVENT_KEY = EAT.EVENT_KEY
                              FOR XML PATH ('attr'), root ('attributes')
                             ) AS EVT_ATTRS
-                          , FER.MODIFYTS REF_EVENT_MODIFYTS
+                          , FER.MODIFYTS AS REF_EVENT_MODIFYTS
                           , FEA.VALUE AS APPL_NAME
                         FROM FG_EVENT FE
                             LEFT OUTER JOIN FG_EVENT FER ON (FER.EVENT_CODE = 'FG_0503' AND FER.ARRIVEDFILE_KEY = FE.ARRIVEDFILE_KEY)
