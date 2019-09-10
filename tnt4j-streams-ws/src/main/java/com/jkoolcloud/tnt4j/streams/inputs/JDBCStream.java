@@ -54,6 +54,16 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>DropRecurrentResultSets - flag indicating whether to drop streaming stream input buffer contained recurring
  * result sets, when stream input scheduler invokes JDBC queries faster than they can be processed (parsed and sent to
  * sink, e.g. because of sink/JKool limiter throttling). Default value - {@code false}. (Optional)</li>
+ * <li>ConnAutoCommit - flag indicating whether JDBC connection shall perform auto-commits. See
+ * {@link java.sql.Connection#setAutoCommit(boolean)} for details. Default value - {@code false}. (Optional)</li>
+ * <li>ConnReadOnly - flag indicating whether JDBC connection shall be set to read-only mode. See
+ * {@link java.sql.Connection#setReadOnly(boolean)} for details. Default value - {@code true}. (Optional)</li>
+ * <li>QueryFetchRows - number of rows to be fetched from database per query returned {@link java.sql.ResultSet} cursor
+ * access. Value {@code 0} implies to use default JDBC setting. See {@link java.sql.Statement#setFetchSize(int)} for
+ * details. Default value - {@code 0}. (Optional)</li>
+ * <li>QueryMaxRows - limit for the maximum number of rows that query returned {@link java.sql.ResultSet} can contain.
+ * Value {@code 0} implies to use default JDBC setting. See {@link java.sql.Statement#setMaxRows(int)} for details.
+ * Default value - {@code 0}. (Optional)</li>
  * <li>set of JDBC driver supported properties used to invoke
  * {@link DriverManager#getConnection(String, java.util.Properties)}. (Optional)</li>
  * <li>when {@value com.jkoolcloud.tnt4j.streams.configure.StreamProperties#PROP_USE_EXECUTOR_SERVICE} is set to
@@ -84,6 +94,10 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	protected Map<String, String> jdbcProperties = new HashMap<>();
 
 	private boolean dropRecurrentResultSets = false;
+	private boolean autoCommit = false;
+	private boolean readOnly = true;
+	private int fetchSize = 0;
+	private int maxRows = 0;
 
 	/**
 	 * Constructs an empty JDBCStream. Requires configuration settings to set input stream source.
@@ -103,6 +117,14 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 
 		if (WsStreamProperties.PROP_DROP_RECURRENT_RESULT_SETS.equalsIgnoreCase(name)) {
 			dropRecurrentResultSets = Utils.toBoolean(value);
+		} else if (WsStreamProperties.PROP_CONN_AUTO_COMMIT.equalsIgnoreCase(name)) {
+			autoCommit = Utils.toBoolean(value);
+		} else if (WsStreamProperties.PROP_CONN_READ_ONLY.equalsIgnoreCase(name)) {
+			readOnly = Utils.toBoolean(value);
+		} else if (WsStreamProperties.PROP_QUERY_FETCH_ROWS.equalsIgnoreCase(name)) {
+			fetchSize = Integer.parseInt(value);
+		} else if (WsStreamProperties.PROP_QUERY_MAX_ROWS.equalsIgnoreCase(name)) {
+			maxRows = Integer.parseInt(value);
 		} else {
 			jdbcProperties.put(name, value);
 		}
@@ -112,6 +134,18 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	public Object getProperty(String name) {
 		if (WsStreamProperties.PROP_DROP_RECURRENT_RESULT_SETS.equalsIgnoreCase(name)) {
 			return dropRecurrentResultSets;
+		}
+		if (WsStreamProperties.PROP_CONN_AUTO_COMMIT.equalsIgnoreCase(name)) {
+			return autoCommit;
+		}
+		if (WsStreamProperties.PROP_CONN_READ_ONLY.equalsIgnoreCase(name)) {
+			return readOnly;
+		}
+		if (WsStreamProperties.PROP_QUERY_FETCH_ROWS.equalsIgnoreCase(name)) {
+			return fetchSize;
+		}
+		if (WsStreamProperties.PROP_QUERY_MAX_ROWS.equalsIgnoreCase(name)) {
+			return maxRows;
 		}
 
 		Object pValue = super.getProperty(name);
@@ -133,6 +167,19 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 		}
 
 		super.initialize();
+	}
+
+	@Override
+	protected void cleanupItem(WsResponse<ResultSet> item) {
+		if (item != null && item.getData() != null) {
+			try {
+				closeRS(item.getData());
+			} catch (SQLException exc) {
+				Utils.logThrowable(logger(), OpLevel.WARNING,
+						StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+						"JDBCStream.rs.consumption.exception", exc);
+			}
+		}
 	}
 
 	@Override
@@ -191,9 +238,16 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 		}
 	}
 
-	private static void closeRS(ResultSet rs) throws SQLException {
+	private void closeRS(ResultSet rs) throws SQLException {
 		Statement st = rs.getStatement();
 		Connection conn = st == null ? null : st.getConnection();
+
+		if (conn != null && !autoCommit) {
+			try {
+				conn.commit();
+			} catch (SQLException exc) {
+			}
+		}
 
 		Utils.close(rs);
 		Utils.close(st);
@@ -273,6 +327,9 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 			}
 			dbConn = DriverManager.getConnection(url, connProps);
 		}
+		dbConn.setAutoCommit(stream.autoCommit);
+		dbConn.setReadOnly(stream.readOnly);
+
 		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"JDBCStream.db.connection.obtained", url, cod.durationHMS());
 
@@ -280,6 +337,13 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 				"JDBCStream.preparing.query", query);
 
 		PreparedStatement statement = dbConn.prepareStatement(query);
+		if (stream.fetchSize > 0) {
+			statement.setFetchSize(stream.fetchSize);
+		}
+		if (stream.maxRows > 0) {
+			statement.setMaxRows(stream.maxRows);
+		}
+
 		addStatementParameters(statement, params, stream);
 
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),

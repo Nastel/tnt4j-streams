@@ -9,6 +9,11 @@
         <property name="HaltIfNoParser" value="false"/>
         <property name="DropRecurrentResultSets" value="true"/>
 
+        <property name="ConnAutoCommit" value="false"/>
+        <property name="ConnReadOnly" value="true"/>
+        <property name="QueryFetchRows" value="500"/>
+        <!--<property name="QueryMaxRows" value="50000"/>-->
+
         <tnt4j-properties>
             <property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://test.jkoolcloud.com:6585"/>
             <property name="event.sink.factory.EventSinkFactory.prod.Token" value="YOUR_REPO_TOKEN"/>
@@ -346,7 +351,7 @@
                       FROM DOCUMENT D
                        INNER JOIN DATA_FLOW DF ON (D.DOC_ID = DF.ROOT_DOCUMENT)
                       WHERE D.MODIFYTS > ?
-                       ORDER BY D.CREATE_TIME, D.DOC_ID ASC
+                      ORDER BY D.CREATE_TIME, D.DOC_ID ASC
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastDocumentsRecordMDate}" type="TIMESTAMP"/>

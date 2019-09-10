@@ -16,6 +16,8 @@
 
 package com.jkoolcloud.tnt4j.streams.inputs;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -266,12 +268,44 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 	 */
 	protected abstract long getActivityItemByteSize(T activityItem);
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Drains all input buffer remaining items and performs clean up (finalization) of every item.
+	 *
+	 * @see #cleanupItem(Object)
+	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void cleanup() {
 		if (inputBuffer != null) {
-			inputBuffer.clear();
+			Collection<Object> itemList = new ArrayList<>();
+			inputBuffer.drainTo(itemList);
+
+			if (!itemList.isEmpty()) {
+				for (Object item : itemList) {
+					if (DIE_MARKER.equals(item)) {
+						continue;
+					}
+					cleanupItem((T) item);
+				}
+			}
 		}
 		super.cleanup();
+	}
+
+	/**
+	 * Cleans up activity data item remaining on input buffer on stream {@link #cleanup()} call.
+	 * <p>
+	 * By default it does nothing, but if item is of {@link java.io.Closeable} resource type, it shall be properly
+	 * handled (closed) before dropping it, even if item was not used by the stream.
+	 *
+	 * @param item
+	 *            activity data item to cleanup
+	 * 
+	 * @see #cleanup()
+	 */
+	protected void cleanupItem(T item) {
 	}
 
 	/**

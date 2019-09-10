@@ -9,6 +9,11 @@
         <property name="HaltIfNoParser" value="false"/>
         <property name="DropRecurrentResultSets" value="true"/>
 
+        <property name="ConnAutoCommit" value="false"/>
+        <property name="ConnReadOnly" value="true"/>
+        <property name="QueryFetchRows" value="500"/>
+        <!--<property name="QueryMaxRows" value="50000"/>-->
+
         <tnt4j-properties>
             <property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://test.jkoolcloud.com:6585"/>
             <property name="event.sink.factory.EventSinkFactory.prod.Token" value="YOUR_REPO_TOKEN"/>
@@ -50,7 +55,9 @@
                           , FAF.DIST_MSG_ID AS AFILE_DIST_MSG_ID
                         FROM FG_ARRIVEDFILE FAF
                         WHERE FAF.MODIFYTS > ?
+                          AND FAF.MODIFYTS < (sysdate - interval '5' minute)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY FAF.CREATETS, FAF.DATA_FLOW_ID ASC
+                        FETCH FIRST 50000 ROWS ONLY -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastAFileRecordMDate}" type="TIMESTAMP"/>
@@ -101,7 +108,9 @@
                         FROM FG_EVENT FE
                             LEFT OUTER JOIN FG_ARRIVEDFILE FAF ON (FAF.ARRIVEDFILE_KEY = FE.ARRIVEDFILE_KEY)
                         WHERE FE.MODIFYTS > ?
+                          AND FE.MODIFYTS < (sysdate - interval '5' minute)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY FE.CREATETS, FE.COUNTER ASC
+                        FETCH FIRST 50000 ROWS ONLY -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastEventRecordMDate}" type="TIMESTAMP"/>
@@ -153,7 +162,9 @@
                             LEFT OUTER JOIN FG_ARRIVEDFILE FAF ON (FAF.ARRIVEDFILE_KEY = FE.ARRIVEDFILE_KEY)
                         WHERE FE.EVENT_CODE = 'FG_0425'
                           AND FER.MODIFYTS > ?
+                          AND FER.MODIFYTS < (sysdate - interval '5' minute)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY FE.CREATETS, FE.COUNTER ASC
+                        FETCH FIRST 50000 ROWS ONLY -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastEventApplRecordMDate}" type="TIMESTAMP"/>
@@ -187,7 +198,9 @@
                         FROM FG_ROUTE FR
                         WHERE FR.MODIFYTS > ?
                           AND FR.ROUTCHAN_KEY IS NOT NULL  -- exclude all routes having no channel key defined
+                          AND FR.MODIFYTS < (sysdate - interval '5' minute)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY FR.CREATETS, FR.DATA_FLOW_ID ASC
+                        FETCH FIRST 50000 ROWS ONLY -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastRouteRecordMDate}" type="TIMESTAMP"/>
@@ -220,7 +233,9 @@
                         FROM FG_DELIVERY FD
                         WHERE FD.MODIFYTS > ?
                           AND FD.FILENAME IS NOT NULL  -- exclude all deliveries not bound to particular file transfer
+                          AND FD.MODIFYTS < (sysdate - interval '5' minute)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY FD.CREATETS, FD.DATA_FLOW_ID ASC
+                        FETCH FIRST 50000 ROWS ONLY -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastDeliveryRecordMDate}" type="TIMESTAMP"/>
@@ -250,7 +265,9 @@
                         FROM CORRELATION_SET CS
                             INNER JOIN CORREL_KEY CK ON (CS.KEY_ID = CK.ID)
                         WHERE CS.REC_TIME > ?
+                          AND CS.REC_TIME < (sysdate - interval '5' minute) -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY CS.REC_TIME, CS.OBJECT_ID ASC
+                        FETCH FIRST 50000 ROWS ONLY -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastCorrelationSetRecordMDate}" type="TIMESTAMP"/>
@@ -303,7 +320,9 @@
                                         WHERE WL.ROOT_WF_ID = WC.WORKFLOW_ID
                                            OR DL.WORKFLOW_ID = WC.WORKFLOW_ID
                                      )  -- pick only document related workflow events
+                          AND WC.START_TIME < (sysdate - interval '5' minute)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY WC.START_TIME, WC.WORKFLOW_ID ASC
+                        FETCH FIRST 50000 ROWS ONLY -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastWorkflowContextRecordMDate}" type="TIMESTAMP"/>
@@ -345,7 +364,9 @@
                       FROM DOCUMENT D
                        INNER JOIN DATA_FLOW DF ON (D.DOC_ID = DF.ROOT_DOCUMENT)
                       WHERE D.MODIFYTS > ?
-                       ORDER BY D.CREATE_TIME, D.DOC_ID ASC
+                        AND D.MODIFYTS < (sysdate - interval '5' minute)  -- Don't pick entries younger than 5min. - update for them may be still in progress
+                      ORDER BY D.CREATE_TIME, D.DOC_ID ASC
+                      FETCH FIRST 50000 ROWS ONLY -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastDocumentsRecordMDate}" type="TIMESTAMP"/>

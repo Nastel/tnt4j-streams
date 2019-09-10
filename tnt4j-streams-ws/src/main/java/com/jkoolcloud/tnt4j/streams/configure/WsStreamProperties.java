@@ -50,4 +50,20 @@ public interface WsStreamProperties extends StreamProperties {
 	 * Constant for name of built-in stream {@value} property.
 	 */
 	public static final String PROP_DROP_RECURRENT_RESULT_SETS = "DropRecurrentResultSets"; // NON-NLS
+	/**
+	 * Constant for name of built-in stream {@value} property.
+	 */
+	public static final String PROP_CONN_AUTO_COMMIT = "ConnAutoCommit"; // NON-NLS
+	/**
+	 * Constant for name of built-in stream {@value} property.
+	 */
+	public static final String PROP_CONN_READ_ONLY = "ConnReadOnly"; // NON-NLS
+	/**
+	 * Constant for name of built-in stream {@value} property.
+	 */
+	public static final String PROP_QUERY_FETCH_ROWS = "QueryFetchRows"; // NON-NLS
+	/**
+	 * Constant for name of built-in stream {@value} property.
+	 */
+	public static final String PROP_QUERY_MAX_ROWS = "QueryMaxRows"; // NON-NLS
 }
