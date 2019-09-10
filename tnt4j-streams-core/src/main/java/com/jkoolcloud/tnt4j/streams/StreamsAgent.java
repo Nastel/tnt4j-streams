@@ -43,7 +43,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * Main class for jKool LLC TNT4J-Streams standalone application.
  *
  * @version $Revision: 3 $
- * 
+ *
  * @see com.jkoolcloud.tnt4j.streams.configure.build.StreamsBuilder
  */
 public final class StreamsAgent {
@@ -140,7 +140,7 @@ public final class StreamsAgent {
 
 	/**
 	 * Returns jKool LLC TNT4J-Streams runtime environment properties string.
-	 * 
+	 *
 	 * @return runtime environment properties string
 	 */
 	static String runEnv() {
@@ -178,7 +178,7 @@ public final class StreamsAgent {
 	 *
 	 * @param builder
 	 *            streams builder to build streams context
-	 * 
+	 *
 	 * @see #run(com.jkoolcloud.tnt4j.streams.configure.build.StreamsBuilder)
 	 */
 	public static void runFromAPI(StreamsBuilder builder) {
@@ -192,7 +192,7 @@ public final class StreamsAgent {
 	 *
 	 * @param builder
 	 *            streams builder to build streams context
-	 * 
+	 *
 	 * @see #run(com.jkoolcloud.tnt4j.streams.configure.build.StreamsBuilder)
 	 */
 	protected static void loadConfigAndRun(CfgStreamsBuilder builder) {
@@ -312,7 +312,7 @@ public final class StreamsAgent {
 
 	/**
 	 * Stops running streams identified by {@code streamNames} defined names within default streams thread group.
-	 * 
+	 *
 	 * @param streamNames
 	 *            names of the stream to stop
 	 */
@@ -382,10 +382,24 @@ public final class StreamsAgent {
 		restartStreams(null);
 	}
 
+	/**
+	 * Restart set of streams within default streams thread group.
+	 *
+	 * @param streamNames
+	 *            set of stream names to restart
+	 */
 	public static void restartStreams(String... streamNames) {
 		restartStreams(null, streamNames);
 	}
 
+	/**
+	 * Restart set of streams within default streams thread group.
+	 *
+	 * @param reader
+	 *            streams configuration data reader
+	 * @param streamNames
+	 *            set of stream names to restart
+	 */
 	public static void restartStreams(Reader reader, String... streamNames) {
 		if (isStreamsRunning()) {
 			restarting = false;
@@ -555,7 +569,7 @@ public final class StreamsAgent {
 
 	/**
 	 * Returns list of running stream names.
-	 * 
+	 *
 	 * @return list of running stream names.
 	 */
 	public static Collection<String> getRunningStreamNames() {
