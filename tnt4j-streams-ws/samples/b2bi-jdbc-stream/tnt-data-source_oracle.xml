@@ -8,9 +8,11 @@
     <stream name="B2BiOracleJDBCStream" class="com.jkoolcloud.tnt4j.streams.inputs.JDBCStream">
         <property name="HaltIfNoParser" value="false"/>
         <property name="DropRecurrentResultSets" value="true"/>
-
-        <property name="ConnAutoCommit" value="false"/>
-        <property name="ConnReadOnly" value="true"/>
+        <!-- DB data source configuration using HikariCP supported configuration properties-->
+        <property name="autoCommit" value="false"/>
+        <property name="readOnly" value="true"/>
+        <property name="maximumPoolSize" value="5"/>
+        <!-- Query returned ResultSet configuration -->
         <property name="QueryFetchRows" value="500"/>
         <!--<property name="QueryMaxRows" value="50000"/>-->
 

@@ -5307,26 +5307,20 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
  * `DropRecurrentResultSets` - flag indicating whether to drop streaming stream input buffer contained recurring result sets, when stream 
  input scheduler invokes JDBC queries faster than they can be processed (parsed and sent to sink, e.g. because of sink/JKool limiter 
  throttling). Default value - `false`. (Optional)
- * `ConnAutoCommit` - flag indicating whether JDBC connection shall perform auto-commits. See [JDBC Connection.setAutoCommit()](https://docs.oracle.com/javase/7/docs/api/java/sql/Connection.html#setAutoCommit(boolean)) 
- for details. Default value - `false`. (Optional)
- * `ConnReadOnly` - flag indicating whether JDBC connection shall be set to read-only mode. See [[JDBC Connection.setReadOnly()](https://docs.oracle.com/javase/7/docs/api/java/sql/Connection.html#setReadOnly(boolean)) 
- for details. Default value - `true`. (Optional)
  * `QueryFetchRows` - number of rows to be fetched from database per query returned `java.sql.ResultSet` cursor access. Value `0` implies to 
  use default JDBC setting. See [JDBC Statement.setFetchSize()](https://docs.oracle.com/javase/7/docs/api/java/sql/Statement.html#setFetchSize(int)) 
  for details. Default value - `0`. (Optional)
  * `QueryMaxRows` - limit for the maximum number of rows that query returned `java.sql.ResultSet` can contain. Value `0` implies to use 
  default JDBC setting. See [JDBC Statement.setMaxRows()](https://docs.oracle.com/javase/7/docs/api/java/sql/Statement.html#setMaxRows(int)) 
  for details. Default value - `0. (Optional)
- * List of `JDBC` driver supported properties used to invoke ['DriverManager.getConnection(String, Properties)'](https://docs.oracle.com/javase/8/docs/api/java/sql/DriverManager.html#getConnection-java.lang.String-java.util.Properties-). 
- (Optional)
+ * set of [HikariCP supported properties](https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby) used to configure JDBC data 
+ source. (Optional)
  * when `UseExecutors` is set to `true` and `ExecutorThreadsQuantity` is greater than `1`, value for that property is reset to `1` since 
  `java.sql.ResultSet` can't be accessed in multi-thread manner.
 
     sample:
  ```xml
      <property name="DropRecurrentResultSets" value="true"/>
-     <property name="ConnAutoCommit" value="true"/>
-     <property name="ConnReadOnly" value="false"/>
      <property name="QueryFetchRows" value="500"/>
      <property name="QueryMaxRows" value="50000"/>
  ```
