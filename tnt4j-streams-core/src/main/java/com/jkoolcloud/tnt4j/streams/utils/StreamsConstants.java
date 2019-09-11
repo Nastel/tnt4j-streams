@@ -16,7 +16,10 @@
 
 package com.jkoolcloud.tnt4j.streams.utils;
 
+import java.lang.reflect.Field;
 import java.util.regex.Pattern;
+
+import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 
 /**
  * TNT4J-Streams constants.
@@ -122,5 +125,33 @@ public final class StreamsConstants {
 	 */
 	public static String[] getMultiProperties(String pValue) {
 		return pValue.split(Pattern.quote(MULTI_PROPS_DELIMITER));
+	}
+
+	/**
+	 * Checks if property name is defined streams property name.
+	 * 
+	 * @param props
+	 *            class containing streams property names definition
+	 * @param prop
+	 *            property name to check
+	 * @return {@code true} if property name is defined streams property name, {@code false} - otherwise
+	 */
+	public static boolean isStreamCfgProperty(Class<? extends StreamProperties> props, String prop) {
+		Field[] dProps = props.getFields();
+
+		for (Field dProp : dProps) {
+			dProp.setAccessible(true);
+			if (dProp.getName().startsWith("PROP_")) { // NON-NLS
+				try {
+					String propName = (String) dProp.get(props);
+					if (propName.equalsIgnoreCase(prop)) {
+						return true;
+					}
+				} catch (Exception exc) {
+				}
+			}
+		}
+
+		return false;
 	}
 }

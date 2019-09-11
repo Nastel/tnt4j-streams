@@ -33,6 +33,7 @@ import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.JMSStreamProperties;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
@@ -96,6 +97,7 @@ public class JMSStream extends AbstractBufferedStream<Message> {
 		if (JMSStreamProperties.PROP_JMS_CONN_FACTORY.equalsIgnoreCase(name)) {
 			return jmsConnFactory;
 		}
+
 		String cpv = ctxProps.getProperty(name);
 		if (cpv != null) {
 			return cpv;
@@ -114,7 +116,7 @@ public class JMSStream extends AbstractBufferedStream<Message> {
 			topicNames = value.split(DEFINITION_DELIMITER);
 		} else if (JMSStreamProperties.PROP_JMS_CONN_FACTORY.equalsIgnoreCase(name)) {
 			jmsConnFactory = value;
-		} else {
+		} else if (!StreamsConstants.isStreamCfgProperty(JMSStreamProperties.class, name)) {
 			ctxProps.put(name, value);
 		}
 	}

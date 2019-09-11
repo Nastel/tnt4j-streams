@@ -17,7 +17,7 @@
 package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.time.Duration;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
@@ -27,11 +27,9 @@ import org.apache.kafka.common.errors.WakeupException;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
+import com.jkoolcloud.tnt4j.streams.configure.KafkaStreamProperties;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
-import com.jkoolcloud.tnt4j.streams.utils.KafkaStreamConstants;
-import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
-import com.jkoolcloud.tnt4j.streams.utils.Utils;
+import com.jkoolcloud.tnt4j.streams.utils.*;
 
 /**
  * Implements a Kafka topics transmitted activity stream, where each message body is assumed to represent a single
@@ -39,7 +37,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * configuration. Difference from {@link com.jkoolcloud.tnt4j.streams.inputs.KafkaStream} is that this stream uses
  * "kafka-clients" library to implement Kafka consumer part of the stream.
  * <p>
- * This activity stream requires parsers that can support {@link ConsumerRecords} data like
+ * This activity stream requires parsers that can support {@link ConsumerRecord} data like
  * {@link com.jkoolcloud.tnt4j.streams.parsers.KafkaConsumerRecordParser}.
  * <p>
  * This activity stream supports the following configuration properties (in addition to those supported by
@@ -100,24 +98,8 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 			topicName = value;
 		} else if (StreamProperties.PROP_FILENAME.equalsIgnoreCase(name)) {
 			cfgFileName = value;
-		} else {
-			Field[] propFields = StreamProperties.class.getDeclaredFields();
-
-			boolean streamsProperty = false;
-			for (Field pf : propFields) {
-				try {
-					pf.setAccessible(true);
-					if (pf.get(StreamProperties.class).toString().equalsIgnoreCase(name)) {
-						streamsProperty = true;
-						break;
-					}
-				} catch (Exception exc) {
-				}
-			}
-
-			if (!streamsProperty) {
-				addUserKafkaProperty(name, value);
-			}
+		} else if (!StreamsConstants.isStreamCfgProperty(KafkaStreamProperties.class, name)) {
+			addUserKafkaProperty(name, value);
 		}
 	}
 
@@ -283,9 +265,7 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 
 	@Override
 	protected long getActivityItemByteSize(ConsumerRecord<?, ?> activityItem) {
-		int size = Math.max(activityItem.serializedKeySize(), 0) + Math.max(activityItem.serializedValueSize(), 0);
-
-		return size;
+		return Math.max(activityItem.serializedKeySize(), 0) + Math.max(activityItem.serializedValueSize(), 0);
 	}
 
 	@Override
@@ -343,7 +323,7 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 					consumer.subscribe(topics);
 
 					while (!isHalted()) {
-						ConsumerRecords<?, ?> records = consumer.poll(Long.MAX_VALUE);
+						ConsumerRecords<?, ?> records = consumer.poll(Duration.ofSeconds(Long.MAX_VALUE));
 						if (autoCommit) {
 							addRecordsToBuffer(records);
 						} else {

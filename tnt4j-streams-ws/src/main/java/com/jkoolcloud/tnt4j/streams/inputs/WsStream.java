@@ -46,10 +46,7 @@ import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.WsStreamProperties;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
 import com.jkoolcloud.tnt4j.streams.scenario.*;
-import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
-import com.jkoolcloud.tnt4j.streams.utils.Utils;
-import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
+import com.jkoolcloud.tnt4j.streams.utils.*;
 
 /**
  * Implements a scheduled JAX-WS service call activity stream, where each call response is assumed to represent a single
@@ -110,7 +107,7 @@ public class WsStream extends AbstractWsStream<String> {
 
 		if (WsStreamProperties.PROP_DISABLE_SSL.equalsIgnoreCase(name)) {
 			disableSSL = Utils.toBoolean(value);
-		} else {
+		} else if (!StreamsConstants.isStreamCfgProperty(WsStreamProperties.class, name)) {
 			wsProperties.put(name, value);
 		}
 	}
