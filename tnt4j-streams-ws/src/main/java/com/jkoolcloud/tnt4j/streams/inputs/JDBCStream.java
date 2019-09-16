@@ -16,12 +16,15 @@
 
 package com.jkoolcloud.tnt4j.streams.inputs;
 
+import java.io.Closeable;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.JobBuilder;
@@ -95,7 +98,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	private int fetchSize = 0;
 	private int maxRows = 0;
 
-	private Map<String, HikariDataSource> dbDataSources = new HashMap<>(3);
+	private Map<String, DataSource> dbDataSources = new HashMap<>(3);
 
 	/**
 	 * Constructs an empty JDBCStream. Requires configuration settings to set input stream source.
@@ -161,8 +164,10 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	protected void cleanup() {
 		super.cleanup();
 
-		for (HikariDataSource dbDataSource : dbDataSources.values()) {
-			Utils.close(dbDataSource);
+		for (DataSource dbDataSource : dbDataSources.values()) {
+			if (dbDataSource instanceof Closeable) {
+				Utils.close((Closeable) dbDataSource);
+			}
 		}
 
 		dbDataSources.clear();
@@ -360,7 +365,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	 */
 	protected static Connection getDbConnection(String url, String user, String pass, JDBCStream stream)
 			throws SQLException {
-		HikariDataSource hds = stream.dbDataSources.get(url);
+		DataSource hds = stream.dbDataSources.get(url);
 
 		if (hds == null) {
 			Properties dbProps = new Properties();
