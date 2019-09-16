@@ -8,10 +8,10 @@
     <!-- Example RegEx Parser to capture parts of the field -->
     <parser name="RegExParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityRegExParser">
         <property name="Pattern" value="(.*)\.(.*)\.(.*)\.(.*)"/>
-        <field name="ProcessArea" locator="2" locator-type="REGroupNum"/>
-        <field name="InterfaceID" locator="3" locator-type="REGroupNum"/>
-        <field name="HopNum" locator="4" locator-type="REGroupNum"/>
-        <field name="CoId" locator="1" locator-type="REGroupNum"/>
+        <field name="ProcessArea" locator="2" locator-type="Index"/>
+        <field name="InterfaceID" locator="3" locator-type="Index"/>
+        <field name="HopNum" locator="4" locator-type="Index"/>
+        <field name="CoId" locator="1" locator-type="Index"/>
     </parser>
 
     <parser name="TransferSetParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
@@ -89,7 +89,7 @@
             <field-map-ref resource="MFT_MAPPINGS.CompCode3"/>
         </field>
 
-        <embedded-activity name="TRANSFERSET" locator="/item/*" locator-type="Label">
+        <embedded-activity name="TRANSFERSET" locator="/item/*[name(.) = 'source' or name(.) = 'destination']" locator-type="Label">
             <parser-ref name="TransferSetParser" aggregation="Relate"/>
         </embedded-activity>
     </parser>

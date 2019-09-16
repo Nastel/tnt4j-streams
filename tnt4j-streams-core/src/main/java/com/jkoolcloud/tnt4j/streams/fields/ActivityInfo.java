@@ -1007,7 +1007,11 @@ public class ActivityInfo {
 				continue;
 			}
 
+			if (cais.size() > 1) {
+				child.determineTrackingId();
+			}
 			child.merge(this);
+			verifyDuplicates(child, chTrackables);
 			Trackable t = child.buildTrackable(tracker);
 			if (chTrackables != null) {
 				chTrackables.put(t, child);
@@ -1015,9 +1019,31 @@ public class ActivityInfo {
 		}
 
 		if (chTrackables != null && chTrackables.isEmpty()) {
+			verifyDuplicates(this, chTrackables);
 			Trackable t = buildTrackable(tracker);
 			chTrackables.put(t, this);
 		}
+	}
+
+	private void verifyDuplicates(ActivityInfo child, Map<Trackable, ActivityInfo> chTrackables) {
+		Map.Entry<Trackable, ActivityInfo> dCh = getDuplicate(child, chTrackables);
+		if (dCh != null) {
+			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+					"ActivityInfo.duplicate.child", child.trackingId, child, dCh.getValue());
+		}
+	}
+
+	private Map.Entry<Trackable, ActivityInfo> getDuplicate(ActivityInfo child,
+			Map<Trackable, ActivityInfo> chTrackables) {
+		if (chTrackables != null) {
+			for (Map.Entry<Trackable, ActivityInfo> chT : chTrackables.entrySet()) {
+				if (chT.getKey().getTrackingId().equals(child.trackingId)) {
+					return chT;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	private static boolean addTrackableChild(Trackable pTrackable, Trackable chTrackable) {
