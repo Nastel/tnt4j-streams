@@ -457,32 +457,32 @@ See [Parser matching data or parsing context](#parser-matching-data-or-parsing-c
 
 #### Relative locators
 
- * `^.fieldName` - stacked parser `Activity` type locator prefix `^.` can be used to access parent parser (one stacked parser was invoked from) 
- produced activity entity field value, where field name is defined by locator token `fieldName`. E.g.:
- ```xml
- <tnt-data-source
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="tnt-data-source.xsd">
+ * `^.fieldName` - stacked parser `Activity` type locator prefix `^.` can be used to access parent parser (one stacked parser was invoked 
+ from) produced activity entity field value, where field name is defined by locator token `fieldName`. E.g.:
+     ```xml
+     <tnt-data-source
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="tnt-data-source.xsd">
 
-     <parser name="AccessLogParserCommon" class="com.jkoolcloud.tnt4j.streams.custom.parsers.ApacheAccessLogParser">
-         <.../>
-         <field name="ValueFromParent" locator="^.StaticValue" locator-type="Activity"/>
-     </parser>
+         <parser name="AccessLogParserCommon" class="com.jkoolcloud.tnt4j.streams.custom.parsers.ApacheAccessLogParser">
+             <.../>
+             <field name="ValueFromParent" locator="^.StaticValue" locator-type="Activity"/>
+         </parser>
 
-     <parser name="SampleJMSParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJMSMessageParser">
-         <.../>
-         <field name="StaticValue" value="SampleJMSParser_Value" transparent="true"/>
-         <.../>
-         <embedded-activity name="InternalActivity" locator="OtherActivityData" locator-type="Label">
-             <parser-ref name="AccessLogParserCommon" aggregation="Relate"/>
-         </embedded-activity>
-         <.../>
-     </parser>
-     ...
- </tnt-data-source>
- ```
- `AccessLogParserCommon` uses field `ValueFromParent` locator `^.StaticValue` to fill in value defined in `SampleJMSParser` parser field 
- `StaticValue`. After parsing, field `ValueFromParent` will have value `SampleJMSParser_Value`.
+         <parser name="SampleJMSParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJMSMessageParser">
+             <.../>
+             <field name="StaticValue" value="SampleJMSParser_Value" transparent="true"/>
+             <.../>
+             <embedded-activity name="InternalActivity" locator="OtherActivityData" locator-type="Label">
+                 <parser-ref name="AccessLogParserCommon" aggregation="Relate"/>
+             </embedded-activity>
+             <.../>
+         </parser>
+         ...
+     </tnt-data-source>
+     ```
+    `AccessLogParserCommon` uses field `ValueFromParent` locator `^.StaticValue` to fill in value defined in `SampleJMSParser` parser field
+    `StaticValue`. After parsing, field `ValueFromParent` will have value `SampleJMSParser_Value`.
 
  * `^.child[groupName.chIndex].fieldName` (short form `^.child[chIndex].fieldName` or `^.child[groupName].fieldName`) - stacked parser 
  aggregating activity entities using `Relate` method, `Activity` type locators can resolve field values from these child entities using 
@@ -495,64 +495,104 @@ See [Parser matching data or parsing context](#parser-matching-data-or-parsing-c
     parser produced activity entity
     * `fieldName` - is child activity entity field name
 
- Locator definition samples:
- ```xml
-    <field name="mainReason" locator="^.child[0].reason" locator-type="Activity"/>
-    <field name="mainReason" locator="^.child[OtherParser].reason" locator-type="Activity"/>
-    <field name="mainReason" locator="^.child[InputsParser.0].reason" locator-type="Activity"/>
- ```
+     Locator definition samples:
+     ```xml
+        <field name="mainReason" locator="^.child[0].reason" locator-type="Activity"/>
+        <field name="mainReason" locator="^.child[OtherParser].reason" locator-type="Activity"/>
+        <field name="mainReason" locator="^.child[InputsParser.0].reason" locator-type="Activity"/>
+     ```
 
- Parsers sample:
- ```xml
-     <parser name="tokenAttributesBySLP" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser" manualFieldsOrder="true">
-         <.../>
-         <field name="transactionType" locator="transactionType" locator-type="Label" datatype="AsInput"/>
-         <.../> 
-     </parser>
+     Parsers sample:
+     ```xml
+         <parser name="tokenAttributesBySLP" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser" manualFieldsOrder="true">
+             <.../>
+             <field name="transactionType" locator="transactionType" locator-type="Label" datatype="AsInput"/>
+             <.../> 
+         </parser>
 
-     <parser name="voutParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser" manualFieldsOrder="true">
-         <field name="EventType" value="Snapshot"/> 
-         <.../> 
-         <field name="slpTxAttributes" locator="slpAttributes" locator-type="Label" transparent="true">
-             <parser-ref name="tokenAttributesBySLP" aggregation="Merge"/>
-         </field>
-         <field name="transactionIndex" locator="n" datatype="Number" locator-type="Label"/>
-         <field name="transactionType" locator="^.child[0].transactionType" locator-type="Activity"/> 
-         <.../>
-     </parser>
+         <parser name="voutParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser" manualFieldsOrder="true">
+             <field name="EventType" value="Snapshot"/> 
+             <.../> 
+             <field name="slpTxAttributes" locator="slpAttributes" locator-type="Label" transparent="true">
+                 <parser-ref name="tokenAttributesBySLP" aggregation="Merge"/>
+             </field>
+             <field name="transactionIndex" locator="n" datatype="Number" locator-type="Label"/>
+             <field name="transactionType" locator="^.child[0].transactionType" locator-type="Activity"/> 
+             <.../>
+         </parser>
 
-     <parser name="vinParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-         <field name="EventType" value="Snapshot"/>
-         <.../>
-         <field name="tinIndex" locator="^.child[voutParser.0].transactionIndex" locator-type="Activity"/>
-         <.../>
-     </parser>
+         <parser name="vinParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+             <field name="EventType" value="Snapshot"/>
+             <.../>
+             <field name="tinIndex" locator="^.child[voutParser.0].transactionIndex" locator-type="Activity"/>
+             <.../>
+         </parser>
 
-     <parser name="TransactionParserEnhanced" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser" manualFieldsOrder="true">
-         <field name="EventType" value="Event"/>
-         <.../>
-         <embedded-activity name="vin" locator="$.result.vin" locator-type="Label">
-             <parser-ref name="vinParser" aggregation="Relate"/>
-         </embedded-activity>
-         <embedded-activity name="vout" locator="$.result.vout" locator-type="Label">
-             <parser-ref name="voutParser" aggregation="Relate"/>
-         </embedded-activity>
-         <.../>
-     </parser>
- ```
-Parent activity entity (event) is created by parser named `TransactionParserEnhanced`. This parser has two fields `vin` and `vout` resolving 
-array of JSON maps and referring stacked parsers `vinParser` and `voutParser` and aggregating child activity entities (snapshots) using 
-`Relate` method. `voutParser` itself has field `slpTxAttributes` referring stacked parser `tokenAttributesBySLP` appending  field 
-`transactionType` to `voutParser` parser created snapshot. Consider `TransactionParserEnhanced` passes different contents of maps into 
-`voutParser` and first map (child) entry `slpAttributes` has value map entry `transactionType`, the rest - not. But we want all produced 
-snapshots to have field `transactionType` and to have value defined in first child. Locator `^.child[0].transactionType` allows us to access 
-that wanted value from first child (in case current child entry is the first one, field value is simply remapped to itself). Meanwhile 
-parser `vinParser` can access `voutParser` produced snapshots field `transactionIndex` value since they both "are under" same parent parser 
-`TransactionParserEnhanced`.
+         <parser name="TransactionParserEnhanced" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser" manualFieldsOrder="true">
+             <field name="EventType" value="Event"/>
+             <.../>
+             <embedded-activity name="vin" locator="$.result.vin" locator-type="Label">
+                 <parser-ref name="vinParser" aggregation="Relate"/>
+             </embedded-activity>
+             <embedded-activity name="vout" locator="$.result.vout" locator-type="Label">
+                 <parser-ref name="voutParser" aggregation="Relate"/>
+             </embedded-activity>
+             <.../>
+         </parser>
+     ```
+    Parent activity entity (event) is created by parser named `TransactionParserEnhanced`. This parser has two fields `vin` and `vout` 
+    resolving array of JSON maps and referring stacked parsers `vinParser` and `voutParser` and aggregating child activity entities 
+    (snapshots) using `Relate` method. `voutParser` itself has field `slpTxAttributes` referring stacked parser `tokenAttributesBySLP` 
+    appending  field `transactionType` to `voutParser` parser created snapshot. Consider `TransactionParserEnhanced` passes different 
+    contents of maps into `voutParser` and first map (child) entry `slpAttributes` has value map entry `transactionType`, the rest - not. 
+    But we want all produced snapshots to have field `transactionType` and to have value defined in first child. Locator 
+    `^.child[0].transactionType` allows us to access that wanted value from first child (in case current child entry is the first one, field 
+    value is simply remapped to itself). Meanwhile parser `vinParser` can access `voutParser` produced snapshots field `transactionIndex` 
+    value since they both "are under" same parent parser `TransactionParserEnhanced`.
 
-When two or more stacked parsers produces related sets of activity entities (having same count of child entities), it may be useful to 
-access corresponding (auto mapped by index) activity entity. In such case using child locator pattern `^.child[groupName].fieldName` allows 
-to perform such index auto mapping from current stacked parser children set to `groupName` defined group children set.
+    When two or more stacked parsers produces related sets of activity entities (having same count of child entities), it may be useful to 
+    access corresponding (auto mapped by index) activity entity. In such case using child locator pattern `^.child[groupName].fieldName` 
+    allows to perform such index auto mapping from current stacked parser children set to `groupName` defined group children set.
+
+ * `^.XPathExpression` - `ActivityXMLParser` stacked parser field `Label` type locator prefix `^.` can be used to access parent parser (one 
+ stacked parser was invoked from) parsed document/node value using XPath expression, defined by token `XPathExpression`. E.g.:
+    ```xml
+       <!-- parser handles XML having root tags <source> or <destination> -->
+       <parser name="TransferSetParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
+            <field name="LastModified" locator="/source/file/@last-modified" locator-type="Label" required="false"/>
+            <.../>
+            <!-- access some field values from parent context document -->
+            <field name="SourceSystemName" locator="^./transaction/sourceAgent/@agent" locator-type="Label"/>
+            <field name="DestinationSystemName" locator="^./transaction/destinationAgent/@agent" locator-type="Label"/>
+            <field name="Correlator" locator="^./transaction/@ID" locator-type="Label" datatype="String" format="string"/>
+            <.../>
+        </parser>
+
+        <!-- parser handles XML having root tag <item> -->
+        <parser name="TransferSetItemParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
+            <field name="ResultCode" locator="/item/status/@resultCode" locator-type="Label" datatype="Number" transparent="true"/>
+            <.../>
+            <!-- field passes '/item/source' or '/item/destination' node to be root for stacked parser -->
+            <embedded-activity name="TS_ITEM" locator="/item/*[name(.) = 'source' or name(.) = 'destination']" locator-type="Label">
+                <parser-ref name="TransferSetParser" aggregation="Relate"/>
+            </embedded-activity>
+            <.../>
+        </parser>
+
+       <!-- parser handles XML having root tag <transaction> -->
+        <parser name="ProgressEventParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
+            <field name="EventType" value="Event"/>
+
+            <field name="UserName" locator="/transaction/originator/userID" locator-type="Label"/>
+            <field name="Location" locator="/transaction/originator/hostName" locator-type="Label"/>
+            <.../>
+            <!-- field passes '/transaction/transferSet/item' node to be root for stacked parser -->
+            <embedded-activity name="TRANSFERSET" locator="/transaction/transferSet/item" locator-type="Label">
+                <parser-ref name="TransferSetItemParser" aggregation="Merge"/>
+            </embedded-activity>
+            <.../>
+        </parser>
+    ```
 
 #### Resolved activity entities aggregation
 
@@ -5076,7 +5116,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
     <property name="CMQC.THREAD_AFFINITY_PROPERTY" value="false"/>
     ...
     <!-- MULTIPLE INSTANCES (MI) host configurations -->
-    <property name="Host" value="wmq.sample1.com(1420),wmq.sample2.com(1421)"/>    
+    <property name="Host" value="wmq.sample1.com(1420),wmq.sample2.com(1421)"/>
     <property name="Host" value="wmq.sample1.com:1420,wmq.sample2.com:1421"/>
     <property name="Host" value="wmq.sample1.com,wmq.sample2.com"/>
     <property name="Port" value="1420"/>

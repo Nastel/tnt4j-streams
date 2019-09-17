@@ -613,15 +613,16 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 				"ActivityParser.preparsed.data", getLogString(data));
 
 		ActivityContext cData = prepareItem(stream, data);
-		if (pContextData != null) {
-			cData.setParentActivity(pContextData.getActivity());
-			cData.setParserRef(pContextData.getParserRef());
-		}
-
 		if (cData == null || !cData.isValid()) {
 			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityParser.nothing.to.parse");
 			return null;
+		}
+
+		if (pContextData != null) {
+			cData.setParentContext(pContextData);
+			cData.setParentActivity(pContextData.getActivity());
+			cData.setParserRef(pContextData.getParserRef());
 		}
 
 		if (logger().isSet(OpLevel.DEBUG)) {
@@ -1316,6 +1317,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		private static final String STREAM_KEY = "STREAM_DATA"; // NON-NLS
 		private static final String RAW_DATA_KEY = "RAW_ACTIVITY_DATA"; // NON-NLS
 		private static final String PARENT_ACTIVITY_KEY = "PARENT_ACTIVITY_DATA"; // NON-NLS
+		private static final String PARENT_CONTEXT_KEY = "PARENT_CONTEXT_DATA"; // NON-NLS
 
 		private static final String PREPARED_DATA_KEY = "PREPARED_ACTIVITY_DATA"; // NON-NLS
 		private static final String ACTIVITY_DATA_KEY = "ACTIVITY_DATA"; // NON-NLS
@@ -1457,6 +1459,25 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 */
 		public String getMessage() {
 			return (String) get(MESSAGE_DATA_KEY);
+		}
+
+		/**
+		 * Sets parent parser context data.
+		 * 
+		 * @param pContext
+		 *            parent parser context data
+		 */
+		public void setParentContext(ActivityParserContext pContext) {
+			put(PARENT_CONTEXT_KEY, pContext);
+		}
+
+		/**
+		 * Returns parent parser context data.
+		 * 
+		 * @return parent parser context data, or {@code null} if no parent parser is available for this context
+		 */
+		public ActivityParserContext getParentContext() {
+			return (ActivityParserContext) get(PARENT_CONTEXT_KEY);
 		}
 
 		/**

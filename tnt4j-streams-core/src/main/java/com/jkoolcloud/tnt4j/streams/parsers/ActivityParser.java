@@ -146,7 +146,7 @@ public abstract class ActivityParser implements NamedObject {
 	 * @param data
 	 *            raw activity data to parse
 	 * @param cData
-	 *            parsing context data package
+	 *            parent parser context data package
 	 * @return converted activity info, or {@code null} if raw activity data does not match format for this parser
 	 * @throws IllegalStateException
 	 *             if parser has not been properly initialized

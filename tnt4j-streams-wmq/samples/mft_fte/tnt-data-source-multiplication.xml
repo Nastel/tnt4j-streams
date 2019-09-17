@@ -5,13 +5,14 @@
 
     <resource-ref id="MFT_MAPPINGS" type="ValuesMap" uri="mft_mappings.json"/>
     <resource-ref id="MFT_SDS_MAPPINGS" type="ValuesMap" uri="mft_SDS_mappings.json"/>
-    <!-- Example RegEx Parser to capture parts of the field -->
-    <parser name="RegExParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityRegExParser">
+    <!-- Splits Job Name into tokens  -->
+    <parser name="JobNameParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityRegExParser">
         <property name="Pattern" value="(.*)\.(.*)\.(.*)\.(.*)"/>
+
+        <field name="CoId" locator="1" locator-type="Index"/>
         <field name="ProcessArea" locator="2" locator-type="Index"/>
         <field name="InterfaceID" locator="3" locator-type="Index"/>
         <field name="HopNum" locator="4" locator-type="Index"/>
-        <field name="CoId" locator="1" locator-type="Index"/>
     </parser>
 
     <parser name="TransferSetParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
@@ -23,10 +24,10 @@
         </field>
 
         <!-- Map Custom fields using field map reference -->
-        <field name="SourceSystemName" locator="/transaction/sourceAgent/@agent" locator-type="Label">
+        <field name="SourceSystemName" locator="^./transaction/sourceAgent/@agent" locator-type="Label">
             <field-map-ref resource="MFT_SDS_MAPPINGS.SourceSystemName"/>
         </field>
-        <field name="DestinationSystemName" locator="/transaction/destinationAgent/@agent" locator-type="Label">
+        <field name="DestinationSystemName" locator="^./transaction/destinationAgent/@agent" locator-type="Label">
             <field-map-ref resource="MFT_SDS_MAPPINGS.DestinationSystemName"/>
         </field>
 
@@ -40,7 +41,7 @@
         <field name="Correlator" datatype="String" format="string" separator=".">
             <field-locator locator="//*/checksum" locator-type="Label" required="false"/>
             <field-locator locator="Correlator2" locator-type="Activity" required="false"/>
-            <field-locator locator="/transaction/@ID" locator-type="Label"/>
+            <field-locator locator="^./transaction/@ID" locator-type="Label"/>
         </field>
 
         <field name="ResourceName" formattingPattern="{0}={1};Agent={2}">
@@ -62,7 +63,7 @@
             <field-locator locator="/${Direction}/file" locator-type="Label" required="false"/>
             <field-locator locator="ts:getObjectName(/${Direction}/queue)" locator-type="Label" required="false"/>
             <!-- agent-->
-            <field-locator locator="/transaction/${Direction}Agent/@agent" locator-type="Label" required="false"/>
+            <field-locator locator="^./transaction/${Direction}Agent/@agent" locator-type="Label" required="false"/>
         </field>
 
         <field name="TrackingId" value-type="signature">
@@ -89,7 +90,7 @@
             <field-map-ref resource="MFT_MAPPINGS.CompCode3"/>
         </field>
 
-        <embedded-activity name="TRANSFERSET" locator="/item/*[name(.) = 'source' or name(.) = 'destination']" locator-type="Label">
+        <embedded-activity name="TS_ITEM" locator="/item/*[name(.) = 'source' or name(.) = 'destination']" locator-type="Label">
             <parser-ref name="TransferSetParser" aggregation="Relate"/>
         </embedded-activity>
     </parser>
@@ -110,7 +111,6 @@
         <field name="ServerOs" locator="/transaction/sourceAgent/systemInfo/@name" locator-type="Label"/>
         <field name="StartTime" locator="/transaction/action/@time" locator-type="Label" datatype="DateTime"
                format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT"/>
-
         <field name="Correlator" locator="/transaction/@ID" locator-type="Label" datatype="String" format="string"/>
         <field name="Exception" separator="">
             <field-locator locator="/transaction/transferSet/item/status/supplement" locator-type="Label" required="false"/>
@@ -140,7 +140,7 @@
 				This is the default value when attribute aggregation definition is missing
                 in the configuration.-->
         <field name="MFT_JOB_NAME" locator="/transaction/job/name" locator-type="Label" required="false">
-            <parser-ref name="RegExParser" aggregation="Merge"/>
+            <parser-ref name="JobNameParser" aggregation="Merge"/>
         </field>
 
         <!-- Example of using 'Relate' attribute in stacked parser.
@@ -172,7 +172,7 @@
         <field name="StartTime" locator="/transaction/action/@time" locator-type="Label" datatype="DateTime"
                format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT"/>
         <field name="MFT_JOB_NAME" locator="/transaction/job/name" locator-type="Label" required="false">
-            <parser-ref name="RegExParser" aggregation="Merge"/>
+            <parser-ref name="JobNameParser" aggregation="Merge"/>
         </field>
 
         <field name="TrackingId" value-type="signature">
@@ -211,7 +211,7 @@
         <field name="ServerOs" locator="/transaction/sourceAgent/systemInfo/@name" locator-type="Label"/>
         <field name="StartTime" locator="/transaction/action/@time" locator-type="Label" datatype="DateTime"
                format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT"/>
-        <field name="ResultCode" locator="/item/status/@resultCode" locator-type="Label" datatype="Number" transparent="true"/>
+        <field name="ResultCode" locator="/transaction/status/@resultCode" locator-type="Label" datatype="Number" transparent="true"/>
 
         <field name="ReasonCode" separator="">
             <field-locator locator="ResultCode" locator-type="Activity" datatype="Number"/>
@@ -226,11 +226,13 @@
             <field-locator locator="/transaction/status/supplement" locator-type="Label" required="false"/>
         </field>
         <field name="MFT_JOB_NAME" locator="/transaction/job/name" locator-type="Label" required="false">
-            <parser-ref name="RegExParser" aggregation="Merge"/>
+            <parser-ref name="JobNameParser" aggregation="Merge"/>
         </field>
     </parser>
 
     <parser name="MsgSwitchParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
+        <field name="EventType" value="NOOP"/>
+
         <field name="message-text" locator="/transaction" locator-type="Label" transparent="true">
             <parser-ref name="CompletedEventParser" aggregation="Merge">
                 <matchExp>XPATH:/transaction/action/text()[. = 'completed']</matchExp>

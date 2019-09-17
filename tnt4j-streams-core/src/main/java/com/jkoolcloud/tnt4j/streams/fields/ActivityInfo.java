@@ -1381,7 +1381,7 @@ public class ActivityInfo {
 		if (StringUtils.isEmpty(eventName)) {
 			eventName = otherAi.eventName;
 		}
-		if (eventType == null) {
+		if (eventType == null || eventType == OpType.NOOP) {
 			eventType = otherAi.eventType;
 		}
 		if (eventStatus == null) {

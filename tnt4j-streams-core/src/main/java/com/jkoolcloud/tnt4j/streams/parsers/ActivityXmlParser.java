@@ -365,17 +365,25 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 		}
 
 		if (StringUtils.isNotEmpty(locStr)) {
-			Object rawData = cData.getRawData();
-			Node xmlDoc = rawData instanceof Node ? ((Node) rawData).getOwnerDocument() : null;
-			Node nodeDocument = cData.getData();
 			try {
-				XPathExpression expr = getXPathExpr(locStr);
+				if (locStr.startsWith(StreamsConstants.PARENT_REFERENCE_PREFIX)) {
+					XPathExpression expr = getXPathExpr(
+							locStr.substring(StreamsConstants.PARENT_REFERENCE_PREFIX.length()));
+					val = resolveValueOverXPath(cData.getParentContext(), expr);
+				} else {
+					XPathExpression expr = getXPathExpr(locStr);
+					Node nodeDocument = cData.getData();
 
-				if (nodeDocument != null) { // try expression relative to node
-					val = resolveValueOverXPath(nodeDocument, expr);
-				}
-				if (val == null && xmlDoc != null) { // otherwise try on complete document
-					val = resolveValueOverXPath(xmlDoc, expr);
+					if (nodeDocument != null) { // try expression relative to node
+						val = resolveValueOverXPath(nodeDocument, expr);
+					}
+					if (val == null) { // otherwise try on context document
+						Object rawData = cData.getRawData();
+						Node xmlDoc = rawData instanceof Node ? ((Node) rawData).getOwnerDocument() : null;
+						if (xmlDoc != null) {
+							val = resolveValueOverXPath(xmlDoc, expr);
+						}
+					}
 				}
 
 				if (val instanceof Node) {
@@ -466,6 +474,23 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 
 			val = Utils.simplifyValue(valuesList);
 		}
+		return val;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static Object resolveValueOverXPath(ActivityParserContext pcData, XPathExpression expr)
+			throws XPathExpressionException {
+		Object val = null;
+		ActivityContext pc = (ActivityContext) pcData;
+		Node xmlDoc = pc == null ? null : pc.getData();
+		if (xmlDoc != null) {
+			val = resolveValueOverXPath(xmlDoc, expr);
+
+			if (val == null) {
+				val = resolveValueOverXPath(pc.getParentContext(), expr);
+			}
+		}
+
 		return val;
 	}
 
