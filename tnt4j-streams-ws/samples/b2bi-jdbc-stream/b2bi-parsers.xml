@@ -18,7 +18,7 @@
         <field name="StartTime" locator="AFILE_CREATETS" locator-type="Label"/>
         <field name="EndTime" locator="AFILE_MODIFYTS" locator-type="Label"/>
 
-        <field name="TrackingId" separator="_">
+        <field name="Correlator" separator="_">
             <field-locator id="DataFlowId" locator="AFILE_DATA_FLOW_ID" locator-type="Label"/>
             <field-locator id="MailBox" locator="AFILE_MAILBOX_PATH" locator-type="Label" required="false"/>
             <field-locator id="FileName" locator="AFILE_FILE_NAME" locator-type="Label" required="false"/>
@@ -126,7 +126,7 @@
         <embedded-activity name="FG_Event_Attrs" locator="EVT_ATTRS" locator-type="Label">
             <parser-ref name="B2BiFGEventAttributesXMLParser" aggregation="Merge"/>
         </embedded-activity>
-        <field name="TrackingId" separator="_">
+        <field name="Correlator" separator="_">
             <field-locator id="DataFlowId" locator="DataFlowId" locator-type="Activity"/>
             <field-locator id="ProducerFilename" locator="FG_E_Attr_ProducerFilename" locator-type="Activity" required="false"/>
             <field-locator id="ConsumerFilename" locator="FG_E_Attr_ConsumerFilename" locator-type="Activity" required="false"/>
@@ -226,7 +226,7 @@
         <embedded-activity name="FG_Event_Attrs" locator="EVT_ATTRS" locator-type="Label">
             <parser-ref name="B2BiFGEventAttributesXMLParser" aggregation="Merge"/>
         </embedded-activity>
-        <field name="TrackingId" separator="_">
+        <field name="Correlator" separator="_">
             <field-locator id="DataFlowId" locator="DataFlowId" locator-type="Activity"/>
             <field-locator id="ProducerFilename" locator="FG_E_Attr_ProducerFilename" locator-type="Activity" required="false"/>
             <field-locator id="ConsumerFilename" locator="FG_E_Attr_ConsumerFilename" locator-type="Activity" required="false"/>
@@ -489,6 +489,17 @@
 
         <!-- TODO: filtering if needed -->
     </parser>
+
+    <parser name="B2BiTransferIdsXMLParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
+        <field name="Correlator">
+            <field-locator id="XferId" locator="/xfers/xfer[*]/XFER_ID" locator-type="Label">
+                <field-transform lang="groovy" name="XFerIdTransform"><![CDATA[
+                    Strings.extractToken($fieldValue, ":", 2);
+                ]]></field-transform>
+            </field-locator>
+        </field>
+    </parser>
+
     <parser name="B2BiDocumentsResultSetParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJDBCResultSetParser">
         <field name="Guid" formattingPattern="Document_{0}">
             <field-locator id="WorkflowWFCId" locator="DOCUMENT_ID" locator-type="Label"/>
@@ -537,6 +548,11 @@
 
         <!-- Store latest value to cache -->
         <field name="Doc_ModifyTs" locator="DOCUMENT_MODIFYTS" locator-type="Label" transparent="true"/>
+
+        <!-- ACT_XFER table columns from XML -->
+        <embedded-activity name="TransferIds" locator="XFER_XFER_IDS" locator-type="Label">
+            <parser-ref name="B2BiTransferIdsXMLParser" aggregation="Merge"/>
+        </embedded-activity>
 
         <!-- TODO: filtering if needed -->
     </parser>

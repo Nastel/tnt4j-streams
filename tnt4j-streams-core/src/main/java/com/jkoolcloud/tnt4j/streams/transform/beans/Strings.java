@@ -18,6 +18,8 @@ package com.jkoolcloud.tnt4j.streams.transform.beans;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Transformations bean to perform strings manipulation.
  *
@@ -62,7 +64,7 @@ public class Strings {
 	public static List<String> replace(List<String> strings, String target, String replacement) {
 		if (strings != null) {
 			for (int i = 0; i < strings.size(); i++) {
-				strings.set(i, strings.get(i).replace(target, replacement));
+				strings.set(i, replace(strings.get(i), target, replacement));
 			}
 		}
 
@@ -82,5 +84,67 @@ public class Strings {
 	 */
 	public static String replace(String string, String target, String replacement) {
 		return string == null ? string : string.replace(target, replacement);
+	}
+
+	/**
+	 * Extracts {@code delim} symbol delimited token from provided {@code strings} elements, where token value defined
+	 * by index {@code tIndex}.
+	 * 
+	 * @param strings
+	 *            strings array to extract tokens
+	 * @param delim
+	 *            tokens delimiter
+	 * @param tIndex
+	 *            token index to pick
+	 * @return token values array
+	 */
+	public static String[] extractToken(String[] strings, String delim, int tIndex) {
+		if (strings != null) {
+			for (int i = 0; i < strings.length; i++) {
+				strings[i] = extractToken(strings[i], delim, tIndex);
+			}
+		}
+
+		return strings;
+	}
+
+	/**
+	 * Extracts {@code delim} symbol delimited token from provided {@code strings} elements, where token value defined
+	 * by index {@code tIndex}.
+	 * 
+	 * @param strings
+	 *            strings list to extract tokens
+	 * @param delim
+	 *            tokens delimiter
+	 * @param tIndex
+	 *            token index to pick
+	 * @return token values list
+	 */
+	public static List<String> extractToken(List<String> strings, String delim, int tIndex) {
+		if (strings != null) {
+			for (int i = 0; i < strings.size(); i++) {
+				strings.set(i, extractToken(strings.get(i), delim, tIndex));
+			}
+		}
+
+		return strings;
+	}
+
+	/**
+	 * Extracts {@code delim} symbol delimited token from provided {@code string}, where token value defined by index
+	 * {@code tIndex}.
+	 * 
+	 * @param string
+	 *            string to extract token
+	 * @param delim
+	 *            tokens delimiter
+	 * @param tIndex
+	 *            token index to pick
+	 * @return string token value
+	 */
+	public static String extractToken(String string, String delim, int tIndex) {
+		String[] tokens = StringUtils.split(string, delim);
+
+		return tokens == null || tokens.length < tIndex || tIndex <= 0 ? null : tokens[tIndex - 1];
 	}
 }

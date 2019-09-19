@@ -329,6 +329,13 @@
                            , DF.DOC_TRAK_ID AS DATA_FLOW_DOC_TRAK_ID
                            , DF.ROOT_DOC_NAME AS DATA_FLOW_ROOT_DOC_NAME
                            , DF.ROOT_DOC_SIZE AS DATA_FLOW_ROOT_DOC_SIZE
+                           , (SELECT
+                                 XFR.XFER_ID as "XFER_ID"
+                              FROM ACT_XFER XFR
+                              WHERE D.DOC_ID = XFR.DOC_ID
+                                AND XFR.XFER_ID like 'WMQFTE:%'
+                              FOR XML PATH ('xfer'), root ('xfers')
+                             ) AS XFER_XFER_IDS
                       FROM DOCUMENT D
                        INNER JOIN DATA_FLOW DF ON (D.DOC_ID = DF.ROOT_DOCUMENT)
                       WHERE D.MODIFYTS > ?

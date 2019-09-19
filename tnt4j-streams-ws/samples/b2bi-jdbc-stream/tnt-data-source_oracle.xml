@@ -363,6 +363,21 @@
                            , DF.DOC_TRAK_ID AS DATA_FLOW_DOC_TRAK_ID
                            , DF.ROOT_DOC_NAME AS DATA_FLOW_ROOT_DOC_NAME
                            , DF.ROOT_DOC_SIZE AS DATA_FLOW_ROOT_DOC_SIZE
+                           , (SELECT xmlserialize(
+                                       content xmlelement("xfers",
+                                         xmlagg(
+                                           xmlelement("xfer",
+                                             xmlforest(
+                                               XFR.XFER_ID as "XFER_ID"
+                                             )
+                                           )
+                                         )
+                                       ) AS CLOB VERSION '1.0" encoding="utf-8' no indent
+                                     )
+                              FROM ACT_XFER XFR
+                              WHERE D.DOC_ID = XFR.DOC_ID
+                                AND XFR.XFER_ID like 'WMQFTE:%'
+                             ) AS XFER_XFER_IDS
                       FROM DOCUMENT D
                        INNER JOIN DATA_FLOW DF ON (D.DOC_ID = DF.ROOT_DOCUMENT)
                       WHERE D.MODIFYTS > ?
