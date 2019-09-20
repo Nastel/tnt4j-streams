@@ -477,9 +477,13 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 				fieldsMap.put(fieldKey(spf), spf);
 
 				if (pmf != null && spRef.getAggregationType() == AggregationType.Merge) {
-					logger().log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"ActivityParser.stacked.field.conflict", f.getParser().getName(), f,
-							spf.getParser().getName(), spf, pmf.getParser().getName(), pmf);
+					StreamFieldType fieldType = pmf.getFieldType();
+
+					if (!Utils.isCollectionType(fieldType == null ? null : fieldType.getDataType())) {
+						logger().log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+								"ActivityParser.stacked.field.conflict", f.getParser().getName(), f,
+								spf.getParser().getName(), spf, pmf.getParser().getName(), pmf);
+					}
 				}
 
 				collectStackedParsersFields(fieldsMap, spf, sParser);
