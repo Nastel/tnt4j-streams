@@ -42,6 +42,7 @@ import com.jkoolcloud.tnt4j.streams.configure.zookeeper.ZKConfigManager;
 import com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener;
 import com.jkoolcloud.tnt4j.streams.inputs.StreamStatus;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
+import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStreamStatistics;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsThread;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
@@ -338,8 +339,6 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 
 	@Override
 	public void sinkError(SinkError ev) {
-
-
 	}
 
 	protected void dumpTrackerStats(Tracker tracker) {
@@ -605,7 +604,7 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 	}
 
 	/**
-	 * Formats stream status message to be output compliant format.
+	 * Formats stream status message to have output compliant format.
 	 *
 	 * @param statusMessage
 	 *            stream status message
@@ -647,7 +646,7 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 		}
 
 		@Override
-		public void onFinish(TNTInputStream<?, ?> stream, TNTInputStream.StreamStats stats) {
+		public void onFinish(TNTInputStream<?, ?> stream, TNTInputStreamStatistics stats) {
 		}
 
 		@Override

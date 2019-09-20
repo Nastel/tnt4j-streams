@@ -20,7 +20,7 @@ import java.io.File;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.streams.inputs.StreamingStatus;
-import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
+import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStreamStatistics;
 
 /**
  * For internal development use.
@@ -53,7 +53,7 @@ public class StreamingJobLogger implements StreamingJobListener, JobFilesListene
 	}
 
 	@Override
-	public void onFinish(StreamingJob job, TNTInputStream.StreamStats stats) {
+	public void onFinish(StreamingJob job, TNTInputStreamStatistics stats) {
 		System.out.println("Streaming job finished: job=" + job + " stats=" + stats); // NON-NLS
 	}
 
@@ -65,7 +65,7 @@ public class StreamingJobLogger implements StreamingJobListener, JobFilesListene
 
 	@Override
 	public void onJobFileStateChanged(File jobCfgFile, String jobId, JobFileState fileState) {
-		System.out.println("Streaming job configuration file state changed: job=" + jobId + " file=" + jobCfgFile
+		System.out.println("Streaming job configuration file state changed: job=" + jobId + " file=" + jobCfgFile // NON-NLS
 				+ " state=" + fileState); // NON-NLS
 	}
 }

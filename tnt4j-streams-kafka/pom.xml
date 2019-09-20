@@ -184,11 +184,6 @@
         <!--<artifactId>monitoring-interceptors</artifactId>-->
         <!--<version>3.2.2</version>-->
         <!--</dependency>-->
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-json</artifactId>
-            <version>3.2.6</version>
-        </dependency>
 
         <dependency>
             <groupId>com.jkoolcloud.tnt4j.streams</groupId>

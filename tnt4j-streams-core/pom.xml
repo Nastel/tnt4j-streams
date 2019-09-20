@@ -28,6 +28,7 @@
         <zookeeper.version>3.5.5</zookeeper.version>
 
         <groovy.version>2.5.7</groovy.version>
+        <dropwizard.metrics.version>4.1.0</dropwizard.metrics.version>
 
         <org.slf4j.version>1.7.26</org.slf4j.version>
         <log4j.version>1.2.17</log4j.version>
@@ -224,6 +225,28 @@
                 <exclusion>
                     <artifactId>log4j</artifactId>
                     <groupId>log4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-json</artifactId>
+            <version>${dropwizard.metrics.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jmx</artifactId>
+            <version>${dropwizard.metrics.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -282,7 +282,7 @@ public class DefaultStreamingJob implements StreamingJob {
 		}
 
 		@Override
-		public void onFinish(TNTInputStream<?, ?> stream, TNTInputStream.StreamStats stats) {
+		public void onFinish(TNTInputStream<?, ?> stream, TNTInputStreamStatistics stats) {
 			if (jobListeners != null) {
 				for (StreamingJobListener l : jobListeners) {
 					l.onFinish(DefaultStreamingJob.this, stats);

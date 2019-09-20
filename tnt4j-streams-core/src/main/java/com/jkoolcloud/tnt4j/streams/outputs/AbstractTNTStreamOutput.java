@@ -1,10 +1,12 @@
 package com.jkoolcloud.tnt4j.streams.outputs;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import com.jkoolcloud.tnt4j.core.Trackable;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 
@@ -14,6 +16,7 @@ public abstract class AbstractTNTStreamOutput<T> implements TNTStreamOutput<T> {
 	private TNTInputStream<?, ?> stream;
 
 	private boolean closed = false;
+	private Collection<OutputStreamListener> outputListeners;
 
 	protected AbstractTNTStreamOutput() {
 	}
@@ -82,6 +85,66 @@ public abstract class AbstractTNTStreamOutput<T> implements TNTStreamOutput<T> {
 	public void cleanup() {
 		closed = true;
 
+		if (outputListeners != null) {
+			outputListeners.clear();
+		}
 	}
 
+	@Override
+	public void logItem(T item) throws Exception {
+		notifyLoggingStart(item);
+	}
+
+	@Override
+	public void addOutputListener(OutputStreamListener listener) {
+		if (outputListeners == null) {
+			outputListeners = new ArrayList<>(3);
+		}
+
+		outputListeners.add(listener);
+	}
+
+	/**
+	 * Notifies activity item has been entered logging procedure.
+	 *
+	 * @param item
+	 *            logged activity item
+	 */
+	protected void notifyLoggingStart(T item) {
+		if (outputListeners != null) {
+			for (OutputStreamListener listener : outputListeners) {
+				listener.onItemLogStart(stream, item);
+			}
+		}
+	}
+
+	/**
+	 * Notifies activity item logging procedure has been completed.
+	 *
+	 * @param item
+	 *            logged activity item
+	 */
+	protected void notifyLoggingFinish(T item) {
+		if (outputListeners != null) {
+			for (OutputStreamListener listener : outputListeners) {
+				listener.onItemLogFinish(item);
+			}
+		}
+	}
+
+	/**
+	 * Notifies activity item entity (itself or child) has been sent.
+	 *
+	 * @param item
+	 *            recorded activity item
+	 * @param trackable
+	 *            recorded trackable instance
+	 */
+	protected void notifyEntityRecorded(T item, Trackable trackable) {
+		if (outputListeners != null) {
+			for (OutputStreamListener listener : outputListeners) {
+				listener.onItemRecorded(item, trackable);
+			}
+		}
+	}
 }

@@ -334,6 +334,7 @@ public abstract class TNTParseableInputStream<T> extends TNTInputStream<T, Activ
 			if (ai.isDeliverable()) {
 				getOutput().logItem(ai);
 			} else {
+				incrementFilteredActivitiesCount();
 				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"TNTInputStream.activity.filtered.out", ai);
 			}

@@ -185,7 +185,7 @@ public class TNTInputStreamTest {
 		ts.notifyStatusChange(StreamStatus.STARTED);
 		verify(inputStreamListenerMock).onStatusChange(ts, StreamStatus.STARTED);
 		ts.notifyFinished();
-		verify(inputStreamListenerMock).onFinish(eq(ts), any(TNTInputStream.StreamStats.class));
+		verify(inputStreamListenerMock).onFinish(eq(ts), any(TNTInputStreamStatistics.class));
 		ts.notifyStreamEvent(OpLevel.NOTICE, "", "");
 		verify(inputStreamListenerMock).onStreamEvent(ts, OpLevel.NOTICE, "", "");
 

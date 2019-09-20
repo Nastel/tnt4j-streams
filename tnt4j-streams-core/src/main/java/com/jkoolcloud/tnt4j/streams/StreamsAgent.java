@@ -420,6 +420,7 @@ public final class StreamsAgent {
 	 * Performs actions on agent process completion.
 	 */
 	public static void complete() {
+		new StreamStatisticsReporter(TNTInputStreamStatistics.getMetrics(), null).report(LOGGER);
 		DefaultEventSinkFactory.shutdownAll();
 	}
 

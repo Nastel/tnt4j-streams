@@ -116,4 +116,11 @@ public interface TNTStreamOutput<T> extends NamedObject {
 	 */
 	boolean isClosed();
 
+	/**
+	 * Adds defined {@code OutputStreamListener} to stream output listeners list.
+	 *
+	 * @param listener
+	 *            the {@code OutputStreamListener} to be added
+	 */
+	void addOutputListener(OutputStreamListener listener);
 }

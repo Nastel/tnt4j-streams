@@ -68,7 +68,12 @@ public class JKCloudJsonOutput extends AbstractJKCloudOutput<String, String> {
 	 */
 	@Override
 	public void logItem(String ai) throws Exception {
+		super.logItem(ai);
+		try {
 			recordActivity(getTracker(), CONN_RETRY_INTERVAL, ai);
+		} finally {
+			notifyLoggingFinish(ai);
+		}
 	}
 
 	@Override

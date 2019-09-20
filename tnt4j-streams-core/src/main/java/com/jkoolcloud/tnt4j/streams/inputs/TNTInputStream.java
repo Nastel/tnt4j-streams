@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2019 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.apache.commons.collections4.MapUtils;
 
+import com.codahale.metrics.Timer;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.NamedObject;
@@ -82,11 +82,6 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 */
 	private StreamThread ownerThread = null;
 
-	private AtomicInteger currActivityIndex = new AtomicInteger(0);
-	private AtomicInteger skippedActivitiesCount = new AtomicInteger(0);
-	private AtomicInteger filteredActivitiesCount = new AtomicInteger(0);
-	private AtomicInteger lostActivitiesCount = new AtomicInteger(0);
-	private AtomicLong streamedBytesCount = new AtomicLong(0);
 	private AtomicBoolean failureFlag = new AtomicBoolean(false);
 	private long startTime = -1;
 	private long endTime = -1;
@@ -95,8 +90,12 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 	private TNTStreamOutput<O> out;
 
+	private TNTInputStreamStatistics statistics;
+
 	private List<InputStreamListener> streamListeners;
 	private List<StreamTasksListener> streamTasksListeners;
+	private Map<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> streamItemProcessingListeners;
+	private List<StreamItemAccountingListener> streamItemAccountingListeners;
 
 	private boolean useExecutorService = false;
 	private ExecutorService streamExecutorService = null;
@@ -311,8 +310,14 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * @see #setProperties(Collection)
 	 */
 	protected void initialize() throws Exception {
-		ensureOutputSet();
+		statistics = TNTInputStreamStatistics.getStatisticsModule(this);
+		statistics.startStatisticsReporting(pingLogActivitiesDelay, pingLogActivitiesCount);
 
+		addItemProcessingListener(statistics);
+		addStreamItemAccountingListener(statistics);
+
+		ensureOutputSet();
+		getOutput().addOutputListener(statistics);
 		out.initialize();
 
 		if (useExecutorService) {
@@ -492,7 +497,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * @see #getTotalActivities()
 	 */
 	public int getCurrentActivity() {
-		return currActivityIndex.get();
+		return statistics.getCurrentActivity();
 	}
 
 	/**
@@ -501,7 +506,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * @return new value of current activity index
 	 */
 	protected int incrementCurrentActivitiesCount() {
-		return currActivityIndex.incrementAndGet();
+		return statistics.incrementCurrentActivitiesCount();
 	}
 
 	/**
@@ -532,63 +537,34 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * @return streamed activity data items size in bytes
 	 */
 	public long getStreamedBytesCount() {
-		return streamedBytesCount.get();
-	}
-
-	/**
-	 * Returns number of activity data items skipped from streaming. Item may be skipped if it can't be parsed or some
-	 * non-critical exception occurs.
-	 *
-	 * @return number of skipped activities
-	 */
-	public int getSkippedActivitiesCount() {
-		return skippedActivitiesCount.get();
+		return statistics.getStreamedBytesCount();
 	}
 
 	/**
 	 * Increments processing skipped activity items count.
-	 *
-	 * @return new value of skipped items count
 	 */
-	protected int incrementSkippedActivitiesCount() {
-		return skippedActivitiesCount.incrementAndGet();
-	}
-
-	/**
-	 * Returns number of activity data items filtered by stream configuration.
-	 *
-	 * @return number of filtered activities
-	 */
-	public int getFilteredActivitiesCount() {
-		return filteredActivitiesCount.get();
+	protected void incrementSkippedActivitiesCount() {
+		for (StreamItemAccountingListener streamItemAccountingListener : streamItemAccountingListeners) {
+			streamItemAccountingListener.onItemSkipped();
+		}
 	}
 
 	/**
 	 * Increments processing filtered activity items count.
-	 *
-	 * @return new value of filtered items count
 	 */
-	protected int incrementFilteredActivitiesCount() {
-		return filteredActivitiesCount.incrementAndGet();
-	}
-
-	/**
-	 * Returns number of activity data items lost while streaming. Item may be lost if stream gets lack of storage
-	 * resources or some critical exception occurs.
-	 *
-	 * @return number of lost activities
-	 */
-	public int getLostActivitiesCount() {
-		return lostActivitiesCount.get();
+	protected void incrementFilteredActivitiesCount() {
+		for (StreamItemAccountingListener streamItemAccountingListener : streamItemAccountingListeners) {
+			streamItemAccountingListener.onItemFiltered();
+		}
 	}
 
 	/**
 	 * Increments processing skipped lost activity items count.
-	 *
-	 * @return new value of lost items count
 	 */
-	protected int incrementLostActivitiesCount() {
-		return lostActivitiesCount.incrementAndGet();
+	protected void incrementLostActivitiesCount() {
+		for (StreamItemAccountingListener streamItemAccountingListener : streamItemAccountingListeners) {
+			streamItemAccountingListener.onItemLost();
+		}
 	}
 
 	/**
@@ -597,7 +573,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 */
 	protected void skipFilteredActivities() {
 		incrementSkippedActivitiesCount();
-		notifyProgressUpdate(incrementCurrentActivitiesCount(), getTotalActivities());
+		notifyProgressUpdate(getCurrentActivity(), getTotalActivities());
 	}
 
 	/**
@@ -607,7 +583,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *            number of bytes to add
 	 */
 	protected void addStreamedBytesCount(long bytesCount) {
-		streamedBytesCount.addAndGet(bytesCount);
+		for (StreamItemAccountingListener streamItemAccountingListener : streamItemAccountingListeners) {
+			streamItemAccountingListener.onBytesStreamed(bytesCount);
+			streamItemAccountingListener.updateTotal(getTotalBytes());
+		}
 	}
 
 	/**
@@ -637,10 +616,8 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *
 	 * @return snapshot of instant stream statistics
 	 */
-	public StreamStats getStreamStatistics() {
-		StreamStats stats = new StreamStats(this);
-
-		return stats;
+	public TNTInputStreamStatistics getStreamStatistics() {
+		return statistics;
 	}
 
 	/**
@@ -738,6 +715,14 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 		if (CollectionUtils.isNotEmpty(streamTasksListeners)) {
 			streamTasksListeners.clear();
 		}
+
+		if (CollectionUtils.isNotEmpty(streamItemAccountingListeners)) {
+			streamItemAccountingListeners.clear();
+		}
+
+		if (MapUtils.isNotEmpty(streamItemProcessingListeners)) {
+			streamItemProcessingListeners.clear();
+		}
 	}
 
 	private synchronized void shutdownExecutors() {
@@ -782,7 +767,12 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 			while (!isHalted()) {
 				try {
+					beforeNextItem();
+
 					T item = getNextItem();
+
+					afterNextItem();
+
 					if (item == null) {
 						logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 								"TNTInputStream.data.stream.ended", name);
@@ -863,10 +853,11 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 		logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 				"TNTInputStream.thread.ended", Thread.currentThread().getName());
-		logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"TNTInputStream.stream.statistics", name, getStreamStatistics());
 
 		removeListeners();
+
+		new StreamStatisticsReporter(TNTInputStreamStatistics.getMetrics(this), null).report(logger());
+		TNTInputStreamStatistics.clear(this);
 
 		if (isOwned()) {
 			ownerThread.notifyCompleted();
@@ -890,23 +881,24 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	private AtomicInteger processingCount = new AtomicInteger();
 
 	private void processActivityItem_(T item, AtomicBoolean failureFlag) throws Exception {
-		processActivityItem(item, failureFlag);
+		beforeProcessItem();
 		startProcessingTask();
 		try {
 			processActivityItem(item, failureFlag);
 		} finally {
 			endProcessingTask();
 		}
+		afterProcessItem();
 		lastActivityTime = System.currentTimeMillis();
 
 		// TODO: make ping logger class running separate thread.
-		if ((pingLogActivitiesCount > 0 && cai.incrementAndGet() % pingLogActivitiesCount == 0)
-				|| (pingLogActivitiesDelay > 0
-						&& lastActivityTime - lastLogTime > TimeUnit.SECONDS.toMillis(pingLogActivitiesDelay))) {
-			lastLogTime = System.currentTimeMillis();
-			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"TNTInputStream.stream.statistics", name, getStreamStatistics());
-		}
+		/*
+		 * if ((pingLogActivitiesCount > 0 && cai.incrementAndGet() % pingLogActivitiesCount == 0) ||
+		 * (pingLogActivitiesDelay > 0 && lastActivityTime - lastLogTime >
+		 * TimeUnit.SECONDS.toMillis(pingLogActivitiesDelay))) { lastLogTime = System.currentTimeMillis();
+		 * logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+		 * "TNTInputStream.stream.statistics", name, getStreamStatistics()); }
+		 */
 	}
 
 	/**
@@ -1060,6 +1052,110 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	}
 
 	/**
+	 * Adds defined {@code StreamItemAccountingListener} to stream items accounting listeners list.
+	 *
+	 * @param l
+	 *            the {@code StreamItemAccountingListener} to be added
+	 */
+	public void addStreamItemAccountingListener(StreamItemAccountingListener l) {
+		if (l == null) {
+			return;
+		}
+
+		if (streamItemAccountingListeners == null) {
+			streamItemAccountingListeners = new ArrayList<>();
+		}
+
+		if (!streamItemAccountingListeners.contains(l)) {
+			streamItemAccountingListeners.add(l);
+		}
+	}
+
+	/**
+	 * Removes defined {@code StreamItemAccountingListener} from stream items accounting listeners list.
+	 *
+	 * @param l
+	 *            the {@code StreamItemAccountingListener} to be removed
+	 */
+	public void removeStreamItemAccountingListener(StreamItemAccountingListener l) {
+		if (l != null && streamItemAccountingListeners != null) {
+			streamItemAccountingListeners.remove(l);
+		}
+	}
+
+	/**
+	 * Adds defined {@code StreamItemProcessingListener} to stream items processing listeners list.
+	 *
+	 * @param l
+	 *            the {@code StreamItemProcessingListener} to be added
+	 */
+	public void addItemProcessingListener(StreamItemProcessingListener<Timer.Context> l) {
+		if (l == null) {
+			return;
+		}
+
+		if (streamItemProcessingListeners == null) {
+			streamItemProcessingListeners = new HashMap<>();
+		}
+
+		if (!streamItemProcessingListeners.containsKey(l)) {
+			streamItemProcessingListeners.put(l, null);
+		}
+	}
+
+	/**
+	 * Removes defined {@code StreamItemProcessingListener} from stream items processing listeners list.
+	 *
+	 * @param l
+	 *            the {@code StreamItemProcessingListener} to be removed
+	 */
+	public void removeItemProcessingListener(StreamItemProcessingListener<Timer.Context> l) {
+		if (l != null && streamItemProcessingListeners != null) {
+			streamItemProcessingListeners.remove(l);
+		}
+	}
+
+	/**
+	 * Notifies stream items processing listeners that stream is going to get next item to process.
+	 */
+	protected void beforeNextItem() {
+		for (Map.Entry<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> entry : streamItemProcessingListeners
+				.entrySet()) {
+			entry.setValue(entry.getKey().beforeNextItem());
+		}
+	}
+
+	/**
+	 * Notifies stream items processing listeners that stream has got next item to process.
+	 */
+	protected void afterNextItem() {
+		for (Map.Entry<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> entry : streamItemProcessingListeners
+				.entrySet()) {
+			entry.getKey().afterNextItem(entry.getValue());
+		}
+	}
+
+	/**
+	 * Notifies stream items processing listeners that stream is starting activity item processing/parsing.
+	 */
+	protected void beforeProcessItem() {
+		for (Map.Entry<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> entry : streamItemProcessingListeners
+				.entrySet()) {
+			entry.setValue(entry.getKey().beforeProcessItem());
+		}
+	}
+
+	/**
+	 * Notifies stream items processing listeners that stream has completed activity item processing (parsing).
+	 */
+	protected void afterProcessItem() {
+		for (Map.Entry<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> entry : streamItemProcessingListeners
+				.entrySet()) {
+			entry.getKey().afterProcessItem(entry.getValue());
+		}
+	}
+
+	/**
 	 * Notifies that activity items streaming process progress has updated.
 	 *
 	 * @param curr
@@ -1125,7 +1221,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 */
 	protected void notifyFinished() {
 		if (streamListeners != null) {
-			StreamStats stats = getStreamStatistics();
+			TNTInputStreamStatistics stats = getStreamStatistics();
 			for (InputStreamListener l : streamListeners) {
 				l.onFinish(this, stats);
 			}
@@ -1337,147 +1433,6 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 			 *            factory created thread
 			 */
 			void newThreadCreated(Thread t);
-		}
-	}
-
-	/**
-	 * Class representing snapshot of instant stream statistics.
-	 */
-	public static class StreamStats {
-		private int activitiesTotal;
-		private int currActivity;
-
-		private long totalBytes;
-		private long bytesStreamed;
-
-		private long skippedActivities;
-		private long filteredActivities;
-		private long lostActivities;
-
-		private long elapsedTime;
-		private double averageActivitiesRate;
-
-		/**
-		 * Constructs a new StreamStats.
-		 *
-		 * @param stream
-		 *            TNT4J input stream statistics to get
-		 */
-		StreamStats(TNTInputStream<?, ?> stream) {
-			this.activitiesTotal = stream.getTotalActivities();
-			this.currActivity = stream.getCurrentActivity();
-			this.totalBytes = stream.getTotalBytes();
-			this.bytesStreamed = stream.getStreamedBytesCount();
-			this.skippedActivities = stream.getSkippedActivitiesCount();
-			this.filteredActivities = stream.getFilteredActivitiesCount();
-			this.lostActivities = stream.getLostActivitiesCount();
-			this.elapsedTime = stream.getElapsedTime();
-			this.averageActivitiesRate = stream.getAverageActivityRate();
-
-			if (activitiesTotal == -1) {
-				activitiesTotal = currActivity;
-			}
-			if (totalBytes == 0) {
-				totalBytes = bytesStreamed;
-			}
-			if (elapsedTime == -1) {
-				elapsedTime = 0;
-			}
-		}
-
-		/**
-		 * Returns total number of activities available to stream.
-		 *
-		 * @return total number of available activities
-		 */
-		public int getActivitiesTotal() {
-			return activitiesTotal;
-		}
-
-		/**
-		 * Returns number of currently streamed activity data item.
-		 *
-		 * @return activity data item number
-		 */
-		public int getCurrActivity() {
-			return currActivity;
-		}
-
-		/**
-		 * Returns total size (in bytes) of activity items available to stream.
-		 *
-		 * @return number of total bytes
-		 */
-		public long getTotalBytes() {
-			return totalBytes;
-		}
-
-		/**
-		 * Returns size (in bytes) of streamed activity data items.
-		 *
-		 * @return number of streamed bytes
-		 */
-		public long getBytesStreamed() {
-			return bytesStreamed;
-		}
-
-		/**
-		 * Returns duration of streaming process.
-		 *
-		 * @return streaming process duration
-		 */
-		public long getElapsedTime() {
-			return elapsedTime;
-		}
-
-		/**
-		 * Returns average stream rate in activities per second.
-		 * 
-		 * @return average stream rate in activities per second
-		 */
-		public double getAverageActivitiesRate() {
-			return averageActivitiesRate;
-		}
-
-		/**
-		 * Returns number of activities skipped by stream.
-		 *
-		 * @return number of skipped activities
-		 */
-		public long getSkippedActivities() {
-			return skippedActivities;
-		}
-
-		/**
-		 * Returns number of activities filtered by stream.
-		 *
-		 * @return number of filtered activities
-		 */
-		public long getFilteredActivities() {
-			return filteredActivities;
-		}
-
-		/**
-		 * Returns number of activities lost by stream due to lack of resources.
-		 *
-		 * @return number of lost activities
-		 */
-		public long getLostActivities() {
-			return lostActivities;
-		}
-
-		/**
-		 * Returns stream statistics as text string.
-		 *
-		 * @return stream statistics text string
-		 */
-		@Override
-		public String toString() {
-			return "[" + "activities.total=" + activitiesTotal + ", activities.current=" + currActivity // NON-NLS
-					+ ", activities.skipped=" + skippedActivities + ", activities.filtered=" + filteredActivities // NON-NLS
-					+ ", activities.lost=" + lostActivities + ", bytes.total=" + totalBytes + ", bytes.streamed=" // NON-NLS
-					+ bytesStreamed + ", time.elapsed=" + DurationFormatUtils.formatDurationHMS(elapsedTime) // NON-NLS
-					+ ", rate.average=" + String.format("%.2f", averageActivitiesRate) + "aps]"; // NON-NLS
 		}
 	}
 }

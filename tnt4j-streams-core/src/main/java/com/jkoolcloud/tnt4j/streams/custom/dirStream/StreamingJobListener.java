@@ -18,7 +18,7 @@ package com.jkoolcloud.tnt4j.streams.custom.dirStream;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.streams.inputs.StreamingStatus;
-import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
+import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStreamStatistics;
 
 /**
  * A streaming job progress/status notifications listener interface. This interface can be implemented by classes that
@@ -85,7 +85,7 @@ public interface StreamingJobListener {
 	 * @param stats
 	 *            stream statistics
 	 */
-	void onFinish(StreamingJob job, TNTInputStream.StreamStats stats);
+	void onFinish(StreamingJob job, TNTInputStreamStatistics stats);
 
 	/**
 	 * This method gets called when streaming job detects some notable event.
