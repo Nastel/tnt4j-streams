@@ -421,6 +421,7 @@ public final class StreamsAgent {
 	 */
 	public static void complete() {
 		new StreamStatisticsReporter(TNTInputStreamStatistics.getMetrics(), null).report(LOGGER);
+		TNTInputStreamStatistics.clear();
 		DefaultEventSinkFactory.shutdownAll();
 	}
 
