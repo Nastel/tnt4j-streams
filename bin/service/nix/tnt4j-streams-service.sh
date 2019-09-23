@@ -18,7 +18,7 @@ NAME=tnt4j-streams
 EXEC="/usr/bin/jsvc"
 
 # The path to the folder containing tnt4j-streams-core-*.jar
-FILE_PATH="/home/tnt4j-streams-1.9.0/"
+FILE_PATH="/home/tnt4j-streams-1.9.1/"
 
 PARSER_CONFIG=$FILE_PATH/config/tnt-data-source.xml
 
