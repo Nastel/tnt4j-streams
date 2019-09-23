@@ -48,6 +48,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>key - record key</li>
  * <li>value - record data</li>
  * <li>headers - record headers</li>
+ * <li>leaderEpoch - record leader epoch</li>
  * </ul>
  * <p>
  * If {@code key} or {@code value} contains complex data, use stacked parsers to parse that data. Or if it can be
@@ -185,6 +186,8 @@ public class KafkaConsumerRecordParser extends GenericActivityParser<ConsumerRec
 			val = Utils.getFieldValue(path, cRecord.key(), i + 1);
 		} else if ("value".equalsIgnoreCase(propStr)) { // NON-NLS
 			val = Utils.getFieldValue(path, cRecord.value(), i + 1);
+		} else if ("leaderEpoch".equalsIgnoreCase(propStr)) { // NON-NLS
+			// val = Utils.getFieldValue(path, cRecord.leaderEpoch().orElse(null), i + 1);
 		}
 
 		return val;

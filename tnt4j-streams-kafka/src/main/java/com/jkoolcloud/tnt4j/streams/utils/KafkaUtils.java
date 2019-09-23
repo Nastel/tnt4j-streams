@@ -42,19 +42,15 @@ public class KafkaUtils {
 	 *
 	 * @see #getHeadersValue(String[], Iterable, int)
 	 */
-	public static Object getHeadersValue(String[] path, Headers headers, int i) throws RuntimeException {
+	public static byte[] getHeadersValue(String[] path, Headers headers, int i) throws RuntimeException {
 		if (ArrayUtils.isEmpty(path) || headers == null) {
 			return null;
 		}
 
-		Object val = null;
+		byte[] val = null;
 		String headerStr = path[i];
 		try {
 			val = resolveHeaderByIndex(headers, Integer.parseInt(headerStr));
-
-			if (val != null) {
-				val = Utils.getFieldValue(path, val, i + 1);
-			}
 		} catch (NumberFormatException exc) {
 			Iterable<Header> hHeaders = headers.headers(headerStr);
 
@@ -69,9 +65,6 @@ public class KafkaUtils {
 	/**
 	 * Resolves {@link org.apache.kafka.common.header.Header} value from {@code headers} collection defined by
 	 * keys/indices {@code path} array.
-	 * <p>
-	 * If path does not terminate at header value level, then remaining path is processed using resolved header value as
-	 * Java object (POJO) over {@link Utils#getFieldValue(String[], Object, int)}.
 	 *
 	 * @param path
 	 *            keys/indices path as array of consumer record headers
@@ -82,15 +75,13 @@ public class KafkaUtils {
 	 * @return resolved consumer record header value, or {@code null} if value is not resolved
 	 * @throws java.lang.RuntimeException
 	 *             if field can't be found or accessed
-	 *
-	 * @see Utils#getFieldValue(String[], Object, int)
 	 */
-	public static Object getHeadersValue(String[] path, Iterable<Header> headers, int i) throws RuntimeException {
+	public static byte[] getHeadersValue(String[] path, Iterable<Header> headers, int i) throws RuntimeException {
 		if (ArrayUtils.isEmpty(path) || headers == null) {
 			return null;
 		}
 
-		Object val = null;
+		byte[] val = null;
 		String headerStr = path[i];
 		try {
 			val = resolveHeaderByIndex(headers, Integer.parseInt(headerStr));
@@ -101,10 +92,6 @@ public class KafkaUtils {
 					break;
 				}
 			}
-		}
-
-		if (val != null) {
-			val = Utils.getFieldValue(path, val, i + 1);
 		}
 
 		return val;
@@ -122,7 +109,7 @@ public class KafkaUtils {
 	 *            header index to get value
 	 * @return resolved consumer record header value, or {@code null} if value is not resolved
 	 */
-	public static Object resolveHeaderByIndex(Iterable<Header> headers, int hIdx) {
+	public static byte[] resolveHeaderByIndex(Iterable<Header> headers, int hIdx) {
 		if (headers != null) {
 			int idx = 0;
 			for (Header header : headers) {

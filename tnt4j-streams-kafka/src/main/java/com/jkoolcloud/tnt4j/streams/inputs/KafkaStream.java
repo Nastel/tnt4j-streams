@@ -17,13 +17,15 @@
 package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.header.Header;
 import org.apache.zookeeper.server.ServerCnxnFactory;
 import org.apache.zookeeper.server.ServerConfig;
 import org.apache.zookeeper.server.ZooKeeperServer;
@@ -36,11 +38,6 @@ import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser;
 import com.jkoolcloud.tnt4j.streams.utils.*;
 
-import kafka.consumer.Consumer;
-import kafka.consumer.ConsumerConfig;
-import kafka.consumer.ConsumerTimeoutException;
-import kafka.javaapi.consumer.ConsumerConnector;
-import kafka.message.MessageAndMetadata;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServerStartable;
 
@@ -55,9 +52,19 @@ import kafka.server.KafkaServerStartable;
  * <li>ActivityTopic - topic name message with activity data was received.</li>
  * <li>ActivityData - raw activity data as {@code byte[]} retrieved from message.</li>
  * <li>ActivityTransport - activity transport definition: 'Kafka'.</li>
+ * <li>Partition - partition from which this record is received.</li>
+ * <li>Offset - position of this record in the corresponding Kafka partition.</li>
+ * <li>Key - message key (or null if no key is specified).</li>
+ * <li>Timestamp - timestamp of this record.</li>
+ * <li>TimestampType - timestamp type of this record.</li>
+ * <li>SerializedKeySize - size of the serialized, uncompressed key in bytes.</li>
+ * <li>SerializedValueSize - size of the serialized, uncompressed value in bytes.</li>
+ * <li>Epoch - leader epoch for the record if available.</li>
+ * <li>Checksum - checksum (CRC32) of the record.</li>
+ * <li>Headers - map message headers contained values</li>
  * </ul>
  * <p>
- * NOTE: if {@link org.apache.kafka.clients.consumer.ConsumerRecords} is preferred to be used as activity RAW data
+ * NOTE: if {@link org.apache.kafka.clients.consumer.ConsumerRecord} is preferred to be used as activity RAW data
  * packages, use {@link KafkaConsumerStream} instead.
  * <p>
  * This activity stream supports the following configuration properties (in addition to those supported by
@@ -68,9 +75,10 @@ import kafka.server.KafkaServerStartable;
  * (Optional)</li>
  * <li>StartZooKeeper - flag indicating if stream has to start ZooKeeper server on startup. Default value -
  * {@code false}. (Optional)</li>
- * <li>List of properties used by Kafka API, e.g., zookeeper.connect, group.id. See
- * {@link kafka.consumer.ConsumerConfig} for more details on Kafka consumer properties. @see
- * <a href="https://kafka.apache.org/08/configuration.html">Kafka configuration reference</a></li>.
+ * <li>List of properties used by Kafka API, e.g., zookeeper.connect, group.id. @see
+ * <a href="https://kafka.apache.org/documentation/#consumerconfigs">for more details on Kafka consumer configuration
+ * properties</a>. @see <a href="https://kafka.apache.org/documentation/#configuration">Kafka configuration
+ * reference</a></li>.
  * </ul>
  * <p>
  * Default ZooKeeper and Kafka server configuration properties are loaded from configuration files referenced by Java
@@ -89,7 +97,6 @@ import kafka.server.KafkaServerStartable;
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  * @see ActivityMapParser
- * @see kafka.consumer.ConsumerConfig
  * @see kafka.server.KafkaServer
  * @see KafkaConsumerStream
  */
@@ -120,8 +127,9 @@ public class KafkaStream extends TNTParseableInputStream<Map<String, ?>> {
 
 	private final AtomicBoolean closed = new AtomicBoolean(false);
 
-	private ConsumerConnector consumer;
+	private Consumer<?, ?> consumer;
 	private String topicName;
+	boolean autoCommit = true;
 
 	private ServerCnxnFactory zkCnxnFactory;
 	private FileTxnSnapLog zLog;
@@ -129,7 +137,7 @@ public class KafkaStream extends TNTParseableInputStream<Map<String, ?>> {
 	private KafkaServerStartable server;
 	private boolean startServer = false;
 
-	private Iterator<MessageAndMetadata<byte[], byte[]>> messageBuffer;
+	private List<ConsumerRecord<?, ?>> messageBuffer = new ArrayList<>();
 
 	private Map<String, Properties> userKafkaProps = new HashMap<>(3);
 
@@ -155,24 +163,8 @@ public class KafkaStream extends TNTParseableInputStream<Map<String, ?>> {
 			startServer = Utils.toBoolean(value);
 		} else if (KafkaStreamProperties.PROP_START_ZOOKEEPER.equalsIgnoreCase(name)) {
 			startZooKeeper = Utils.toBoolean(value);
-		} else {
-			Field[] propFields = StreamProperties.class.getDeclaredFields();
-
-			boolean streamsProperty = false;
-			for (Field pf : propFields) {
-				try {
-					pf.setAccessible(true);
-					if (pf.get(StreamProperties.class).toString().equalsIgnoreCase(name)) {
-						streamsProperty = true;
-						break;
-					}
-				} catch (Exception exc) {
-				}
-			}
-
-			if (!streamsProperty) {
-				addUserKafkaProperty(name, value);
-			}
+		} else if (!StreamsConstants.isStreamCfgProperty(KafkaStreamProperties.class, name)) {
+			addUserKafkaProperty(name, value);
 		}
 	}
 
@@ -330,7 +322,9 @@ public class KafkaStream extends TNTParseableInputStream<Map<String, ?>> {
 		logger().log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 				"KafkaStream.consumer.starting");
 
-		consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(getScopeProps(PROP_SCOPE_CONSUMER)));
+		Properties cProperties = getScopeProps(PROP_SCOPE_CONSUMER);
+		consumer = new KafkaConsumer<>(cProperties);
+		autoCommit = Utils.getBoolean(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, cProperties, true);
 	}
 
 	/**
@@ -420,49 +414,65 @@ public class KafkaStream extends TNTParseableInputStream<Map<String, ?>> {
 	public Map<String, ?> getNextItem() throws Exception {
 		while (!closed.get() && !isHalted()) {
 			try {
-				if (messageBuffer == null || !messageBuffer.hasNext()) {
+				if (messageBuffer.isEmpty()) {
 					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 							"KafkaStream.empty.messages.buffer");
 					Map<String, Integer> topicCountMap = new HashMap<>();
 					topicCountMap.put(topicName, 1);
 
-					Map<String, List<kafka.consumer.KafkaStream<byte[], byte[]>>> streams = consumer
-							.createMessageStreams(topicCountMap);
+					ConsumerRecords<?, ?> records = consumer.poll(Duration.ofSeconds(Long.MAX_VALUE));
 
-					if (MapUtils.isNotEmpty(streams)) {
-						kafka.consumer.KafkaStream<byte[], byte[]> stream = streams.get(topicName).get(0);
-						messageBuffer = stream.iterator();
-						logger().log(OpLevel.DEBUG,
-								StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-								"KafkaStream.retrieved.new.messages", stream.size());
+					if (autoCommit) {
+						addRecordsToBuffer(records);
 					} else {
-						logger().log(OpLevel.DEBUG,
-								StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-								"KafkaStream.retrieved.no.new.messages");
+						for (TopicPartition partition : records.partitions()) {
+							List<? extends ConsumerRecord<?, ?>> partitionRecords = records.records(partition);
+							addRecordsToBuffer(partitionRecords);
+							long lastOffset = partitionRecords.get(partitionRecords.size() - 1).offset();
+							consumer.commitSync(
+									Collections.singletonMap(partition, new OffsetAndMetadata(lastOffset + 1)));
+							logger().log(OpLevel.DEBUG,
+									StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
+									"KafkaStream.committing.offset", partition, lastOffset);
+						}
 					}
 				}
 
-				if (messageBuffer != null && messageBuffer.hasNext()) {
-					MessageAndMetadata<byte[], byte[]> msg = messageBuffer.next();
-					byte[] msgPayload = msg.message();
-					String msgData = Utils.getString(msgPayload);
-
+				if (!messageBuffer.isEmpty()) {
+					ConsumerRecord<?, ?> msg = messageBuffer.remove(0);
 					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-							"KafkaStream.next.message", msgData);
+							"KafkaStream.next.message", Utils.toString(msg.value()));
 
 					Map<String, Object> msgDataMap = new HashMap<>();
+					msgDataMap.put(StreamsConstants.TOPIC_KEY, msg.topic());
+					msgDataMap.put(StreamsConstants.ACTIVITY_DATA_KEY, msg.value());
+					msgDataMap.put(StreamsConstants.TRANSPORT_KEY, KafkaStreamConstants.TRANSPORT_KAFKA);
+					msgDataMap.put("Partition", msg.partition()); // NON-NLS
+					msgDataMap.put("Offset", msg.offset()); // NON-NLS
+					msgDataMap.put("Timestamp", msg.timestamp()); // NON-NLS
+					msgDataMap.put("TimestampType", msg.timestampType()); // NON-NLS
+					msgDataMap.put("SerializedKeySize", msg.serializedKeySize()); // NON-NLS
+					msgDataMap.put("SerializedValueSize", msg.serializedValueSize()); // NON-NLS
+					msgDataMap.put("Key", msg.key()); // NON-NLS
+					// msgDataMap.put("Epoch", msg.leaderEpoch().orElse(null)); // NON-NLS
+					msgDataMap.put("Checksum", msg.checksum()); // NON-NLS
 
-					if (ArrayUtils.isNotEmpty(msgPayload)) {
-						msgDataMap.put(StreamsConstants.TOPIC_KEY, msg.topic());
-						msgDataMap.put(StreamsConstants.ACTIVITY_DATA_KEY, msgPayload);
-						msgDataMap.put(StreamsConstants.TRANSPORT_KEY, KafkaStreamConstants.TRANSPORT_KAFKA);
+					Iterable<Header> headers = msg.headers();
+					if (!IterableUtils.isEmpty(headers)) {
+						Map<String, byte[]> hMap = new HashMap<>();
+						for (Header header : headers) {
+							hMap.put(header.key(), header.value());
+						}
 
-						addStreamedBytesCount(msgPayload.length);
+						msgDataMap.put("Headers", hMap); // NON-NLS
 					}
+
+					addStreamedBytesCount(
+							Math.max(msg.serializedKeySize(), 0) + Math.max(msg.serializedValueSize(), 0));
 
 					return msgDataMap;
 				}
-			} catch (ConsumerTimeoutException e) {
+			} catch (Exception e) {
 				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 						"KafkaStream.retrieving.messages.timeout");
 			}
@@ -470,6 +480,22 @@ public class KafkaStream extends TNTParseableInputStream<Map<String, ?>> {
 		logger().log(OpLevel.INFO, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 				"KafkaStream.stopping");
 		return null;
+	}
+
+	/**
+	 * Adds consumer records from provided {@code records} collection to stream input buffer.
+	 *
+	 * @param records
+	 *            records collection to add to stream input buffer
+	 */
+	protected void addRecordsToBuffer(Iterable<? extends ConsumerRecord<?, ?>> records) {
+		for (ConsumerRecord<?, ?> record : records) {
+			String msgData = Utils.toString(record.value());
+			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
+					"KafkaStream.next.message", msgData);
+
+			messageBuffer.add(record);
+		}
 	}
 
 	@Override
@@ -492,7 +518,9 @@ public class KafkaStream extends TNTParseableInputStream<Map<String, ?>> {
 
 		closed.set(true);
 		if (consumer != null) {
-			consumer.shutdown();
+			consumer.wakeup();
+			consumer.unsubscribe();
+			consumer.close();
 		}
 
 		userKafkaProps.clear();
