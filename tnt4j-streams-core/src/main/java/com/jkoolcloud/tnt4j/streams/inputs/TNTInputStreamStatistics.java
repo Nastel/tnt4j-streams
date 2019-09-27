@@ -75,8 +75,6 @@ public class TNTInputStreamStatistics
 	private Counter outputActivities;
 	private Counter outputSnapshots;
 	private Counter outputOther;
-	@SuppressWarnings("rawtypes")
-	private MetricRegistry.MetricSupplier<Gauge> bytesTotalGauge;
 	private Gauge<Long> bytesTotal;
 	private Counter bytesStreamed;
 
@@ -84,7 +82,6 @@ public class TNTInputStreamStatistics
 		this(null);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private TNTInputStreamStatistics(TNTInputStream<?, ?> stream) {
 		String streamName = "Agent"; // NON-NLS
 		if (stream != null) {
@@ -113,18 +110,12 @@ public class TNTInputStreamStatistics
 		outputSnapshots = metrics.counter(streamName + " output snapshots"); // NON-NLS
 		outputOther = metrics.counter(streamName + " output others"); // NON-NLS
 
-		bytesTotalGauge = new MetricRegistry.MetricSupplier<Gauge>() {
+		bytesTotal = metrics.register(streamName + " total bytes", new Gauge<Long>() { // NON-NLS
 			@Override
-			public Gauge<Long> newMetric() {
-				return new Gauge<Long>() {
-					@Override
-					public Long getValue() {
-						return getTotalBytesCount();
-					}
-				};
+			public Long getValue() {
+				return getTotalBytesCount();
 			}
-		};
-		bytesTotal = metrics.gauge(streamName + " total bytes", bytesTotalGauge); // NON-NLS
+		});
 		bytesStreamed = metrics.counter(streamName + " bytes streamed"); // NON-NLS
 	}
 
