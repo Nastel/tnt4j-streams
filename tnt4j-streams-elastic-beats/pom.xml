@@ -20,7 +20,7 @@
         <java.target.version>${module.java.version}</java.target.version>
         <java.compiler.version>${module.java.version}</java.compiler.version>
 
-        <io.netty.version>4.1.37.Final</io.netty.version>
+        <io.netty.version>4.1.42.Final</io.netty.version>
         <jackson.version>2.9.9</jackson.version>
         <logstash.input.beats.version>5.0.13</logstash.input.beats.version>
     </properties>
