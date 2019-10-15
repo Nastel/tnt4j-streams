@@ -38,7 +38,7 @@ public class StreamStatisticsReporter implements Reporter {
 
 	private static final double UNIT_SWITCH_OFFSET = .9;
 
-	private MetricRegistry registry;
+	private final MetricRegistry registry;
 	private TimeUnit ratesUnit;
 
 	/**
@@ -58,8 +58,10 @@ public class StreamStatisticsReporter implements Reporter {
 	 * Reports streams statistics as provided {@code logger} log entries.
 	 */
 	public void report(EventSink logger) {
-		report(logger, registry.getGauges(), registry.getCounters(), registry.getHistograms(), registry.getMeters(),
-				registry.getTimers());
+		synchronized (registry) {
+			report(logger, registry.getGauges(), registry.getCounters(), registry.getHistograms(), registry.getMeters(),
+					registry.getTimers());
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
