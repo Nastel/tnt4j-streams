@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.github.robtimus.filesystems.sftp.SFTPEnvironment;
 import com.jkoolcloud.tnt4j.streams.configure.FsStreamProperties;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 import com.pastdev.jsch.DefaultSessionFactory;
 import com.pastdev.jsch.nio.file.UnixSshFileSystemProvider;
@@ -150,13 +151,13 @@ class FileSystemAdapter {
 	 */
 	protected void setProperty(String name, String value) {
 		if (StreamProperties.PROP_PASSWORD.equalsIgnoreCase(name)) {
-			password = value;
+			password = TNTInputStream.decPassword(value);
 		} else if (StreamProperties.PROP_HOST.equalsIgnoreCase(name)) {
 			host = value;
 		} else if (StreamProperties.PROP_USERNAME.equalsIgnoreCase(name)) {
 			user = value;
 		} else if (StreamProperties.PROP_PORT.equalsIgnoreCase(name)) {
-			port = Integer.valueOf(value);
+			port = Integer.parseInt(value);
 		} else if (FsStreamProperties.PROP_SCHEME.equalsIgnoreCase(name)) {
 			scheme = value;
 		} else if (FsStreamProperties.PROP_STRICT_HOST_KEY_CHECKING.equalsIgnoreCase(name)) {
@@ -167,8 +168,8 @@ class FileSystemAdapter {
 			knownHosts = value;
 		} else if (FsStreamProperties.PROP_RESOLVE_ABSOLUTE_PATH.equalsIgnoreCase(name)) {
 			resolveAbsolutePath = Utils.toBoolean(value);
-		} else {
-			envConfiguration.put(name, value);
+		} else if (!StreamsConstants.isStreamCfgProperty(FsStreamProperties.class, name)) {
+			envConfiguration.put(name, TNTInputStream.decPassword(value));
 		}
 	}
 
@@ -183,7 +184,7 @@ class FileSystemAdapter {
 	 */
 	public Object getProperty(String name) {
 		if (StreamProperties.PROP_PASSWORD.equalsIgnoreCase(name)) {
-			return password;
+			return TNTInputStream.encPassword(password);
 		}
 		if (StreamProperties.PROP_HOST.equalsIgnoreCase(name)) {
 			return host;

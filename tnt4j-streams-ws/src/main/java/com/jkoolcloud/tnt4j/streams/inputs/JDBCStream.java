@@ -123,7 +123,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 		} else if (WsStreamProperties.PROP_QUERY_MAX_ROWS.equalsIgnoreCase(name)) {
 			maxRows = Integer.parseInt(value);
 		} else if (!StreamsConstants.isStreamCfgProperty(WsStreamProperties.class, name)) {
-			jdbcProperties.put(name, value);
+			jdbcProperties.put(name, decPassword(value));
 		}
 	}
 
@@ -584,7 +584,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 						dbQuery = stream.fillInRequestData(request.getData());
 						request.setSentData(dbQuery);
 						respRs = executeJdbcCall(scenarioStep.getUrlStr(), scenarioStep.getUsername(),
-								scenarioStep.getPassword(), dbQuery, request.getParameters(), stream);
+								decPassword(scenarioStep.getPassword()), dbQuery, request.getParameters(), stream);
 					} catch (Throwable exc) {
 						Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),

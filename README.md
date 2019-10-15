@@ -85,6 +85,20 @@ Running TNT4J-Streams
     * use `StreamsAgent.runFromAPI(new CfgStreamsBuilder().setConfig(configFileName))` in your code
 * As system daemon service. See ['TNT4J-Streams as System Service configuration'](./bin/service/readmeServices.md) for details how to run 
 TNT4J-Streams as your system service.
+* Utility operations:
+    * to encrypt plain text password use `bin/utils/su.cmd` or `bin/utils/su.sh`, e.g:
+
+        *nix
+        ```bash
+        ./bin/utils/su.sh -e somePass
+        ```
+
+        MS Windows
+        ```cmd
+        \bin\utis\su.cmd -e somePass
+        ```
+      Output of this command is like this: `ENCRYPTED PASSWORD: v5OmKh7o3bHWRibcb4bnLg==`. Now you can paste your encrypted password value 
+      (e.g. `v5OmKh7o3bHWRibcb4bnLg`) into your stream configuration.
 
 ## TNT4J Events field mappings
 

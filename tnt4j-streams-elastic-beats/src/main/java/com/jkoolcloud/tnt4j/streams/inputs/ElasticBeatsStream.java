@@ -94,17 +94,17 @@ public class ElasticBeatsStream extends AbstractBufferedStream<Map<?, ?>> {
 		if (StreamProperties.PROP_HOST.equalsIgnoreCase(name)) {
 			host = value;
 		} else if (StreamProperties.PROP_PORT.equalsIgnoreCase(name)) {
-			port = Integer.valueOf(value);
+			port = Integer.parseInt(value);
 		} else if (ElasticBeatsStreamProperties.PROP_SSL_CERTIFICATE_FILE_PATH.equalsIgnoreCase(name)) {
 			sslCertificateFilePath = value;
 		} else if (ElasticBeatsStreamProperties.PROP_SSL_KEY_FILE_PATH.equalsIgnoreCase(name)) {
 			sslKeyFilePath = value;
 		} else if (ElasticBeatsStreamProperties.PROP_PASSPHRASE.equalsIgnoreCase(name)) {
-			passPhrase = value;
+			passPhrase = decPassword(value);
 		} else if (ElasticBeatsStreamProperties.PROP_TIMEOUT.equalsIgnoreCase(name)) {
-			timeout = Integer.valueOf(value);
+			timeout = Integer.parseInt(value);
 		} else if (ElasticBeatsStreamProperties.PROP_THREAD_COUNT.equalsIgnoreCase(name)) {
-			threadCount = Integer.valueOf(value);
+			threadCount = Integer.parseInt(value);
 		}
 	}
 
@@ -123,7 +123,7 @@ public class ElasticBeatsStream extends AbstractBufferedStream<Map<?, ?>> {
 			return sslKeyFilePath;
 		}
 		if (ElasticBeatsStreamProperties.PROP_PASSPHRASE.equalsIgnoreCase(name)) {
-			return passPhrase;
+			return encPassword(passPhrase);
 		}
 		if (ElasticBeatsStreamProperties.PROP_TIMEOUT.equalsIgnoreCase(name)) {
 			return timeout;

@@ -164,7 +164,7 @@ public class KafkaStream extends TNTParseableInputStream<Map<String, ?>> {
 		} else if (KafkaStreamProperties.PROP_START_ZOOKEEPER.equalsIgnoreCase(name)) {
 			startZooKeeper = Utils.toBoolean(value);
 		} else if (!StreamsConstants.isStreamCfgProperty(KafkaStreamProperties.class, name)) {
-			addUserKafkaProperty(name, value);
+			addUserKafkaProperty(name, decPassword(value));
 		}
 	}
 

@@ -140,7 +140,7 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 			}
 		} else if (MsOfficeStreamProperties.PROP_WORKBOOK_PASS.equalsIgnoreCase(name)) {
 			if (StringUtils.isNotEmpty(value)) {
-				wbPass = value;
+				wbPass = decPassword(value);
 			}
 		}
 	}
@@ -157,7 +157,7 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 			return rangeValue;
 		}
 		if (MsOfficeStreamProperties.PROP_WORKBOOK_PASS.equalsIgnoreCase(name)) {
-			return wbPass;
+			return encPassword(wbPass);
 		}
 
 		return super.getProperty(name);

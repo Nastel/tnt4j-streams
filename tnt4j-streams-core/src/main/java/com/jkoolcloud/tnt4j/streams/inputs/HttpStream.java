@@ -121,9 +121,9 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 		} else if (StreamProperties.PROP_KEYSTORE.equalsIgnoreCase(name)) {
 			keystore = value;
 		} else if (StreamProperties.PROP_KEYSTORE_PASS.equalsIgnoreCase(name)) {
-			keystorePass = value;
+			keystorePass = decPassword(value);
 		} else if (StreamProperties.PROP_KEY_PASS.equalsIgnoreCase(name)) {
-			keyPass = value;
+			keyPass = decPassword(value);
 		}
 	}
 
@@ -139,10 +139,10 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 			return keystore;
 		}
 		if (StreamProperties.PROP_KEYSTORE_PASS.equalsIgnoreCase(name)) {
-			return keystorePass;
+			return encPassword(keystorePass);
 		}
 		if (StreamProperties.PROP_KEY_PASS.equalsIgnoreCase(name)) {
-			return keyPass;
+			return encPassword(keyPass);
 		}
 
 		return super.getProperty(name);

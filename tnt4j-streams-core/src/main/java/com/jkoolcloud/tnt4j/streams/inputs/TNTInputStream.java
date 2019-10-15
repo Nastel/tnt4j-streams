@@ -30,10 +30,7 @@ import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.NamedObject;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.outputs.TNTStreamOutput;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsCache;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsThread;
-import com.jkoolcloud.tnt4j.streams.utils.Utils;
+import com.jkoolcloud.tnt4j.streams.utils.*;
 
 /**
  * Base class that all activity streams must extend. It provides some base functionality useful for all activity
@@ -1303,6 +1300,32 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 				l.onDropOff(this, tasks);
 			}
 		}
+	}
+
+	/**
+	 * Checks is provided password string is encoded by Base64 and tries to decrypt it. If decryption fails or provided
+	 * password is {@code null} - original password string is returned.
+	 * 
+	 * @param passStr
+	 *            password string
+	 * @return decrypted password string, or original password string value if decryption fails or provided password
+	 *         string is {@code null}
+	 *
+	 * @see com.jkoolcloud.tnt4j.streams.utils.SecurityUtils#getPass2(String)
+	 */
+	protected static String decPassword(String passStr) {
+		return SecurityUtils.getPass2(passStr);
+	}
+
+	/**
+	 * Placeholder method for plaint text password encryption within streams flow (if such feature will be demanded).
+	 *
+	 * @param passStr
+	 *            plain text password string
+	 * @return original plain text password string
+	 */
+	protected static String encPassword(String passStr) {
+		return passStr;
 	}
 
 	private class ActivityItemProcessingTask implements Runnable {

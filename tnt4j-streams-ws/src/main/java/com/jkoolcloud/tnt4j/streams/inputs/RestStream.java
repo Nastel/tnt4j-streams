@@ -361,7 +361,7 @@ public class RestStream extends AbstractWsStream<String> {
 						reqDataStr = stream.preProcess(request.getData());
 						request.setSentData(reqDataStr);
 						respStr = stream.executePOST(stream.client, scenarioStep.getUrlStr(), reqDataStr,
-								scenarioStep.getUsername(), scenarioStep.getPassword());
+								scenarioStep.getUsername(), decPassword(scenarioStep.getPassword()));
 					} catch (Throwable exc) {
 						Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -400,7 +400,7 @@ public class RestStream extends AbstractWsStream<String> {
 					reqUrl = stream.preProcessURL(stream.uriForGET(urlStr, request), true);
 					request.setSentData(reqUrl);
 					respStr = stream.executeGET(stream.client, reqUrl, scenarioStep.getUsername(),
-							scenarioStep.getPassword());
+							decPassword(scenarioStep.getPassword()));
 				} catch (Throwable exc) {
 					Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),

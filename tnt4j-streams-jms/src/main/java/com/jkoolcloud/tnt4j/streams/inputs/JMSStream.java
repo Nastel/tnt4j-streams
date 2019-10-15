@@ -117,7 +117,7 @@ public class JMSStream extends AbstractBufferedStream<Message> {
 		} else if (JMSStreamProperties.PROP_JMS_CONN_FACTORY.equalsIgnoreCase(name)) {
 			jmsConnFactory = value;
 		} else if (!StreamsConstants.isStreamCfgProperty(JMSStreamProperties.class, name)) {
-			ctxProps.put(name, value);
+			ctxProps.put(name, decPassword(value));
 		}
 	}
 

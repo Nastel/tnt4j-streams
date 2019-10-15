@@ -84,7 +84,7 @@ public abstract class AbstractExcelStream<T> extends TNTParseableInputStream<T> 
 			}
 		} else if (MsOfficeStreamProperties.PROP_WORKBOOK_PASS.equalsIgnoreCase(name)) {
 			if (StringUtils.isNotEmpty(value)) {
-				wbPass = value;
+				wbPass = decPassword(value);
 			}
 		}
 	}
@@ -98,7 +98,7 @@ public abstract class AbstractExcelStream<T> extends TNTParseableInputStream<T> 
 			return sheetName;
 		}
 		if (MsOfficeStreamProperties.PROP_WORKBOOK_PASS.equalsIgnoreCase(name)) {
-			return wbPass;
+			return encPassword(wbPass);
 		}
 
 		// if ("PROP_STREAMED_WORKBOOK".equalsIgnoreCase(name)) {

@@ -36,10 +36,7 @@ import com.ibm.msg.client.commonservices.trace.Trace;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.configure.WmqStreamProperties;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
-import com.jkoolcloud.tnt4j.streams.utils.Utils;
-import com.jkoolcloud.tnt4j.streams.utils.WmqStreamConstants;
-import com.jkoolcloud.tnt4j.streams.utils.WmqUtils;
+import com.jkoolcloud.tnt4j.streams.utils.*;
 
 /**
  * Base class for WebSphere MQ activity stream, where activity data containing {@link MQMessage} is read from the
@@ -208,7 +205,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 			}
 		} else if (StreamProperties.PROP_PASSWORD.equalsIgnoreCase(name)) {
 			if (StringUtils.isNotEmpty(value)) {
-				mqConnProps.put(CMQC.PASSWORD_PROPERTY, value);
+				mqConnProps.put(CMQC.PASSWORD_PROPERTY, decPassword(value));
 			}
 		} else if (StreamProperties.PROP_RECONNECT_DELAY.equalsIgnoreCase(name)) {
 			reconnectDelay = Integer.decode(value);
@@ -227,7 +224,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 					}
 
 					if (cVal == null) {
-						cVal = String.valueOf(value);
+						cVal = decPassword(value);
 					}
 				}
 
@@ -392,7 +389,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 			return mqConnProps.get(CMQC.USER_ID_PROPERTY);
 		}
 		if (StreamProperties.PROP_PASSWORD.equalsIgnoreCase(name)) {
-			return mqConnProps.get(CMQC.PASSWORD_PROPERTY);
+			return encPassword((String) mqConnProps.get(CMQC.PASSWORD_PROPERTY));
 		}
 		if (StreamProperties.PROP_RECONNECT_DELAY.equalsIgnoreCase(name)) {
 			return reconnectDelay;

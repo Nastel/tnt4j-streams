@@ -108,7 +108,7 @@ public class WsStream extends AbstractWsStream<String> {
 		if (WsStreamProperties.PROP_DISABLE_SSL.equalsIgnoreCase(name)) {
 			disableSSL = Utils.toBoolean(value);
 		} else if (!StreamsConstants.isStreamCfgProperty(WsStreamProperties.class, name)) {
-			wsProperties.put(name, value);
+			wsProperties.put(name, decPassword(value));
 		}
 	}
 
@@ -217,7 +217,6 @@ public class WsStream extends AbstractWsStream<String> {
 
 			// Create all-trusting host name verifier
 			HostnameVerifier allHostsValid = new HostnameVerifier() {
-
 				@Override
 				public boolean verify(String hostname, SSLSession session) {
 					return true;

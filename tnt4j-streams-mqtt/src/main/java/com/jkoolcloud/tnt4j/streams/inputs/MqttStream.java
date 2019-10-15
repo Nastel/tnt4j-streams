@@ -107,7 +107,7 @@ public class MqttStream extends AbstractBufferedStream<Map<String, ?>> {
 		} else if (StreamProperties.PROP_USERNAME.equalsIgnoreCase(name)) {
 			userName = value;
 		} else if (StreamProperties.PROP_PASSWORD.equalsIgnoreCase(name)) {
-			password = value;
+			password = decPassword(value);
 		} else if (StreamProperties.PROP_TOPIC_STRING.equalsIgnoreCase(name)) {
 			topic = value;
 		} else if (StreamProperties.PROP_USE_SSL.equalsIgnoreCase(name)) {
@@ -115,7 +115,7 @@ public class MqttStream extends AbstractBufferedStream<Map<String, ?>> {
 		} else if (StreamProperties.PROP_KEYSTORE.equalsIgnoreCase(name)) {
 			keystore = value;
 		} else if (StreamProperties.PROP_KEYSTORE_PASS.equalsIgnoreCase(name)) {
-			keystorePass = value;
+			keystorePass = decPassword(value);
 		}
 	}
 
@@ -128,7 +128,7 @@ public class MqttStream extends AbstractBufferedStream<Map<String, ?>> {
 			return userName;
 		}
 		if (StreamProperties.PROP_PASSWORD.equalsIgnoreCase(name)) {
-			return password;
+			return encPassword(password);
 		}
 		if (StreamProperties.PROP_TOPIC_STRING.equalsIgnoreCase(name)) {
 			return topic;
@@ -140,7 +140,7 @@ public class MqttStream extends AbstractBufferedStream<Map<String, ?>> {
 			return keystore;
 		}
 		if (StreamProperties.PROP_KEYSTORE_PASS.equalsIgnoreCase(name)) {
-			return keystorePass;
+			return encPassword(keystorePass);
 		}
 
 		return super.getProperty(name);
