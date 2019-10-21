@@ -94,6 +94,8 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 
 	@Override
 	public void setProperty(String name, String value) {
+		super.setProperty(name, value);
+
 		if (WsStreamProperties.PROP_SYNCHRONIZE_REQUESTS.equalsIgnoreCase(name)) {
 			synchronizeRequests = Utils.toBoolean(value);
 		} else if (name.startsWith("org.quartz.")) { // NON-NLS
