@@ -656,6 +656,13 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	 * If raw field value is of type {@link Number}, formatting is done using {@code format} and {@code locale}
 	 * attributes.
 	 * <p>
+	 * If raw field value is of type {@link String}, formatting is done using {@code format} and {@code charset}
+	 * attributes. {@link ActivityFieldFormatType} formats processed as:
+	 * <ul>
+	 * <li>{@link ActivityFieldFormatType#base64Binary} - {@link Utils#base64Decode(String, String)}</li>
+	 * <li>performs simple cast to {@link String} in all other cases</li>
+	 * </ul>
+	 * <p>
 	 * In all other cases raw field value conversion to string is performed using {@link Utils#toString(Object)} method.
 	 *
 	 * @param value
@@ -686,6 +693,12 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 			return TimestampFormatter.format(format, value, locale, timeZone);
 		} else if (value instanceof Number) {
 			return NumericFormatter.toString(format, value, locale);
+		} else if (value instanceof String) {
+			if (builtInFormat == ActivityFieldFormatType.base64Binary) {
+				return Utils.base64Decode((String) value, charset);
+			} else {
+				return (String) value;
+			}
 		} else {
 			return Utils.toString(value);
 		}
