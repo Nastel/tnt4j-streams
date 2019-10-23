@@ -119,7 +119,7 @@ public class SecurityUtils {
 	 * @see #decryptPass(String)
 	 */
 	public static String getPass2(String passStr) {
-		if (passStr != null && Base64.isBase64(passStr)) {
+		if (passStr != null && passStr.length() % 4 == 0 && Base64.isBase64(passStr)) {
 			try {
 				return decryptPass(passStr);
 			} catch (Throwable exc) {
