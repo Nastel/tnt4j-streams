@@ -332,7 +332,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	public void ensureOutputSet() {
 		if (out == null) {
 			setDefaultStreamOutput();
-			logger().log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"TNTInputStream.output.undefined");
 		}
 	}
