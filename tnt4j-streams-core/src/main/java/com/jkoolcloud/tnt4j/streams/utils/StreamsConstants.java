@@ -19,8 +19,6 @@ package com.jkoolcloud.tnt4j.streams.utils;
 import java.lang.reflect.Field;
 import java.util.regex.Pattern;
 
-import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
-
 /**
  * TNT4J-Streams constants.
  *
@@ -130,25 +128,44 @@ public final class StreamsConstants {
 	/**
 	 * Checks if property name is defined streams property name.
 	 * 
-	 * @param props
-	 *            class containing streams property names definition
-	 * @param prop
+	 * @param pName
 	 *            property name to check
+	 * @param pCls
+	 *            class containing streams property names definition
 	 * @return {@code true} if property name is defined streams property name, {@code false} - otherwise
 	 */
-	public static boolean isStreamCfgProperty(Class<? extends StreamProperties> props, String prop) {
-		Field[] dProps = props.getFields();
+	public static boolean isStreamCfgProperty(String pName, Class<?> pCls) {
+		Field[] dProps = pCls.getFields();
 
 		for (Field dProp : dProps) {
 			dProp.setAccessible(true);
 			if (dProp.getName().startsWith("PROP_")) { // NON-NLS
 				try {
-					String propName = (String) dProp.get(props);
-					if (propName.equalsIgnoreCase(prop)) {
+					String propName = (String) dProp.get(pCls);
+					if (propName.equalsIgnoreCase(pName)) {
 						return true;
 					}
 				} catch (Exception exc) {
 				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks if property name is defined within provided set of property definition classes.
+	 * 
+	 * @param pName
+	 *            property name to check
+	 * @param pCls
+	 *            classes containing streams property name definitions
+	 * @return {@code true} if property name is defined streams property name, {@code false} - otherwise
+	 */
+	public static boolean isStreamCfgProperty(String pName, Class<?>... pCls) {
+		for (Class<?> pc : pCls) {
+			if (isStreamCfgProperty(pName, pc)) {
+				return true;
 			}
 		}
 

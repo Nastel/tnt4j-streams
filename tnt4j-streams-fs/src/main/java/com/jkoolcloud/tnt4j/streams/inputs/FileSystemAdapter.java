@@ -168,7 +168,7 @@ class FileSystemAdapter {
 			knownHosts = value;
 		} else if (FsStreamProperties.PROP_RESOLVE_ABSOLUTE_PATH.equalsIgnoreCase(name)) {
 			resolveAbsolutePath = Utils.toBoolean(value);
-		} else if (!StreamsConstants.isStreamCfgProperty(FsStreamProperties.class, name)) {
+		} else if (!StreamsConstants.isStreamCfgProperty(name, FsStreamProperties.class)) {
 			envConfiguration.put(name, TNTInputStream.decPassword(value));
 		}
 	}

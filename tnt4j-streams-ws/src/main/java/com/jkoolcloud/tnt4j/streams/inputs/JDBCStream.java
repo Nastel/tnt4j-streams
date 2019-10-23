@@ -122,7 +122,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 			fetchSize = Integer.parseInt(value);
 		} else if (WsStreamProperties.PROP_QUERY_MAX_ROWS.equalsIgnoreCase(name)) {
 			maxRows = Integer.parseInt(value);
-		} else if (!StreamsConstants.isStreamCfgProperty(WsStreamProperties.class, name)) {
+		} else if (!StreamsConstants.isStreamCfgProperty(name, WsStreamProperties.class)) {
 			jdbcProperties.put(name, decPassword(value));
 		}
 	}

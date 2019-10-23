@@ -21,7 +21,7 @@ package com.jkoolcloud.tnt4j.streams.configure;
  *
  * @version $Revision: 1 $
  */
-public interface StreamProperties {
+public interface StreamProperties extends OutputProperties {
 
 	/**
 	 * Constant for name of built-in {@value} property.

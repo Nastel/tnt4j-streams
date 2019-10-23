@@ -98,7 +98,7 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 			topicName = value;
 		} else if (StreamProperties.PROP_FILENAME.equalsIgnoreCase(name)) {
 			cfgFileName = value;
-		} else if (!StreamsConstants.isStreamCfgProperty(KafkaStreamProperties.class, name)) {
+		} else if (!StreamsConstants.isStreamCfgProperty(name, KafkaStreamProperties.class)) {
 			addUserKafkaProperty(name, decPassword(value));
 		}
 	}

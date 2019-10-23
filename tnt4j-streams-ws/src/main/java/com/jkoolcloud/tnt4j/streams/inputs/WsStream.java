@@ -107,7 +107,7 @@ public class WsStream extends AbstractWsStream<String> {
 
 		if (WsStreamProperties.PROP_DISABLE_SSL.equalsIgnoreCase(name)) {
 			disableSSL = Utils.toBoolean(value);
-		} else if (!StreamsConstants.isStreamCfgProperty(WsStreamProperties.class, name)) {
+		} else if (!StreamsConstants.isStreamCfgProperty(name, WsStreamProperties.class)) {
 			wsProperties.put(name, decPassword(value));
 		}
 	}

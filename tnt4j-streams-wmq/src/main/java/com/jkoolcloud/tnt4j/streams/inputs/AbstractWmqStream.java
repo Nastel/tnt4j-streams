@@ -211,7 +211,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 			reconnectDelay = Integer.decode(value);
 		} else if (WmqStreamProperties.OPEN_OPTIONS.equalsIgnoreCase(name)) {
 			openOptions = initOpenOptions(value);
-		} else {
+		} else if (!StreamsConstants.isStreamCfgProperty(name, WmqStreamProperties.class)) {
 			String[] mqcNameTokens = name.split("\\.");
 			String mqcName = mqcNameTokens[mqcNameTokens.length - 1];
 			Object mqcVal = MQConstants.getValue(mqcName);
