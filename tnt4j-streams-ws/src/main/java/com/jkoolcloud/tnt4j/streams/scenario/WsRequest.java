@@ -122,6 +122,33 @@ public class WsRequest<T> {
 	}
 
 	/**
+	 * Returns request parameter mapped to provided key.
+	 * 
+	 * @param pKey
+	 *            parameter key
+	 * @return request parameter mapped to provided key, or {@code null} if request has no such parameter
+	 */
+	public Parameter getParameter(String pKey) {
+		return parameters.get(pKey);
+	}
+
+	/**
+	 * Returns request parameter value.
+	 * 
+	 * @param pKey
+	 *            parameter key
+	 * @return request parameter value, or {@code null} if request has no such parameter
+	 * 
+	 * @see #getParameter(String)
+	 * @see com.jkoolcloud.tnt4j.streams.scenario.WsRequest.Parameter#getValue()
+	 */
+	public String getParameterValue(String pKey) {
+		Parameter param = getParameter(pKey);
+
+		return param == null ? null : param.getValue();
+	}
+
+	/**
 	 * Adds request (command/query/etc.) parameter.
 	 *
 	 * @param parameter

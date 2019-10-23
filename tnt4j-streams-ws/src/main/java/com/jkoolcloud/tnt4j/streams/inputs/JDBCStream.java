@@ -18,10 +18,8 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.Closeable;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Queue;
+import java.sql.Date;
+import java.util.*;
 import java.util.concurrent.Semaphore;
 
 import javax.sql.DataSource;
@@ -99,6 +97,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	private int maxRows = 0;
 
 	private Map<String, DataSource> dbDataSources = new HashMap<>(3);
+	private final Set<String> parsedQueries = new HashSet<>();
 
 	/**
 	 * Constructs an empty JDBCStream. Requires configuration settings to set input stream source.
@@ -164,6 +163,10 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	protected void cleanup() {
 		super.cleanup();
 
+		synchronized (parsedQueries) {
+			parsedQueries.clear();
+		}
+
 		for (DataSource dbDataSource : dbDataSources.values()) {
 			if (dbDataSource instanceof Closeable) {
 				Utils.close((Closeable) dbDataSource);
@@ -171,6 +174,15 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 		}
 
 		dbDataSources.clear();
+	}
+
+	@Override
+	protected void setCurrentItem(WsResponse<ResultSet> item) {
+		super.setCurrentItem(item);
+
+		if (item != null) {
+			queryParsingStarted(item);
+		}
 	}
 
 	@Override
@@ -209,7 +221,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 
 			if (recurringItem != null) {
 				logger().log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-						"JDBCStream.rs.consumption.drop", item.getParameters().get(QUERY_NAME_PROP).getValue());
+						"JDBCStream.rs.consumption.drop", item.getParameterValue(QUERY_NAME_PROP));
 				inputBuffer.remove(recurringItem);
 				try {
 					closeRS(recurringItem.getData());
@@ -228,6 +240,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 
 				logger().log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 						"JDBCStream.rs.consumption.done");
+				queryConsumed(item);
 				return true;
 			}
 
@@ -238,6 +251,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 			Utils.logThrowable(logger(), OpLevel.WARNING,
 					StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"JDBCStream.rs.consumption.exception", exc);
+			queryConsumed(item);
 			return true;
 		}
 	}
@@ -258,20 +272,81 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 		Utils.close(conn);
 	}
 
+	private void queryParsingStarted(WsResponse<ResultSet> cItem) {
+		String qName = cItem.getParameterValue(QUERY_NAME_PROP);
+		if (qName != null) {
+			synchronized (parsedQueries) {
+				parsedQueries.add(qName);
+			}
+		}
+	}
+
+	private void queryConsumed(WsResponse<ResultSet> cItem) {
+		String qName = cItem.getParameterValue(QUERY_NAME_PROP);
+		if (qName != null) {
+			synchronized (parsedQueries) {
+				parsedQueries.remove(qName);
+			}
+		}
+	}
+
+	/**
+	 * Returns recurrent response for currently processed response.
+	 * 
+	 * @param cItem
+	 *            currently parser processed response
+	 * @param buffer
+	 *            input buffer instance
+	 * @return recurrent response for currently processed response, or {@code null} if no recurring responses available
+	 *         in input buffer
+	 */
 	@SuppressWarnings("unchecked")
-	protected WsResponse<ResultSet> getRecurrentResultSet(WsResponse<ResultSet> resp, Queue<?> buffer) {
+	protected WsResponse<ResultSet> getRecurrentResultSet(WsResponse<ResultSet> cItem, Queue<?> buffer) {
 		for (Object item : buffer) {
 			if (item instanceof WsResponse) {
 				WsResponse<ResultSet> respItem = (WsResponse<ResultSet>) item;
 
-				if (respItem.getParameters().get(QUERY_NAME_PROP).getValue()
-						.equals(resp.getParameters().get(QUERY_NAME_PROP).getValue())) {
+				if (respItem.getParameterValue(QUERY_NAME_PROP).equals(cItem.getParameterValue(QUERY_NAME_PROP))) {
 					return respItem;
 				}
 			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * Checks if query is currently processed or pending on input buffer.
+	 * 
+	 * @param qName
+	 *            query name
+	 * @return {@code true} if query is currently processed or pending on input buffer, {@code false} - otherwise
+	 */
+	@SuppressWarnings("unchecked")
+	protected boolean isQueryOngoing(String qName) {
+		synchronized (parsedQueries) {
+			for (String pqName : parsedQueries) {
+				if (qName.equals(pqName)) {
+					LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+							"JDBCStream.query.in.progress", qName);
+					return true;
+				}
+			}
+		}
+
+		for (Object item : inputBuffer) {
+			if (item instanceof WsResponse) {
+				WsResponse<ResultSet> respItem = (WsResponse<ResultSet>) item;
+
+				if (qName.equals(respItem.getParameterValue(QUERY_NAME_PROP))) {
+					LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+							"JDBCStream.query.pending", qName);
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	@Override
@@ -574,10 +649,14 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 			if (!scenarioStep.isEmpty()) {
 				String dbQuery;
 				ResultSet respRs;
-				int stepIdx = 0;
 				Semaphore acquiredSemaphore = null;
+				String qName;
 				for (WsRequest<String> request : scenarioStep.getRequests()) {
-					dbQuery = null;
+					qName = scenarioStep.getName() + ":" + request.getId(); // NON-NLS
+					if (stream.dropRecurrentResultSets && stream.isQueryOngoing(qName)) {
+						continue;
+					}
+
 					respRs = null;
 					try {
 						acquiredSemaphore = acquireSemaphore(stream, request);
@@ -592,8 +671,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 					} finally {
 						if (respRs != null) {
 							WsResponse<ResultSet> resp = new WsReqResponse<>(respRs, request);
-							resp.addParameter(new WsRequest.Parameter(QUERY_NAME_PROP,
-									(stepIdx++) + ":" + scenarioStep.getName())); // NON-NLS
+							resp.addParameter(new WsRequest.Parameter(QUERY_NAME_PROP, qName));
 							stream.addInputToBuffer(resp);
 						} else {
 							releaseSemaphore(acquiredSemaphore, stream, scenarioStep.getName(), request);
