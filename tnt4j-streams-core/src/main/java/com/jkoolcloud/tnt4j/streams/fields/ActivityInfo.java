@@ -711,6 +711,9 @@ public class ActivityInfo {
 		resolveServer(false);
 		determineTrackingId();
 
+		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+				"ActivityInfo.building.trackable", tracker.getId(), eventType, trackingId);
+
 		if (eventType == OpType.ACTIVITY) {
 			return buildActivity(tracker, eventName, trackingId, chTrackables);
 		} else if (eventType == OpType.SNAPSHOT) {
