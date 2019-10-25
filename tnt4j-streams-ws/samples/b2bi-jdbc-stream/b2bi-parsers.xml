@@ -18,11 +18,6 @@
         <field name="StartTime" locator="AFILE_CREATETS" locator-type="Label"/>
         <field name="EndTime" locator="AFILE_MODIFYTS" locator-type="Label"/>
 
-        <field name="Correlator" separator="_">
-            <field-locator id="DataFlowId" locator="AFILE_DATA_FLOW_ID" locator-type="Label"/>
-            <field-locator id="MailBox" locator="AFILE_MAILBOX_PATH" locator-type="Label" required="false"/>
-            <field-locator id="FileName" locator="AFILE_FILE_NAME" locator-type="Label" required="false"/>
-        </field>
         <field name="ApplName" locator="AFILE_CREATEPROGID" locator-type="Label"/>
         <!--field name="ApplName" locator="AFILE_CREATEPROGID" locator-type="Label">
             <field-transform lang="groovy" name="AttrNameTransform"><![CDATA[
@@ -35,19 +30,6 @@
             <field-locator id="Filename" locator="AFILE_FILE_NAME" locator-type="Label" required="false"/>
         </field>
         <field name="ResourceName" locator="ResourceNameTemp" locator-type="Activity" formattingPattern="FILE={0}"/>
-        <field name="Correlator" separator="/">
-            <field-locator id="MailBox" locator="AFILE_MAILBOX_PATH" locator-type="Label" required="false"/>
-            <field-locator id="FileName" locator="AFILE_FILE_NAME" locator-type="Label" required="false"/>
-        </field>
-        <!--<field name="Correlator" formattingPattern="AFile_{0}">-->
-        <!--<field-locator id="AFileKey" locator="AFILE_KEY" locator-type="Label"/>-->
-        <!--</field>-->
-        <field name="Correlator" formattingPattern="CorrelatorsSet_{0}">
-            <field-locator id="DocumentId" locator="AFILE_DOCUMENT_ID" locator-type="Label"/>
-        </field>
-        <field name="Correlator" formattingPattern="Document_{0}">
-            <field-locator id="DocumentId" locator="AFILE_DOCUMENT_ID" locator-type="Label"/>
-        </field>
 
         <field name="MessageId" locator="AFILE_MESSAGE_ID" locator-type="Label" datatype="Number" format="long"/>
         <field name="UserId" locator="AFILE_USER_ID" locator-type="Label"/>
@@ -72,6 +54,26 @@
         <field name="DeliveryState" locator="AFILE_DELIVERY_STATE" locator-type="Label"/>
         <field name="DistMsgId" locator="AFILE_DIST_MSG_ID" locator-type="Label"/>
 
+        <!-- Correlators to build flow context -->
+        <field name="Correlator">
+            <field-locator id="DataFlowId" locator="AFILE_DATA_FLOW_ID" locator-type="Label"/>
+        </field>
+        <field name="Correlator" separator=":">
+            <field-locator id="DataFlowId" locator="AFILE_DATA_FLOW_ID" locator-type="Label"/>
+            <field-locator id="MailBox" locator="AFILE_MAILBOX_PATH" locator-type="Label" required="false"/>
+            <field-locator id="FileName" locator="AFILE_FILE_NAME" locator-type="Label" required="false"/>
+        </field>
+        <field name="Correlator" separator="/">
+            <field-locator id="MailBox" locator="AFILE_MAILBOX_PATH" locator-type="Label" required="false"/>
+            <field-locator id="FileName" locator="AFILE_FILE_NAME" locator-type="Label" required="false"/>
+        </field>
+        <field name="Correlator" formattingPattern="CorrelatorsSet_{0}">
+            <field-locator id="DocumentId" locator="AFILE_DOCUMENT_ID" locator-type="Label"/>
+        </field>
+        <field name="Correlator" formattingPattern="Document_{0}">
+            <field-locator id="DocumentId" locator="AFILE_DOCUMENT_ID" locator-type="Label"/>
+        </field>
+
         <!-- Store latest value to cache -->
         <field name="AF_ModifyTs" locator="AFILE_MODIFYTS" locator-type="Label" transparent="true"/>
     </parser>
@@ -89,9 +91,6 @@
     <parser name="B2BiFGEventsResultSetParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJDBCResultSetParser">
         <field name="Guid" formattingPattern="FGEvent_{0}">
             <field-locator id="EventKey" locator="EVENT_EVENT_KEY" locator-type="Label"/>
-        </field>
-        <field name="Correlator" formattingPattern="AFile_{0}">
-            <field-locator id="AFileKey" locator="EVENT_ARRIVED_FILE_KEY" locator-type="Label"/>
         </field>
         <field name="EventName" locator="EVENT_ENTITY_TYPE" locator-type="Label"/>
         <field name="StartTime" locator="AF_CREATE_TS" locator-type="Label"/>
@@ -126,11 +125,6 @@
         <embedded-activity name="FG_Event_Attrs" locator="EVT_ATTRS" locator-type="Label">
             <parser-ref name="B2BiFGEventAttributesXMLParser" aggregation="Merge"/>
         </embedded-activity>
-        <field name="Correlator" separator="_">
-            <field-locator id="DataFlowId" locator="DataFlowId" locator-type="Activity"/>
-            <field-locator id="ProducerFilename" locator="FG_E_Attr_ProducerFilename" locator-type="Activity" required="false"/>
-            <field-locator id="ConsumerFilename" locator="FG_E_Attr_ConsumerFilename" locator-type="Activity" required="false"/>
-        </field>
         <field name="Owner" value="">
             <field-transform lang="groovy" name="DiffTransform"><![CDATA[
                 ${EventName} == "ARRIVED_FILE"
@@ -157,20 +151,27 @@
             <field-locator id="ConsumerFilename" locator="FG_E_Attr_ConsumerFilename" locator-type="Activity" required="false"/>
         </field>
         <field name="ResourceName" locator="ResourceNameTemp" locator-type="Activity" formattingPattern="FILE={0}"/>
-        <field name="Correlator" separator=".">
+
+        <!-- Correlators to build flow context -->
+        <field name="Correlator">
             <!-- XML stream configuration (minimized)-->
             <field-locator id="AsyncXrefId" locator="FG_E_Attr_AsyncTransferId" locator-type="Activity" required="false"/>
             <field-locator id="ProducerDocumentId" locator="FG_E_Attr_ProducerDocumentId" locator-type="Activity" required="false"/>
             <field-locator id="ConsumerFilename" locator="FG_E_Attr_ConsumerFilename" locator-type="Activity" required="false"/>
             <field-locator id="ProducerPayload" locator="FG_E_Attr_ProducerPayload" locator-type="Activity" required="false"/>
-            <field-locator id="ProducerPayloadDocumentId" locator="FG_E_Attr_ProducerPayloadDocumentId" locator-type="Activity"/>
-            <field-locator id="ConsumerDocumentId" locator="FG_E_Attr_ConsumerDocumentId" locator-type="Activity"/>
+            <field-locator id="ProducerPayloadDocumentId" locator="FG_E_Attr_ProducerPayloadDocumentId" locator-type="Activity"
+                           required="false"/>
+            <field-locator id="ConsumerDocumentId" locator="FG_E_Attr_ConsumerDocumentId" locator-type="Activity" required="false"/>
             <field-locator id="DataFlowId" locator="DataFlowId" locator-type="Activity"/>
         </field>
-
-        <!--<field name="Correlator" formattingPattern="FGEvent_{0}">-->
-        <!--<field-locator id="EventKey" locator="EVENT_EVENT_KEY" locator-type="Label"/>-->
-        <!--</field>-->
+        <field name="Correlator" formattingPattern="AFile_{0}">
+            <field-locator id="AFileKey" locator="EVENT_ARRIVED_FILE_KEY" locator-type="Label"/>
+        </field>
+        <field name="Correlator" separator=":">
+            <field-locator id="DataFlowId" locator="DataFlowId" locator-type="Activity"/>
+            <field-locator id="ProducerFilename" locator="FG_E_Attr_ProducerFilename" locator-type="Activity" required="false"/>
+            <field-locator id="ConsumerFilename" locator="FG_E_Attr_ConsumerFilename" locator-type="Activity" required="false"/>
+        </field>
         <field name="Correlator" formattingPattern="Workflow_Context_{0}">
             <field-locator id="WorkflowId" locator="FG_E_Attr_WorkflowId" locator-type="Activity"/>
         </field>
@@ -189,9 +190,6 @@
     <parser name="B2BiFGEventsApplResultSetParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJDBCResultSetParser">
         <field name="Guid" formattingPattern="FGEvent_{0}">
             <field-locator id="EventKey" locator="EVENT_EVENT_KEY" locator-type="Label"/>
-        </field>
-        <field name="Correlator" formattingPattern="AFile_{0}">
-            <field-locator id="AFileKey" locator="EVENT_ARRIVED_FILE_KEY" locator-type="Label"/>
         </field>
         <field name="EventName" locator="EVENT_ENTITY_TYPE" locator-type="Label"/>
         <field name="StartTime" locator="AF_CREATE_TS" locator-type="Label"/>
@@ -226,11 +224,6 @@
         <embedded-activity name="FG_Event_Attrs" locator="EVT_ATTRS" locator-type="Label">
             <parser-ref name="B2BiFGEventAttributesXMLParser" aggregation="Merge"/>
         </embedded-activity>
-        <field name="Correlator" separator="_">
-            <field-locator id="DataFlowId" locator="DataFlowId" locator-type="Activity"/>
-            <field-locator id="ProducerFilename" locator="FG_E_Attr_ProducerFilename" locator-type="Activity" required="false"/>
-            <field-locator id="ConsumerFilename" locator="FG_E_Attr_ConsumerFilename" locator-type="Activity" required="false"/>
-        </field>
         <field name="Owner" value="">
             <field-transform lang="groovy" name="DiffTransform"><![CDATA[
                 ${EventName} == "ARRIVED_FILE"
@@ -257,20 +250,27 @@
             <field-locator id="ConsumerFilename" locator="FG_E_Attr_ConsumerFilename" locator-type="Activity" required="false"/>
         </field>
         <field name="ResourceName" locator="ResourceNameTemp" locator-type="Activity" formattingPattern="FILE={0}"/>
-        <field name="Correlator" separator=".">
+
+        <!-- Correlators to build flow context -->
+        <field name="Correlator">
             <!-- XML stream configuration (minimized)-->
             <field-locator id="AsyncXrefId" locator="FG_E_Attr_AsyncTransferId" locator-type="Activity" required="false"/>
             <field-locator id="ProducerDocumentId" locator="FG_E_Attr_ProducerDocumentId" locator-type="Activity" required="false"/>
             <field-locator id="ConsumerFilename" locator="FG_E_Attr_ConsumerFilename" locator-type="Activity" required="false"/>
             <field-locator id="ProducerPayload" locator="FG_E_Attr_ProducerPayload" locator-type="Activity" required="false"/>
-            <field-locator id="ProducerPayloadDocumentId" locator="FG_E_Attr_ProducerPayloadDocumentId" locator-type="Activity"/>
-            <field-locator id="ConsumerDocumentId" locator="FG_E_Attr_ConsumerDocumentId" locator-type="Activity"/>
+            <field-locator id="ProducerPayloadDocumentId" locator="FG_E_Attr_ProducerPayloadDocumentId" locator-type="Activity"
+                           required="false"/>
+            <field-locator id="ConsumerDocumentId" locator="FG_E_Attr_ConsumerDocumentId" locator-type="Activity" required="false"/>
             <field-locator id="DataFlowId" locator="DataFlowId" locator-type="Activity"/>
         </field>
-
-        <!--<field name="Correlator" formattingPattern="FGEvent_{0}">-->
-        <!--<field-locator id="EventKey" locator="EVENT_EVENT_KEY" locator-type="Label"/>-->
-        <!--</field>-->
+        <field name="Correlator" formattingPattern="AFile_{0}">
+            <field-locator id="AFileKey" locator="EVENT_ARRIVED_FILE_KEY" locator-type="Label"/>
+        </field>
+        <field name="Correlator" separator=":">
+            <field-locator id="DataFlowId" locator="DataFlowId" locator-type="Activity"/>
+            <field-locator id="ProducerFilename" locator="FG_E_Attr_ProducerFilename" locator-type="Activity" required="false"/>
+            <field-locator id="ConsumerFilename" locator="FG_E_Attr_ConsumerFilename" locator-type="Activity" required="false"/>
+        </field>
         <field name="Correlator" formattingPattern="Workflow_Context_{0}">
             <field-locator id="WorkflowId" locator="FG_E_Attr_WorkflowId" locator-type="Activity"/>
         </field>
@@ -293,12 +293,6 @@
             <field-locator id="RouteKey" locator="ROUTE_KEY" locator-type="Label"/>
         </field>
         <field name="EventType" value="EVENT"/>
-        <field name="Correlator" formattingPattern="AFile_{0}">
-            <field-locator id="AFileKey" locator="ROUTE_AFILE_KEY" locator-type="Label"/>
-        </field>
-        <!--<field name="TrackingId" formattingPattern="Route_{0}">-->
-        <!--<field-locator id="RouteKey" locator="ROUTE_KEY" locator-type="Label"/>-->
-        <!--</field>-->
         <field name="EventName" separator=".">
             <field-locator id="DataFlowId" locator="ROUTE_DATA_FLOW_ID" locator-type="Label"/>
             <field-locator id="ConsOrgKey" locator="ROUTE_CONS_ORG_KEY" locator-type="Label"/>
@@ -326,6 +320,11 @@
         <field name="CreateProgId" locator="ROUTE_CREATEPROGID" locator-type="Label"/>
         <field name="ModifyProgId" locator="ROUTE_MODIFYPROGID" locator-type="Label"/>
 
+        <!-- Correlators to build flow context -->
+        <field name="Correlator" formattingPattern="AFile_{0}">
+            <field-locator id="AFileKey" locator="ROUTE_AFILE_KEY" locator-type="Label"/>
+        </field>
+
         <!-- Store latest value to cache -->
         <field name="R_ModifyTs" locator="ROUTE_MODIFYTS" locator-type="Label" transparent="true"/>
 
@@ -342,15 +341,6 @@
             <field-locator id="DeliveryKey" locator="DELIVERY_KEY" locator-type="Label"/>
         </field>
         <field name="EventType" value="EVENT"/>
-        <!--<field name="TrackingId" formattingPattern="Delivery_{0}">-->
-        <!--<field-locator id="DeliveryKey" locator="DELIVERY_KEY" locator-type="Label"/>-->
-        <!--</field>-->
-        <field name="Correlator" formattingPattern="Route_{0}">
-            <field-locator id="RouteKey" locator="DELIVERY_ROUTE_KEY" locator-type="Label"/>
-        </field>
-        <field name="Correlator" formattingPattern="Document_{0}">
-            <field-locator id="WorkflowId" locator="DELIVERY_CONSUMER_DOCID" locator-type="Label"/>
-        </field>
         <field name="EventName" separator=".">
             <field-locator id="DataFlowId" locator="DELIVERY_DATA_FLOW_ID" locator-type="Label"/>
             <field-locator id="Mailbox" locator="DELIVERY_MAILBOX_PATH" locator-type="Label"/>
@@ -377,6 +367,15 @@
         <field name="ModifyProgId" locator="DELIVERY_MODIFYPROGID" locator-type="Label"/>
         <field name="DistConsumerMsgId" locator="DELIVERY_DIST_CONSUMER_MSGID" locator-type="Label"/>
 
+        <!-- Correlators to build flow context -->
+        <field name="Correlator" formattingPattern="Route_{0}">
+            <field-locator id="RouteKey" locator="DELIVERY_ROUTE_KEY" locator-type="Label"/>
+        </field>
+        <field name="Correlator" formattingPattern="Document_{0}">
+            <field-locator id="WorkflowId" locator="DELIVERY_CONSUMER_DOCID" locator-type="Label"/>
+        </field>
+        <!--<field name="Correlator" locator="AsyncXrefId" locator-type="Activity"/>-->
+
         <!-- Store latest value to cache -->
         <field name="D_ModifyTs" locator="DELIVERY_MODIFYTS" locator-type="Label" transparent="true"/>
 
@@ -393,19 +392,6 @@
             <field-locator id="CorrelId" locator="CORRELATION_ID" locator-type="Label"/>
         </field>
         <field name="EventType" value="EVENT"/>
-        <!--<field name="TrackingId" formattingPattern="Correlation_{0}">-->
-        <!--<field-locator id="CorrelId" locator="CORRELATION_ID" locator-type="Label"/>-->
-        <!--</field>-->
-        <field name="Correlator" formattingPattern="CorrelatorsSet_{0}">
-            <field-locator id="ObjectId" locator="CORRELATION_OBJECT_ID" locator-type="Label"/>
-        </field>
-        <field name="Correlator" formattingPattern="Workflow_Context_{0}">
-            <field-locator id="WorkflowId" locator="CORRELATION_WF_ID" locator-type="Label">
-                <field-transform name="CorrelationSetWFTransform" lang="groovy">
-                    $fieldValue == null || $fieldValue == -1 ? null : $fieldValue
-                </field-transform>
-            </field-locator>
-        </field>
         <field name="EventName" separator=":">
             <field-locator id="Type" locator="CORRELATION_TYPE" locator-type="Label"/>
             <field-locator id="Name" locator="CORRELATION_NAME" locator-type="Label"/>
@@ -427,6 +413,18 @@
         <field name="KeyType" locator="CORR_KEY_TYPE" locator-type="Label"/>
         <field name="KeyLabel" locator="CORR_KEY_LABEL" locator-type="Label"/>
 
+        <!-- Correlators to build flow context -->
+        <field name="Correlator" formattingPattern="CorrelatorsSet_{0}">
+            <field-locator id="ObjectId" locator="CORRELATION_OBJECT_ID" locator-type="Label"/>
+        </field>
+        <field name="Correlator" formattingPattern="Workflow_Context_{0}">
+            <field-locator id="WorkflowId" locator="CORRELATION_WF_ID" locator-type="Label">
+                <field-transform name="CorrelationSetWFTransform" lang="groovy">
+                    $fieldValue == null || $fieldValue == -1 ? null : $fieldValue
+                </field-transform>
+            </field-locator>
+        </field>
+
         <!-- Store latest value to cache -->
         <field name="CS_RecTime" locator="CORRELATION_REC_TIME" locator-type="Label" transparent="true"/>
 
@@ -438,15 +436,6 @@
             <field-locator id="WorkflowWFCId" locator="WORKFLOW_WFC_ID" locator-type="Label"/>
         </field>
         <field name="EventType" value="EVENT"/>
-        <!--<field name="TrackingId" formattingPattern="Workflow_{0}">-->
-        <!--<field-locator id="WorkflowWFCId" locator="WORKFLOW_WFC_ID" locator-type="Label"/>-->
-        <!--</field>-->
-        <field name="Correlator" formattingPattern="Workflow_Context_{0}">
-            <field-locator id="WorkflowId" locator="WORKFLOW_ID" locator-type="Label"/>
-        </field>
-        <field name="Correlator" formattingPattern="Document_{0}">
-            <field-locator id="WorkflowId" locator="WORKFLOW_DOC_ID" locator-type="Label"/>
-        </field>
         <field name="EventName" separator=":">
             <field-locator id="ServiceName" locator="WORKFLOW_SERVICE_NAME" locator-type="Label"/>
         </field>
@@ -484,6 +473,14 @@
         <field name="NodeExcluded" locator="WORKFLOW_NODEEXECUTED" locator-type="Label"/>
         <field name="EventLevel" locator="WORKFLOW_EVENT_LEVEL" locator-type="Label" datatype="Number" format="int"/>
 
+        <!-- Correlators to build flow context -->
+        <field name="Correlator" formattingPattern="Workflow_Context_{0}">
+            <field-locator id="WorkflowId" locator="WORKFLOW_ID" locator-type="Label"/>
+        </field>
+        <field name="Correlator" formattingPattern="Document_{0}">
+            <field-locator id="WorkflowId" locator="WORKFLOW_DOC_ID" locator-type="Label"/>
+        </field>
+
         <!-- Store latest value to cache -->
         <field name="WC_StartTime" locator="WORKFLOW_START_TIME" locator-type="Label" transparent="true"/>
 
@@ -491,6 +488,7 @@
     </parser>
 
     <parser name="B2BiTransferIdsXMLParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
+        <!-- Correlator to relate FG flow with MFT flow -->
         <field name="Correlator">
             <field-locator id="XferId" locator="/xfers/xfer[*]/XFER_ID" locator-type="Label">
                 <field-transform lang="groovy" name="XFerIdTransform"><![CDATA[
@@ -505,16 +503,6 @@
             <field-locator id="WorkflowWFCId" locator="DOCUMENT_ID" locator-type="Label"/>
         </field>
         <field name="EventType" value="EVENT"/>
-        <!--<field name="TrackingId" formattingPattern="Document_{0}">-->
-        <!--<field-locator id="DocumentId" locator="DOCUMENT_ID" locator-type="Label"/>-->
-        <!--</field>-->
-        <field name="Correlator" formattingPattern="File_{0}_{1}">
-            <field-locator id="DocumentName" locator="DOCUMENT_DOC_NAME" locator-type="Label"/>
-            <field-locator id="DocumentSize" locator="DOCUMENT_DOCUMENT_SIZE" locator-type="Label" datatype="Number" format="long"/>
-        </field>
-        <field name="Correlator" formattingPattern="CorrelatorsSet_{0}">
-            <field-locator id="DocumentId" locator="DOCUMENT_ID" locator-type="Label"/>
-        </field>
         <field name="EventName" separator=":">
             <field-locator id="DocumentName" locator="DOCUMENT_DOC_NAME" locator-type="Label"/>
             <field-locator id="DataFlowId" locator="DATA_FLOW_DATA_FLOW_ID" locator-type="Label"/>
@@ -545,6 +533,15 @@
         <field name="DataFlowCreateTime" locator="DATA_FLOW_CREATE_TIME" locator-type="Label" datatype="Timestamp"/>
         <field name="DataFlowDocName" locator="DATA_FLOW_ROOT_DOC_NAME" locator-type="Label"/>
         <field name="DataFlowDocSize" locator="DATA_FLOW_ROOT_DOC_SIZE" locator-type="Label" datatype="Number" format="int"/>
+
+        <!-- Correlators to build flow context -->
+        <field name="Correlator" formattingPattern="File_{0}_{1}">
+            <field-locator id="DocumentName" locator="DOCUMENT_DOC_NAME" locator-type="Label"/>
+            <field-locator id="DocumentSize" locator="DOCUMENT_DOCUMENT_SIZE" locator-type="Label" datatype="Number" format="long"/>
+        </field>
+        <field name="Correlator" formattingPattern="CorrelatorsSet_{0}">
+            <field-locator id="DocumentId" locator="DOCUMENT_ID" locator-type="Label"/>
+        </field>
 
         <!-- Store latest value to cache -->
         <field name="Doc_ModifyTs" locator="DOCUMENT_MODIFYTS" locator-type="Label" transparent="true"/>
