@@ -1177,8 +1177,11 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 * @param cData
 	 *            activity object context data package
 	 * @return raw value resolved by locator, or {@code null} if value is not resolved
+	 * 
+	 * @throws java.text.ParseException
+	 *             if there are any errors while aggregating field value
 	 */
-	protected Object resolveActivityValue(ActivityFieldLocator locator, ActivityContext cData) {
+	protected Object resolveActivityValue(ActivityFieldLocator locator, ActivityContext cData) throws ParseException {
 		Object value = null;
 		String locStr = locator.getLocator();
 		if (StringUtils.isNotEmpty(locStr)) {
@@ -1188,9 +1191,33 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 			} else {
 				value = ActivityInfo.getFieldValue(locStr, getName(), cData.getActivity());
 			}
+
+			ActivityField aField = getField(locStr);
+
+			if (aField != null) {
+				value = ActivityInfo.getAggregatedFieldValue(value, aField, locator);
+			}
 		}
 
 		return value;
+	}
+
+	/**
+	 * Returns an activity field definition from the set of fields supported by this parser.
+	 * 
+	 * @param fName
+	 *            field name
+	 * @return field instance matching provided name, or {@code null} if parser has no such field
+	 */
+	protected ActivityField getField(String fName) {
+		for (ActivityField aField : fieldList) {
+			if (fName.equals(aField.getFieldTypeName())) {
+				return aField;
+			}
+
+		}
+
+		return null;
 	}
 
 	/**

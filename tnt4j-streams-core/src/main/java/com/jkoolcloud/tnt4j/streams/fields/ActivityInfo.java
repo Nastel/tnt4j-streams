@@ -147,7 +147,7 @@ public class ActivityInfo {
 		if (!field.isTransparent()) {
 			setFieldValue(field, value);
 		} else {
-			addActivityProperty(field.getFieldTypeName(), getPropertyValue(value, field), true);
+			addActivityProperty(field.getFieldTypeName(), getAggregatedFieldValue(value, field), true);
 		}
 	}
 
@@ -306,7 +306,8 @@ public class ActivityInfo {
 		} else if (fieldValue instanceof Map) {
 			addPropertiesMap(field, (Map<?, ?>) fieldValue, "");
 		} else {
-			addActivityProperty(field.getFieldTypeName(), getPropertyValue(fieldValue, field), field.getValueType());
+			addActivityProperty(field.getFieldTypeName(), getAggregatedFieldValue(fieldValue, field),
+					field.getValueType());
 		}
 	}
 
@@ -318,16 +319,49 @@ public class ActivityInfo {
 				addPropertiesMap(field, (Map<?, ?>) pme.getValue(),
 						pKey + field.getParser().getProperty(ParserProperties.PROP_COMPOSITE_DELIM));
 			} else {
-				addActivityProperty(pKey, getPropertyValue(pme.getValue(), field));
+				addActivityProperty(pKey, getAggregatedFieldValue(pme.getValue(), field));
 			}
 		}
 	}
 
-	private static Object getPropertyValue(Object fieldValue, ActivityField field) throws ParseException {
+	/**
+	 * Formats and aggregates raw field value using {@code field} defined data type and aggregation/formatting rules.
+	 * 
+	 * @param fieldValue
+	 *            raw field value
+	 * @param field
+	 *            field whose value is to be aggregated
+	 * @return aggregated and formatted field value
+	 * @throws ParseException
+	 *             if value aggregation fails
+	 * 
+	 * @see #getAggregatedFieldValue(Object, ActivityField, ActivityFieldLocator)
+	 */
+	public static Object getAggregatedFieldValue(Object fieldValue, ActivityField field) throws ParseException {
 		ActivityFieldLocator fmLocator = field.getMasterLocator();
 
-		if (fmLocator != null) {
-			switch (fmLocator.getDataType()) {
+		return getAggregatedFieldValue(fieldValue, field, fmLocator);
+	}
+
+	/**
+	 * Formats and aggregates raw field value using {@code locator} defined data type and {@code field} defined
+	 * aggregation/formatting rules.
+	 * 
+	 * @param fieldValue
+	 *            raw field value
+	 * @param field
+	 *            field whose value is to be aggregated
+	 * @param locator
+	 *            locator instance defining field value data type
+	 * @return aggregated and formatted field value
+	 * 
+	 * @throws ParseException
+	 *             if value aggregation fails
+	 */
+	public static Object getAggregatedFieldValue(Object fieldValue, ActivityField field, ActivityFieldLocator locator)
+			throws ParseException {
+		if (locator != null) {
+			switch (locator.getDataType()) {
 			case Number:
 				return getNumberValue(fieldValue, field);
 			case DateTime:
@@ -617,7 +651,7 @@ public class ActivityInfo {
 	private static Collection<String> addStrings(Collection<String> collection, String... strings) {
 		if (ArrayUtils.isNotEmpty(strings)) {
 			if (collection == null) {
-				collection = new ArrayList<>();
+				collection = new HashSet<>();
 			}
 
 			for (String str : strings) {
@@ -1416,7 +1450,7 @@ public class ActivityInfo {
 		}
 		if (otherAi.correlator != null) {
 			if (correlator == null) {
-				correlator = new ArrayList<>();
+				correlator = new HashSet<>();
 			}
 
 			correlator.addAll(otherAi.correlator);
@@ -1430,7 +1464,7 @@ public class ActivityInfo {
 		}
 		if (otherAi.tag != null) {
 			if (tag == null) {
-				tag = new ArrayList<>();
+				tag = new HashSet<>();
 			}
 
 			tag.addAll(otherAi.tag);
