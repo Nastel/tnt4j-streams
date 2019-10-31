@@ -38,7 +38,7 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
- * Implements a JMS message transported activity stream, where each JMS message payload data carried data is assumed to
+ * Implements a JMS message transported activity stream, where each JMS message payload carried data is assumed to
  * represent a single activity or event which should be recorded.
  * <p>
  * This activity stream requires parsers that can support JMS {@link javax.jms.Message} data.

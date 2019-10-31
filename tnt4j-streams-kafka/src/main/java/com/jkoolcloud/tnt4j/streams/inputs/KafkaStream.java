@@ -296,7 +296,6 @@ public class KafkaStream extends TNTParseableInputStream<Map<String, ?>> {
 			throw new IllegalStateException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
 					"TNTInputStream.property.undefined", StreamProperties.PROP_TOPIC_NAME));
 		}
-
 	}
 
 	@Override
@@ -454,7 +453,7 @@ public class KafkaStream extends TNTParseableInputStream<Map<String, ?>> {
 					msgDataMap.put("SerializedKeySize", msg.serializedKeySize()); // NON-NLS
 					msgDataMap.put("SerializedValueSize", msg.serializedValueSize()); // NON-NLS
 					msgDataMap.put("Key", msg.key()); // NON-NLS
-					// msgDataMap.put("Epoch", msg.leaderEpoch().orElse(null)); // NON-NLS
+					msgDataMap.put("Epoch", msg.leaderEpoch().orElse(null)); // NON-NLS
 					msgDataMap.put("Checksum", msg.checksum()); // NON-NLS
 
 					Iterable<Header> headers = msg.headers();
