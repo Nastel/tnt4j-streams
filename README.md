@@ -28,6 +28,7 @@ All you need is to define your data format mapping to TNT4J event mapping in TNT
     * Elastic Beats
     * FileSystem (JSR-203 compliant) provided files (accessing remote files over SCP/SSH, SFTP, etc.)
     * JDBC
+    * [Chronicle Queue](https://chronicle.software/products/queue/)
 
 * Files (including provided by HDFS and JSR-203 FileSystem) can be streamed:
     * as "whole at once" - when a stream starts, it reads file contents line by line meaning a single file line holds data of a single 
@@ -6388,6 +6389,7 @@ Modules list:
    * `MsOffice` (O) - MS Office Excel provided data streaming module.
    * `WMQ` (O) - IBM MQ provided data streaming module.
    * `WS` (O) - web-service (or OS command) provided data streaming module.
+   * `Chronicle` (O) - [Chronicle Queue](https://chronicle.software/products/queue/) provided data streaming module.
    * `Samples` (O) - integration into custom API sample module.
    * `Distribution` (OU) - distributable package build module.
 
@@ -6487,6 +6489,7 @@ Maven tests run is disabled by default. To enable Maven to run tests set Maven c
 * in `wmq` module run JUnit test suite named `AllWmqStreamTests`
 * in `ws` module run JUnit test suite named `AllWsStreamTests`
 * in `msoffice` module run JUnit test suite named `AllMsOfficeStreamTests`
+* in `chronicle` module run JUnit test suite named `AllChronicleStreamTests`
 
 Known Projects Using TNT4J-STREAMS
 ===============================================

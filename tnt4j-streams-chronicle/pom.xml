@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+        <artifactId>tnt4j-streams</artifactId>
+        <version>1.10.0-SNAPSHOT</version>
+    </parent>
+    <packaging>jar</packaging>
+
+    <artifactId>tnt4j-streams-chronicle</artifactId>
+
+    <properties>
+        <!-- module dependencies versions-->
+        <chronicle.version>5.17.25</chronicle.version>
+    </properties>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>../</directory>
+                <targetPath>META-INF</targetPath>
+                <includes>
+                    <include>LICENSE</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <archive>
+                        <!--<index>true</index>-->
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                        <manifestEntries>
+                            <Implementation-Vendor>${product.vendor}</Implementation-Vendor>
+                            <Implementation-Title>${product.name}</Implementation-Title>
+                            <Implementation-Version>${project.version}-${maven.build.timestamp}</Implementation-Version>
+                            <Main-Class>com.jkoolcloud.tnt4j.streams.StreamsAgent</Main-Class>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <skipSource>${skip.source.pack}</skipSource>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.openhft</groupId>
+            <artifactId>chronicle-queue</artifactId>
+            <version>${chronicle.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>
