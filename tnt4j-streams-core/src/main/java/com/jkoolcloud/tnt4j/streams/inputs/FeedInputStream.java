@@ -315,7 +315,9 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 	protected void cleanup() {
 		cleanupStreamInternals();
 
-		feedInput.shutdown();
+		if (feedInput != null) {
+			feedInput.shutdown();
+		}
 
 		super.cleanup();
 	}
@@ -328,7 +330,9 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 		rawInputSource = null;
 		dataFeed = null;
 
-		feedInput.cleanup();
+		if (feedInput != null) {
+			feedInput.cleanup();
+		}
 	}
 
 	private class StreamFeedsListener implements Feed.FeedListener {
