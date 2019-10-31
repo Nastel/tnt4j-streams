@@ -401,6 +401,10 @@ public class RestStream extends AbstractWsStream<String> {
 					request.setSentData(reqUrl);
 					respStr = stream.executeGET(stream.client, reqUrl, scenarioStep.getUsername(),
 							decPassword(scenarioStep.getPassword()));
+				} catch (VoidRequestException exc) {
+					stream.logger().log(OpLevel.INFO,
+							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+							"RestStream.void.request", request.getId(), exc.getMessage());
 				} catch (Throwable exc) {
 					Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -438,10 +442,12 @@ public class RestStream extends AbstractWsStream<String> {
 	 *            scenario step bound call endpoint URL string
 	 * @param request
 	 *            request data package
-	 *
 	 * @return URL string appended with query parameter values
+	 * 
+	 * @throws com.jkoolcloud.tnt4j.streams.inputs.VoidRequestException
+	 *             if request URL is meaningless or can't be build from request context data
 	 */
-	protected String uriForGET(String stepUrl, WsRequest<String> request) {
+	protected String uriForGET(String stepUrl, WsRequest<String> request) throws VoidRequestException {
 		if (StringUtils.isNotEmpty(stepUrl)) {
 			return stepUrl;
 		}
@@ -455,16 +461,11 @@ public class RestStream extends AbstractWsStream<String> {
 
 		if (i == -1) {
 			uriBuilder.append('?');
-		} else if (i == uri.length() - 1) {
-		} else {
+		} else if (i != uri.length() - 1) {
 			uriBuilder.append('&');
 		}
 
-		List<NameValuePair> params = new ArrayList<>(request.getParameters().size());
-
-		for (Map.Entry<String, WsRequest.Parameter> param : request.getParameters().entrySet()) {
-			params.add(new BasicNameValuePair(param.getKey(), preProcessURL(param.getValue().getValue(), false)));
-		}
+		List<NameValuePair> params = makeParamsList(request);
 
 		String paramsStr = URLEncodedUtils.format(params, StandardCharsets.UTF_8);
 
@@ -473,6 +474,39 @@ public class RestStream extends AbstractWsStream<String> {
 		}
 
 		return uriBuilder.toString();
+	}
+
+	/**
+	 * Builds list of request parameters by filling in values from request context data.
+	 * 
+	 * @param request
+	 *            request data package
+	 * @return list of request parameters
+	 */
+	protected List<NameValuePair> makeParamsList(WsRequest<String> request) {
+		List<NameValuePair> params = new ArrayList<>(request.getParameters().size());
+
+		for (Map.Entry<String, WsRequest.Parameter> param : request.getParameters().entrySet()) {
+			BasicNameValuePair httpParam = makeParam(param, request);
+			if (httpParam != null) {
+				params.add(httpParam);
+			}
+		}
+
+		return params;
+	}
+
+	/**
+	 * Builds HTTP parameter from request parameter data and request context data.
+	 * 
+	 * @param param
+	 *            request parameter instance
+	 * @param request
+	 *            request data package
+	 * @return HTTP parameter instance, or {@code null} if parameter can't be built
+	 */
+	protected BasicNameValuePair makeParam(Map.Entry<String, WsRequest.Parameter> param, WsRequest<String> request) {
+		return new BasicNameValuePair(param.getKey(), preProcessURL(param.getValue().getValue(), false));
 	}
 
 	/**

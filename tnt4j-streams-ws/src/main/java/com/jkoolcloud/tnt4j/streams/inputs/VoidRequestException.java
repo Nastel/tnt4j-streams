@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2019 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package com.jkoolcloud.tnt4j.streams.parsers;
+package com.jkoolcloud.tnt4j.streams.inputs;
 
 /**
- * This exception is thrown when parser field locator fails to resolve non-null value.
+ * This exception is thrown when request URL is meaningless or cant be build using request context data.
  *
  * @version $Revision: 1 $
  */
-public class MissingFieldValueException extends Exception {
-	private static final long serialVersionUID = -518745191572260401L;
+public class VoidRequestException extends Exception {
+	private static final long serialVersionUID = -723137453526020785L;
 
 	/**
-	 * Constructs an {@code MissingFieldValueException} with the specified detail message.
+	 * Constructs an {@code VoidRequestException} with the specified detail message.
 	 *
 	 * @param message
 	 *            the detail message. The detail message is saved for later retrieval by the {@link #getMessage()}
 	 *            method.
 	 */
-	public MissingFieldValueException(String message) {
+	public VoidRequestException(String message) {
 		super(message);
 	}
 
 	/**
-	 * Constructs an {@code MissingFieldValueException} with the specified detail message and cause.
+	 * Constructs an {@code VoidRequestException} with the specified detail message and cause.
 	 *
 	 * @param message
 	 *            the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
@@ -44,7 +44,7 @@ public class MissingFieldValueException extends Exception {
 	 *            the cause (which is saved for later retrieval by the {@link #getCause()} method). (A <tt>null</tt>
 	 *            value is permitted, and indicates that the cause is nonexistent or unknown.)
 	 */
-	public MissingFieldValueException(String message, Throwable cause) {
+	public VoidRequestException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
@@ -61,7 +61,7 @@ public class MissingFieldValueException extends Exception {
 	 * @param writableStackTrace
 	 *            whether or not the stack trace should be writable
 	 */
-	public MissingFieldValueException(String message, Throwable cause, boolean enableSuppression,
+	public VoidRequestException(String message, Throwable cause, boolean enableSuppression,
 			boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
