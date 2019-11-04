@@ -13,6 +13,11 @@
 
     <artifactId>tnt4j-streams-ws</artifactId>
 
+    <properties>
+        <quartz.version>2.3.2</quartz.version>
+        <hikaricp.version>3.4.1</hikaricp.version>
+    </properties>
+
     <build>
         <resources>
             <resource>
@@ -84,7 +89,7 @@
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>2.3.1</version>
+            <version>${quartz.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -98,12 +103,17 @@
                     <groupId>com.mchange</groupId>
                     <artifactId>c3p0</artifactId>
                 </exclusion>
+                <!-- to exclude all dependencies -->
+                <!--<exclusion>-->
+                <!--<groupId>*</groupId>-->
+                <!--<artifactId>*</artifactId>-->
+                <!--</exclusion>-->
             </exclusions>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>3.3.1</version>
+            <version>${hikaricp.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -111,6 +121,33 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- JDBC drivers to be used by your environment. Uncomment the one you are going to use. -->
+
+        <!-- DB2 JDBC Drivers -->
+        <!--<dependency>-->
+        <!--<groupId>com.ibm.db2</groupId>-->
+        <!--<artifactId>jcc</artifactId>-->
+        <!--<version>11.1.4.4</version>-->
+        <!--<scope>runtime</scope>-->
+        <!--</dependency>-->
+
+        <!-- Oracle JDBC Drivers -->
+        <!-- Oracle does not distribute JDBC drivers over public Maven repo, so you'll have to download it manually -->
+
+        <!-- MS SQL JDBC Drivers -->
+        <!--<dependency>-->
+        <!--<groupId>com.microsoft.sqlserver</groupId>-->
+        <!--<artifactId>mssql-jdbc</artifactId>-->
+        <!--<version>6.4.0.jre7</version>-->
+        <!--<scope>runtime</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>com.microsoft.sqlserver</groupId>-->
+        <!--<artifactId>mssql-jdbc</artifactId>-->
+        <!--<version>7.4.1.jre8</version>-->
+        <!--<scope>runtime</scope>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>com.jkoolcloud.tnt4j.streams</groupId>

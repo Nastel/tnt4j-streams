@@ -188,19 +188,14 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	@Override
 	protected void cleanupItem(WsResponse<ResultSet> item) {
 		if (item != null && item.getData() != null) {
-			try {
-				closeRS(item.getData());
-			} catch (SQLException exc) {
-				Utils.logThrowable(logger(), OpLevel.WARNING,
-						StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-						"JDBCStream.rs.consumption.exception", exc);
-			}
+			closeRS(item.getData());
+			queryConsumed(item);
 		}
 	}
 
 	@Override
 	protected long getActivityItemByteSize(WsResponse<ResultSet> item) {
-		return 0; // TODO
+		return 1; // TODO
 	}
 
 	@Override
@@ -223,13 +218,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 				logger().log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 						"JDBCStream.rs.consumption.drop", item.getParameterValue(QUERY_NAME_PROP));
 				inputBuffer.remove(recurringItem);
-				try {
-					closeRS(recurringItem.getData());
-				} catch (SQLException exc) {
-					Utils.logThrowable(logger(), OpLevel.WARNING,
-							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-							"JDBCStream.rs.consumption.exception", exc);
-				}
+				closeRS(recurringItem.getData());
 			}
 		}
 
@@ -237,10 +226,11 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 		try {
 			if (rs.isClosed() || !rs.next()) {
 				closeRS(rs);
+				queryConsumed(item);
 
 				logger().log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 						"JDBCStream.rs.consumption.done");
-				queryConsumed(item);
+
 				return true;
 			}
 
@@ -251,20 +241,28 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 			Utils.logThrowable(logger(), OpLevel.WARNING,
 					StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"JDBCStream.rs.consumption.exception", exc);
+
+			closeRS(item.getData());
 			queryConsumed(item);
+
 			return true;
 		}
 	}
 
-	private void closeRS(ResultSet rs) throws SQLException {
-		Statement st = rs.getStatement();
-		Connection conn = st == null ? null : st.getConnection();
+	private void closeRS(ResultSet rs) {
+		Statement st = null;
+		Connection conn = null;
 
-		if (conn != null && !conn.getAutoCommit()) {
-			try {
+		try {
+			st = rs.getStatement();
+		} catch (SQLException exc) {
+		}
+		try {
+			conn = st == null ? null : st.getConnection();
+			if (conn != null && !conn.getAutoCommit()) {
 				conn.commit();
-			} catch (SQLException exc) {
 			}
+		} catch (SQLException exc) {
 		}
 
 		Utils.close(rs);
@@ -392,34 +390,46 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"JDBCStream.obtaining.db.connection", url);
-		Duration cod = Duration.arm();
-		Connection dbConn = getDbConnection(url, user, pass, stream);
 
-		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-				"JDBCStream.db.connection.obtained", url, cod.durationHMS());
+		Connection dbConn = null;
+		PreparedStatement statement = null;
+		ResultSet rs = null;
 
-		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-				"JDBCStream.preparing.query", query);
+		try {
+			Duration cod = Duration.arm();
+			dbConn = getDbConnection(url, user, pass, stream);
+			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+					"JDBCStream.db.connection.obtained", url, cod.durationHMS());
 
-		PreparedStatement statement = dbConn.prepareStatement(query);
-		if (stream.fetchSize > 0) {
-			statement.setFetchSize(stream.fetchSize);
+			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+					"JDBCStream.preparing.query", query);
+
+			statement = dbConn.prepareStatement(query);
+			if (stream.fetchSize > 0) {
+				statement.setFetchSize(stream.fetchSize);
+			}
+			if (stream.maxRows > 0) {
+				statement.setMaxRows(stream.maxRows);
+			}
+
+			addStatementParameters(statement, params, stream);
+
+			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+					"JDBCStream.executing.query", url);
+			Duration qed = Duration.arm();
+			rs = statement.executeQuery();
+
+			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+					"JDBCStream.query.execution.completed", url, qed.durationHMS(), cod.durationHMS());
+
+			return rs;
+		} catch (SQLException exc) {
+			Utils.close(rs);
+			Utils.close(statement);
+			Utils.close(dbConn);
+
+			throw exc;
 		}
-		if (stream.maxRows > 0) {
-			statement.setMaxRows(stream.maxRows);
-		}
-
-		addStatementParameters(statement, params, stream);
-
-		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-				"JDBCStream.executing.query", url);
-		Duration qed = Duration.arm();
-		ResultSet rs = statement.executeQuery();
-
-		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-				"JDBCStream.query.execution.completed", url, qed.durationHMS(), cod.durationHMS());
-
-		return rs;
 	}
 
 	/**
