@@ -1379,11 +1379,13 @@ public class ActivityInfo {
 		return fmLocator == null ? NumericFormatter.strToNumber(valStr) : fmLocator.formatNumericValue(value);
 	}
 
+	@SuppressWarnings("unchecked")
 	private static <T extends Number> T getNumberValue(Object value, Class<T> clazz, ActivityField field)
 			throws ParseException {
 		Number num = getNumberValue(value, field);
+		num = NumericFormatter.castNumber(num, clazz, NumericFormatter.CastMode.EXACT);
 
-		return NumericFormatter.castNumber(num, clazz);
+		return (T) num;
 	}
 
 	private static Boolean getBooleanValue(Object value) {

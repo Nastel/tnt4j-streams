@@ -16,8 +16,7 @@
 
 package com.jkoolcloud.tnt4j.streams.utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -120,38 +119,235 @@ public class NumericFormatterTest {
 	}
 
 	@Test
-	public void testCast() {
-		assertEquals((Long) 20L, NumericFormatter.castNumber(20L, Long.class));
-		assertEquals((Long) 20L, NumericFormatter.castNumber(20.3, Long.class));
-		assertEquals((Long) 20L, NumericFormatter.castNumber(20.9, Long.class));
-		assertEquals(20L, NumericFormatter.castNumber(20L, Number.class));
-		assertEquals((Long) 20L, NumericFormatter.castNumber(20.0, Long.class));
-		assertEquals((Long) 20L, NumericFormatter.castNumber(20, Long.class));
-		assertEquals(20.0, NumericFormatter.castNumber(20L, Double.class), 0.0001);
-		assertEquals(20.0, NumericFormatter.castNumber(20.0, Double.class), 0.0001);
-		assertEquals(BigDecimal.valueOf(20.0), NumericFormatter.castNumber(20L, BigDecimal.class));
-		assertEquals(0, new BigDecimal("15445512248522412556325202").compareTo(
-				NumericFormatter.castNumber(new BigInteger("15445512248522412556325202"), BigDecimal.class)));
-		assertEquals(1.2345678901234568E29,
-				NumericFormatter.castNumber(new BigInteger("123456789012345678901234567890"), Double.class), 0.0001);
+	public void testCastExact() {
+		assertEquals(20L, NumericFormatter.castNumber(20L, Long.class, NumericFormatter.CastMode.EXACT));
+		assertEquals(20L, NumericFormatter.castNumber(20.3, Long.class, NumericFormatter.CastMode.EXACT));
+		assertEquals(20L, NumericFormatter.castNumber(20.9, Long.class, NumericFormatter.CastMode.EXACT));
+		assertEquals(20L, NumericFormatter.castNumber(20L, Number.class, NumericFormatter.CastMode.EXACT));
+		assertEquals(20L, NumericFormatter.castNumber(20.0, Long.class, NumericFormatter.CastMode.EXACT));
+		assertEquals(20L, NumericFormatter.castNumber(20, Long.class, NumericFormatter.CastMode.EXACT));
+		assertEquals(20.0,
+				NumericFormatter.castNumber(20L, Double.class, NumericFormatter.CastMode.EXACT).doubleValue(), 0.0001);
+		assertEquals(20.0,
+				NumericFormatter.castNumber(20.0, Double.class, NumericFormatter.CastMode.EXACT).doubleValue(), 0.0001);
+		assertEquals(123456.7890,
+				NumericFormatter.castNumber(123456.7890, Float.class, NumericFormatter.CastMode.EXACT).doubleValue(),
+				0.0001);
+		assertEquals(BigDecimal.valueOf(20.0),
+				NumericFormatter.castNumber(20L, BigDecimal.class, NumericFormatter.CastMode.EXACT));
+		assertEquals(new BigDecimal("15445512248522412556325202"), NumericFormatter.castNumber(
+				new BigInteger("15445512248522412556325202"), BigDecimal.class, NumericFormatter.CastMode.EXACT));
+		assertEquals(new BigInteger("123456789012345678901234567890"), NumericFormatter.castNumber(
+				new BigInteger("123456789012345678901234567890"), BigInteger.class, NumericFormatter.CastMode.EXACT));
+		assertEquals(new BigDecimal("123456789012345678901234567890"), NumericFormatter.castNumber(
+				new BigInteger("123456789012345678901234567890"), BigDecimal.class, NumericFormatter.CastMode.EXACT));
 		assertEquals(new BigInteger("123456789012345678901234567890"),
-				NumericFormatter.castNumber(new BigInteger("123456789012345678901234567890"), BigInteger.class));
-		assertEquals(new BigDecimal("123456789012345678901234567890"),
-				NumericFormatter.castNumber(new BigInteger("123456789012345678901234567890"), BigDecimal.class));
-		assertEquals(new BigInteger("123456789012345678901234567890"),
-				NumericFormatter.castNumber(new BigDecimal("123456789012345678901234567890.123"), BigInteger.class));
+				NumericFormatter.castNumber(new BigDecimal("123456789012345678901234567890.123"), BigInteger.class,
+						NumericFormatter.CastMode.EXACT));
+		assertEquals(123456L, NumericFormatter.castNumber(new BigDecimal("123456.789012345678901234567890"), Long.class,
+				NumericFormatter.CastMode.EXACT));
 	}
 
 	@Test
-	public void testCastFail() {
-		assertEquals(null, NumericFormatter.castNumber(new BigInteger("123456789012345678901234567890"), Long.class));
-		assertEquals(null, NumericFormatter.castNumber(new BigInteger("12345678901234567890"), Integer.class));
-		assertEquals(null, NumericFormatter.castNumber(new BigInteger("1234567890"), Short.class));
-		assertEquals(null, NumericFormatter.castNumber(new BigInteger("12345"), Byte.class));
+	public void testCastExactFail() {
+		assertEquals(null, NumericFormatter.castNumber(1234561245782125452253.123456567889225, Float.class,
+				NumericFormatter.CastMode.EXACT));
+		assertEquals(null, NumericFormatter.castNumber(123456, Byte.class, NumericFormatter.CastMode.EXACT));
+		assertEquals(null, NumericFormatter.castNumber(new BigInteger("123456789012345678901234567890"), Long.class,
+				NumericFormatter.CastMode.EXACT));
+		assertEquals(null, NumericFormatter.castNumber(new BigInteger("12345678901234567890"), Integer.class,
+				NumericFormatter.CastMode.EXACT));
+		assertEquals(null, NumericFormatter.castNumber(new BigInteger("1234567890"), Short.class,
+				NumericFormatter.CastMode.EXACT));
+		assertEquals(null,
+				NumericFormatter.castNumber(new BigInteger("12345"), Byte.class, NumericFormatter.CastMode.EXACT));
 
-		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("123456789012345678901234567890"), Long.class));
-		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("12345678901234567890"), Integer.class));
-		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("1234567890"), Short.class));
-		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("12345"), Byte.class));
+		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("123456789012345678901234567890"), Long.class,
+				NumericFormatter.CastMode.EXACT));
+		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("12345678901234567890"), Integer.class,
+				NumericFormatter.CastMode.EXACT));
+		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("1234567890"), Short.class,
+				NumericFormatter.CastMode.EXACT));
+		assertEquals(null,
+				NumericFormatter.castNumber(new BigDecimal("12345"), Byte.class, NumericFormatter.CastMode.EXACT));
+		assertEquals(null, // 1.2345678901234568E+29,
+				NumericFormatter.castNumber(new BigInteger("123456789012345678901234567890"), Double.class,
+						NumericFormatter.CastMode.EXACT));
+	}
+
+	@Test
+	public void testCastUpBound() {
+		// byte
+		Number cNum = NumericFormatter.castNumber(123, Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Byte.class, cNum.getClass());
+		assertEquals(123, cNum.byteValue());
+		cNum = NumericFormatter.castNumber(12345, Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Short.class, cNum.getClass());
+		assertEquals(12345, cNum.shortValue());
+		cNum = NumericFormatter.castNumber(12345.123, Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Short.class, cNum.getClass());
+		assertEquals(12345, cNum.shortValue());
+		cNum = NumericFormatter.castNumber(123456, Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Integer.class, cNum.getClass());
+		assertEquals(123456, cNum.intValue());
+		cNum = NumericFormatter.castNumber(123L, Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Byte.class, cNum.getClass());
+		assertEquals(123, cNum.byteValue());
+		cNum = NumericFormatter.castNumber(1234567890123456789L, Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Long.class, cNum.getClass());
+		assertEquals(1234567890123456789L, cNum.longValue());
+		cNum = NumericFormatter.castNumber(123f, Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Byte.class, cNum.getClass());
+		assertEquals(123, cNum.byteValue());
+		cNum = NumericFormatter.castNumber(12345678901234567890.0f, Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Float.class, cNum.getClass());
+		assertEquals(12345678901234567890.0f, cNum.floatValue(), 0.00001);
+		cNum = NumericFormatter.castNumber(123.0, Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Byte.class, cNum.getClass());
+		assertEquals(123, cNum.byteValue());
+		cNum = NumericFormatter.castNumber(12345678901234567890.0, Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Double.class, cNum.getClass());
+		assertEquals(12345678901234567890.0, cNum.doubleValue(), 0.00001);
+		cNum = NumericFormatter.castNumber(BigInteger.valueOf(123), Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Byte.class, cNum.getClass());
+		assertEquals(123, cNum.byteValue());
+		cNum = NumericFormatter.castNumber(new BigInteger("1234567890123456789"), Byte.class,
+				NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Long.class, cNum.getClass());
+		assertEquals(1234567890123456789L, cNum.longValue());
+		cNum = NumericFormatter.castNumber(new BigInteger("12345678901234567890123456789012345678901234567890"),
+				Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(BigInteger.class, cNum.getClass());
+		assertEquals(new BigInteger("12345678901234567890123456789012345678901234567890"), cNum);
+		cNum = NumericFormatter.castNumber(BigDecimal.valueOf(123.124), Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Byte.class, cNum.getClass());
+		assertEquals(123, cNum.byteValue());
+		cNum = NumericFormatter.castNumber(new BigDecimal("12345678901234567890123456789012345678901234567890.123"),
+				Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(BigInteger.class, cNum.getClass());
+		assertEquals(new BigInteger("12345678901234567890123456789012345678901234567890"), cNum);
+		cNum = NumericFormatter.castNumber(new BigDecimal(
+				"1234567890123456789012345678901234567890123452343423523652352352352352352352352352352367890.123"),
+				Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(BigInteger.class, cNum.getClass());
+		assertEquals(
+				new BigInteger(
+						"1234567890123456789012345678901234567890123452343423523652352352352352352352352352352367890"),
+				cNum);
+
+		// float
+		cNum = NumericFormatter.castNumber(123, Float.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Float.class, cNum.getClass());
+		assertEquals(123, cNum.floatValue(), 0.0001);
+		cNum = NumericFormatter.castNumber(123.125f, Float.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Float.class, cNum.getClass());
+		assertEquals(123.125f, cNum.floatValue(), 0.0001);
+		cNum = NumericFormatter.castNumber(123.125d, Float.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Float.class, cNum.getClass());
+		assertEquals(123.125f, cNum.floatValue(), 0.0001);
+		cNum = NumericFormatter.castNumber(1231452445454454578777878787788754545653.1454556525d, Float.class,
+				NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Double.class, cNum.getClass());
+		assertEquals(1231452445454454578777878787788754545653.1454556525d, cNum.doubleValue(), 0.0001);
+		cNum = NumericFormatter.castNumber(new BigInteger("1231452445454454578777878787788754545"), Float.class,
+				NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(BigDecimal.class, cNum.getClass());
+		assertEquals(new BigDecimal("1231452445454454578777878787788754545"), cNum);
+		cNum = NumericFormatter.castNumber(new BigDecimal("1231452445454454578777878787788754545"), Float.class,
+				NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(BigDecimal.class, cNum.getClass());
+		assertEquals(new BigDecimal("1231452445454454578777878787788754545"), cNum);
+		cNum = NumericFormatter.castNumber(new BigDecimal("1231452445454454578777878787788754545.45525"), Float.class,
+				NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(BigDecimal.class, cNum.getClass());
+		assertEquals(new BigDecimal("1231452445454454578777878787788754545.45525"), cNum);
+
+		// edge numbers
+		cNum = NumericFormatter.castNumber(Float.POSITIVE_INFINITY, Float.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Float.class, cNum.getClass());
+		assertEquals(Float.POSITIVE_INFINITY, cNum.floatValue(), 0.0001);
+		cNum = NumericFormatter.castNumber(Float.NEGATIVE_INFINITY, Float.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Float.class, cNum.getClass());
+		assertEquals(Float.NEGATIVE_INFINITY, cNum.floatValue(), 0.0001);
+		cNum = NumericFormatter.castNumber(Float.NaN, Float.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Float.class, cNum.getClass());
+		assertEquals(Float.NaN, cNum.floatValue(), 0.0001);
+		cNum = NumericFormatter.castNumber(Double.POSITIVE_INFINITY, Float.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Float.class, cNum.getClass());
+		assertEquals(Double.POSITIVE_INFINITY, cNum.floatValue(), 0.0001);
+		cNum = NumericFormatter.castNumber(Double.NEGATIVE_INFINITY, Float.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Float.class, cNum.getClass());
+		assertEquals(Double.NEGATIVE_INFINITY, cNum.floatValue(), 0.0001);
+		cNum = NumericFormatter.castNumber(Double.NaN, Float.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Float.class, cNum.getClass());
+		assertEquals(Double.NaN, cNum.floatValue(), 0.0001);
+		cNum = NumericFormatter.castNumber(Float.POSITIVE_INFINITY, Double.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Double.class, cNum.getClass());
+		assertEquals(Float.POSITIVE_INFINITY, cNum.floatValue(), 0.0001);
+		cNum = NumericFormatter.castNumber(Float.NEGATIVE_INFINITY, Double.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Double.class, cNum.getClass());
+		assertEquals(Float.NEGATIVE_INFINITY, cNum.floatValue(), 0.0001);
+		cNum = NumericFormatter.castNumber(Float.NaN, Double.class, NumericFormatter.CastMode.UP_BOUND);
+		assertEquals(Double.class, cNum.getClass());
+		assertEquals(Float.NaN, cNum.floatValue(), 0.0001);
+	}
+
+	@Test
+	public void testCastAPI() {
+		assertEquals((byte) 20, NumericFormatter.castNumber(20, Byte.class, NumericFormatter.CastMode.API));
+		assertEquals((byte) -56, NumericFormatter.castNumber(200, Byte.class, NumericFormatter.CastMode.API));
+		assertEquals((byte) -48, NumericFormatter.castNumber(2000, Byte.class, NumericFormatter.CastMode.API));
+		assertEquals((short) 200, NumericFormatter.castNumber(200L, Short.class, NumericFormatter.CastMode.API));
+		assertEquals((short) 3392, NumericFormatter.castNumber(200000L, Short.class, NumericFormatter.CastMode.API));
+		assertEquals(2000000000,
+				NumericFormatter.castNumber(2000000000L, Integer.class, NumericFormatter.CastMode.API));
+		assertEquals(-1454759936,
+				NumericFormatter.castNumber(2000000000000L, Integer.class, NumericFormatter.CastMode.API));
+		assertEquals(2000000000000L,
+				NumericFormatter.castNumber(2000000000000L, Long.class, NumericFormatter.CastMode.API));
+		assertEquals(9223372036854775807L,
+				NumericFormatter.castNumber(20000000000000000000f, Long.class, NumericFormatter.CastMode.API));
+		assertEquals(20000000000000000000f,
+				NumericFormatter.castNumber(20000000000000000000f, Float.class, NumericFormatter.CastMode.API));
+		assertEquals(Float.POSITIVE_INFINITY, NumericFormatter.castNumber(
+				2000000000000000000000000000000000000000.00001d, Float.class, NumericFormatter.CastMode.API));
+		assertEquals(2000000000000000000000000000000000000000.00001d, NumericFormatter.castNumber(
+				2000000000000000000000000000000000000000.00001d, Double.class, NumericFormatter.CastMode.API));
+		assertEquals(1.7976931348623157E308,
+				NumericFormatter.castNumber(Double.MAX_VALUE + 1, Double.class, NumericFormatter.CastMode.API));
+		assertEquals(1.7976931348623157E308,
+				NumericFormatter.castNumber(Double.MAX_VALUE + 123, Double.class, NumericFormatter.CastMode.API));
+		assertEquals(new BigInteger("1545489754158478941211549841515484111551884411218411159181"),
+				NumericFormatter.castNumber(
+						new BigInteger("1545489754158478941211549841515484111551884411218411159181"), BigInteger.class,
+						NumericFormatter.CastMode.API));
+		assertEquals(new BigDecimal("1545489754158478941211549841515484111551884411218411159181"),
+				NumericFormatter.castNumber(
+						new BigInteger("1545489754158478941211549841515484111551884411218411159181"), BigDecimal.class,
+						NumericFormatter.CastMode.API));
+		assertEquals(new BigInteger("1545489754158478941211549841515484111551884411218411159181"),
+				NumericFormatter.castNumber(
+						new BigDecimal("1545489754158478941211549841515484111551884411218411159181.1245"),
+						BigInteger.class, NumericFormatter.CastMode.API));
+	}
+
+	@Test
+	public void testCastAPIFault() {
+		assertNotEquals(new BigDecimal("1545489754158478941211549841515484111551884411218411159181"),
+				NumericFormatter.castNumber(
+						new BigInteger("1545489754158478941211549841515484111551884411218411159181"), BigInteger.class,
+						NumericFormatter.CastMode.API));
+		assertNotEquals(new BigInteger("1545489754158478941211549841515484111551884411218411159181"),
+				NumericFormatter.castNumber(
+						new BigInteger("1545489754158478941211549841515484111551884411218411159181"), BigDecimal.class,
+						NumericFormatter.CastMode.API));
+		assertNotEquals(new BigInteger("1545489754158478941211549841515484111551884411218411159181"),
+				NumericFormatter.castNumber(
+						new BigInteger("1545489754158478941211549841515484111551884411218411159181"), BigDecimal.class,
+						NumericFormatter.CastMode.API));
+		assertNotEquals(new BigDecimal("1545489754158478941211549841515484111551884411218411159181.145"),
+				NumericFormatter.castNumber(
+						new BigDecimal("1545489754158478941211549841515484111551884411218411159181.145"),
+						BigInteger.class, NumericFormatter.CastMode.API));
 	}
 }

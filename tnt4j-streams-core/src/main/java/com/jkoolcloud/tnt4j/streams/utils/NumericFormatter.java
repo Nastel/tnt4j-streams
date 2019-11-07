@@ -22,9 +22,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -60,11 +58,6 @@ public class NumericFormatter {
 
 	/**
 	 * Creates a number formatter/parser for numbers using the specified format pattern.
-	 * <p>
-	 * Pattern also can be one of number types enumerators: {@code "integer"}, {@code "int"}, {@code "long"},
-	 * {@code "double"}, {@code "float"}, {@code "short"}, {@code "byte"}, {@code "bigint"}, {@code "biginteger"},
-	 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@code "any"}. {@code "any"} will
-	 * resolve any possible numeric value out of provided string, e.g. {@code "30hj00"} will result {@code 30}.
 	 *
 	 * @param pattern
 	 *            format pattern - can be set to {@code null} to use default representation
@@ -121,6 +114,15 @@ public class NumericFormatter {
 	 * {@code "double"}, {@code "float"}, {@code "short"}, {@code "byte"}, {@code "bigint"}, {@code "biginteger"},
 	 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@code "any"}. {@code "any"} will
 	 * resolve any possible numeric value out of provided string, e.g. {@code "30hj00"} will result {@code 30}.
+	 * <p>
+	 * {@code "~"} prefixed number type enumerator (except {@code "any"}) means numeric casting shall be performed using
+	 * plain Java API, in some cases resulting significant value loss.
+	 * <p>
+	 * {@code "^"} prefixed number type enumerator (except {@code "any"}) means if value can't be cast to defined type,
+	 * closest upper bound type shall be used to maintain value without significant loss.
+	 * <p>
+	 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to target
+	 * type, original value is kept.
 	 *
 	 * @param pattern
 	 *            format pattern - can be set to {@code null} to use default representation
@@ -170,11 +172,6 @@ public class NumericFormatter {
 	/**
 	 * Formats the specified object using the defined pattern, or using the default numeric formatting if no pattern was
 	 * defined.
-	 * <p>
-	 * Pattern also can be one of number types enumerators: {@code "integer"}, {@code "int"}, {@code "long"},
-	 * {@code "double"}, {@code "float"}, {@code "short"}, {@code "byte"}, {@code "bigint"}, {@code "biginteger"},
-	 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@code "any"}. {@code "any"} will
-	 * resolve any possible numeric value out of provided string, e.g. {@code "30hj00"} will result {@code 30}.
 	 *
 	 * @param value
 	 *            value to convert
@@ -194,11 +191,6 @@ public class NumericFormatter {
 	/**
 	 * Formats the specified object using the defined pattern, or using the default numeric formatting if no pattern was
 	 * defined.
-	 * <p>
-	 * Pattern also can be one of number types enumerators: {@code "integer"}, {@code "int"}, {@code "long"},
-	 * {@code "double"}, {@code "float"}, {@code "short"}, {@code "byte"}, {@code "bigint"}, {@code "biginteger"},
-	 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@code "any"}. {@code "any"} will
-	 * resolve any possible numeric value out of provided string, e.g. {@code "30hj00"} will result {@code 30}.
 	 *
 	 * @param value
 	 *            value to convert
@@ -225,6 +217,15 @@ public class NumericFormatter {
 	 * {@code "double"}, {@code "float"}, {@code "short"}, {@code "byte"}, {@code "bigint"}, {@code "biginteger"},
 	 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@code "any"}. {@code "any"} will
 	 * resolve any possible numeric value out of provided string, e.g. {@code "30hj00"} will result {@code 30}.
+	 * <p>
+	 * {@code "~"} prefixed number type enumerator (except {@code "any"}) means numeric casting shall be performed using
+	 * plain Java API, in some cases resulting significant value loss.
+	 * <p>
+	 * {@code "^"} prefixed number type enumerator (except {@code "any"}) means if value can't be cast to defined type,
+	 * closest upper bound type shall be used to maintain value without significant loss.
+	 * <p>
+	 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to target
+	 * type, original value is kept.
 	 *
 	 * @param value
 	 *            value to convert
@@ -336,6 +337,15 @@ public class NumericFormatter {
 	 * <li>to cast to {@link java.math.BigInteger} - {@code "bigint"}, {@code "biginteger"}, {@code "bint"}</li>
 	 * <li>to cast to {@link java.math.BigDecimal} - {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"}</li>
 	 * </ul>
+	 * <p>
+	 * {@code "~"} prefixed number type enumerator (except {@code "any"}) means numeric casting shall be performed using
+	 * plain Java API, in some cases resulting significant value loss.
+	 * <p>
+	 * {@code "^"} prefixed number type enumerator (except {@code "any"}) means if value can't be cast to defined type,
+	 * closest upper bound type shall be used to maintain value without significant loss.
+	 * <p>
+	 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to target
+	 * type, original value is kept.
 	 * 
 	 * @param num
 	 *            number value to cast
@@ -345,66 +355,56 @@ public class NumericFormatter {
 	 */
 	public static Number castNumber(Number num, String type) {
 		if (StringUtils.isNotEmpty(type)) {
-			return castNumber(num, FormatterContext.NUMBER_TYPES.get(type));
+			Class<? extends Number> nType;
+			CastMode cMode;
+
+			if (type.startsWith(CastMode.API.symbol)) {
+				nType = FormatterContext.NUMBER_TYPES.get(type.substring(1));
+				cMode = CastMode.API;
+			} else if (type.startsWith(CastMode.UP_BOUND.symbol)) {
+				nType = FormatterContext.NUMBER_TYPES.get(type.substring(1));
+				cMode = CastMode.UP_BOUND;
+			} else {
+				nType = FormatterContext.NUMBER_TYPES.get(type);
+				cMode = CastMode.EXACT;
+			}
+
+			return castNumber(num, nType, cMode);
 		}
 
 		return num;
 	}
 
 	/**
-	 * Casts provided number value to desired number type.
+	 * Casts provided number value to desired number type and casting mode.
 	 *
 	 * @param num
 	 *            number value to cast
 	 * @param clazz
 	 *            number class to cast number to
-	 * @param <T>
-	 *            desired number type
+	 * @param castMode
+	 *            cast mode to be used
 	 * @return number value cast to desired numeric type
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends Number> T castNumber(Number num, Class<T> clazz) {
-		if (num == null) {
+	public static Number castNumber(Number num, Class<? extends Number> clazz, CastMode castMode) {
+		switch (castMode) {
+		case API:
+			return castNumberAPI(num, clazz);
+		case UP_BOUND:
+			return castNumberUpBound(num, clazz);
+		case EXACT:
+		default:
+			return castNumberExact(num, clazz);
+		}
+	}
+
+	private static Number castNumberAPI(Number num, Class<? extends Number> clazz) {
+		if (num == null || clazz == null) {
 			return null;
 		}
 
 		Number cNum = null;
-
-		if (num instanceof BigInteger) {
-			BigInteger bNum = (BigInteger) num;
-
-			try {
-				if (clazz.isAssignableFrom(Long.class)) {
-					cNum = bNum.longValueExact();
-				} else if (clazz.isAssignableFrom(Integer.class)) {
-					cNum = bNum.intValueExact();
-				} else if (clazz.isAssignableFrom(Byte.class)) {
-					cNum = bNum.byteValueExact();
-				} else if (clazz.isAssignableFrom(Short.class)) {
-					cNum = bNum.shortValueExact();
-				}
-			} catch (ArithmeticException exc) {
-				return null;
-			}
-		}
-
-		if (num instanceof BigDecimal) {
-			BigDecimal bNum = (BigDecimal) num;
-
-			try {
-				if (clazz.isAssignableFrom(Long.class)) {
-					cNum = bNum.longValueExact();
-				} else if (clazz.isAssignableFrom(Integer.class)) {
-					cNum = bNum.intValueExact();
-				} else if (clazz.isAssignableFrom(Byte.class)) {
-					cNum = bNum.byteValueExact();
-				} else if (clazz.isAssignableFrom(Short.class)) {
-					cNum = bNum.shortValueExact();
-				}
-			} catch (ArithmeticException exc) {
-				return null;
-			}
-		}
 
 		if (!clazz.isAssignableFrom(num.getClass())) {
 			if (clazz.isAssignableFrom(Long.class)) {
@@ -426,7 +426,78 @@ public class NumericFormatter {
 			}
 		}
 
-		return (T) (cNum == null ? num : cNum);
+		return cNum == null ? num : cNum;
+	}
+
+	private static Number castNumberExact(Number num, Class<? extends Number> clazz) {
+		Number cNum = castNumberAPI(num, clazz);
+
+		if (isSignificantDifference(num, cNum, 2)) {
+			return null;
+		}
+
+		return cNum;
+	}
+
+	private static Number castNumberUpBound(Number num, Class<? extends Number> clazz) {
+		return castNumberUpBound(num, clazz, clazz);
+	}
+
+	private static Number castNumberUpBound(Number num, Class<? extends Number> clazz, Class<? extends Number> oClazz) {
+		Number cNum = castNumberAPI(num, clazz);
+
+		if (isSignificantDifference(num, cNum, 2)) {
+			Class<? extends Number> uClazz = null;
+			try {
+				if (isFloatPoint(oClazz)) {
+					int cIndex = FormatterContext.UP_BOUNDS_FP.indexOf(clazz);
+					uClazz = FormatterContext.UP_BOUNDS_FP.get(cIndex + 1);
+				} else {
+					int cIndex = FormatterContext.UP_BOUNDS.indexOf(clazz);
+					uClazz = FormatterContext.UP_BOUNDS.get(cIndex + 1);
+				}
+			} catch (IndexOutOfBoundsException exc) {
+			}
+
+			if (uClazz == null) {
+				return null;
+			}
+
+			return castNumberUpBound(num, uClazz, oClazz);
+		}
+
+		return cNum;
+	}
+
+	private static boolean isSignificantDifference(Number num, Number cNum, double delta) {
+		if (cNum == null) {
+			return false;
+		}
+
+		if (cNum.getClass().isAssignableFrom(Float.class) //
+				|| cNum.getClass().isAssignableFrom(Double.class)) {
+			if (!Double.isFinite(cNum.doubleValue())) {
+				return Double.isFinite(num.doubleValue());
+			}
+		}
+
+		if (isFloatPoint(num.getClass())) {
+			BigDecimal obd = toBigDecimal(num);
+			BigDecimal cbd = toBigDecimal(cNum);
+
+			return obd.compareTo(cbd) != 0 && Math.abs(obd.subtract(cbd).doubleValue()) > delta;
+		} else {
+			BigInteger obi = toBigInteger(num);
+			BigInteger cbi = toBigInteger(cNum);
+
+			return obi.compareTo(cbi) != 0 && Math.abs(obi.subtract(cbi).doubleValue()) > delta;
+		}
+	}
+
+	private static boolean isFloatPoint(Class<? extends Number> clazz) {
+		return clazz.isAssignableFrom(Float.class) //
+				|| clazz.isAssignableFrom(Double.class) //
+				|| clazz.isAssignableFrom(BigDecimal.class);
 	}
 
 	private static BigInteger toBigInteger(Number num) {
@@ -523,7 +594,7 @@ public class NumericFormatter {
 		} else {
 			scaledValue = numValue.doubleValue() * scale.doubleValue();
 		}
-		return castNumber(scaledValue, numValue.getClass());
+		return castNumber(scaledValue, numValue.getClass(), CastMode.UP_BOUND);
 	}
 
 	/**
@@ -552,7 +623,7 @@ public class NumericFormatter {
 	public static class FormatterContext {
 		public static final String ANY = "any"; // NON-NLS
 
-		private static Map<String, Class<? extends Number>> NUMBER_TYPES = new HashMap<>(10);
+		private static Map<String, Class<? extends Number>> NUMBER_TYPES = new HashMap<>(13);
 		static {
 			NUMBER_TYPES.put("int", Integer.class); // NON-NLS
 			NUMBER_TYPES.put("integer", Integer.class); // NON-NLS
@@ -569,6 +640,23 @@ public class NumericFormatter {
 
 			NUMBER_TYPES.put(ANY, Number.class); // NON-NLS
 		}
+		private static List<Class<? extends Number>> UP_BOUNDS = new ArrayList<>();
+		static {
+			UP_BOUNDS.add(Byte.class);
+			UP_BOUNDS.add(Short.class);
+			UP_BOUNDS.add(Integer.class);
+			UP_BOUNDS.add(Long.class);
+			UP_BOUNDS.add(Float.class);
+			UP_BOUNDS.add(Double.class);
+			UP_BOUNDS.add(BigInteger.class);
+			UP_BOUNDS.add(BigDecimal.class);
+		}
+		private static List<Class<? extends Number>> UP_BOUNDS_FP = new ArrayList<>();
+		static {
+			UP_BOUNDS_FP.add(Float.class);
+			UP_BOUNDS_FP.add(Double.class);
+			UP_BOUNDS_FP.add(BigDecimal.class);
+		}
 
 		// private static final String GENERIC_NUMBER_PATTERN = "###,###.###"; // NON-NLS
 
@@ -583,6 +671,15 @@ public class NumericFormatter {
 		 * {@code "double"}, {@code "float"}, {@code "short"}, {@code "byte"}, {@code "bigint"}, {@code "biginteger"},
 		 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@code "any"}. {@code "any"} will
 		 * resolve any possible numeric value out of provided string, e.g. {@code "30hj00"} will result {@code 30}.
+		 * <p>
+		 * {@code "~"} prefixed number type enumerator (except {@code "any"}) means numeric casting shall be performed
+		 * using plain Java API, in some cases resulting significant value loss.
+		 * <p>
+		 * {@code "^"} prefixed number type enumerator (except {@code "any"}) means if value can't be cast to defined
+		 * type, closest upper bound type shall be used to maintain value without significant loss.
+		 * <p>
+		 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to
+		 * target type, original value is kept.
 		 *
 		 * @param pattern
 		 *            format pattern - can be set to {@code null} to use default representation.
@@ -598,7 +695,16 @@ public class NumericFormatter {
 		 * {@code "double"}, {@code "float"}, {@code "short"}, {@code "byte"}, {@code "bigint"}, {@code "biginteger"},
 		 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@code "any"}. {@code "any"} will
 		 * resolve any possible numeric value out of provided string, e.g. {@code "30hj00"} will result {@code 30}.
-		 *
+		 * <p>
+		 * {@code "~"} prefixed number type enumerator (except {@code "any"}) means numeric casting shall be performed
+		 * using plain Java API, in some cases resulting significant value loss.
+		 * <p>
+		 * {@code "^"} prefixed number type enumerator (except {@code "any"}) means if value can't be cast to defined
+		 * type, closest upper bound type shall be used to maintain value without significant loss.
+		 * <p>
+		 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to
+		 * target type, original value is kept.
+		 * 
 		 * @param pattern
 		 *            format pattern - can be set to {@code null} to use default representation.
 		 * @param locale
@@ -608,9 +714,17 @@ public class NumericFormatter {
 			this.pattern = pattern;
 			this.locale = locale;
 
-			Locale loc = Utils.getLocale(locale);
+			boolean numNamePattern = StringUtils.length(pattern) > 1;
 
-			if (pattern == null || NUMBER_TYPES.get(pattern.toLowerCase()) == null) {
+			if (numNamePattern) {
+				String numName = pattern.startsWith(CastMode.API.symbol) || pattern.startsWith(CastMode.UP_BOUND.symbol)
+						? pattern.substring(1) : pattern;
+				numNamePattern = NUMBER_TYPES.get(numName.toLowerCase()) != null;
+			}
+
+			if (!numNamePattern) {
+				Locale loc = Utils.getLocale(locale);
+
 				format = StringUtils.isEmpty(pattern) ? null : loc == null ? new DecimalFormat(pattern)
 						: new DecimalFormat(pattern, DecimalFormatSymbols.getInstance(loc));
 			}
@@ -653,6 +767,41 @@ public class NumericFormatter {
 			// : new DecimalFormat(GENERIC_NUMBER_PATTERN, new DecimalFormatSymbols(loc));
 
 			return loc == null ? NumberFormat.getNumberInstance() : NumberFormat.getNumberInstance(loc);
+		}
+	}
+
+	/**
+	 * Supported casting modes enumeration.
+	 */
+	public static enum CastMode {
+		/**
+		 * Numeric casting shall be performed using plain Java API, in some cases resulting significant value loss.
+		 */
+		API("~"), // NON-NLS
+		/**
+		 * Numeric casting shall be performed without significant value loss. In case number can't be cast to target
+		 * type, original value is kept.
+		 */
+		EXACT(""), // NON-NLS
+		/**
+		 * Numeric casting shall be performed in such a way that when value can't be cast to defined type, closest upper
+		 * bound type shall be used to maintain value without significant loss.
+		 */
+		UP_BOUND("^"); // NON-NLS
+
+		private String symbol;
+
+		private CastMode(String symbol) {
+			this.symbol = symbol;
+		}
+
+		/**
+		 * Returns cast mode prefix symbol.
+		 * 
+		 * @return cast mode prefix symbol.
+		 */
+		public String getSymbol() {
+			return symbol;
 		}
 	}
 }

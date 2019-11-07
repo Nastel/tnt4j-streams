@@ -123,7 +123,22 @@ Mapping of streamed data to activity event fields are performed by parser. To ma
         * any decimal or time format pattern, e.g. `#####0.000`
         * one of number type enumerators: `integer`/`int`, `long`, `double`, `float`, `short`, `byte`, `biginteger`/`bigint`/`bint`, 
         `bigdecimal`/`bigdec`/`bdec` and `any`. `any` will resolve any possible numeric value out of provided string, e.g. string `"30hj00"` 
-        will result value `30`.
+        will result value `30`. It also allows to define casting mode, by adding prefix to number type enumerator (except enumerator `any`):
+            * default casting mode without prefix is `EXACT`: numeric casting without significant value loss. In case number can't be cast 
+            to target type, original value is kept.
+            * `~` - `API` casting mode: numeric casting shall be performed using plain Java API and in some cases resulting significant 
+            value loss.
+            * `^` - `UP_BOUND` casting mode: if value can't be cast to target type, closest upper bound type shall be used to maintain value 
+            without significant loss. Upper bound sequences:
+                * For floating point numbers: `Float`, `Double`, `BigDecimal`
+                * For non-floating point numbers: `Byte`, `Short`, `Integer`, `Long`, `Float`, `Double`, `BigInteger`, `BigDecimal`
+
+            For example:
+            ```xml
+            <field name="NumericCastExact" locaotr="number1" locator-type="Label" datatype="Number" format="long"/>
+            <field name="NumericCastApi" locaotr="number1" locator-type="Label" datatype="Number" format="~long"/>
+            <field name="NumericCastUpBound" locaotr="number1" locator-type="Label" datatype="Number" format="^int"/>
+            ```
     * `value` - defines predefined (hardcoded) value of field
     * `datatype` - defines how to interpret field resolved value. Set of supported values:
         * `String` 
