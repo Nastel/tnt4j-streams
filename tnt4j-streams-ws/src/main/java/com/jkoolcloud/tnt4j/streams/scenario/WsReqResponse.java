@@ -45,6 +45,35 @@ public class WsReqResponse<O, T> extends WsResponse<T> {
 	}
 
 	/**
+	 * Constructs a new WsReqResponse. Defines response and original request data from interim response data.
+	 * 
+	 * @param responseData
+	 *            response data package
+	 * @param iResponse
+	 *            interim response data
+	 */
+	public WsReqResponse(T responseData, WsResponse<T> iResponse) {
+		super(responseData, iResponse.getTags());
+
+		if (iResponse instanceof WsReqResponse) {
+			this.originalRequest = ((WsReqResponse<O, T>) iResponse).getOriginalRequest();
+		}
+	}
+
+	/**
+	 * Constructs a new WsReqResponse. Defines response and original request data from interim response data.
+	 * 
+	 * @param responseData
+	 *            response data package
+	 * @param iResponse
+	 *            interim response data
+	 */
+	public WsReqResponse(T responseData, WsReqResponse<O, T> iResponse) {
+		super(responseData, iResponse.getTags());
+		this.originalRequest = iResponse.getOriginalRequest();
+	}
+
+	/**
 	 * Returns original request data.
 	 * 
 	 * @return original request data
