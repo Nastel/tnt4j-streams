@@ -285,6 +285,12 @@
             <version>${org.slf4j.version}</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>apache-log4j-extras</artifactId>
+            <version>${log4j.version}</version>
+            <scope>runtime</scope>
+        </dependency>
 
         <!-- uncomment if slf4j-simple logger shall be used -->
         <!--<dependency>-->
