@@ -79,13 +79,6 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>com.jkoolcloud.tnt4j.streams</groupId>
@@ -105,14 +98,14 @@
             <version>0.1.55</version>
         </dependency>
         <dependency>
-            <groupId>com.github.lucastheisen</groupId>
+            <groupId>com.pastdev</groupId>
             <artifactId>jsch-nio</artifactId>
-            <version>jsch-nio-1.0.7</version>
+            <version>1.0.14</version>
         </dependency>
         <dependency>
             <groupId>com.github.robtimus</groupId>
             <artifactId>sftp-fs</artifactId>
-            <version>1.3</version>
+            <version>1.3.3</version>
         </dependency>
         <!-- HTTP file system support -->
         <!--<dependency>-->
