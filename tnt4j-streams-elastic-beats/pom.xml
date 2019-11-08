@@ -22,7 +22,7 @@
 
         <io.netty.version>4.1.42.Final</io.netty.version>
         <jackson.version>2.9.9</jackson.version>
-        <logstash.input.beats.version>5.0.13</logstash.input.beats.version>
+        <logstash.input.beats.version>5.0.16</logstash.input.beats.version> <!-- new available: 5.0.16, 5.1.9, 6.0.3 -->
     </properties>
 
     <build>
@@ -87,6 +87,13 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>com.jkoolcloud.tnt4j.streams</groupId>
@@ -94,7 +101,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.logstash.plugins</groupId>
+            <groupId>com.github.logstash-plugins</groupId>
             <artifactId>logstash-input-beats</artifactId>
             <version>${logstash.input.beats.version}</version>
         </dependency>
