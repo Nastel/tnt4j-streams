@@ -811,11 +811,7 @@ public class ActivityInfo {
 	 */
 	protected TrackingEvent buildEvent(Tracker tracker, String trackName, String trackId,
 			Map<Trackable, ActivityInfo> chTrackables) {
-		if (StringUtils.isEmpty(trackName)) {
-			trackName = "_UNNAMED_EVENT_"; // NON-NLS
-			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ActivityInfo.activity.has.no.name", TrackingEvent.class.getSimpleName(), trackName);
-		}
+		trackName = getVerifiedEntityName(trackName, trackId, TrackingEvent.class);
 
 		TrackingEvent event = tracker.newEvent(severity == null ? OpLevel.INFO : severity, trackName, (String) null,
 				(String) null, (Object[]) null);
@@ -915,11 +911,7 @@ public class ActivityInfo {
 	 */
 	protected TrackingActivity buildActivity(Tracker tracker, String trackName, String trackId,
 			Map<Trackable, ActivityInfo> chTrackables) {
-		if (StringUtils.isEmpty(trackName)) {
-			trackName = "_UNNAMED_ACTIVITY_"; // NON-NLS
-			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ActivityInfo.activity.has.no.name", TrackingActivity.class.getSimpleName(), trackName);
-		}
+		trackName = getVerifiedEntityName(trackName, trackId, TrackingActivity.class);
 
 		TrackingActivity activity = tracker.newActivity(severity == null ? OpLevel.INFO : severity, trackName);
 		activity.setTrackingId(trackId);
@@ -1160,11 +1152,7 @@ public class ActivityInfo {
 	 * @return snapshot instance
 	 */
 	protected Snapshot buildSnapshot(Tracker tracker, String trackName, String trackId) {
-		if (StringUtils.isEmpty(trackName)) {
-			trackName = "_UNNAMED_SNAPSHOT_"; // NON-NLS
-			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ActivityInfo.activity.has.no.name", PropertySnapshot.class.getSimpleName(), trackName);
-		}
+		trackName = getVerifiedEntityName(trackName, trackId, PropertySnapshot.class);
 
 		PropertySnapshot snapshot = (PropertySnapshot) (category != null ? tracker.newSnapshot(category, trackName)
 				: tracker.newSnapshot(trackName));
@@ -1185,16 +1173,27 @@ public class ActivityInfo {
 	 * @return dataset instance
 	 */
 	protected Dataset buildDataset(Tracker tracker, String trackName, String trackId) {
-		if (StringUtils.isEmpty(trackName)) {
-			trackName = "_UNNAMED_DATASET_"; // NON-NLS
-			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ActivityInfo.activity.has.no.name", Dataset.class.getSimpleName(), trackName);
-		}
+		trackName = getVerifiedEntityName(trackName, trackId, Dataset.class);
 
 		Dataset dataset = category != null ? tracker.newDataset(category, trackName) : tracker.newDataset(trackName);
 		fillSnapshot(dataset, trackId);
 
 		return dataset;
+	}
+
+	private String getVerifiedEntityName(String trackName, String trackId, Class<?> eClass) {
+		// NOTE: TNT4J API fails if operation name is null
+		if (StringUtils.isEmpty(trackName)) {
+			if (StringUtils.isNotEmpty(guid)) {
+				trackName = guid;
+			} else {
+				trackName = trackId;
+			}
+			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+					"ActivityInfo.activity.has.no.name", eClass.getSimpleName(), trackId, trackName);
+		}
+
+		return trackName;
 	}
 
 	private void fillSnapshot(PropertySnapshot snapshot, String trackId) {

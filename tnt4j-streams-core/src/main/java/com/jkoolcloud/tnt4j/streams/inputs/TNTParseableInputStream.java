@@ -253,11 +253,6 @@ public abstract class TNTParseableInputStream<T> extends TNTInputStream<T, Activ
 			if (parserMatch) {
 				ActivityInfo ai = pRef.getParser().parse(this, data);
 				if (ai != null) {
-					// NOTE: TNT4J API fails if operation name is null
-					if (StringUtils.isEmpty(ai.getEventName())) {
-						ai.setEventName(getName() == null ? pRef.getParser().getName() : getName());
-					}
-
 					return ai;
 				}
 			}
