@@ -55,7 +55,8 @@ public class TNTInputStreamStatistics
 
 	private final MetricRegistry metrics = new MetricRegistry();
 	private final HashMap<Object, Timer.Context> pendingOutputs = new HashMap<>();
-	private final JmxReporter jmxReporter = JmxReporter.forRegistry(metrics).build();
+	private final JmxReporter jmxReporter = JmxReporter.forRegistry(metrics).inDomain("com.jkoolcloud.tnt4j.streams") // NON-NLS
+			.build();
 	private TNTInputStream<?, ?> refStream = null;
 
 	private Long bytesTotalValue = 0L;
