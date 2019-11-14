@@ -56,7 +56,7 @@ import com.zaxxer.hikari.HikariDataSource;
  * <ul>
  * <li>DropRecurrentResultSets - flag indicating whether to drop streaming stream input buffer contained recurring
  * result sets, when stream input scheduler invokes JDBC queries faster than they can be processed (parsed and sent to
- * sink, e.g. because of sink/JKool limiter throttling). Default value - {@code false}. (Optional)</li>
+ * sink, e.g. because of sink/JKool limiter throttling). Default value - {@code true}. (Optional)</li>
  * <li>QueryFetchRows - number of rows to be fetched from database per query returned {@link java.sql.ResultSet} cursor
  * access. Value {@code 0} implies to use default JDBC setting. See {@link java.sql.Statement#setFetchSize(int)} for
  * details. Default value - {@code 0}. (Optional)</li>
@@ -92,7 +92,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	 */
 	protected Map<String, String> jdbcProperties = new HashMap<>();
 
-	private boolean dropRecurrentResultSets = false;
+	private boolean dropRecurrentResultSets = true;
 	private int fetchSize = 0;
 	private int maxRows = 0;
 

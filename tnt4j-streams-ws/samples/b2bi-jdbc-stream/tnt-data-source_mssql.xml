@@ -18,10 +18,17 @@
 
         <tnt4j-properties>
             <property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://test.jkoolcloud.com:6585"/>
-            <property name="event.sink.factory.EventSinkFactory.prod.Token" value="YOUR_REPO_TOKEN"/>
+            <!--<property name="event.sink.factory.EventSinkFactory.prod.Token" value="EsXZbhn0qHCvB6dwitt92e76s6iOgK3k"/>-->
+            <!--<property name="event.sink.factory.EventSinkFactory.prod.Token" value="oIghyRUYAfKXZou3a97OXRlSLcTAl1IK"/>-->
+            <!--<property name="event.sink.factory.EventSinkFactory.prod.Token" value="bhBSr09QsWrqTJSreNMIkgrV6SqAeKeY"/>-->
+            <property name="event.sink.factory.EventSinkFactory.prod.Token" value="XXKP2p3tNDZKuTDCPo8yySY3ElkdAumn"/>
+            <!--<property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://data.jkoolcloud.com"/>-->
+            <!--<property name="event.sink.factory.EventSinkFactory.prod.Token" value="gqE52EU79toRcypXAVs7fTZVjbEze1sb"/>-->
         </tnt4j-properties>
 
-        <scenario name="Sample MSSQL-JDBC stream scenario" url="jdbc:sqlserver://[HOST]:1433;database=[DB_NAME];" username="[USER_NAME]" password="[USER_PASS]">
+        <!--<scenario name="Sample MSSQL-JDBC stream scenario" url="jdbc:sqlserver://[HOST]:1433;database=[DB_NAME];" username="[USER_NAME]" password="[USER_PASS]">-->
+        <scenario name="Sample MSSQL-JDBC stream scenario" url="jdbc:sqlserver://11.0.0.87:1433;database=SB2BIDB;" username="db2inst1"
+                  password="nastel123">
             <step name="B2Bi arrived files query">
                 <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="0" startDelayUnits="Seconds"/>
                 <request id="AFile_Data_Req">

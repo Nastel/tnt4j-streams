@@ -5376,7 +5376,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 
  * `DropRecurrentResultSets` - flag indicating whether to drop streaming stream input buffer contained recurring result sets, when stream 
  input scheduler invokes JDBC queries faster than they can be processed (parsed and sent to sink, e.g. because of sink/JKool limiter 
- throttling). Default value - `false`. (Optional)
+ throttling). Default value - `true`. (Optional)
  * `QueryFetchRows` - number of rows to be fetched from database per query returned `java.sql.ResultSet` cursor access. Value `0` implies to 
  use default JDBC setting. See [JDBC Statement.setFetchSize()](https://docs.oracle.com/javase/7/docs/api/java/sql/Statement.html#setFetchSize(int)) 
  for details. Default value - `0`. (Optional)
@@ -5390,7 +5390,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 
     sample:
  ```xml
-     <property name="DropRecurrentResultSets" value="true"/>
+     <property name="DropRecurrentResultSets" value="false"/>
      <property name="QueryFetchRows" value="500"/>
      <property name="QueryMaxRows" value="50000"/>
  ```
