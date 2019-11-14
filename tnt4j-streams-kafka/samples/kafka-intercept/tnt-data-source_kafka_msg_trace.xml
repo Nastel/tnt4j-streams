@@ -189,7 +189,7 @@
         <field name="ResourceName" formattingPattern="QUEUE={0}">
             <field-locator locator="Topic" locator-type="Activity"/>
         </field>
-        <field name="Correlator" formattingPattern="{0}_{1}">
+        <field name="Correlator" separator="_">
             <field-locator locator="Topic" locator-type="Activity" required="false"/>
             <field-locator locator="Offset" locator-type="Activity" required="false"/>
         </field>
