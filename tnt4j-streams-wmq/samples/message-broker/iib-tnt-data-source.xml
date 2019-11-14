@@ -116,11 +116,23 @@
         <property name="Port" value="1414"/>
         <property name="QueueManager" value="[QMGR]"/>
         <property name="Queue" value="NASTEL.BROKER.MONITOR.FLOW.QUEUE"/>
-        <parser-ref name="EventParser"/>
+
+        <!-- In case of SSL Connection: cipher suite value must match one defined for server connection channel -->
+        <!--<property name="CMQC.SSL_CIPHER_SUITE_PROPERTY" value="TLS_RSA_WITH_AES_128_CBC_SHA256"/>-->
+        <!-- Also dont forget to configure Java Key/Trust stores over system properties: -->
+        <!--                             -Djavax.net.ssl.trustStore=[sysPath]/client.jks -->
+        <!--                             -Djavax.net.ssl.trustStorePassword=clientpass -->
+        <!--                             -Djavax.net.ssl.keyStore=[sysPath]/client.jks -->
+        <!--                             -Djavax.net.ssl.keyStorePassword=clientpass -->
+        <!-- and if you are using non IBM java on client side add sys property: -->
+        <!--                             -Dcom.ibm.mq.cfg.useIBMCipherMappings=false -->
+
         <property name="UseExecutors" value="true"/>
         <property name="ExecutorThreadsQuantity" value="10"/>
         <property name="ExecutorsTerminationTimeout" value="20"/>
         <property name="ExecutorsBoundedModel" value="true"/>
         <property name="ExecutorRejectedTaskOfferTimeout" value="20"/>
+
+        <parser-ref name="EventParser"/>
     </stream>
 </tnt-data-source>

@@ -215,6 +215,14 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 			String[] mqcNameTokens = name.split("\\.");
 			String mqcName = mqcNameTokens[mqcNameTokens.length - 1];
 			Object mqcVal = MQConstants.getValue(mqcName);
+
+			if (mqcVal == null) {
+				mqcName = MQConstants.lookup(name, ".*");// NON-NLS
+				if (StringUtils.isNotEmpty(mqcName)) {
+					mqcVal = name;
+				}
+			}
+
 			if (mqcVal != null) {
 				Object cVal = Utils.getBoolean(value);
 				if (cVal == null) {

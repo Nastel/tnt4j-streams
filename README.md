@@ -5174,6 +5174,28 @@ Also see ['Generic streams parameters'](#generic-streams-parameters).
 
 Also see ['WMQ Stream parameters'](#wmq-stream-parameters).
 
+##### WMQ SSL connections configuration
+
+See post [on how to configure WMQ server and client sides communicating over SSL](https://blog.niklasottosson.com/java/setup-ibm-mq-v9-for-java-clients-over-ssl/).
+
+When you already have server side SSL configured and SSL certificates imported into client machine KeyStore/TrustStore, to run WMQ stream 
+you'll need:
+* in streams configuration define Cipher Suite used for SSL connection:
+```xml
+    <property name="CMQC.SSL_CIPHER_SUITE_PROPERTY" value="TLS_RSA_WITH_AES_128_CBC_SHA256"/>
+```
+   **NOTE:** cipher suite value must match one configured for Server Connections Channel! 
+* to run stream instance using SSL communication, you'll have to define Java KeyStore/TrustStore credentials though system properties:
+```cmd  
+  -Djavax.net.ssl.trustStore=[sysPath]/[ts_file].jks
+  -Djavax.net.ssl.trustStorePassword=clientpass
+  -Djavax.net.ssl.keyStore=[sysPath]/[ks_file].jks
+  -Djavax.net.ssl.keyStorePassword=clientpass
+```
+* in case you are using non IBM JVM to run streams (WMQ client), set system property `-Dcom.ibm.mq.cfg.useIBMCipherMappings=false` to 
+disable direct cipher suites mapping between client and server side. Also see [IBM docs for Oracle and IBM cipher suites mapping](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_8.0.0/com.ibm.mq.dev.doc/q113220_.htm).
+* set system property `-Djavax.net.debug=ssl` to enable verbose JVM debug messages for SSL communication.
+
 #### Zipped file line stream parameters (also from Hdfs)
 
  * `FileName` - defines zip file path and concrete zip file entry name or entry name pattern defined using characters `*`

@@ -32,6 +32,16 @@
         <property name="QueueManager" value="QMGR.NAME"/>
         <property name="Queue" value="QUEUE.NAME"/>
 
+        <!-- In case of SSL Connection: cipher suite value must match one defined for server connection channel -->
+        <!--<property name="CMQC.SSL_CIPHER_SUITE_PROPERTY" value="TLS_RSA_WITH_AES_128_CBC_SHA256"/>-->
+        <!-- Also dont forget to configure Java Key/Trust stores over system properties: -->
+        <!--                             -Djavax.net.ssl.trustStore=[sysPath]/client.jks -->
+        <!--                             -Djavax.net.ssl.trustStorePassword=clientpass -->
+        <!--                             -Djavax.net.ssl.keyStore=[sysPath]/client.jks -->
+        <!--                             -Djavax.net.ssl.keyStorePassword=clientpass -->
+        <!-- and if you are using non IBM java on client side add sys property: -->
+        <!--                             -Dcom.ibm.mq.cfg.useIBMCipherMappings=false -->
+
         <parser-ref name="DatapowerParser"/>
     </stream>
 </tnt-data-source>
