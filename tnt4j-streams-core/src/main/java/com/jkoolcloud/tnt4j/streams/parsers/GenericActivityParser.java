@@ -1191,12 +1191,6 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 			} else {
 				value = ActivityInfo.getFieldValue(locStr, getName(), cData.getActivity());
 			}
-
-			ActivityField aField = getField(locStr);
-
-			if (aField != null) {
-				value = ActivityInfo.getAggregatedFieldValue(value, aField);
-			}
 		}
 
 		return value;
