@@ -275,7 +275,7 @@
     </field>
 
     <!-- If we have message age, use for Elapsed Time, otherwise use reported MQ time -->
-    <field name="ElapsedTime" value="0" datatype="Number">
+    <field name="ElapsedTime" value="0" datatype="Number" units="Microseconds">
         <field-transform name="EtTransform" lang="groovy"><![CDATA[
             ${MessageAge} > 0 ? ${MessageAge} : ${QMgrOpDuration}
         ]]></field-transform>
