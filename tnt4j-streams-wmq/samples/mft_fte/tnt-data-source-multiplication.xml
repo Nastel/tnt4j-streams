@@ -38,7 +38,7 @@
             <field-locator locator="ts:getFileName(/${Direction}/file)" locator-type="Label" required="false"/>
             <field-locator locator="ts:getObjectName(/${Direction}/queue)" locator-type="Label" required="false"/>
         </field>
-        <field name="Correlator" datatype="String" format="string" separator=".">
+        <field name="Correlator" separator=".">
             <field-locator locator="//*/checksum" locator-type="Label" required="false"/>
             <field-locator locator="Correlator2" locator-type="Activity" required="false"/>
             <field-locator locator="^./transaction/@ID" locator-type="Label"/>
@@ -111,7 +111,7 @@
         <field name="ServerOs" locator="/transaction/sourceAgent/systemInfo/@name" locator-type="Label"/>
         <field name="StartTime" locator="/transaction/action/@time" locator-type="Label" datatype="DateTime"
                format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT"/>
-        <field name="Correlator" locator="/transaction/@ID" locator-type="Label" datatype="String" format="string"/>
+        <field name="Correlator" locator="/transaction/@ID" locator-type="Label"/>
         <field name="Exception" separator="">
             <field-locator locator="/transaction/transferSet/item/status/supplement" locator-type="Label" required="false"/>
         </field>
@@ -157,7 +157,7 @@
         <property name="RequireDefault" value="true"/>
 
         <field name="EventType" value="EVENT"/>
-        <field name="Correlator" locator="/transaction/@ID" locator-type="Label" datatype="String" format="string"/>
+        <field name="Correlator" locator="/transaction/@ID" locator-type="Label"/>
         <field name="EventName" value="Started"/>
         <field name="UserName" locator="/transaction/originator/userID" locator-type="Label"/>
         <field name="Location" locator="/transaction/originator/hostName" locator-type="Label"/>
@@ -190,9 +190,7 @@
             <field-locator locator="/transaction/@ID" locator-type="Label"/>
         </field>
 
-        <!-- Correlator will be set from TrackingId.
-             UnComment if Correlator is different from TrackingId -->
-        <!--	<field name="Correlator" locator="/transaction/@ID" locator-type="Label" datatype="String" format="string"/> -->
+        <field name="Correlator" locator="/transaction/@ID" locator-type="Label"/>
         <field name="EventName" value="completed"/>
         <field name="UserName" locator="/transaction/originator/userID" locator-type="Label"/>
         <field name="Location" locator="/transaction/originator/hostName" locator-type="Label"/>
