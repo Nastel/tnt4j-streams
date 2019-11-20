@@ -443,8 +443,11 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 		 *
 		 * @param file
 		 *            file to read
+		 * 
+		 * @throws java.io.IOException
+		 *             if an I/O error occurs
 		 */
-		protected void setFileToRead(T file) {
+		protected void setFileToRead(T file) throws IOException {
 			this.fileToRead = file;
 
 			if (stateHandler != null) {

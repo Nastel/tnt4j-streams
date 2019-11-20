@@ -406,44 +406,17 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
-	 * Returns first readable file from {@code files} array which has last modification timestamp newer than
+	 * Returns first readable file path from {@code files} array which has last modification timestamp newer than
 	 * {@code lastModif}. If {@code lastModif} is {@code null}, then newest readable file is returned.
 	 *
 	 * @param files
 	 *            last modification timestamp ordered files array
 	 * @param lastModif
 	 *            last modification time to compare. If {@code null} - then newest file is returned
-	 * @return first file from array which has modification time later than {@code lastModif}, or {@code null} if
+	 * @return first path from array which has modification time later than {@code lastModif}, or {@code null} if
 	 *         {@code files} is empty or does not contain readable file with last modification time later than
 	 *         {@code lastModif}
 	 */
-	public static File getFirstNewer(File[] files, Long lastModif) {
-		File last = null;
-
-		if (ArrayUtils.isNotEmpty(files)) {
-			boolean changeDir = (files[0].lastModified() - files[files.length - 1].lastModified()) < 0;
-
-			for (int i = changeDir ? files.length - 1 : 0; changeDir ? i >= 0
-					: i < files.length; i = changeDir ? i - 1 : i + 1) {
-				File f = files[i];
-				if (f.canRead()) {
-					if (lastModif == null) {
-						last = f;
-						break;
-					} else {
-						if (f.lastModified() > lastModif) {
-							last = f;
-						} else {
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		return last;
-	}
-
 	public static Path getFirstNewer(Path[] files, Long lastModif) throws IOException {
 		Path last = null;
 
@@ -459,7 +432,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 						last = f;
 						break;
 					} else {
-						if (Files.getLastModifiedTime(f).toMillis() >= lastModif) {
+						if (Files.getLastModifiedTime(f).toMillis() > lastModif) {
 							last = f;
 						} else {
 							break;
@@ -1944,8 +1917,10 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *            name pattern to find files
 	 * @param fs
 	 *            file system to use
-	 *
 	 * @return array of found files
+	 * 
+	 * @throws java.io.IOException
+	 *             if an I/O error occurs
 	 *
 	 * @see WildcardFileFilter#WildcardFileFilter(String)
 	 * @see File#listFiles(FilenameFilter)

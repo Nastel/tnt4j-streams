@@ -19,6 +19,9 @@ package com.jkoolcloud.tnt4j.streams.utils;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.*;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -96,34 +99,35 @@ public class UtilsTest {
 	@Test
 	public void testGetFirstNewer() throws Exception {
 		int count = 5;
-		List<File> files = new ArrayList<>();
+		List<Path> files = new ArrayList<>();
 		for (int i = 0; i <= count; i++) {
 			File tempFile = File.createTempFile("TEST", ".TST");
 			if (count / 2 >= i) {
 				(new Date()).getTime();
 			}
-			files.add(tempFile);
+			files.add(tempFile.toPath());
 			Thread.sleep(300);
 		}
-		File[] fArray = files.toArray(new File[files.size()]);
-		File result = Utils.getFirstNewer(fArray, null);
+		Path[] fArray = files.toArray(new Path[files.size()]);
+		Path result = Utils.getFirstNewer(fArray, null);
 		assertEquals(files.get(files.size() - 1), result);
 
-		result = Utils.getFirstNewer(fArray, files.get(3).lastModified());
+		result = Utils.getFirstNewer(fArray,
+				Files.getLastModifiedTime(files.get(0), LinkOption.NOFOLLOW_LINKS).toMillis());
+		assertEquals(files.get(1), result);
+
+		result = Utils.getFirstNewer(fArray,
+				Files.getLastModifiedTime(files.get(3), LinkOption.NOFOLLOW_LINKS).toMillis());
 		assertEquals(files.get(4), result);
 
 		ArrayUtils.reverse(fArray);
-		File result2 = Utils.getFirstNewer(fArray, files.get(3).lastModified());
+		Path result2 = Utils.getFirstNewer(fArray,
+				Files.getLastModifiedTime(files.get(3), LinkOption.NOFOLLOW_LINKS).toMillis());
 		assertEquals(result, result2);
 
-		// result = Utils.getFirstNewer(files.toArray(new File[files.size()]),
-		// date);
-		// assertEquals(files.get(count/2+1), result);
-
-		for (File fileToRemove : files) {
-			fileToRemove.delete();
+		for (Path fileToRemove : files) {
+			Files.delete(fileToRemove);
 		}
-
 	}
 
 	@Test
@@ -199,7 +203,7 @@ public class UtilsTest {
 		assertArrayEquals(expected, result);
 
 		result = Utils.getTags(this);
-		assertNull(result);
+		assertTrue(result != null && result.length == 1);
 	}
 
 	@Test

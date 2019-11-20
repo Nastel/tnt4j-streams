@@ -24,7 +24,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.*;
-import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -137,6 +136,15 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 			this(FileSystems.newFileSystem(fUri, Collections.<String, Object> emptyMap()));
 		}
 
+		@Override
+		protected void setFileToRead(Path file) throws IOException {
+			super.setFileToRead(file);
+
+			if (file != null) {
+				lastModifTime = Files.getLastModifiedTime(file, LinkOption.NOFOLLOW_LINKS).toMillis();
+			}
+		}
+
 		/**
 		 * Initializes files watcher thread. Picks file matching user defined file name to monitor. If user defined to
 		 * start streaming from latest file line, then count of lines in file is calculated to mark latest activity
@@ -167,13 +175,12 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 			} else {
 				file = ArrayUtils.isEmpty(availableFiles) ? null
 						: startFromLatestActivity ? availableFiles[availableFiles.length - 1] : availableFiles[0];
+				lineNumber = 0;
 			}
 
 			setFileToRead(file);
 
-			FileTime lastModifiedTime = Files.getLastModifiedTime(fileToRead, LinkOption.NOFOLLOW_LINKS);
-			if (startFromLatestActivity && fileToRead != null && lastModifiedTime != null) {
-				lastModifTime = lastModifiedTime.toMillis();
+			if (startFromLatestActivity && fileToRead != null) {
 				lineNumber = Utils.countLines(Files.newInputStream(fileToRead));
 			}
 
@@ -183,7 +190,7 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 		}
 
 		/**
-		 * Closes openend file system.
+		 * Closes opened file system.
 		 *
 		 * @throws Exception
 		 *             if fails to close opened resources due to internal error
@@ -231,9 +238,8 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 				logger().log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"FileLineStream.cant.access");
 
-				try {
-					swapToNextFile();
-				} catch (IOException e) {
+				boolean swapped = swapToNextFile();
+				if (!swapped) {
 					logger().log(OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 							"FileLineStream.next.not.found");
 
@@ -241,28 +247,30 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 					return;
 				}
 			} else {
-				long flm = 0;
-				try {
-					flm = Files.getLastModifiedTime(fileToRead, LinkOption.NOFOLLOW_LINKS).toMillis();
-				} catch (IOException e) {
-				}
-
-				if (flm > lastModifTime) {
-					logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"FileLineStream.file.updated", getPeriodInSeconds(flm), getPeriodInSeconds(lastReadTime));
-
-					lastModifTime = flm;
-				} else {
-					logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"FileLineStream.file.not.changed");
-					boolean swapped = false;
-
+				if (lastReadTime >= 0) {
+					long flm = 0;
 					try {
-						swapped = swapToNextFile();
+						flm = Files.getLastModifiedTime(fileToRead, LinkOption.NOFOLLOW_LINKS).toMillis();
 					} catch (IOException e) {
-						logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-								"FileLineStream.no.changes", e.getMessage());
-						return;
+					}
+
+					if (flm > lastModifTime) {
+						logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+								"FileLineStream.file.updated", getPeriodInSeconds(flm),
+								getPeriodInSeconds(lastReadTime));
+
+						lastModifTime = flm;
+					} else {
+						logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+								"FileLineStream.file.not.changed");
+
+						boolean swapped = swapToNextFile();
+						if (!swapped) {
+							logger().log(OpLevel.DEBUG,
+									StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+									"FileLineStream.no.changes");
+							return;
+						}
 					}
 				}
 			}
@@ -325,7 +333,6 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 
 			if (skipFail) {
 				boolean swapped = swapToPrevFile();
-
 				if (swapped) {
 					Utils.close(lnr);
 
@@ -345,62 +352,72 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 			return lnr;
 		}
 
-		private boolean swapToPrevFile() throws IOException {
+		private boolean swapToPrevFile() {
 			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"FileLineStream.will.swap.to.previous", fileName);
 
 			if (Utils.isWildcardString(fileName)) {
-				availableFiles = Utils.searchFiles(fileName, fs);
-				updateDataTotals(availableFiles);
-				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"FileLineStream.found.files", availableFiles.length, fileName);
+				try {
+					availableFiles = Utils.searchFiles(fileName, fs);
+					updateDataTotals(availableFiles);
+					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+							"FileLineStream.found.files", availableFiles.length, fileName);
 
-				Path prevFile = ArrayUtils.getLength(availableFiles) < 2 ? null
-						: availableFiles[availableFiles.length - 2];
+					Path prevFile = ArrayUtils.getLength(availableFiles) < 2 ? null
+							: availableFiles[availableFiles.length - 2];
 
-				if (prevFile != null) {
-					setFileToRead(prevFile);
-					lastModifTime = Files.getLastModifiedTime(prevFile, LinkOption.NOFOLLOW_LINKS).toMillis();
+					if (prevFile != null) {
+						setFileToRead(prevFile);
 
-					logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"FileLineStream.swapping.to.previous", lineNumber, prevFile.toAbsolutePath());
-				} else {
-					logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"FileLineStream.no.previous");
+						logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+								"FileLineStream.swapping.to.previous", lineNumber, prevFile.toAbsolutePath());
+
+						return true;
+					} else {
+						logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+								"FileLineStream.no.previous");
+					}
+				} catch (Exception exc) {
+					Utils.logThrowable(logger(), OpLevel.ERROR,
+							StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+							"FileLineStream.swapping.failed", exc);
 				}
-
-				return prevFile != null;
 			}
 
 			return false;
 		}
 
-		private boolean swapToNextFile() throws IOException {
+		private boolean swapToNextFile() {
 			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"FileLineStream.will.swap.to.next", fileName);
 
 			if (Utils.isWildcardString(fileName)) {
-				availableFiles = Utils.searchFiles(fileName, fs);
-				updateDataTotals(availableFiles);
+				try {
+					availableFiles = Utils.searchFiles(fileName, fs);
+					updateDataTotals(availableFiles);
 
-				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"FileLineStream.found.files", availableFiles.length, fileName);
+					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+							"FileLineStream.found.files", availableFiles.length, fileName);
 
-				Path nextFile = Utils.getFirstNewer(availableFiles, lastModifTime);
+					Path nextFile = Utils.getFirstNewer(availableFiles, lastModifTime);
 
-				if (nextFile != null && !Files.isSameFile(nextFile, fileToRead)) {
-					setFileToRead(nextFile);
-					lastModifTime = Files.getLastModifiedTime(nextFile, LinkOption.NOFOLLOW_LINKS).toMillis();
-					lineNumber = 0;
+					if (nextFile == null || Files.isSameFile(nextFile, fileToRead)) {
+						logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+								"FileLineStream.no.next");
+					} else {
+						setFileToRead(nextFile);
+						lineNumber = 0;
 
-					logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"FileLineStream.swapping.to.next", nextFile.toAbsolutePath());
-				} else {
-					logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"FileLineStream.no.next");
+						logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+								"FileLineStream.swapping.to.next", nextFile.toAbsolutePath());
+
+						return true;
+					}
+				} catch (IOException exc) {
+					Utils.logThrowable(logger(), OpLevel.ERROR,
+							StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+							"FileLineStream.swapping.failed", exc);
 				}
-
-				return nextFile != null;
 			}
 
 			return false;
