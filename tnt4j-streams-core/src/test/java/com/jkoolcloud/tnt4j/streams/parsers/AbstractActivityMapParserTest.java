@@ -26,6 +26,7 @@ import org.mockito.Mockito;
 
 import com.jkoolcloud.tnt4j.streams.TestUtils;
 import com.jkoolcloud.tnt4j.streams.configure.ParserProperties;
+import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldDataType;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocator;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType;
 import com.jkoolcloud.tnt4j.streams.inputs.AbstractBufferedStream;
@@ -90,7 +91,7 @@ public class AbstractActivityMapParserTest {
 	}
 
 	@SuppressWarnings("deprecation")
-	@Test(expected = NumberFormatException.class)
+	@Test
 	public void getLocatorValueWhenLocatorEmptyTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "");
 		Map<String, String> myMap = new HashMap<>();
@@ -117,7 +118,7 @@ public class AbstractActivityMapParserTest {
 	}
 
 	@SuppressWarnings("deprecation")
-	@Test(expected = NumberFormatException.class)
+	@Test
 	public void getLocatorValuePathTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "333.555"); // NON-NLS
 		Map<String, Object> myMap = new HashMap<>();
@@ -127,7 +128,7 @@ public class AbstractActivityMapParserTest {
 	}
 
 	@SuppressWarnings("deprecation")
-	@Test(expected = NumberFormatException.class)
+	@Test
 	public void getLocatorValuePathListTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "333.0.222"); // NON-NLS
 		Map<String, Object> testMap = new HashMap<>();
@@ -138,10 +139,11 @@ public class AbstractActivityMapParserTest {
 		assertNull(testParser.getLocatorValue(stream, fieldLocator, myMap));
 	}
 
-	@Test(expected = NumberFormatException.class)
+	@Test
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	public void getLocatorValueNumberExceptionTest() throws Exception {
-		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "333.test.222"); // NON-NLS
+		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "333.test.222", // NON-NLS
+				ActivityFieldDataType.AsInput);
 		Map<String, Object> myMap = new HashMap<>();
 		myMap.put("333", Arrays.asList("test1", "test2", "test3")); // NON-NLS
 		myMap.put("status", "TEST"); // NON-NLS
@@ -150,7 +152,7 @@ public class AbstractActivityMapParserTest {
 	}
 
 	@SuppressWarnings("deprecation")
-	@Test(expected = NumberFormatException.class)
+	@Test
 	public void getLocatorValueInstanceTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "333"); // NON-NLS
 		Map<String, Object> myMap = new HashMap<>();
@@ -159,7 +161,7 @@ public class AbstractActivityMapParserTest {
 	}
 
 	@SuppressWarnings("deprecation")
-	@Test(expected = NumberFormatException.class)
+	@Test
 	public void getLocatorValueEmptyLocatorTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "1"); // NON-NLS
 		Map<String, Object> myMap = new HashMap<>();
@@ -167,7 +169,7 @@ public class AbstractActivityMapParserTest {
 		assertNull(testParser.getLocatorValue(stream, fieldLocator, myMap));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void getLocatorValueIndexAsTypeTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Index, "1"); // NON-NLS
 		Map<String, Object> myMap = new HashMap<>();

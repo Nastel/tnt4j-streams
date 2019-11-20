@@ -72,7 +72,7 @@ public class AbstractBufferedStreamTest {
 		});
 		thread.start();
 		TimeUnit.SECONDS.sleep(1);
-		assertEquals(Thread.State.WAITING, thread.getState());
+		assertTrue(thread.getState() == Thread.State.WAITING || thread.getState() == Thread.State.TIMED_WAITING);
 		thread.interrupt();
 	}
 

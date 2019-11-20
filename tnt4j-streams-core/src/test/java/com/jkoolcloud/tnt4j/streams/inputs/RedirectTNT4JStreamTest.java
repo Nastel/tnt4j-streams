@@ -42,7 +42,7 @@ public class RedirectTNT4JStreamTest {
 
 	@Test
 	public void setPropertiesFileTest() throws Exception {
-		final File tempFile = File.createTempFile("Test", ".test");
+		File tempFile = File.createTempFile("Test", ".test");
 		tempFile.deleteOnExit();
 		Map<String, String> props = new HashMap<>(3);
 		props.put(StreamProperties.PROP_FILENAME, tempFile.getAbsolutePath());
@@ -62,7 +62,7 @@ public class RedirectTNT4JStreamTest {
 		rs.startStream();
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void setPropertiesSetShouldFailTest() {
 		Map<String, String> props = new HashMap<>(3);
 		props.put(StreamProperties.PROP_FILENAME, "TestFile"); // NON-NLS

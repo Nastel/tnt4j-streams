@@ -50,7 +50,7 @@ public class CharacterStreamTest {
 		cStream.cleanup();
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void settingsFailToSetBothTest() {
 		CharacterStream cStream = new CharacterStream();
 		Map<String, String> props = new HashMap<>(2);

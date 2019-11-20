@@ -102,8 +102,8 @@ public class StreamsAgentTest {
 		fw.flush();
 		Utils.close(fw);
 		StreamsAgent.runFromAPI(new CfgStreamsBuilder().setConfig(tempConfFile.getAbsolutePath()));
-		Thread.sleep(500);
 		tempConfFile.delete();
+		// Collection<String> rStreams = StreamsAgent.getRunningStreamNames();
 		Set<Thread> threads = Thread.getAllStackTraces().keySet();
 		for (Thread thread : threads) {
 			if (thread.getName().contains(testStreamName)) {

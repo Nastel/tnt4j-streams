@@ -30,10 +30,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jkoolcloud.tnt4j.streams.TestUtils;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
-import com.jkoolcloud.tnt4j.streams.fields.ActivityField;
-import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocator;
-import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType;
-import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
+import com.jkoolcloud.tnt4j.streams.fields.*;
 import com.jkoolcloud.tnt4j.streams.inputs.AbstractBufferedStream;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
@@ -92,9 +89,10 @@ public class ActivityJsonParserTest {
 	}
 
 	@SuppressWarnings("deprecation")
-	@Test(expected = NumberFormatException.class)
+	@Test(expected = ParseException.class)
 	public void getLocatorValueTest() throws Exception {
-		ActivityFieldLocator aLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "test"); // NON-NLS
+		ActivityFieldLocator aLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "test", // NON-NLS
+				ActivityFieldDataType.Number);
 		String jsonString = "{\"test\":\"OK\",\"status\":\"finished\"}"; // NON-NLS
 		DocumentContext jsonContext = JsonPath.parse(jsonString);
 		parser.getLocatorValue(stream, aLocator, jsonContext);
@@ -109,7 +107,7 @@ public class ActivityJsonParserTest {
 	}
 
 	@SuppressWarnings("deprecation")
-	@Test(expected = NumberFormatException.class)
+	@Test
 	public void getLocatorValueWhenLocatorEmptyTest() throws Exception {
 		ActivityFieldLocator aLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "");
 		String jsonString = "{\"test\":\"OK\",\"status\":\"finished\"}"; // NON-NLS
@@ -125,14 +123,14 @@ public class ActivityJsonParserTest {
 		props.put(StreamProperties.PROP_EXECUTOR_THREADS_QTY, String.valueOf(5));
 		stream.setProperties(props.entrySet());
 		ActivityFieldLocator aLocator = new ActivityFieldLocator(ActivityFieldLocatorType.StreamProp,
-				"ExecutorThreadsQuantity"); // NON-NLS
+				"ExecutorThreadsQuantity", ActivityFieldDataType.Number); // NON-NLS
 		String jsonString = "{\"test\":\"OK\",\"status\":\"finished\"}"; // NON-NLS
 		DocumentContext jsonContext = JsonPath.parse(jsonString);
 		assertEquals(5, parser.getLocatorValue(stream, aLocator, jsonContext));
 	}
 
 	@SuppressWarnings("deprecation")
-	@Test(expected = NumberFormatException.class)
+	@Test
 	public void getLocatorValueStartsWithJsonPathTest() throws Exception {
 		ActivityFieldLocator aLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "$.test"); // NON-NLS
 		String jsonString = "{\"test\":\"OK\",\"status\":\"finished\"}"; // NON-NLS
@@ -141,23 +139,23 @@ public class ActivityJsonParserTest {
 	}
 
 	@SuppressWarnings("deprecation")
-	@Test(expected = NumberFormatException.class)
+	@Test
 	public void getLocatorValueJsonPathIsListTest() throws Exception {
 		ActivityFieldLocator aLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "$.values"); // NON-NLS
 		String jsonString = "{\"test\":\"OK\",\"status\":\"finished\",\"values\":[4, 5, 6]}"; // NON-NLS
 		DocumentContext jsonContext = JsonPath.parse(jsonString);
-		List<Object> testData = new ArrayList<Object>(Arrays.asList(4, 5, 6));
+		List<Object> testData = new ArrayList<>(Arrays.asList(4, 5, 6));
 		testData.equals(parser.getLocatorValue(stream, aLocator, jsonContext));
 	}
 
 	@SuppressWarnings("deprecation")
-	@Test(expected = NumberFormatException.class)
+	@Test
 	public void getLocatorValueJsonPathIsEmptyListTest() throws Exception {
 		ActivityFieldLocator aLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "$.values"); // NON-NLS
 		String jsonString = "{\"test\":\"OK\",\"status\":\"finished\",\"values\":[]}"; // NON-NLS
 		DocumentContext jsonContext = JsonPath.parse(jsonString);
 		List<Object> testData = new ArrayList<>();
-		testData.equals(parser.getLocatorValue(stream, aLocator, jsonContext));
+		assertNull(parser.getLocatorValue(stream, aLocator, jsonContext));
 	}
 
 	@Test
