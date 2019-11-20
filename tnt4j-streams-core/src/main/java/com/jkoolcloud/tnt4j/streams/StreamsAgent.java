@@ -184,7 +184,11 @@ public final class StreamsAgent {
 	public static void runFromAPI(StreamsBuilder builder) {
 		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 				"StreamsAgent.start.api", pkgVersion(), runEnv());
-		run(builder);
+		if (builder instanceof CfgStreamsBuilder) {
+			loadConfigAndRun((CfgStreamsBuilder) builder);
+		} else {
+			run(builder);
+		}
 	}
 
 	/**
