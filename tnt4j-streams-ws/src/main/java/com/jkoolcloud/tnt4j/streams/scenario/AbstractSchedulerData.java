@@ -17,6 +17,7 @@
 package com.jkoolcloud.tnt4j.streams.scenario;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.DateBuilder;
@@ -44,9 +45,25 @@ public abstract class AbstractSchedulerData implements SchedulerData {
 	 *
 	 * @param startDelay
 	 *            scheduler start delay interval
+	 * @param tUnits
+	 *            start delay time units name
 	 */
-	public void setStartDelay(Integer startDelay) {
+	public void setStartDelay(Integer startDelay, String tUnits) {
 		this.startDelay = startDelay;
+		setStartDelayUnits(tUnits);
+	}
+
+	/**
+	 * Sets scheduler start delay interval.
+	 *
+	 * @param startDelay
+	 *            scheduler start delay interval
+	 * @param tUnits
+	 *            start delay time units
+	 */
+	public void setStartDelay(Integer startDelay, TimeUnit tUnits) {
+		this.startDelay = startDelay;
+		setStartDelayUnits(tUnits == null ? null : tUnits.name());
 	}
 
 	/**
@@ -61,20 +78,10 @@ public abstract class AbstractSchedulerData implements SchedulerData {
 	/**
 	 * Sets start delay time units.
 	 *
-	 * @param startDelayUnits
-	 *            start delay time units
-	 */
-	public void setStartDelayUnits(DateBuilder.IntervalUnit startDelayUnits) {
-		this.startDelayUnits = startDelayUnits;
-	}
-
-	/**
-	 * Sets start delay time units.
-	 *
 	 * @param startDelayUnitsName
 	 *            start delay time units name
 	 */
-	public void setStartDelayUnits(String startDelayUnitsName) {
+	protected void setStartDelayUnits(String startDelayUnitsName) {
 		if (StringUtils.length(startDelayUnitsName) > 1 && startDelayUnitsName.toUpperCase().endsWith("S")) { // NON-NLS
 			startDelayUnitsName = startDelayUnitsName.substring(0, startDelayUnitsName.length() - 1);
 		}

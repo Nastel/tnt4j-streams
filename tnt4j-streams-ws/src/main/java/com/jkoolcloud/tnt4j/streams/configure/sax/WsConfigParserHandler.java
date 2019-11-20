@@ -202,8 +202,7 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 		notEmpty(expression, SCHED_CRON_ELMT, EXPRESSION_ATTR);
 
 		CronSchedulerData schedData = new CronSchedulerData(expression);
-		schedData.setStartDelay(startDelay);
-		schedData.setStartDelayUnits(startDelayUnits);
+		schedData.setStartDelay(startDelay, startDelayUnits);
 
 		currStep.setSchedulerData(schedData);
 	}
@@ -252,8 +251,7 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 
 		SimpleSchedulerData schedData = new SimpleSchedulerData(interval, timeUnits);
 		schedData.setRepeatCount(repeatCount);
-		schedData.setStartDelay(startDelay);
-		schedData.setStartDelayUnits(startDelayUnits);
+		schedData.setStartDelay(startDelay, startDelayUnits);
 
 		currStep.setSchedulerData(schedData);
 	}
