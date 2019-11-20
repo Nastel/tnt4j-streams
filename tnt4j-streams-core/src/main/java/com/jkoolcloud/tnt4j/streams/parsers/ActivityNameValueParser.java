@@ -17,10 +17,8 @@
 package com.jkoolcloud.tnt4j.streams.parsers;
 
 import java.text.ParseException;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,9 +31,6 @@ import org.apache.commons.text.matcher.StringMatcherFactory;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.ParserProperties;
-import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldDataType;
-import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocator;
-import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
@@ -48,7 +43,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * field. The field-separator and the name/value separator can both be customized.
  * <p>
  * This parser supports the following configuration properties (in addition to those supported by
- * {@link GenericActivityParser}):
+ * {@link com.jkoolcloud.tnt4j.streams.parsers.AbstractActivityMapParser}):
  * <ul>
  * <li>FieldDelim - fields separator. (Optional)</li>
  * <li>ValueDelim - value delimiter. (Optional)</li>
@@ -59,18 +54,10 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * {@code "key"} and {@code "value"} used to map data contained values to name/value pair. NOTE: this parameter takes
  * preference on {@code "FieldDelim"} and {@code "ValueDelim"} properties. (Optional)</li>
  * </ul>
- * <p>
- * This activity parser supports those activity field locator types:
- * <ul>
- * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Label}</li>
- * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#StreamProp}</li>
- * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Cache}</li>
- * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Activity}</li>
- * </ul>
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  */
-public class ActivityNameValueParser extends GenericActivityParser<Map<String, String>> {
+public class ActivityNameValueParser extends AbstractActivityMapParser {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(ActivityNameValueParser.class);
 
 	/**
@@ -108,7 +95,7 @@ public class ActivityNameValueParser extends GenericActivityParser<Map<String, S
 	 * Constructs a new ActivityNameValueParser.
 	 */
 	public ActivityNameValueParser() {
-		super(ActivityFieldDataType.String);
+		super();
 	}
 
 	@Override
@@ -168,6 +155,28 @@ public class ActivityNameValueParser extends GenericActivityParser<Map<String, S
 		return super.getProperty(name);
 	}
 
+	/**
+	 * Returns whether this parser supports the given format of the activity data. This is used by activity streams to
+	 * determine if the parser can parse the data in the format that the stream has it.
+	 * <p>
+	 * This parser supports the following class types (and all classes extending/implementing any of these):
+	 * <ul>
+	 * <li>{@link java.lang.String}</li>
+	 * <li>{@code byte[]}</li>
+	 * <li>{@link java.nio.ByteBuffer}</li>
+	 * <li>{@link java.io.Reader}</li>
+	 * <li>{@link java.io.InputStream}</li>
+	 * </ul>
+	 *
+	 * @param data
+	 *            data object whose class is to be verified
+	 * @return {@code true} if this parser can process data in the specified format, {@code false} - otherwise
+	 */
+	@Override
+	protected boolean isDataClassSupportedByParser(Object data) {
+		return isDataClassSupportedByDefault(data);
+	}
+
 	@Override
 	protected ActivityInfo parse(TNTInputStream<?, ?> stream, Object data, ActivityParserContext cData)
 			throws IllegalStateException, ParseException {
@@ -183,8 +192,20 @@ public class ActivityNameValueParser extends GenericActivityParser<Map<String, S
 		return super.parse(stream, data, cData);
 	}
 
+	/**
+	 * Makes map of name/value pairs, resolved from provided string.
+	 *
+	 * @param data
+	 *            activity object data object
+	 *
+	 * @return activity object data map
+	 */
 	@Override
-	protected ActivityContext prepareItem(TNTInputStream<?, ?> stream, Object data) throws ParseException {
+	protected Map<String, String> getDataMap(Object data) {
+		if (data == null) {
+			return null;
+		}
+
 		String dataStr = getNextActivityString(data);
 		if (StringUtils.isEmpty(dataStr)) {
 			return null;
@@ -200,11 +221,7 @@ public class ActivityNameValueParser extends GenericActivityParser<Map<String, S
 			}
 		}
 
-		Map<String, String> nameValues = entryPattern == null ? delimit(dataStr) : regex(dataStr);
-		ActivityContext cData = new ActivityContext(stream, data, nameValues);
-		// cData.setMessage(getRawDataAsMessage(nameValues));
-
-		return cData;
+		return entryPattern == null ? delimit(dataStr) : regex(dataStr);
 	}
 
 	private Map<String, String> delimit(String dataStr) {
@@ -247,45 +264,5 @@ public class ActivityNameValueParser extends GenericActivityParser<Map<String, S
 		}
 
 		return nameValues;
-	}
-
-	/**
-	 * Gets field raw data value resolved by locator.
-	 *
-	 * @param locator
-	 *            activity field locator
-	 * @param cData
-	 *            activity object name/value pairs map
-	 * @param formattingNeeded
-	 *            flag to set if value formatting is not needed
-	 * @return raw value resolved by locator, or {@code null} if value is not resolved
-	 */
-	@Override
-	protected Object resolveLocatorValue(ActivityFieldLocator locator, ActivityContext cData,
-			AtomicBoolean formattingNeeded) {
-		Object val = null;
-		String locStr = locator.getLocator();
-		val = cData.getData().get(locStr); // NOTE: locStr == null?
-
-		return val;
-	}
-
-	@SuppressWarnings("deprecation")
-	private static final EnumSet<ActivityFieldLocatorType> UNSUPPORTED_LOCATOR_TYPES = EnumSet
-			.of(ActivityFieldLocatorType.Index, ActivityFieldLocatorType.Range, ActivityFieldLocatorType.REMatchId);
-
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * Unsupported activity locator types are:
-	 * <ul>
-	 * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Index}</li>
-	 * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Range}</li>
-	 * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#REMatchId}</li>
-	 * </ul>
-	 */
-	@Override
-	protected EnumSet<ActivityFieldLocatorType> getUnsupportedLocatorTypes() {
-		return UNSUPPORTED_LOCATOR_TYPES;
 	}
 }

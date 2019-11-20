@@ -16,8 +16,9 @@
 
 package com.jkoolcloud.tnt4j.streams.custom.parsers;
 
-import java.io.*;
-import java.nio.ByteBuffer;
+import java.io.BufferedReader;
+import java.io.EOFException;
+import java.io.IOException;
 import java.nio.CharBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -140,8 +141,7 @@ public class IBMMQLogParser extends AbstractActivityMapParser {
 	 */
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
-		return String.class.isInstance(data) || byte[].class.isInstance(data) || ByteBuffer.class.isInstance(data)
-				|| Reader.class.isInstance(data) || InputStream.class.isInstance(data);
+		return isDataClassSupportedByDefault(data);
 	}
 
 	@Override

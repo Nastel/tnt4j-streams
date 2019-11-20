@@ -16,6 +16,10 @@
 
 package com.jkoolcloud.tnt4j.streams.preparsers;
 
+import java.io.InputStream;
+import java.io.Reader;
+import java.nio.ByteBuffer;
+
 /**
  * Base class for abstract activity RAW data value pre-parser.
  *
@@ -42,6 +46,24 @@ public abstract class AbstractPreParser<V, O> implements ActivityDataPreParser<V
 	@Override
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This pre-parser supports the following class types (and all classes extending/implementing any of these):
+	 * <ul>
+	 * <li>{@link java.lang.String}</li>
+	 * <li>{@link java.io.InputStream}</li>
+	 * <li>{@link java.io.Reader}</li>
+	 * <li>{@code byte[]}</li>
+	 * <li>{@link java.nio.ByteBuffer}</li>
+	 * </ul>
+	 */
+	@Override
+	public boolean isDataClassSupported(Object data) {
+		return String.class.isInstance(data) || InputStream.class.isInstance(data) || Reader.class.isInstance(data)
+				|| byte[].class.isInstance(data) || ByteBuffer.class.isInstance(data);
 	}
 
 	/**

@@ -5178,8 +5178,8 @@ Also see ['WMQ Stream parameters'](#wmq-stream-parameters).
 
 See post [on how to configure WMQ server and client sides communicating over SSL](https://blog.niklasottosson.com/java/setup-ibm-mq-v9-for-java-clients-over-ssl/).
 
-When you already have server side SSL configured and SSL certificates imported into client machine KeyStore/TrustStore, to run WMQ stream 
-you'll need:
+When you already have server side SSL configured and SSL certificates imported into client machine (if it is not the same as server) 
+KeyStore/TrustStore, to run WMQ stream you'll need:
 * in streams configuration define Cipher Suite used for SSL connection:
 ```xml
     <property name="CMQC.SSL_CIPHER_SUITE_PROPERTY" value="TLS_RSA_WITH_AES_128_CBC_SHA256"/>
@@ -5552,7 +5552,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
     <property name="EntryPattern"><![CDATA[:(?<key>.*?):(?<value>.[^:]+)]]></property>
 ```
 
-Also see [Generic parser parameters](#generic-parser-parameters).
+Also see [Activity map parser](#activity-map-parser) regarding higher level parser configuration.
 
 #### Activity RegEx parser
 

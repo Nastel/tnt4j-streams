@@ -214,6 +214,10 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 * @return {@code true} if this parser can process data in the specified format, {@code false} - otherwise
 	 */
 	protected boolean isDataClassSupportedByParser(Object data) {
+		return isDataClassSupportedByDefault(data);
+	}
+
+	protected static boolean isDataClassSupportedByDefault(Object data) {
 		return String.class.isInstance(data) || byte[].class.isInstance(data) || ByteBuffer.class.isInstance(data)
 				|| Reader.class.isInstance(data) || InputStream.class.isInstance(data);
 	}

@@ -179,7 +179,7 @@ public abstract class AbstractActivityMapParser extends GenericActivityParser<Ma
 
 	@Override
 	protected ActivityContext prepareItem(TNTInputStream<?, ?> stream, Object data) throws ParseException {
-		Map<String, Object> dataMap = getDataMap(data);
+		Map<String, ?> dataMap = getDataMap(data);
 		if (MapUtils.isEmpty(dataMap)) {
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityParser.no.fields");
@@ -200,7 +200,7 @@ public abstract class AbstractActivityMapParser extends GenericActivityParser<Ma
 	 *            activity object data
 	 * @return activity object data map
 	 */
-	protected abstract Map<String, Object> getDataMap(Object data);
+	protected abstract Map<String, ?> getDataMap(Object data);
 
 	/**
 	 * Transforms activity data to be put to activity entity field
