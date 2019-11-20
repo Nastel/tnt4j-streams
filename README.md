@@ -243,7 +243,7 @@ sample:
     EndTime(UsecTimestamp.class),
 
     /**
-     * Elapsed time of the activity.
+     * Elapsed time of the activity in microseconds.
      */
     ElapsedTime(Long.class),
 

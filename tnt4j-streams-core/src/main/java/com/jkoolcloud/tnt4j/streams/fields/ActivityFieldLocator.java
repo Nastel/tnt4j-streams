@@ -55,7 +55,7 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 
 	private ActivityFieldLocatorType builtInType = null;
 	private ActivityFieldFormatType builtInFormat = null;
-	private TimeUnit builtInUnits = TimeUnit.MILLISECONDS;
+	private TimeUnit builtInUnits = null;
 	private Map<Object, Object> valueMap = null;
 	private Object mapCatchAll = null;
 
@@ -312,23 +312,43 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	/**
 	 * Gets the built-in time units enumerator matching defined locator units.
 	 * <p>
-	 * If locator defined units can't be mapped to built-in time units,
-	 * {@link java.util.concurrent.TimeUnit#MICROSECONDS} is set.
-	 * <p>
 	 * Note: This is not applicable for all fields and will be ignored by those fields to which it does not apply.
 	 *
-	 * @return the built-in time units enumerator
+	 * @return the built-in time units enumerator, or {@code null} if this units specification is a custom one.
 	 */
 	public TimeUnit getBuiltInUnits() {
 		return builtInUnits;
 	}
 
 	/**
+	 * Gets the built-in time units enumerator matching defined locator units.
+	 * <p>
+	 * If locator has no built-in units defined, then parameter defined {@code defaultUnits} is returned.
+	 * 
+	 * @param defaultUnits
+	 *            default time units
+	 * @return the locator built-in time units enumerator, or default units if locator has has no built-in units defined
+	 */
+	public TimeUnit getBuiltInUnits(TimeUnit defaultUnits) {
+		return builtInUnits == null ? defaultUnits : builtInUnits;
+	}
+
+	/**
+	 * Returns locator instance defined time units.
+	 * 
+	 * @param loc
+	 *            locator instance to get time units
+	 * @param defaultUnits
+	 *            default time units
+	 * @return locator defined time units, or default units if locator is {@code null} or has has no units defined
+	 */
+	public static TimeUnit getLocatorUnits(ActivityFieldLocator loc, TimeUnit defaultUnits) {
+		return loc == null ? defaultUnits : loc.getBuiltInUnits(defaultUnits);
+	}
+
+	/**
 	 * Sets the units represented by the raw data field value. This value can be one of the predefined units, or it can
 	 * be a custom unit type.
-	 * <p>
-	 * If locator defined units can't be mapped to built-in time units,
-	 * {@link java.util.concurrent.TimeUnit#MICROSECONDS} is set.
 	 * <p>
 	 * Note: This is not applicable for all fields and will be ignored by those fields to which it does not apply.
 	 *
@@ -337,8 +357,8 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	 */
 	public void setUnits(String units) {
 		this.units = units;
+		this.builtInUnits = null;
 
-		this.builtInUnits = TimeUnit.MICROSECONDS;
 		try {
 			if (StringUtils.isNotEmpty(units)) {
 				builtInUnits = TimeUnit.valueOf(units.toUpperCase());
@@ -784,7 +804,8 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 		}
 		if (timeParser == null) {
 			timeParser = dataType == ActivityFieldDataType.Timestamp || dataType == ActivityFieldDataType.Number
-					? new TimestampFormatter(builtInUnits) : new TimestampFormatter(format, timeZone, locale);
+					? new TimestampFormatter(getBuiltInUnits(TimeUnit.MILLISECONDS))
+					: new TimestampFormatter(format, timeZone, locale);
 		}
 		return timeParser.parse(value);
 	}

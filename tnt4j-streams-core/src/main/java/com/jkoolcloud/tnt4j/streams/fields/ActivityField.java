@@ -931,7 +931,7 @@ public class ActivityField extends AbstractFieldEntity {
 					if (!(value instanceof Number)) {
 						value = Long.valueOf(Utils.toString(value));
 					}
-					TimeUnit units = locator == null ? TimeUnit.MICROSECONDS : locator.getBuiltInUnits();
+					TimeUnit units = ActivityFieldLocator.getLocatorUnits(locator, TimeUnit.MICROSECONDS);
 					value = TimestampFormatter.convert((Number) value, units, TimeUnit.MICROSECONDS);
 				} catch (Exception e) {
 				}

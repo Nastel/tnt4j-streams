@@ -76,7 +76,8 @@ public class ActivityFieldLocatorTest {
 	public void testUnits() {
 		locator = new ActivityFieldLocator(1);
 		locator.setUnits("TEST"); // NON-NLS
-		assertEquals(TimeUnit.MICROSECONDS, locator.getBuiltInUnits());
+		assertEquals(null, locator.getBuiltInUnits());
+		assertEquals(TimeUnit.MICROSECONDS, ActivityFieldLocator.getLocatorUnits(locator, TimeUnit.MICROSECONDS));
 		for (TimeUnit unit : TimeUnit.values()) {
 			locator.setFormat(unit.name(), null); // TODO
 			locator.setUnits(unit.name());
@@ -177,6 +178,11 @@ public class ActivityFieldLocatorTest {
 		locator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "NONE"); // NON-NLS
 		locator.setDataType(ActivityFieldDataType.Generic);
 		assertEquals(25, locator.formatValue("25")); // NON-NLS
+
+		locator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "NONE"); // NON-NLS
+		locator.setDataType(ActivityFieldDataType.String);
+		locator.setFormat("yyyy-MM-dd", null);
+		assertEquals("yyyy-MM-dd25", locator.formatValue(25)); // NON-NLS
 	}
 
 	@Test

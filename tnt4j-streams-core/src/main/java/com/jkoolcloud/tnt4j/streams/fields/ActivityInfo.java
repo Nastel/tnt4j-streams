@@ -416,7 +416,7 @@ public class ActivityInfo {
 		ActivityFieldLocator fmLocator = field.getMasterLocator();
 		String tz = fmLocator == null ? null : fmLocator.getTimeZone();
 		try {
-			TimeUnit units = fmLocator == null ? TimeUnit.MICROSECONDS : fmLocator.getBuiltInUnits();
+			TimeUnit units = ActivityFieldLocator.getLocatorUnits(fmLocator, TimeUnit.MILLISECONDS);
 			timestamp = TimestampFormatter.parse(units, fieldValue, tz);
 			if (timestamp != null) {
 				return timestamp;
