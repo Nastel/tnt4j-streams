@@ -481,7 +481,7 @@ public class NumericFormatter {
 			}
 		}
 
-		if (isFloatPoint(num.getClass())) {
+		if (isFloatPoint(num.getClass()) || isFloatPoint(cNum.getClass())) {
 			BigDecimal obd = toBigDecimal(num);
 			BigDecimal cbd = toBigDecimal(cNum);
 
@@ -525,7 +525,8 @@ public class NumericFormatter {
 			return new BigDecimal((BigInteger) num);
 		}
 
-		return BigDecimal.valueOf(num.doubleValue());
+		// NOTE: simple call of .doubleValue produces rounding errors on large (not necessarily Big) numbers.
+		return new BigDecimal(num.toString());
 	}
 
 	/**
@@ -587,12 +588,15 @@ public class NumericFormatter {
 		Number scaledValue;
 		if (numValue instanceof BigInteger) {
 			BigDecimal bdv = new BigDecimal((BigInteger) numValue);
-			scaledValue = bdv.multiply(BigDecimal.valueOf(scale.doubleValue()));
+			scaledValue = bdv.multiply(new BigDecimal(scale.toString()));
 		} else if (numValue instanceof BigDecimal) {
 			BigDecimal bdv = (BigDecimal) numValue;
-			scaledValue = bdv.multiply(BigDecimal.valueOf(scale.doubleValue()));
+			scaledValue = bdv.multiply(new BigDecimal(scale.toString()));
 		} else {
-			scaledValue = numValue.doubleValue() * scale.doubleValue();
+			// NOTE: simple call of .doubleValue produces rounding errors on large (not necessarily Big) numbers.
+			// scaledValue = numValue.doubleValue() * scale.doubleValue();
+			BigDecimal bdv = new BigDecimal(numValue.toString());
+			scaledValue = bdv.multiply(new BigDecimal(scale.toString()));
 		}
 		return castNumber(scaledValue, numValue.getClass(), CastMode.UP_BOUND);
 	}

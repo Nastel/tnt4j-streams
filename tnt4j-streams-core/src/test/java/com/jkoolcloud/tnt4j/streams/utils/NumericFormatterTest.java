@@ -133,7 +133,7 @@ public class NumericFormatterTest {
 		assertEquals(123456.7890,
 				NumericFormatter.castNumber(123456.7890, Float.class, NumericFormatter.CastMode.EXACT).doubleValue(),
 				0.0001);
-		assertEquals(BigDecimal.valueOf(20.0),
+		assertEquals(new BigDecimal(20.0),
 				NumericFormatter.castNumber(20L, BigDecimal.class, NumericFormatter.CastMode.EXACT));
 		assertEquals(new BigDecimal("15445512248522412556325202"), NumericFormatter.castNumber(
 				new BigInteger("15445512248522412556325202"), BigDecimal.class, NumericFormatter.CastMode.EXACT));
@@ -219,7 +219,7 @@ public class NumericFormatterTest {
 				Byte.class, NumericFormatter.CastMode.UP_BOUND);
 		assertEquals(BigInteger.class, cNum.getClass());
 		assertEquals(new BigInteger("12345678901234567890123456789012345678901234567890"), cNum);
-		cNum = NumericFormatter.castNumber(BigDecimal.valueOf(123.124), Byte.class, NumericFormatter.CastMode.UP_BOUND);
+		cNum = NumericFormatter.castNumber(new BigDecimal(123.124), Byte.class, NumericFormatter.CastMode.UP_BOUND);
 		assertEquals(Byte.class, cNum.getClass());
 		assertEquals(123, cNum.byteValue());
 		cNum = NumericFormatter.castNumber(new BigDecimal("12345678901234567890123456789012345678901234567890.123"),
