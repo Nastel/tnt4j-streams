@@ -1367,15 +1367,18 @@ public class ActivityInfo {
 
 	private static Number getNumberValue(Object value, ActivityField field) throws ParseException {
 		if (value instanceof Number) {
-			return (Number) value;
+			// value = (Number) value;
+		} else {
+			value = StringUtils.trim(value == null ? null : Utils.toString(value));
 		}
-
-		String valStr = Utils.toString(value);
-		valStr = StringUtils.trim(valStr);
 
 		ActivityFieldLocator fmLocator = field.getMasterLocator();
 
-		return fmLocator == null ? NumericFormatter.strToNumber(valStr) : fmLocator.formatNumericValue(value);
+		if (fmLocator == null) {
+			return value instanceof Number ? (Number) value : NumericFormatter.strToNumber((String) value);
+		} else {
+			return fmLocator.formatNumericValue(value);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
