@@ -784,7 +784,7 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 			}
 		}
 
-		return numberParser.parse(val, 1.0);
+		return numberParser.parse(val);
 	}
 
 	/**
