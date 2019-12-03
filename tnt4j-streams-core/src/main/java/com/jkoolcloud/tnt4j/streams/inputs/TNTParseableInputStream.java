@@ -99,6 +99,11 @@ public abstract class TNTParseableInputStream<T> extends TNTInputStream<T, Activ
 	protected void initialize() throws Exception {
 		super.initialize();
 
+		if (parsersSet.isEmpty()) {
+			throw new IllegalStateException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+					"TNTInputStream.has.no.parsers.bound", getName()));
+		}
+
 		if (StringUtils.isNotEmpty(groupingActivityName)) {
 			ActivityInfo gai = new ActivityInfo(true);
 			gai.setFieldValue(new ActivityField(StreamFieldType.EventType.name()), OpType.ACTIVITY.name());
