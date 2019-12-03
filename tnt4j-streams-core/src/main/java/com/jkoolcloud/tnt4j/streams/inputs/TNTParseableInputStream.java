@@ -106,7 +106,7 @@ public abstract class TNTParseableInputStream<T> extends TNTInputStream<T, Activ
 			output().logItem(gai);
 
 			StreamsCache.addValue(getName() + StreamsConstants.STREAM_GROUPING_ACTIVITY_ID_CACHE_KEY,
-					gai.getTrackingId());
+					gai.getTrackingId(), true);
 		}
 	}
 

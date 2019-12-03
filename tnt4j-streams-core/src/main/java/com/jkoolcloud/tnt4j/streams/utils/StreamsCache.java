@@ -432,7 +432,7 @@ public final class StreamsCache {
 	}
 
 	/**
-	 * Adds cache entry for defined key and value.
+	 * Adds non-transient cache entry for defined key and value.
 	 * 
 	 * @param key
 	 *            cache entry key
@@ -440,7 +440,7 @@ public final class StreamsCache {
 	 *            cache entry value
 	 */
 	public static void addValue(String key, Object value) {
-		addValue(key, value, true);
+		addValue(key, value, false);
 	}
 
 	/**
