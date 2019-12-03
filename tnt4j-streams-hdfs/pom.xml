@@ -14,7 +14,7 @@
     <artifactId>tnt4j-streams-hdfs</artifactId>
 
     <properties>
-        <org.apache.hadoop.version>3.2.0</org.apache.hadoop.version>
+        <org.apache.hadoop.version>3.2.1</org.apache.hadoop.version>
     </properties>
 
     <build>
@@ -89,6 +89,12 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
             <version>${org.apache.hadoop.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
