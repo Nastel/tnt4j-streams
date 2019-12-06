@@ -50,6 +50,8 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
  * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#StreamProp}</li>
  * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Cache}</li>
  * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Activity}</li>
+ * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Label} - only for locator
+ * {@value #LOC_FOR_COMPLETE_ACTIVITY_DATA}</li>
  * </ul>
  * <p>
  * Here are some examples of how this parser can be used:
@@ -153,7 +155,7 @@ public class ActivityStringParser extends GenericActivityParser<String> {
 
 	@SuppressWarnings("deprecation")
 	private static final EnumSet<ActivityFieldLocatorType> UNSUPPORTED_LOCATOR_TYPES = EnumSet
-			.of(ActivityFieldLocatorType.Index, ActivityFieldLocatorType.Label, ActivityFieldLocatorType.REMatchId);
+			.of(ActivityFieldLocatorType.Index, ActivityFieldLocatorType.REMatchId);
 
 	/**
 	 * {@inheritDoc}
@@ -161,7 +163,6 @@ public class ActivityStringParser extends GenericActivityParser<String> {
 	 * Unsupported activity locator types are:
 	 * <ul>
 	 * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Index}</li>
-	 * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Label}</li>
 	 * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#REMatchId}</li>
 	 * </ul>
 	 */
