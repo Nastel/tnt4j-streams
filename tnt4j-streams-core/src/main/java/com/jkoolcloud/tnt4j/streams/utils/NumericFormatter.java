@@ -384,19 +384,43 @@ public class NumericFormatter {
 	 *            number class to cast number to
 	 * @param castMode
 	 *            cast mode to be used
-	 * @return number value cast to desired numeric type
+	 * @return number value cast to desired numeric type, or original number {@code num} if number can't be cast
+	 * 
+	 * @see #castNumber(Number, Class, com.jkoolcloud.tnt4j.streams.utils.NumericFormatter.CastMode, Number)
 	 */
-	@SuppressWarnings("unchecked")
 	public static Number castNumber(Number num, Class<? extends Number> clazz, CastMode castMode) {
+		return castNumber(num, clazz, castMode, num);
+	}
+
+	/**
+	 * Casts provided number value to desired number type and casting mode.
+	 *
+	 * @param num
+	 *            number value to cast
+	 * @param clazz
+	 *            number class to cast number to
+	 * @param castMode
+	 *            cast mode to be used
+	 * @param failValue
+	 *            value to return if number can't be cast
+	 * @return number value cast to desired numeric type, or {@code failValue} if number can't be cast
+	 */
+	public static Number castNumber(Number num, Class<? extends Number> clazz, CastMode castMode, Number failValue) {
+		Number cNum;
 		switch (castMode) {
 		case API:
-			return castNumberAPI(num, clazz);
+			cNum = castNumberAPI(num, clazz);
+			break;
 		case UP_BOUND:
-			return castNumberUpBound(num, clazz);
+			cNum = castNumberUpBound(num, clazz);
+			break;
 		case EXACT:
 		default:
-			return castNumberExact(num, clazz);
+			cNum = castNumberExact(num, clazz);
+			break;
 		}
+
+		return cNum == null ? failValue : cNum;
 	}
 
 	private static Number castNumberAPI(Number num, Class<? extends Number> clazz) {
@@ -426,7 +450,7 @@ public class NumericFormatter {
 			}
 		}
 
-		return cNum == null ? num : cNum;
+		return cNum;
 	}
 
 	private static Number castNumberExact(Number num, Class<? extends Number> clazz) {
@@ -446,7 +470,7 @@ public class NumericFormatter {
 	private static Number castNumberUpBound(Number num, Class<? extends Number> clazz, Class<? extends Number> oClazz) {
 		Number cNum = castNumberAPI(num, clazz);
 
-		if (isSignificantDifference(num, cNum, 2)) {
+		if (isSignificantDifference(num, cNum, 2.0d)) {
 			Class<? extends Number> uClazz = null;
 			try {
 				if (isFloatPoint(oClazz)) {

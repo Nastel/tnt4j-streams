@@ -151,28 +151,28 @@ public class NumericFormatterTest {
 	@Test
 	public void testCastExactFail() {
 		assertEquals(null, NumericFormatter.castNumber(1234561245782125452253.123456567889225, Float.class,
-				NumericFormatter.CastMode.EXACT));
-		assertEquals(null, NumericFormatter.castNumber(123456, Byte.class, NumericFormatter.CastMode.EXACT));
+				NumericFormatter.CastMode.EXACT, null));
+		assertEquals(null, NumericFormatter.castNumber(123456, Byte.class, NumericFormatter.CastMode.EXACT, null));
 		assertEquals(null, NumericFormatter.castNumber(new BigInteger("123456789012345678901234567890"), Long.class,
-				NumericFormatter.CastMode.EXACT));
+				NumericFormatter.CastMode.EXACT, null));
 		assertEquals(null, NumericFormatter.castNumber(new BigInteger("12345678901234567890"), Integer.class,
-				NumericFormatter.CastMode.EXACT));
+				NumericFormatter.CastMode.EXACT, null));
 		assertEquals(null, NumericFormatter.castNumber(new BigInteger("1234567890"), Short.class,
-				NumericFormatter.CastMode.EXACT));
-		assertEquals(null,
-				NumericFormatter.castNumber(new BigInteger("12345"), Byte.class, NumericFormatter.CastMode.EXACT));
+				NumericFormatter.CastMode.EXACT, null));
+		assertEquals(null, NumericFormatter.castNumber(new BigInteger("12345"), Byte.class,
+				NumericFormatter.CastMode.EXACT, null));
 
 		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("123456789012345678901234567890"), Long.class,
-				NumericFormatter.CastMode.EXACT));
+				NumericFormatter.CastMode.EXACT, null));
 		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("12345678901234567890"), Integer.class,
-				NumericFormatter.CastMode.EXACT));
+				NumericFormatter.CastMode.EXACT, null));
 		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("1234567890"), Short.class,
-				NumericFormatter.CastMode.EXACT));
-		assertEquals(null,
-				NumericFormatter.castNumber(new BigDecimal("12345"), Byte.class, NumericFormatter.CastMode.EXACT));
+				NumericFormatter.CastMode.EXACT, null));
+		assertEquals(null, NumericFormatter.castNumber(new BigDecimal("12345"), Byte.class,
+				NumericFormatter.CastMode.EXACT, null));
 		assertEquals(null, // 1.2345678901234568E+29,
 				NumericFormatter.castNumber(new BigInteger("123456789012345678901234567890"), Double.class,
-						NumericFormatter.CastMode.EXACT));
+						NumericFormatter.CastMode.EXACT, null));
 	}
 
 	@Test
