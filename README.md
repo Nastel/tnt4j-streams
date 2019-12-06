@@ -4916,6 +4916,9 @@ Supported file systems:
  * any other JSR-203 compliant (requires manually add file system implementing libs to classpath), but those are not tested and may not 
  work "out of the box"
 
+When stream is intended to access files over `SCP` (schemes `ssh.unix:`, `scp:` and `ssh:`) from *nix machine - pay attention to check if 
+environment variable `SSH_AUTH_SOCK` is configured.
+
 General stream configuration parameters:
  * `Host` - remote machine host name/IP address. Default value - `localhost`. (Optional - can be defined over stream property `FileName`, 
  e.g. `ftp://username:password@hostname:port/[FILE_PATH]`
