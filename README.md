@@ -120,7 +120,7 @@ Mapping of streamed data to activity event fields are performed by parser. To ma
         * `base64Binary`
         * `hexBinary` 
         * `string`
-        * any decimal or time format pattern, e.g. `#####0.000`
+        * any decimal or date-time format pattern, e.g. `#####0.000`. Can be defined multiple date-time patterns delimited using `|` symbol.  
         * one of number type enumerators: `integer`/`int`, `long`, `double`, `float`, `short`, `byte`, `biginteger`/`bigint`/`bint`, 
         `bigdecimal`/`bigdec`/`bdec` and `any`. `any` will resolve any possible numeric value out of provided string, e.g. string `"30hj00"` 
         will result value `30`. It also allows to define casting mode, by adding prefix to number type enumerator (except enumerator `any`):

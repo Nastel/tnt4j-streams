@@ -36,6 +36,13 @@ import com.jkoolcloud.tnt4j.core.UsecTimestamp;
  * This is based on {@link SimpleDateFormat}, but extends its support to recognize microsecond fractional seconds. If
  * number of fractional second characters is greater than 3, then it's assumed to be microseconds. Otherwise, it's
  * assumed to be milliseconds (as this is the behavior of {@link SimpleDateFormat}.
+ * <p>
+ * Supports such pattern definitions:
+ * <ul>
+ * <li>{@link java.text.SimpleDateFormat} compliant pattern</li>
+ * <li>{@code null} to use default locale format</li>
+ * <li>multiple {@link java.text.SimpleDateFormat} compliant patterns delimited using {@code "|"} symbol</li>
+ * </ul>
  *
  * @version $Revision: 1 $
  *
@@ -64,7 +71,8 @@ public class TimestampFormatter {
 	 * Creates a timestamp formatter/parser for date/time expressions, using the specified format pattern.
 	 *
 	 * @param pattern
-	 *            format pattern, or {@code null} to use the default format
+	 *            date/time format pattern - can be set to {@code null} to use the default locale format, or multiple
+	 *            patterns delimited using {@code "|"} delimiter
 	 * @param timeZone
 	 *            time zone ID, or {@code null} to use the default time zone or to assume pattern contains time zone
 	 *            specification
@@ -89,9 +97,10 @@ public class TimestampFormatter {
 	 * Sets the format pattern string for this formatter.
 	 *
 	 * @param pattern
-	 *            format pattern - can be set to {@code null} to use default format representation.
+	 *            date/time format pattern - can be set to {@code null} to use the default locale format, or multiple
+	 *            patterns delimited using {@code "|"} delimiter
 	 * @param locale
-	 *            locale for date format to use.
+	 *            locale for date format to use
 	 */
 	protected void setPattern(String pattern, String locale) {
 		this.pattern = pattern;
@@ -411,7 +420,8 @@ public class TimestampFormatter {
 	 * formatter.
 	 *
 	 * @param pattern
-	 *            pattern value is in
+	 *            date/time format pattern - can be set to {@code null} to use the default locale format, or multiple
+	 *            patterns delimited using {@code "|"} delimiter
 	 * @param value
 	 *            value to convert
 	 * @param timeZoneId
@@ -427,30 +437,44 @@ public class TimestampFormatter {
 	public static UsecTimestamp parse(String pattern, Object value, String timeZoneId, String locale)
 			throws ParseException {
 		String dateStr = Utils.toString(value);
-		return new UsecTimestamp(dateStr, pattern, timeZoneId, locale);
+		String[] patterns = Utils.splitValue(pattern);
+		for (int i = 0; i < patterns.length; i++) {
+			try {
+				return new UsecTimestamp(dateStr, patterns[i], timeZoneId, locale);
+			} catch (ParseException pe) {
+				if (i == patterns.length - 1) {
+					throw pe;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	/**
 	 * Formats the given object representing a date/time as a string using the specified pattern.
 	 *
 	 * @param pattern
-	 *            format pattern
+	 *            date/time format pattern - can be set to {@code null} to use the default locale format, or multiple
+	 *            patterns delimited using {@code "|"} delimiter
 	 * @param value
 	 *            date/time to format
 	 * @param locale
-	 *            locale for date format to use.
+	 *            locale for date format to use
 	 * @return date /time formatted as a string
+	 *
+	 * @see #format(String, Object, String, String)
 	 */
 	public static String format(String pattern, Object value, String locale) {
-		TimestampFormatter formatter = new TimestampFormatter(pattern, null, locale);
-		return formatter.format(value);
+		return format(pattern, value, locale, null);
 	}
 
 	/**
 	 * Formats the given object representing a date/time as a string using the specified pattern.
 	 *
 	 * @param pattern
-	 *            format pattern
+	 *            date/time format pattern - can be set to {@code null} to use the default locale format, or multiple
+	 *            patterns delimited using {@code "|"} delimiter
 	 * @param value
 	 *            date/time to format
 	 * @param locale
