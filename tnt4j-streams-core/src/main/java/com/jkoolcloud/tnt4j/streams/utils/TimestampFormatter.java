@@ -295,11 +295,18 @@ public class TimestampFormatter {
 				units = TimeUnit.MILLISECONDS;
 			} else {
 				if (units == null) {
-					units = TimeUnit.MILLISECONDS;
+					String vStr = Utils.toString(value);
+
+					units = TimeUnit.SECONDS;
+					if (vStr.length() > 10 && vStr.length() < 14) {
+						units = TimeUnit.MILLISECONDS;
+					} else if (vStr.length() > 13) {
+						units = TimeUnit.MICROSECONDS;
+					}
 				}
 
 				double dTime = value instanceof Number ? ((Number) value).doubleValue()
-						: Double.parseDouble(value.toString());
+						: Double.parseDouble(Utils.toString(value));
 
 				Pair<Double, TimeUnit> sTimePair = scale(dTime, units);
 				dTime = sTimePair.getLeft();
