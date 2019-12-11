@@ -21,7 +21,7 @@
         <java.compiler.version>${module.java.version}</java.compiler.version>
 
         <io.netty.version>4.1.43.Final</io.netty.version>
-        <logstash.input.beats.version>6.0.3</logstash.input.beats.version> <!-- new available: 5.0.16, 5.1.9, 6.0.3 -->
+        <logstash.input.beats.version>5.0.16</logstash.input.beats.version> <!-- new available: 5.0.16, 5.1.9, 6.0.3 -->
     </properties>
 
     <build>
