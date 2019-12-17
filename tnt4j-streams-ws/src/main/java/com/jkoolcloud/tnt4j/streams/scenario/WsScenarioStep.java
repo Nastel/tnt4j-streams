@@ -224,6 +224,15 @@ public class WsScenarioStep extends WsScenarioEntity {
 	}
 
 	/**
+	 * Returns properties collection for this step.
+	 * 
+	 * @return properties collection for this step
+	 */
+	public Collection<Map.Entry<String, String>> getProperties() {
+		return properties == null ? null : properties.entrySet();
+	}
+
+	/**
 	 * Returns requests synchronization semaphore instance for this step.
 	 * 
 	 * @return step requests synchronization semaphore instance, or {@code null} is step requests does not require

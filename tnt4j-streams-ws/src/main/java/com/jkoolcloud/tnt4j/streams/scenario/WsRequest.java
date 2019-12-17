@@ -122,6 +122,18 @@ public class WsRequest<T> {
 	}
 
 	/**
+	 * Sets parameters map for this request.
+	 * 
+	 * @param params
+	 *            parameters map to be set for this request
+	 */
+	public void setParameters(Map<String, Parameter> params) {
+		if (params != null) {
+			parameters.putAll(params);
+		}
+	}
+
+	/**
 	 * Returns request parameter mapped to provided key.
 	 * 
 	 * @param pKey
