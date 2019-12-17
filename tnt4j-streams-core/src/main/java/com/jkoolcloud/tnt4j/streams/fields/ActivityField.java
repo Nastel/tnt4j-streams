@@ -424,7 +424,7 @@ public class ActivityField extends AbstractFieldEntity {
 	public ActivityField setSeparator(String locatorSep) {
 		this.separator = locatorSep;
 
-		setMasterLocatorDataType(ActivityFieldDataType.String);
+		adjustMasterLocatorDataType(ActivityFieldDataType.String);
 
 		return this;
 	}
@@ -451,15 +451,18 @@ public class ActivityField extends AbstractFieldEntity {
 	public ActivityField setFormattingPattern(String pattern) {
 		this.formattingPattern = pattern;
 
-		setMasterLocatorDataType(ActivityFieldDataType.String);
+		adjustMasterLocatorDataType(ActivityFieldDataType.String);
 
 		return this;
 	}
 
-	private void setMasterLocatorDataType(ActivityFieldDataType dType) {
+	private void adjustMasterLocatorDataType(ActivityFieldDataType dType) {
 		ActivityFieldLocator mLoc = getMasterLocator();
 		if (mLoc != null) {
-			mLoc.setDataType(dType);
+			if (mLoc.getDataType() == ActivityFieldDataType.AsInput
+					|| mLoc.getDataType() == ActivityFieldDataType.Generic) {
+				mLoc.setDataType(dType);
+			}
 		}
 	}
 
