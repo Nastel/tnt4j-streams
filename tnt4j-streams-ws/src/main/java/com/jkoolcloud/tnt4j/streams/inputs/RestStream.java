@@ -362,10 +362,14 @@ public class RestStream extends AbstractWsStream<String> {
 						request.setSentData(reqDataStr);
 						respStr = stream.executePOST(stream.client, scenarioStep.getUrlStr(), reqDataStr,
 								scenarioStep.getUsername(), decPassword(scenarioStep.getPassword()));
+					} catch (IOException exc) {
+						stream.logger().log(OpLevel.WARNING,
+								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+								"RestStream.execute.exception", stream.getName(), request.getId(), exc.getMessage());
 					} catch (Throwable exc) {
 						Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-								"RestStream.execute.exception", stream.getName(), exc);
+								"RestStream.execute.exception", stream.getName(), request.getId(), exc);
 					}
 
 					if (StringUtils.isNotEmpty(respStr)) {
@@ -407,10 +411,14 @@ public class RestStream extends AbstractWsStream<String> {
 					stream.logger().log(OpLevel.INFO,
 							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 							"RestStream.void.request", request.getId(), exc.getMessage());
+				} catch (IOException exc) {
+					stream.logger().log(OpLevel.WARNING,
+							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+							"RestStream.execute.exception", stream.getName(), request.getId(), exc.getMessage());
 				} catch (Throwable exc) {
 					Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-							"RestStream.execute.exception", stream.getName(), exc);
+							"RestStream.execute.exception", stream.getName(), request.getId(), exc);
 				}
 
 				if (StringUtils.isNotEmpty(respStr)) {

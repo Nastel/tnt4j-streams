@@ -409,10 +409,14 @@ public class WsStream extends AbstractWsStream<String> {
 						request.setSentData(reqStr);
 						respStr = callWebService(stream.fillInRequestData(scenarioStep.getUrlStr()), reqStr, stream,
 								scenarioStep.getScenario());
+					} catch (IOException exc) {
+						stream.logger().log(OpLevel.WARNING,
+								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+								"WsStream.execute.exception", stream.getName(), request.getId(), exc.getMessage());
 					} catch (Throwable exc) {
 						Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-								"WsStream.execute.exception", exc);
+								"WsStream.execute.exception", stream.getName(), request.getId(), exc);
 					} finally {
 						if (StringUtils.isNotEmpty(respStr)) {
 							stream.addInputToBuffer(new WsReqResponse<>(respStr, request));
