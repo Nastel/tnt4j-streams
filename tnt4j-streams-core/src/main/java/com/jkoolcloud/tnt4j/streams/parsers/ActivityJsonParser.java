@@ -26,7 +26,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.jayway.jsonpath.DocumentContext;
@@ -255,23 +254,17 @@ public class ActivityJsonParser extends GenericActivityParser<DocumentContext> {
 			}
 
 			if (jsonValue != null) {
-				List<Object> jsonValuesList;
 				if (jsonValue instanceof List) {
-					jsonValuesList = (List<Object>) jsonValue;
-				} else {
-					jsonValuesList = new ArrayList<>(1);
-					jsonValuesList.add(jsonValue);
-				}
-
-				if (CollectionUtils.isNotEmpty(jsonValuesList)) {
+					List<Object> jsonValuesList = (List<Object>) jsonValue;
 					List<Object> valuesList = new ArrayList<>(jsonValuesList.size());
 					for (Object jsonValues : jsonValuesList) {
 						valuesList.add(locator.formatValue(jsonValues));
 					}
-
-					val = Utils.simplifyValue(valuesList);
-					formattingNeeded.set(false);
+					val = valuesList;
+				} else {
+					val = locator.formatValue(jsonValue);
 				}
+				formattingNeeded.set(false);
 			}
 		}
 
