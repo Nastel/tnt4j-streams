@@ -762,14 +762,31 @@ public class ActivityInfo {
 	/**
 	 * Assigns new activity entity tracking identifier value if not yet defined.
 	 *
-	 * @return the tracking identifier
+	 * @return the assigned tracking identifier
+	 * 
+	 * @see #determineTrackingId(String)
 	 */
 	public String determineTrackingId() {
+		return determineTrackingId(null);
+	}
+
+	/**
+	 * Assigns new activity entity tracking identifier value if not yet defined.
+	 * <p>
+	 * If context and provided {@code defaultTrackingId} tracking identifier values are {@code null} or empty - new UUID
+	 * value is assigned.
+	 *
+	 * @param defaultTrackingId
+	 *            tracking identifier to assign if there is no context applicable value
+	 * @return the assigned tracking identifier
+	 */
+	public String determineTrackingId(String defaultTrackingId) {
 		if (StringUtils.isEmpty(trackingId)) {
 			if (StringUtils.isNotEmpty(guid)) {
 				trackingId = guid;
 			} else {
-				trackingId = DefaultUUIDFactory.getInstance().newUUID();
+				trackingId = StringUtils.isEmpty(defaultTrackingId) ? DefaultUUIDFactory.getInstance().newUUID()
+						: defaultTrackingId;
 			}
 		}
 		return trackingId;
@@ -1036,9 +1053,7 @@ public class ActivityInfo {
 				continue;
 			}
 
-			if (cais.size() > 1) {
-				child.determineTrackingId();
-			}
+			child.determineTrackingId(cais.size() > 1 ? null : this.trackingId);
 			child.merge(this);
 			verifyDuplicates(child, chTrackables);
 			Trackable t = child.buildTrackable(tracker);
