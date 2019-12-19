@@ -99,6 +99,16 @@ public class WsRequest<T> {
 		return data;
 	}
 
+	/**
+	 * Sets request data package.
+	 * 
+	 * @param data
+	 *            request data package
+	 */
+	public void setData(T data) {
+		this.data = data;
+	}
+
 	@Override
 	public String toString() {
 		return String.valueOf(data);
@@ -232,6 +242,16 @@ public class WsRequest<T> {
 	 */
 	public void setScenarioStep(WsScenarioStep scenarioStep) {
 		this.scenarioStep = scenarioStep;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof WsRequest) {
+			WsRequest<?> other = (WsRequest<?>) obj;
+			return id == null ? data.equals(other.data) : id.equals(other.id);
+		}
+
+		return false;
 	}
 
 	/**
