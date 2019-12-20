@@ -28,6 +28,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.AbstractTrigger;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
@@ -84,7 +85,6 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	 * Semaphore for synchronizing stream requests.
 	 */
 	private Semaphore semaphore;
-	private boolean itemPicked = false;
 
 	private List<WsScenario> scenarioList;
 
@@ -208,7 +208,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 
 		String jobId = step.getScenario().getName() + ':' + step.getName();
 
-		JobDetail job = buildJob(jobId, jobAttrs);
+		JobDetail job = buildJob(step.getScenario().getName(), step.getName(), jobAttrs);
 
 		ScheduleBuilder<?> scheduleBuilder;
 		AbstractSchedulerData schedulerData = (AbstractSchedulerData) step.getSchedulerData();
@@ -237,7 +237,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 		}
 
 		Date startAt = schedulerData == null ? new Date() : schedulerData.getStartAt();
-		Trigger trigger = TriggerBuilder.newTrigger().withIdentity(job.getKey() + "Trigger") // NON-NLS
+		Trigger trigger = TriggerBuilder.newTrigger().withIdentity(String.valueOf(job.getKey()), getName())
 				.startAt(startAt).withSchedule(scheduleBuilder).build();
 
 		if (schedulerData != null && schedulerData.getStartDelay() != null && schedulerData.getStartDelay() > 0) {
@@ -254,13 +254,15 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	/**
 	 * Builds scheduler job for call scenario step.
 	 *
+	 * @param group
+	 *            jobs group name
 	 * @param jobId
 	 *            job identifier
 	 * @param jobAttrs
 	 *            additional job attributes
 	 * @return scheduler job detail object.
 	 */
-	protected abstract JobDetail buildJob(String jobId, JobDataMap jobAttrs);
+	protected abstract JobDetail buildJob(String group, String jobId, JobDataMap jobAttrs);
 
 	/**
 	 * Adds scenario to scenarios list.
@@ -312,7 +314,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 		if (scheduler != null) {
 			try {
 				int rCount = 0;
-				Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(null);
+				Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.anyGroup());
 				if (CollectionUtils.isNotEmpty(triggerKeys)) {
 					for (TriggerKey tKey : triggerKeys) {
 						try {
@@ -320,6 +322,9 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 							if (t != null && isInactiveTrigger(t)) {
 								scheduler.deleteJob(t.getJobKey());
 								rCount++;
+								logger().log(OpLevel.TRACE,
+										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+										"AbstractWsStream.scheduler.removed.inactive.job", getName(), tKey);
 							}
 						} catch (SchedulerException exc) {
 						}
@@ -357,7 +362,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 
 			// Check scheduler triggers - have they been fired and may fire again
 			try {
-				Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(null);
+				Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.anyGroup());
 				logger().log(OpLevel.TRACE, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 						"AbstractWsStream.scheduler.triggers", triggerKeys.size());
 				if (CollectionUtils.isNotEmpty(triggerKeys)) {
@@ -417,11 +422,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	 * @see #postParse(com.jkoolcloud.tnt4j.streams.scenario.WsResponse)
 	 */
 	protected void pickAndPostParseItem(WsResponse<T> item) {
-		if (itemPicked) {
-			postParse(item);
-		} else {
-			itemPicked = true;
-		}
+		postParse(item);
 	}
 
 	@Override
@@ -444,17 +445,17 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 			WsReqResponse<?, ?> resp = (WsReqResponse<?, ?>) item;
 
 			if (semaphore != null) {
-				releaseSemaphore(semaphore, this, getName(), resp.getOriginalRequest());
+				releaseSemaphore(semaphore, getName(), resp.getOriginalRequest());
 			}
 
 			Semaphore reqSemaphore = resp.getSemaphore();
 
 			if (reqSemaphore != null) {
-				releaseSemaphore(reqSemaphore, this, resp.getScenarioStep().getName(), resp.getOriginalRequest());
+				releaseSemaphore(reqSemaphore, resp.getScenarioStep().getName(), resp.getOriginalRequest());
 			}
 		} else {
 			if (semaphore != null) {
-				releaseSemaphore(semaphore, this, getName(), null);
+				releaseSemaphore(semaphore, getName(), null);
 			}
 		}
 	}
@@ -659,17 +660,14 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	 *
 	 * @param acquiredSemaphore
 	 *            requests semaphore to release
-	 * @param stream
-	 *            stream instance used
 	 * @param lockName
 	 *            locker object name
 	 * @param request
 	 *            request semaphore was obtained for
 	 */
-	protected static void releaseSemaphore(Semaphore acquiredSemaphore, AbstractWsStream<?> stream, String lockName,
-			WsRequest<?> request) {
+	protected void releaseSemaphore(Semaphore acquiredSemaphore, String lockName, WsRequest<?> request) {
 		if (acquiredSemaphore != null && acquiredSemaphore.availablePermits() < 1) {
-			stream.logger().log(OpLevel.DEBUG,
+			logger().log(OpLevel.DEBUG,
 					StreamsResources.getString(WsStreamConstants.RESOURCE_BUNDLE_NAME,
 							"AbstractWsStream.semaphore.release"),
 					lockName, request == null ? "UNKNOWN" : request.getId()); // NON-NLS

@@ -72,8 +72,8 @@ public class CmdStream extends AbstractWsStream<String> {
 	}
 
 	@Override
-	protected JobDetail buildJob(String jobId, JobDataMap jobAttrs) {
-		return JobBuilder.newJob(CmdCallJob.class).withIdentity(jobId).usingJobData(jobAttrs).build();
+	protected JobDetail buildJob(String group, String jobId, JobDataMap jobAttrs) {
+		return JobBuilder.newJob(CmdCallJob.class).withIdentity(jobId, group).usingJobData(jobAttrs).build();
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class CmdStream extends AbstractWsStream<String> {
 					if (StringUtils.isNotEmpty(respStr)) {
 						stream.addInputToBuffer(new WsReqResponse<>(respStr, request));
 					} else {
-						releaseSemaphore(acquiredSemaphore, stream, scenarioStep.getName(), request);
+						stream.releaseSemaphore(acquiredSemaphore, scenarioStep.getName(), request);
 					}
 				}
 			}

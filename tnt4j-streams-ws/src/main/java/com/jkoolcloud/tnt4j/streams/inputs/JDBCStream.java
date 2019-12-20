@@ -199,8 +199,8 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	}
 
 	@Override
-	protected JobDetail buildJob(String jobId, JobDataMap jobAttrs) {
-		return JobBuilder.newJob(JdbcCallJob.class).withIdentity(jobId).usingJobData(jobAttrs).build();
+	protected JobDetail buildJob(String group, String jobId, JobDataMap jobAttrs) {
+		return JobBuilder.newJob(JdbcCallJob.class).withIdentity(jobId, group).usingJobData(jobAttrs).build();
 	}
 
 	@Override
@@ -684,7 +684,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 							resp.addParameter(new WsRequest.Parameter(QUERY_NAME_PROP, qName));
 							stream.addInputToBuffer(resp);
 						} else {
-							releaseSemaphore(acquiredSemaphore, stream, scenarioStep.getName(), request);
+							stream.releaseSemaphore(acquiredSemaphore, scenarioStep.getName(), request);
 						}
 					}
 				}
