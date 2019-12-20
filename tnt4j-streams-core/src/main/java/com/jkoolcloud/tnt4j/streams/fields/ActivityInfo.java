@@ -1198,13 +1198,13 @@ public class ActivityInfo {
 
 	private String getVerifiedEntityName(String trackName, String trackId, Class<?> eClass) {
 		// NOTE: TNT4J API fails if operation name is null
-		if (StringUtils.isEmpty(trackName)) {
+		if (StringUtils.isEmpty(trackName) && eventType != OpType.NOOP) {
 			if (StringUtils.isNotEmpty(guid)) {
 				trackName = guid;
 			} else {
 				trackName = trackId;
 			}
-			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityInfo.activity.has.no.name", eClass.getSimpleName(), trackId, trackName);
 		}
 

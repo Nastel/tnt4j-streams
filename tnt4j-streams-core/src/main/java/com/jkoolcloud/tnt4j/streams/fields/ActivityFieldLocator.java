@@ -159,7 +159,7 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 			builtInType = StringUtils.isNumeric(locator) ? ActivityFieldLocatorType.Index
 					: ActivityFieldLocatorType.Label;
 
-			logger().log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityFieldLocator.setting.default.locator.type", locator, builtInType);
 		} else {
 			if (builtInType.getDataType() == Integer.class) {
