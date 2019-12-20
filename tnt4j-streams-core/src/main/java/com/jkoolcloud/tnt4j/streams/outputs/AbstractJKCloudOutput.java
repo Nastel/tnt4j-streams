@@ -584,7 +584,8 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "TNTStreamOutput.status.msg"),
 					getStream().getName(), status);
 		} else {
-			sMsgEvent = tracker.newEvent(OpLevel.INFO, OpType.STOP, "Streaming-session-shutdown-event", // NON-NLS
+			sMsgEvent = tracker.newEvent(status == StreamStatus.FAILURE ? OpLevel.ERROR : OpLevel.INFO, OpType.STOP,
+					"Streaming-session-shutdown-event", // NON-NLS
 					(String) null, "STREAM_SHUTDOWN", // NON-NLS
 					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "TNTStreamOutput.status.msg"),
 					getStream().getName(), status);
