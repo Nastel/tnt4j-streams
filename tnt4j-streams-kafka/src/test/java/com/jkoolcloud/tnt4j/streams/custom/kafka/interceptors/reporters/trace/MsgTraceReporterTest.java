@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -87,7 +88,7 @@ public class MsgTraceReporterTest {
 		TopicPartition topic = new TopicPartition(MsgTraceReporter.TNT_TRACE_CONFIG_TOPIC, 0);
 		consumer.assign(Arrays.asList(topic));
 		while (true) {
-			ConsumerRecords<String, String> records = consumer.poll(100);
+			ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
 			if (records.count() > 0) {
 				System.out.println("Polled " + records.count() + "messages");
 			}

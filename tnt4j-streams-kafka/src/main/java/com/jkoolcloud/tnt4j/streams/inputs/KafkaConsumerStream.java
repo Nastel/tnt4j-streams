@@ -323,7 +323,7 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 					consumer.subscribe(topics);
 
 					while (!isHalted()) {
-						ConsumerRecords<?, ?> records = consumer.poll(Duration.ofSeconds(Long.MAX_VALUE));
+						ConsumerRecords<?, ?> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
 						if (autoCommit) {
 							addRecordsToBuffer(records);
 						} else {

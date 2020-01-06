@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.text.ParseException;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -309,7 +310,8 @@ public class MsgTraceReporter implements InterceptionsReporter {
 			props.remove(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG);
 			KafkaConsumer<String, TraceCommandDeserializer.TopicTraceCommand> consumer = getKafkaConsumer(props);
 			while (true) {
-				ConsumerRecords<String, TraceCommandDeserializer.TopicTraceCommand> records = consumer.poll(100);
+				ConsumerRecords<String, TraceCommandDeserializer.TopicTraceCommand> records = consumer
+						.poll(Duration.ofMillis(100));
 				if (records.count() > 0) {
 					LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 							"MsgTraceReporter.polled.commands", records.count(), records.iterator().next());

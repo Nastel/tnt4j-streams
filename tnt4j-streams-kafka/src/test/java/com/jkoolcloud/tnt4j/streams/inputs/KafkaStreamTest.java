@@ -126,7 +126,7 @@ public class KafkaStreamTest {
 		KafkaConsumer<byte[], byte[]> consumer = new KafkaConsumer<>(props);
 		consumer.subscribe(topics);
 
-		ConsumerRecords<byte[], byte[]> consumerRecords = consumer.poll(Duration.ofSeconds(1).toMillis());
+		ConsumerRecords<byte[], byte[]> consumerRecords = consumer.poll(Duration.ofSeconds(1));
 		for (ConsumerRecord<byte[], byte[]> cRec : consumerRecords) {
 			System.out.println(new String(cRec.value()));
 		}

@@ -18,6 +18,7 @@ package com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors;
 
 import java.io.FileReader;
 import java.net.URL;
+import java.time.Duration;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
@@ -192,7 +193,7 @@ public class InterceptorsTest {
 		Map<String, Object> data = new HashMap<>(3);
 		while (!halt) {
 			try {
-				ConsumerRecords<String, String> records = consumer.poll(Long.MAX_VALUE);
+				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
 				for (ConsumerRecord<String, String> record : records) {
 					data.clear();
 					data.put("partition", record.partition()); // NON-NLS

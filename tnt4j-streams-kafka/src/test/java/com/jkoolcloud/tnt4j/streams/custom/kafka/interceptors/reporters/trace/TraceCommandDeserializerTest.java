@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -96,7 +97,7 @@ public class TraceCommandDeserializerTest {
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
 		consumer.subscribe(Collections.singletonList(MsgTraceReporter.TNT_TRACE_CONFIG_TOPIC));
 		while (true) {
-			ConsumerRecords<String, String> records = consumer.poll(100);
+			ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
 			for (ConsumerRecord<String, String> record : records) {
 				System.out.printf("offset = %d, key = %s, value = %s", record.offset(), record.key(), record.value());
 			}

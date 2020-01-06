@@ -419,7 +419,7 @@ public class KafkaStream extends TNTParseableInputStream<Map<String, ?>> {
 					Map<String, Integer> topicCountMap = new HashMap<>();
 					topicCountMap.put(topicName, 1);
 
-					ConsumerRecords<?, ?> records = consumer.poll(Duration.ofSeconds(Long.MAX_VALUE));
+					ConsumerRecords<?, ?> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
 
 					if (autoCommit) {
 						addRecordsToBuffer(records);
