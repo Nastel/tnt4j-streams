@@ -126,7 +126,7 @@ public class CmdStream extends AbstractWsStream<String> {
 				for (WsRequest<String> request : scenarioStep.getRequests()) {
 					respStr = null;
 					try {
-						acquiredSemaphore = acquireSemaphore(stream, request);
+						acquiredSemaphore = stream.acquireSemaphore(request);
 						String processedRequest = request.getData();
 						for (Map.Entry<String, WsRequest.Parameter> req : request.getParameters().entrySet()) {
 							processedRequest = stream.fillInRequestData(processedRequest, req.getValue().getFormat());

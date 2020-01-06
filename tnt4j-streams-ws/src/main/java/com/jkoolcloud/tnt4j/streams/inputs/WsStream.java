@@ -404,7 +404,7 @@ public class WsStream extends AbstractWsStream<String> {
 					reqStr = null;
 					respStr = null;
 					try {
-						acquiredSemaphore = acquireSemaphore(stream, request);
+						acquiredSemaphore = stream.acquireSemaphore(request);
 						reqStr = stream.fillInRequestData(request.getData());
 						request.setSentData(reqStr);
 						respStr = callWebService(stream.fillInRequestData(scenarioStep.getUrlStr()), reqStr, stream,

@@ -357,7 +357,7 @@ public class RestStream extends AbstractWsStream<String> {
 					reqDataStr = null;
 					respStr = null;
 					try {
-						acquiredSemaphore = acquireSemaphore(stream, request);
+						acquiredSemaphore = stream.acquireSemaphore(request);
 						reqDataStr = stream.preProcess(request.getData());
 						request.setSentData(reqDataStr);
 						respStr = stream.executePOST(stream.client, scenarioStep.getUrlStr(), reqDataStr,
@@ -402,7 +402,7 @@ public class RestStream extends AbstractWsStream<String> {
 				reqUrl = null;
 				respStr = null;
 				try {
-					acquiredSemaphore = acquireSemaphore(stream, request);
+					acquiredSemaphore = stream.acquireSemaphore(request);
 					reqUrl = stream.preProcessURL(stream.uriForGET(urlStr, request), true);
 					request.setSentData(reqUrl);
 					respStr = stream.executeGET(stream.client, reqUrl, scenarioStep.getUsername(),

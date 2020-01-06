@@ -669,7 +669,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 
 					respRs = null;
 					try {
-						acquiredSemaphore = acquireSemaphore(stream, request);
+						acquiredSemaphore = stream.acquireSemaphore(request);
 						dbQuery = stream.fillInRequestData(request.getData());
 						request.setSentData(dbQuery);
 						respRs = executeJdbcCall(scenarioStep.getUrlStr(), scenarioStep.getUsername(),

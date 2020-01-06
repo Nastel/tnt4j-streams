@@ -621,33 +621,30 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	 * configuration property
 	 * {@value com.jkoolcloud.tnt4j.streams.configure.WsStreamProperties#PROP_SYNCHRONIZE_REQUESTS}.
 	 *
-	 * @param stream
-	 *            stream instance used
 	 * @param request
 	 *            request semaphore is obtained for
 	 * @return acquired semaphore instance or {@code null} if no semaphore was acquired
 	 * @throws InterruptedException
 	 *             if current thread got interrupted when acquiring semaphore
 	 */
-	protected static Semaphore acquireSemaphore(AbstractWsStream<?> stream, WsRequest<?> request)
-			throws InterruptedException {
+	protected Semaphore acquireSemaphore(WsRequest<?> request) throws InterruptedException {
 		WsScenarioStep scenarioStep = request.getScenarioStep();
 		Semaphore stepSemaphore = scenarioStep.getSemaphore();
 
-		if (stream.semaphore != null) {
-			while (!stream.semaphore.tryAcquire()) {
+		if (semaphore != null) {
+			while (!semaphore.tryAcquire()) {
 				Thread.sleep(50);
 			}
-			stream.logger().log(OpLevel.DEBUG, StreamsResources.getString(WsStreamConstants.RESOURCE_BUNDLE_NAME,
-					"AbstractWsStream.semaphore.acquired.stream"), stream.getName(), request.getId());
-			return stream.semaphore;
+			logger().log(OpLevel.DEBUG, StreamsResources.getString(WsStreamConstants.RESOURCE_BUNDLE_NAME,
+					"AbstractWsStream.semaphore.acquired.stream"), getName(), request.getId());
+			return semaphore;
 		}
 
 		if (stepSemaphore != null) {
 			while (!stepSemaphore.tryAcquire()) {
 				Thread.sleep(50);
 			}
-			stream.logger().log(OpLevel.DEBUG, StreamsResources.getString(WsStreamConstants.RESOURCE_BUNDLE_NAME,
+			logger().log(OpLevel.DEBUG, StreamsResources.getString(WsStreamConstants.RESOURCE_BUNDLE_NAME,
 					"AbstractWsStream.semaphore.acquired.step"), scenarioStep.getName(), request.getId());
 			return stepSemaphore;
 		}
