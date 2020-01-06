@@ -18,12 +18,11 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayDeque;
-import java.util.Hashtable;
-import java.util.NoSuchElementException;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -125,6 +124,15 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 	protected static final String PORT_E = ")"; // NON-NLS
 
 	/**
+	 * Key for message read failures counter.
+	 */
+	protected static final String READ_FAIL_COUNT_KEY = "ReadFailCount"; // NON-NLS
+	/**
+	 * Key for queue manager connection failures counter.
+	 */
+	protected static final String CONN_FAIL_COUNT_KEY = "ConnFailCount"; // NON-NLS
+
+	/**
 	 * Represents Queue Manager connected to
 	 */
 	protected MQQueueManager qmgr = null;
@@ -140,11 +148,18 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 	protected MQGetMessageOptions gmo = null;
 
 	/**
-	 * Current count of number of successive get failures.
+	 * Registry map for failure counters. Currently two types of failures are supported out of the box: READ and
+	 * CONNECT.
 	 *
+	 * @see #READ_FAIL_COUNT_KEY
+	 * @see #CONN_FAIL_COUNT_KEY
 	 * @see #MAX_CONSECUTIVE_FAILURES
 	 */
-	protected int curFailCount = 0;
+	protected Map<String, AtomicInteger> failCountsMap = new HashMap<>(2);
+	{
+		failCountsMap.put(READ_FAIL_COUNT_KEY, new AtomicInteger());
+		failCountsMap.put(CONN_FAIL_COUNT_KEY, new AtomicInteger());
+	}
 
 	// Stream properties
 	private String qmgrName = null;
@@ -545,7 +560,50 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 		logger().log(OpLevel.INFO, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
 				"WmqStream.reading.from", dest.getName().trim(), String.format("%08X", gmo.options), // NON-NLS
 				MQConstants.decodeOptions(gmo.options, "MQGMO_.*")); // NON-NLS
-		curFailCount = 0;
+		resetFailCounts();
+	}
+
+	/**
+	 * Resets all registered failure counters.
+	 */
+	protected void resetFailCounts() {
+		resetFailCount(READ_FAIL_COUNT_KEY);
+		resetFailCount(CONN_FAIL_COUNT_KEY);
+	}
+
+	/**
+	 * Resets count of defined failures counter to {@code 0}.
+	 * 
+	 * @param fKey
+	 *            failure counter key
+	 */
+	protected void resetFailCount(String fKey) {
+		failCountsMap.get(fKey).set(0);
+	}
+
+	/**
+	 * Increments count of defined failures counter by {@code 1}.
+	 * 
+	 * @param fKey
+	 *            failure counter key
+	 * @return updated failures count value
+	 */
+	protected int incrementFailCount(String fKey) {
+		return failCountsMap.get(fKey).incrementAndGet();
+	}
+
+	/**
+	 * Checks if failures counter reached limit of consecutive failures.
+	 * 
+	 * @param fKey
+	 *            failure counter key
+	 * @param max
+	 *            maximum number of consecutive failures
+	 * @return {@code true} if current failures count is greater or equals maximum number of consecutive failures,
+	 *         {@code false} - otherwise
+	 */
+	protected boolean isFailLimitReached(String fKey, int max) {
+		return failCountsMap.get(fKey).get() >= max;
 	}
 
 	@Override
@@ -562,13 +620,22 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 								"WmqStream.failed.opening", formatMqException(mqe));
 						return null;
 					}
+
+					incrementFailCount(CONN_FAIL_COUNT_KEY);
 					logger().log(OpLevel.ERROR, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
 							"WmqStream.failed.to.connect", formatMqException(mqe));
 					if (!isHalted()) {
-						if (connections.isEmpty()) {
+						if (isFailLimitReached(CONN_FAIL_COUNT_KEY, connections.size())) {
+							logger().log(OpLevel.WARNING,
+									StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+									"WmqStream.reached.conn.limit", connections.size());
 							sleep(reconnectDelay);
+							resetFailCount(CONN_FAIL_COUNT_KEY);
 						}
-						swapConnection();
+
+						if (CollectionUtils.size(connections) > 1) {
+							swapConnection();
+						}
 					}
 				}
 			}
@@ -594,7 +661,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 				}
 				T msgData = getActivityDataFromMessage(mqMsg);
 				qmgr.commit();
-				curFailCount = 0;
+				resetFailCount(READ_FAIL_COUNT_KEY);
 				addStreamedBytesCount(mqMsg.getMessageLength());
 				// logger().log(OpLevel.DEBUG, "QUEUE {0} DEPTH: {1}", queueName, ((MQQueue) dest).getCurrentDepth());
 				return msgData;
@@ -605,15 +672,15 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 					return null;
 				}
 
-				curFailCount++;
+				incrementFailCount(READ_FAIL_COUNT_KEY);
 				logger().log(OpLevel.ERROR, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
 						"WmqStream.failed.reading", dest.getName().trim(), formatMqException(mqe));
 				boolean throwException = true;
-				if (curFailCount >= MAX_CONSECUTIVE_FAILURES) {
-					logger().log(OpLevel.ERROR, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+				if (isFailLimitReached(READ_FAIL_COUNT_KEY, MAX_CONSECUTIVE_FAILURES)) {
+					logger().log(OpLevel.WARNING, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
 							"WmqStream.reached.limit", MAX_CONSECUTIVE_FAILURES);
 					closeQmgrConnection();
-					curFailCount = 0;
+					resetFailCount(READ_FAIL_COUNT_KEY);
 				} else {
 					if (!isHalted()) {
 						switch (mqe.getReason()) {
