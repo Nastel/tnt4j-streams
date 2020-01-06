@@ -23,7 +23,6 @@ import static org.junit.Assert.assertNotEquals;
 import java.time.Duration;
 import java.util.*;
 
-import org.I0Itec.zkclient.exception.ZkTimeoutException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -58,7 +57,7 @@ public class KafkaStreamTest {
 		testPropertyList(input, props.entrySet());
 	}
 
-	@Test(expected = ZkTimeoutException.class)
+	@Test(expected = Exception.class)
 	public void testInitialize() throws Exception {
 		testProperties();
 		input.startStream();
