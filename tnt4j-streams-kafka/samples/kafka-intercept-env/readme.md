@@ -55,8 +55,12 @@ log4j.appender.activities_log.layout.ConversionPattern=%m%n
 #log4j.appender.activities_log.bufferSize=512
 
 log4j.logger.com.jkoolcloud.tnt4j.streams=DEBUG, tnt4jAppender
-### if streams are not subject to log ###
 #log4j.logger.com.jkoolcloud.tnt4j.streams=OFF
+#### tnt4j API logger ####
+#log4j.logger.com.jkoolcloud.tnt4j=DEBUG
+#### tnt4j API logger ####
+#log4j.logger.com.jkoolcloud.jesl=DEBUG
+### if streams are not subject to log ###
 log4j.additivity.com.jkoolcloud.tnt4j.streams=false
 #### tnt4j API logger ####
 #log4j.logger.com.jkoolcloud.tnt4j=DEBUG
