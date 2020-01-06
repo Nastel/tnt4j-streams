@@ -187,7 +187,7 @@ public class KafkaConsumerRecordParser extends GenericActivityParser<ConsumerRec
 		} else if ("value".equalsIgnoreCase(propStr)) { // NON-NLS
 			val = Utils.getFieldValue(path, cRecord.value(), i + 1);
 		} else if ("leaderEpoch".equalsIgnoreCase(propStr)) { // NON-NLS
-			// val = Utils.getFieldValue(path, cRecord.leaderEpoch().orElse(null), i + 1);
+			val = Utils.getFieldValue(path, cRecord.leaderEpoch().orElse(null), i + 1);
 		}
 
 		return val;
