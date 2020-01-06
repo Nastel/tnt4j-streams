@@ -46,7 +46,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>Topic - topic name to listen. (Required)</li>
  * <li>FileName - Kafka Consumer configuration file ({@code "consumer.properties"}) path. (Optional)</li>
  * <li>List of Kafka Consumer configuration properties. See
- * <a href="https://kafka.apache.org/documentation/#consumerconfigs">Kafka Consumer configuration reference</a></li>.
+ * <a href="https://kafka.apache.org/documentation/#consumerconfigs">Kafka Consumer configuration reference</a>.</li>
  * </ul>
  * <p>
  * NOTE: those file defined Kafka consumer properties gets merged with ones defined in stream configuration - user

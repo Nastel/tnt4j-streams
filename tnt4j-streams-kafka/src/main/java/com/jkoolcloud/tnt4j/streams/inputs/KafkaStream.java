@@ -78,7 +78,7 @@ import kafka.server.KafkaServerStartable;
  * <li>List of properties used by Kafka API, e.g., zookeeper.connect, group.id. @see
  * <a href="https://kafka.apache.org/documentation/#consumerconfigs">for more details on Kafka consumer configuration
  * properties</a>. @see <a href="https://kafka.apache.org/documentation/#configuration">Kafka configuration
- * reference</a></li>.
+ * reference</a>.</li>
  * </ul>
  * <p>
  * Default ZooKeeper and Kafka server configuration properties are loaded from configuration files referenced by Java
