@@ -34,6 +34,7 @@ import com.jkoolcloud.tnt4j.streams.configure.build.CfgStreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.configure.build.StreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.configure.zookeeper.ZKConfigManager;
 import com.jkoolcloud.tnt4j.streams.inputs.*;
+import com.jkoolcloud.tnt4j.streams.management.MBeansManager;
 import com.jkoolcloud.tnt4j.streams.utils.Duration;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
@@ -303,7 +304,7 @@ public final class StreamsAgent {
 	 * @return {@code true} if streams threads group is not {@code null} and has active treads running, {@code false} -
 	 *         otherwise
 	 */
-	protected static boolean isStreamsRunning() {
+	public static boolean isStreamsRunning() {
 		return streamThreads != null && streamThreads.activeCount() > 0;
 	}
 
@@ -427,6 +428,7 @@ public final class StreamsAgent {
 		new StreamStatisticsReporter(TNTInputStreamStatistics.getMetrics(), null).report(LOGGER);
 		TNTInputStreamStatistics.clear();
 		DefaultEventSinkFactory.shutdownAll();
+		MBeansManager.unregisterMBeans();
 	}
 
 	/**
@@ -459,6 +461,8 @@ public final class StreamsAgent {
 		if (streamThreads == null) {
 			streamThreads = new StreamThreadGroup(StreamsAgent.class.getName() + "Threads"); // NON-NLS
 		}
+
+		MBeansManager.registerMBeans();
 
 		InputStreamListener streamListener = builder.getStreamListener();
 		StreamTasksListener streamTasksListener = builder.getTasksListener();
@@ -539,8 +543,8 @@ public final class StreamsAgent {
 				if (StringUtils.isEmpty(zookeeperStreamId)) {
 					logOutput(OpLevel.ERROR,
 							StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
-							"StreamsAgent.missing.argument.value",
-							arg.substring(0, PARAM_ZOOKEEPER_STREAM_ID.length())));
+									"StreamsAgent.missing.argument.value",
+									arg.substring(0, PARAM_ZOOKEEPER_STREAM_ID.length())));
 					printUsage();
 					return false;
 				}
@@ -590,7 +594,7 @@ public final class StreamsAgent {
 	/**
 	 * Returns list of running stream names.
 	 *
-	 * @return list of running stream names.
+	 * @return list of running stream names
 	 */
 	public static Collection<String> getRunningStreamNames() {
 		List<String> runningStreamNames = new ArrayList<>();
