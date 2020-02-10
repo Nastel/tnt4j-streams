@@ -166,7 +166,7 @@ IF ["%CLASSPATH%"] EQU [""] (
 	EXIT /B 2
 )
 
-set COMMAND=%JAVA% %KAFKA_HEAP_OPTS% %KAFKA_JVM_PERFORMANCE_OPTS% %KAFKA_JMX_OPTS% %KAFKA_LOG4J_OPTS% -Dtnt4j.config="../../config/tnt4j.properties" -cp "%CLASSPATH%" %KAFKA_OPTS% %*
+set COMMAND=%JAVA% %KAFKA_HEAP_OPTS% %KAFKA_JVM_PERFORMANCE_OPTS% %KAFKA_JMX_OPTS% %KAFKA_LOG4J_OPTS% -Dtnt4j.config="../../config/tnt4j.properties" -Dfile.encoding=UTF-8 -cp "%CLASSPATH%" %KAFKA_OPTS% %*
 rem echo.
 rem echo %COMMAND%
 rem echo.
