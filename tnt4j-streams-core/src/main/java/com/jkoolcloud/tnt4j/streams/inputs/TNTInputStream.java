@@ -91,7 +91,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 	private List<InputStreamListener> streamListeners;
 	private List<StreamTasksListener> streamTasksListeners;
-	private Map<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> streamItemProcessingListeners;
+	private final Map<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> streamItemProcessingListeners = new HashMap<>();
 	private List<StreamItemAccountingListener> streamItemAccountingListeners;
 
 	private boolean useExecutorService = false;
@@ -1090,12 +1090,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 			return;
 		}
 
-		if (streamItemProcessingListeners == null) {
-			streamItemProcessingListeners = new HashMap<>();
-		}
-
-		if (!streamItemProcessingListeners.containsKey(l)) {
-			streamItemProcessingListeners.put(l, null);
+		synchronized (streamItemProcessingListeners) {
+			if (!streamItemProcessingListeners.containsKey(l)) {
+				streamItemProcessingListeners.put(l, null);
+			}
 		}
 	}
 
@@ -1106,8 +1104,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *            the {@code StreamItemProcessingListener} to be removed
 	 */
 	public void removeItemProcessingListener(StreamItemProcessingListener<Timer.Context> l) {
-		if (l != null && streamItemProcessingListeners != null) {
-			streamItemProcessingListeners.remove(l);
+		synchronized (streamItemProcessingListeners) {
+			if (l != null && streamItemProcessingListeners != null) {
+				streamItemProcessingListeners.remove(l);
+			}
 		}
 	}
 
@@ -1115,9 +1115,11 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * Notifies stream items processing listeners that stream is going to get next item to process.
 	 */
 	protected void beforeNextItem() {
-		for (Map.Entry<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> entry : streamItemProcessingListeners
-				.entrySet()) {
-			entry.setValue(entry.getKey().beforeNextItem());
+		synchronized (streamItemProcessingListeners) {
+			for (Map.Entry<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> entry : streamItemProcessingListeners
+					.entrySet()) {
+				entry.setValue(entry.getKey().beforeNextItem());
+			}
 		}
 	}
 
@@ -1125,9 +1127,11 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * Notifies stream items processing listeners that stream has got next item to process.
 	 */
 	protected void afterNextItem() {
-		for (Map.Entry<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> entry : streamItemProcessingListeners
-				.entrySet()) {
-			entry.getKey().afterNextItem(entry.getValue());
+		synchronized (streamItemProcessingListeners) {
+			for (Map.Entry<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> entry : streamItemProcessingListeners
+					.entrySet()) {
+				entry.getKey().afterNextItem(entry.getValue());
+			}
 		}
 	}
 
@@ -1135,9 +1139,11 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * Notifies stream items processing listeners that stream is starting activity item processing/parsing.
 	 */
 	protected void beforeProcessItem() {
-		for (Map.Entry<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> entry : streamItemProcessingListeners
-				.entrySet()) {
-			entry.setValue(entry.getKey().beforeProcessItem());
+		synchronized (streamItemProcessingListeners) {
+			for (Map.Entry<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> entry : streamItemProcessingListeners
+					.entrySet()) {
+				entry.setValue(entry.getKey().beforeProcessItem());
+			}
 		}
 	}
 
@@ -1145,9 +1151,11 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * Notifies stream items processing listeners that stream has completed activity item processing (parsing).
 	 */
 	protected void afterProcessItem() {
-		for (Map.Entry<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> entry : streamItemProcessingListeners
-				.entrySet()) {
-			entry.getKey().afterProcessItem(entry.getValue());
+		synchronized (streamItemProcessingListeners) {
+			for (Map.Entry<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> entry : streamItemProcessingListeners
+					.entrySet()) {
+				entry.getKey().afterProcessItem(entry.getValue());
+			}
 		}
 	}
 

@@ -170,26 +170,26 @@ public class TNTInputStreamStatistics
 
 	@Override
 	public Context<Timer.Context> beforeNextItem() {
-		Context<Timer.Context> objectContext = new Context<>();
-		objectContext.setItem(streamsItemsTimer.time());
-		return objectContext;
+		return new Context<>(streamsItemsTimer.time());
 	}
 
 	@Override
 	public void afterNextItem(Context<Timer.Context> context) {
-		context.getItem().stop();
+		if (context != null) {
+			long time = context.getItem().stop();
+		}
 	}
 
 	@Override
 	public Context<Timer.Context> beforeProcessItem() {
-		Context<Timer.Context> objectContext = new Context<>();
-		objectContext.setItem(processingTimer.time());
-		return objectContext;
+		return new Context<>(processingTimer.time());
 	}
 
 	@Override
 	public void afterProcessItem(Context<Timer.Context> context) {
-		long time = context.getItem().stop();
+		if (context != null) {
+			long time = context.getItem().stop();
+		}
 	}
 
 	@Override

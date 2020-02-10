@@ -68,22 +68,22 @@ public interface StreamItemProcessingListener<T> {
 		private T item;
 
 		/**
+		 * Constructs a new bound processing progress and status tracking context.
+		 *
+		 * @param item
+		 *            processing progress and status tracking item
+		 */
+		Context(T item) {
+			this.item = item;
+		}
+
+		/**
 		 * Returns context bound processing progress and status tracking item.
 		 *
 		 * @return processing progress and status tracking item
 		 */
 		public T getItem() {
 			return item;
-		}
-
-		/**
-		 * Sets context bound processing progress and status tracking item.
-		 *
-		 * @param item
-		 *            processing progress and status tracking item
-		 */
-		public void setItem(T item) {
-			this.item = item;
 		}
 	}
 }
