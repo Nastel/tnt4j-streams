@@ -11,7 +11,13 @@ LOG4JOPTS="-Dlog4j.configuration=file:$SCRIPTPATH/../../config/log4j.properties"
 PRODUCER_CONFIG="-Dproducer.config=$SCRIPTPATH/../../config/intercept/producer.properties"
 CONSUMER_CONFIG="-Dconsumer.config=$SCRIPTPATH/../../config/intercept/consumer.properties"
 INTERCEPT_CONFIG="-Dinterceptors.config=$SCRIPTPATH/../../config/intercept/interceptors.properties"
-STREAMSOPTS="$LOG4JOPTS $TNT4JOPTS $PRODUCER_CONFIG $CONSUMER_CONFIG $INTERCEPT_CONFIG"
+STREAMSOPTS="$LOG4JOPTS $TNT4JOPTS $PRODUCER_CONFIG $CONSUMER_CONFIG $INTERCEPT_CONFIG -Dfile.encoding=UTF-8"
+
+if [ "$JAVA_HOME" == "" ]; then
+  echo '"JAVA_HOME" env. variable is not defined!..'
+else
+  echo 'Will use java from: "$JAVA_HOME"'
+fi
 
 "$JAVA_HOME/bin/java" $STREAMSOPTS -classpath "$LIBPATH" com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.InterceptorsTest
 
