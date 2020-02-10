@@ -17,21 +17,29 @@
 package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 
 import org.slf4j.Logger;
 
 import com.codahale.metrics.*;
 import com.codahale.metrics.jmx.JmxReporter;
+import com.codahale.metrics.jmx.ObjectNameFactory;
+import com.codahale.metrics.jvm.JmxAttributeGauge;
 import com.jkoolcloud.tnt4j.core.Activity;
+import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.core.OpType;
 import com.jkoolcloud.tnt4j.core.Trackable;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.outputs.OutputStreamListener;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
+import com.jkoolcloud.tnt4j.streams.utils.Utils;
 import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
 
 /**
@@ -48,7 +56,7 @@ public class TNTInputStreamStatistics
 	/**
 	 * Constant defining stream start time counter name.
 	 */
-	static final String START_TIME_KEY = "streamStartTime"; // NON-NLS
+	static final String START_TIME_KEY = ":start time"; // NON-NLS
 
 	private static TNTInputStreamStatistics delegate;
 	private static Map<TNTInputStream<?, ?>, TNTInputStreamStatistics> streamStatistics = new HashMap<>();
@@ -56,7 +64,7 @@ public class TNTInputStreamStatistics
 	private final MetricRegistry metrics = new MetricRegistry();
 	private final HashMap<Object, Timer.Context> pendingOutputs = new HashMap<>();
 	private final JmxReporter jmxReporter = JmxReporter.forRegistry(metrics).inDomain("com.jkoolcloud.tnt4j.streams") // NON-NLS
-			.build();
+			.createsObjectNamesWith(new StreamsStatsObjectNameFactory()).build();
 	private TNTInputStream<?, ?> refStream = null;
 
 	private Long bytesTotalValue = 0L;
@@ -91,33 +99,39 @@ public class TNTInputStreamStatistics
 		}
 
 		if (stream == null) {
-			Counter streamTimer = metrics.counter(START_TIME_KEY);
+			try {
+				metrics.register(streamName + START_TIME_KEY,
+						new JmxAttributeGauge(new ObjectName("java.lang:type=Runtime"), "StartTime"));
+			} catch (Exception e) {
+			}
+		} else {
+			Counter streamTimer = metrics.counter(streamName + START_TIME_KEY);
 			streamTimer.inc(System.currentTimeMillis());
 		}
 
 		jmxReporter.start();
-		streamsItemsTimer = metrics.timer(streamName + " input timer"); // NON-NLS
-		processingTimer = metrics.timer(streamName + " processing timer"); // NON-NLS
-		outputTimer = metrics.timer(streamName + " output timer"); // NON-NLS
+		streamsItemsTimer = metrics.timer(streamName + ":input timer"); // NON-NLS
+		processingTimer = metrics.timer(streamName + ":processing timer"); // NON-NLS
+		outputTimer = metrics.timer(streamName + ":output timer"); // NON-NLS
 
-		skippedActivitiesCount = metrics.counter(streamName + " skipped entities"); // NON-NLS
-		filteredActivitiesCount = metrics.counter(streamName + " filtered entities"); // NON-NLS
-		lostActivitiesCount = metrics.counter(streamName + " lost entities"); // NON-NLS
-		totalActivities = metrics.meter(streamName + " total entities"); // NON-NLS
-		processedActivitiesCount = metrics.counter(streamName + " processed entities"); // NON-NLS
+		skippedActivitiesCount = metrics.counter(streamName + ":skipped entities"); // NON-NLS
+		filteredActivitiesCount = metrics.counter(streamName + ":filtered entities"); // NON-NLS
+		lostActivitiesCount = metrics.counter(streamName + ":lost entities"); // NON-NLS
+		totalActivities = metrics.meter(streamName + ":total entities"); // NON-NLS
+		processedActivitiesCount = metrics.counter(streamName + ":processed entities"); // NON-NLS
 
-		outputEvents = metrics.counter(streamName + " output events"); // NON-NLS
-		outputActivities = metrics.counter(streamName + " output activities"); // NON-NLS
-		outputSnapshots = metrics.counter(streamName + " output snapshots"); // NON-NLS
-		outputOther = metrics.counter(streamName + " output others"); // NON-NLS
+		outputEvents = metrics.counter(streamName + ":output events"); // NON-NLS
+		outputActivities = metrics.counter(streamName + ":output activities"); // NON-NLS
+		outputSnapshots = metrics.counter(streamName + ":output snapshots"); // NON-NLS
+		outputOther = metrics.counter(streamName + ":output others"); // NON-NLS
 
-		bytesTotal = metrics.register(streamName + " total bytes", new Gauge<Long>() { // NON-NLS
+		bytesTotal = metrics.register(streamName + ":total bytes", new Gauge<Long>() { // NON-NLS
 			@Override
 			public Long getValue() {
 				return getTotalBytesCount();
 			}
 		});
-		bytesStreamed = metrics.counter(streamName + " bytes streamed"); // NON-NLS
+		bytesStreamed = metrics.counter(streamName + ":bytes streamed"); // NON-NLS
 	}
 
 	/**
@@ -417,11 +431,13 @@ public class TNTInputStreamStatistics
 		if (stream == null) {
 			if (delegate != null) {
 				mRegistry = delegate.metrics;
+				Utils.close(delegate.jmxReporter);
 			}
 		} else {
 			TNTInputStreamStatistics ss = streamStatistics.remove(stream);
 			if (ss != null) {
 				mRegistry = ss.metrics;
+				Utils.close(ss.jmxReporter);
 			}
 		}
 
@@ -435,5 +451,43 @@ public class TNTInputStreamStatistics
 	 */
 	public static void clear() {
 		clear(null);
+	}
+
+	private static class StreamsStatsObjectNameFactory implements ObjectNameFactory {
+		@Override
+		public ObjectName createName(String type, String domain, String name) {
+			try {
+				Hashtable<String, String> properties = new Hashtable<>();
+				String[] nameTokens = name.split(":"); // NON-NLS
+				if (nameTokens.length > 1) {
+					properties.put("type", nameTokens[0]); // NON-NLS
+					properties.put("name", nameTokens[1]); // NON-NLS
+				} else {
+					properties.put("type", "Other"); // NON-NLS
+					properties.put("name", name); // NON-NLS
+				}
+
+				ObjectName objectName = new ObjectName(domain, properties);
+				if (objectName.isDomainPattern()) {
+					domain = ObjectName.quote(domain);
+				}
+
+				for (Map.Entry<String, String> pe : properties.entrySet()) {
+					if (objectName.isPropertyValuePattern(pe.getKey())) {
+						properties.put(pe.getKey(), ObjectName.quote(pe.getValue()));
+					}
+				}
+
+				objectName = new ObjectName(domain, properties);
+				return objectName;
+			} catch (MalformedObjectNameException exc) {
+				try {
+					return new ObjectName(domain, "name", ObjectName.quote(name)); // NON-NLS
+				} catch (MalformedObjectNameException exc2) {
+					LOGGER.log(OpLevel.WARNING, "Unable to register MBean: type={0}, name={1}", type, name, exc2); // NON-NLS
+					throw new RuntimeException(exc2);
+				}
+			}
+		}
 	}
 }

@@ -73,7 +73,7 @@ public class StreamStatisticsReporter implements Reporter {
 		}
 
 		for (Map.Entry<String, Counter> entry : counters.entrySet()) {
-			if (entry.getKey() == START_TIME_KEY) {
+			if (entry.getKey().endsWith(START_TIME_KEY)) {
 				logElapsedTime(b, entry.getValue());
 			} else {
 				logCounter(b, entry.getKey(), entry.getValue());
