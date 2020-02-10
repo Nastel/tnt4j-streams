@@ -31,7 +31,7 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
- * Pre-parser to convert parser parser input data using transformations compatible with
+ * Pre-parser to convert parser input data using transformations compatible with
  * {@link com.jkoolcloud.tnt4j.streams.transform.ValueTransformation} and defined by script or transformation bean
  * reference.
  * <p>
