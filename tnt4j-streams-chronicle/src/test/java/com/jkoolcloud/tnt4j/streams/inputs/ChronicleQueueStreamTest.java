@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import com.jkoolcloud.tnt4j.streams.configure.ChronicleQueueProperties;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
-import com.jkoolcloud.tnt4j.streams.outputs.NullActivityOutput;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser;
 
 import net.openhft.chronicle.queue.ChronicleQueue;
@@ -43,7 +42,7 @@ public class ChronicleQueueStreamTest {
 				return item;
 			}
 		};
-		stream.setOutput(new NullActivityOutput());
+		// stream.setOutput(new NullActivityOutput());
 
 		Path testQueue = Files.createTempDirectory("testQueue");
 
@@ -55,7 +54,7 @@ public class ChronicleQueueStreamTest {
 				"com.jkoolcloud.tnt4j.streams.inputs.ChronicleQueueStreamTest$EntryDefinition");
 		stream.setProperty(ChronicleQueueProperties.PROP_START_FROM_LATEST, "true");
 
-		stream.addReference(new NullActivityOutput());
+		// stream.addReference(new NullActivityOutput());
 		stream.addParser(new ActivityJavaObjectParser());
 
 		stream.addStreamItemAccountingListener(new StreamItemAccountingListener() {
