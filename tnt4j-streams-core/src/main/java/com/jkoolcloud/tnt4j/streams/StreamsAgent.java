@@ -446,6 +446,10 @@ public final class StreamsAgent {
 		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread t, Throwable exc) {
+				if (exc instanceof ThreadDeath) {
+					return;
+				}
+
 				Utils.logThrowable(LOGGER, OpLevel.ERROR,
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"StreamsAgent.uncaught.exception", t, exc);

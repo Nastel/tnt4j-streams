@@ -71,31 +71,10 @@ public class StreamThreadGroup extends ThreadGroup {
 		Thread[] atl = new Thread[activeCount()];
 		enumerate(atl, false);
 
-		Duration tsd;
 		for (Thread t : atl) {
 			if (!isStreamThread(t)) {
-				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"StreamThreadGroup.stopping.thread", t);
-				tsd = Duration.arm();
-				try {
-					t.interrupt();
-					t.join(TimeUnit.SECONDS.toMillis(5));
-				} catch (Exception e) {
-				}
-				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"StreamThreadGroup.stopped.thread", t, t.isAlive(), tsd.duration());
-
-				if (t.isAlive()) {
-					LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"StreamThreadGroup.killing.thread", t);
-					tsd = Duration.arm();
-					try {
-						t.stop();
-					} catch (ThreadDeath e) {
-					}
-					LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"StreamThreadGroup.killed.thread", t, tsd.duration());
-				}
+				Thread tTerminator = new Thread(new ThreadTerminator(t));
+				tTerminator.start();
 			}
 		}
 	}
@@ -131,6 +110,40 @@ public class StreamThreadGroup extends ThreadGroup {
 			staticShutdownHooks.clear();
 		} finally {
 			staticHooksLock.unlock();
+		}
+	}
+
+	private static class ThreadTerminator implements Runnable {
+		private final Thread t;
+
+		ThreadTerminator(Thread t) {
+			this.t = t;
+		}
+
+		@Override
+		public void run() {
+			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+					"StreamThreadGroup.stopping.thread", t);
+			Duration tsd = Duration.arm();
+			try {
+				t.interrupt();
+				t.join(TimeUnit.SECONDS.toMillis(5));
+			} catch (Exception e) {
+			}
+			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+					"StreamThreadGroup.stopped.thread", t, t.isAlive(), tsd.duration());
+
+			if (t.isAlive()) {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						"StreamThreadGroup.killing.thread", t);
+				tsd = Duration.arm();
+				try {
+					t.stop();
+				} catch (ThreadDeath e) {
+				}
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						"StreamThreadGroup.killed.thread", t, tsd.duration());
+			}
 		}
 	}
 }
