@@ -259,10 +259,18 @@ public final class StreamsCache {
 		CacheValue value = valuesCache == null ? null : valuesCache.getIfPresent(cacheKey);
 		if (value == null) {
 			CacheEntry cacheEntry = cacheEntries.get(cacheKey);
+			if (cacheEntry != null) {
+				String cValue = cacheEntry.getValue();
+				return isInvalidCacheEntryValue(cValue) ? cacheEntry.getDefaultValue() : cValue;
+			}
 
-			return cacheEntry == null ? null : cacheEntry.getDefaultValue();
+			return null;
 		}
 		return value.value();
+	}
+
+	private static boolean isInvalidCacheEntryValue(String val) {
+		return val == null || Utils.isVariableExpression(val);
 	}
 
 	/**
