@@ -323,7 +323,11 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 					for (TriggerKey tKey : triggerKeys) {
 						try {
 							Trigger t = scheduler.getTrigger(tKey);
-							if (t != null && isInactiveTrigger(t)) {
+							if (t == null) {
+								continue;
+							}
+
+							if (isInactiveTrigger(t)) {
 								scheduler.deleteJob(t.getJobKey());
 								rCount++;
 								logger().log(OpLevel.TRACE,
@@ -373,12 +377,16 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 					for (TriggerKey tKey : triggerKeys) {
 						try {
 							Trigger t = scheduler.getTrigger(tKey);
+							if (t == null) {
+								continue;
+							}
+
 							logger().log(OpLevel.TRACE,
 									StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 									"AbstractWsStream.scheduler.trigger", t instanceof AbstractTrigger
 											? ((AbstractTrigger<?>) t).getFullName() : t.getClass().getName(),
 									t.getPreviousFireTime(), t.getNextFireTime());
-							if (t != null && isActiveTrigger(t)) {
+							if (isActiveTrigger(t)) {
 								return false;
 							}
 						} catch (SchedulerException exc) {
