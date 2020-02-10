@@ -41,9 +41,16 @@ public class StreamsDaemon implements Daemon {
 	private static final String START_COMMAND = "start"; // NON-NLS
 
 	private static final StreamsDaemon instance = new StreamsDaemon();
+	private DaemonContext daemonContext;
 
 	@Override
 	public void init(DaemonContext daemonContext) throws DaemonInitException, Exception {
+		if (this.daemonContext != null) {
+			throw new DaemonInitException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+					"StreamsDaemon.already.initialized"));
+		}
+
+		this.daemonContext = daemonContext;
 		String[] arguments = daemonContext.getArguments();
 		LOGGER.log(OpLevel.INFO,
 				StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsDaemon.init"),
@@ -54,7 +61,11 @@ public class StreamsDaemon implements Daemon {
 					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsDaemon.processing.args"),
 					(Object[]) arguments);
 
-			StreamsAgent.processArgs(arguments);
+			boolean validArgs = StreamsAgent.processArgs(arguments);
+			if (!validArgs) {
+				throw new DaemonInitException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+						"StreamsDaemon.invalid.args"));
+			}
 		} else {
 			LOGGER.log(OpLevel.WARNING,
 					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsDaemon.no.args"));
@@ -84,14 +95,17 @@ public class StreamsDaemon implements Daemon {
 	public void stop() throws Exception {
 		LOGGER.log(OpLevel.INFO,
 				StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsDaemon.stopping"));
-		notifyInstance();
-		StreamsAgent.stopStreams();
+		stopStreams();
 		LOGGER.log(OpLevel.INFO,
 				StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsDaemon.stop.completed"));
 	}
 
 	@Override
 	public void destroy() {
+		daemonContext = null;
+	}
+
+	private void stopStreams() {
 		notifyInstance();
 		StreamsAgent.stopStreams();
 	}

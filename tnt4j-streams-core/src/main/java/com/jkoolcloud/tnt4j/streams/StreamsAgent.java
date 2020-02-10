@@ -500,7 +500,7 @@ public final class StreamsAgent {
 			}
 			if (arg.startsWith(PARAM_STREAM_CFG)) {
 				if (StringUtils.isNotEmpty(cfgFileName)) {
-					System.out.println(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+					logOutput(OpLevel.ERROR, StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
 							"StreamsAgent.invalid.args"));
 					printUsage();
 					return false;
@@ -508,14 +508,14 @@ public final class StreamsAgent {
 
 				cfgFileName = arg.substring(PARAM_STREAM_CFG.length());
 				if (StringUtils.isEmpty(cfgFileName)) {
-					System.out.println(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+					logOutput(OpLevel.ERROR, StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
 							"StreamsAgent.missing.cfg.file", arg.substring(0, PARAM_STREAM_CFG.length())));
 					printUsage();
 					return false;
 				}
 			} else if (arg.startsWith(PARAM_ZOOKEEPER_CFG)) {
 				if (StringUtils.isNotEmpty(zookeeperCfgFile)) {
-					System.out.println(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+					logOutput(OpLevel.ERROR, StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
 							"StreamsAgent.invalid.args2"));
 					printUsage();
 					return false;
@@ -523,21 +523,22 @@ public final class StreamsAgent {
 
 				zookeeperCfgFile = arg.substring(PARAM_ZOOKEEPER_CFG.length());
 				if (StringUtils.isEmpty(zookeeperCfgFile)) {
-					System.out.println(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+					logOutput(OpLevel.ERROR, StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
 							"StreamsAgent.missing.cfg.file", arg.substring(0, PARAM_ZOOKEEPER_CFG.length())));
 					printUsage();
 					return false;
 				}
 			} else if (arg.startsWith(PARAM_ZOOKEEPER_STREAM_ID)) {
 				if (StringUtils.isNotEmpty(zookeeperStreamId)) {
-					System.out.println(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+					logOutput(OpLevel.ERROR, StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
 							"StreamsAgent.invalid.args3"));
 					printUsage();
 					return false;
 				}
 				zookeeperStreamId = arg.substring(PARAM_ZOOKEEPER_STREAM_ID.length());
 				if (StringUtils.isEmpty(zookeeperStreamId)) {
-					System.out.println(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+					logOutput(OpLevel.ERROR,
+							StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
 							"StreamsAgent.missing.argument.value",
 							arg.substring(0, PARAM_ZOOKEEPER_STREAM_ID.length())));
 					printUsage();
@@ -551,7 +552,7 @@ public final class StreamsAgent {
 				printUsage();
 				return false;
 			} else {
-				System.out.println(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+				logOutput(OpLevel.ERROR, StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
 						"StreamsAgent.invalid.argument", arg));
 				printUsage();
 				return false;
@@ -565,7 +566,16 @@ public final class StreamsAgent {
 	 * Prints short standalone application usage manual.
 	 */
 	protected static void printUsage() {
-		System.out.println(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsAgent.help"));
+		logOutput(OpLevel.INFO, StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsAgent.help"));
+	}
+
+	private static void logOutput(OpLevel lvl, String msg) {
+		LOGGER.log(lvl, msg);
+		if (lvl.ordinal() >= OpLevel.ERROR.ordinal()) {
+			System.err.println(msg);
+		} else {
+			System.out.println(msg);
+		}
 	}
 
 	/**
