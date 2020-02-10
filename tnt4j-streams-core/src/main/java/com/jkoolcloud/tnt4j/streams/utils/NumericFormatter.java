@@ -275,7 +275,7 @@ public class NumericFormatter {
 			numValue = (Number) value;
 		} else {
 			String strValue = Utils.toString(value).trim();
-			if (StringUtils.isEmpty(strValue)) {
+			if (isEmptyNumberStr(strValue)) {
 				return null;
 			}
 
@@ -558,7 +558,8 @@ public class NumericFormatter {
 	 *
 	 * @param str
 	 *            string defining numeric value
-	 * @return number value built from provided {@code str}, or {@code null} if {@code str} is {@code null} or empty
+	 * @return number value built from provided {@code str}, or {@code null} if {@code str} is {@code null}, empty or
+	 *         equals {@code "null"} ignoring case
 	 *
 	 * @see #strToNumber(String, int)
 	 */
@@ -573,10 +574,11 @@ public class NumericFormatter {
 	 *            string defining numeric value
 	 * @param radix
 	 *            radix the radix to be used in interpreting {@code str}
-	 * @return number value built from provided {@code str}, or {@code null} if {@code str} is {@code null} or empty
+	 * @return number value built from provided {@code str}, or {@code null} if {@code str} is {@code null}, empty or
+	 *         equals {@code "null"} ignoring case
 	 */
 	public static Number strToNumber(String str, int radix) {
-		if (StringUtils.isEmpty(str)) {
+		if (isEmptyNumberStr(str)) {
 			return null;
 		}
 
@@ -593,6 +595,10 @@ public class NumericFormatter {
 		} else {
 			return NumberUtils.createNumber(str);
 		}
+	}
+
+	private static boolean isEmptyNumberStr(String str) {
+		return StringUtils.isEmpty(str) || "null".equalsIgnoreCase(str); // NON-NLS
 	}
 
 	/**
