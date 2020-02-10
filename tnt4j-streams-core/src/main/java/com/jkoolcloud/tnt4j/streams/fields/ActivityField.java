@@ -148,9 +148,8 @@ public class ActivityField extends AbstractFieldEntity {
 		try {
 			return StreamFieldType._valueOfIgnoreCase(fieldTypeName);
 		} catch (IllegalArgumentException exc) {
+			return null;
 		}
-
-		return null;
 	}
 
 	/**

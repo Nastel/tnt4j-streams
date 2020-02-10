@@ -1841,7 +1841,6 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		}
 
 		E[] enumConstants = enumClass.getEnumConstants();
-
 		for (E ec : enumConstants) {
 			if (ec.name().equalsIgnoreCase(name)) {
 				return ec;

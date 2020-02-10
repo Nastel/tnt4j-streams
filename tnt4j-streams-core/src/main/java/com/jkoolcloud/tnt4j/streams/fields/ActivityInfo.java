@@ -2201,7 +2201,6 @@ public class ActivityInfo {
 
 		ActivityInfo ai = last(ais);
 
-		try {
 		if (StreamsConstants.isParentEntityRef(fieldName)) {
 			return getParentFieldValue(fieldName, groupName, ais);
 		}
@@ -2219,7 +2218,8 @@ public class ActivityInfo {
 			fieldName = Utils.getVarName(fieldName);
 		}
 
-			StreamFieldType sft = Utils.valueOfIgnoreCase(StreamFieldType.class, fieldName);
+		StreamFieldType sft = StreamFieldType._valueOfIgnoreCase(fieldName);
+		if (sft != null) {
 			switch (sft) {
 			case ApplName:
 				return ai.applName;
@@ -2284,14 +2284,12 @@ public class ActivityInfo {
 			case Guid:
 				return ai.guid;
 			default:
-				throw new IllegalArgumentException(StreamsResources.getStringFormatted(
-						StreamsResources.RESOURCE_BUNDLE_NAME, "ActivityInfo.unrecognized.field", fieldName));
 			}
-		} catch (IllegalArgumentException exc) {
-			Property p = ai.activityProperties == null ? null : ai.activityProperties.get(fieldName);
-
-			return p == null ? null : p.getValue();
 		}
+
+		Property p = ai.activityProperties == null ? null : ai.activityProperties.get(fieldName);
+
+		return p == null ? null : p.getValue();
 	}
 
 	/**

@@ -406,7 +406,9 @@ public enum StreamFieldType {
 				CACHE.put(name, NULL_VALUE);
 			}
 
-			return NULL_VALUE.equals(sft) ? null : (StreamFieldType) sft;
+			if (sft instanceof StreamFieldType) {
+				return (StreamFieldType) sft;
+			}
 		}
 
 		return null;
