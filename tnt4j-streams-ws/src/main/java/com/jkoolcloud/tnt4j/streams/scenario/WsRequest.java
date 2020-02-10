@@ -202,6 +202,20 @@ public class WsRequest<T> {
 	 *            parameter identifier
 	 * @param value
 	 *            parameter value
+	 * @param transient_
+	 *            transiency flag
+	 */
+	public void addParameter(String id, String value, boolean transient_) {
+		addParameter(new Parameter(id, value, transient_));
+	}
+
+	/**
+	 * Adds request (command/query/etc.) parameter.
+	 *
+	 * @param id
+	 *            parameter identifier
+	 * @param value
+	 *            parameter value
 	 * @param type
 	 *            parameter type
 	 */
@@ -223,6 +237,24 @@ public class WsRequest<T> {
 	 */
 	public void addParameter(String id, String value, String type, String format) {
 		addParameter(new Parameter(id, value, type, format));
+	}
+
+	/**
+	 * Adds request (command/query/etc.) parameter.
+	 *
+	 * @param id
+	 *            parameter identifier
+	 * @param value
+	 *            parameter value
+	 * @param type
+	 *            parameter type
+	 * @param format
+	 *            parameter format
+	 * @param transient_
+	 *            transiency flag
+	 */
+	public void addParameter(String id, String value, String type, String format, boolean transient_) {
+		addParameter(new Parameter(id, value, type, format, transient_));
 	}
 
 	/**
@@ -262,6 +294,7 @@ public class WsRequest<T> {
 		private String value;
 		private String type;
 		private String format;
+		private boolean transient_ = false;
 
 		/**
 		 * Constructs a new Parameter. Defines parameter identifier and value.
@@ -296,16 +329,49 @@ public class WsRequest<T> {
 		 *            parameter identifier
 		 * @param value
 		 *            parameter value
+		 * @param transient_
+		 *            transiency flag
+		 */
+		public Parameter(String id, String value, boolean transient_) {
+			this(id, value, null, null, transient_);
+		}
+
+		/**
+		 * Constructs a new Parameter. Defines parameter identifier, value and type.
+		 *
+		 * @param id
+		 *            parameter identifier
+		 * @param value
+		 *            parameter value
 		 * @param type
 		 *            parameter type
 		 * @param format
 		 *            parameter format
 		 */
 		public Parameter(String id, String value, String type, String format) {
+			this(id, value, type, format, false);
+		}
+
+		/**
+		 * Constructs a new Parameter. Defines parameter identifier, value and type.
+		 *
+		 * @param id
+		 *            parameter identifier
+		 * @param value
+		 *            parameter value
+		 * @param type
+		 *            parameter type
+		 * @param format
+		 *            parameter format
+		 * @param transient_
+		 *            transiency flag
+		 */
+		public Parameter(String id, String value, String type, String format, boolean transient_) {
 			this.id = id;
 			this.value = value;
 			this.type = type;
 			this.format = format;
+			this.transient_ = transient_;
 		}
 
 		/**
@@ -344,6 +410,18 @@ public class WsRequest<T> {
 			return format;
 		}
 
+		/**
+		 * Returns parameter transiency flag.
+		 * <p>
+		 * When parameter is marked transient, value of it shall be not used directly within request formation. It may
+		 * be some interim value used within mapping request and response.
+		 * 
+		 * @return {@code true} if parameter is transient, {@code false} - otherwise
+		 */
+		public boolean isTransient() {
+			return transient_;
+		}
+
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder("Parameter{"); // NON-NLS
@@ -351,6 +429,7 @@ public class WsRequest<T> {
 			sb.append(", value=").append(Utils.sQuote(value)); // NON-NLS
 			sb.append(", type=").append(Utils.sQuote(type)); // NON-NLS
 			sb.append(", format=").append(Utils.sQuote(format)); // NON-NLS
+			sb.append(", transient=").append(Utils.sQuote(transient_)); // NON-NLS
 			sb.append('}'); // NON-NLS
 			return sb.toString();
 		}

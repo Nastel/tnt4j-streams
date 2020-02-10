@@ -495,6 +495,10 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 			JDBCStream stream) throws SQLException {
 		if (params != null) {
 			for (Map.Entry<String, WsRequest.Parameter> param : params.entrySet()) {
+				if (param.getValue().isTransient()) {
+					continue;
+				}
+
 				try {
 					int pIdx = Integer.parseInt(param.getValue().getId());
 					String type = param.getValue().getType();

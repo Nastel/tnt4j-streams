@@ -300,6 +300,14 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute name="transient" use="optional" type="xs:boolean">
+            <xs:annotation>
+                <xs:documentation>
+                    Parameter transiency flag indicating whether to add parameter to service request or just keep it to be used between
+                    request/response mapping.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
 
     <!-- Element <scenario> definition -->

@@ -299,6 +299,7 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 		String value = null;
 		String type = null;
 		String format = null;
+		boolean transient_ = false;
 		for (int i = 0; i < attrs.getLength(); i++) {
 			String attName = attrs.getQName(i);
 			String attValue = attrs.getValue(i);
@@ -310,6 +311,8 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 				type = attValue;
 			} else if (FORMAT_ATTR.equals(attName)) {
 				format = attValue;
+			} else if (TRANSIENT_ATTR.equals(attName)) {
+				transient_ = Utils.toBoolean(attValue);
 			} else {
 				unknownAttribute(REQ_PARAM_ELMT, attName);
 			}
@@ -318,7 +321,7 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 		// notEmpty(id, REQ_PARAM_ELMT, ID_ATTR);
 		notEmpty(value, REQ_PARAM_ELMT, VALUE_ATTR);
 
-		currRequest.addParameter(id, value, type, format);
+		currRequest.addParameter(id, value, type, format, transient_);
 	}
 
 	@Override
@@ -413,8 +416,8 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 			this.id = id;
 		}
 
-		void addParameter(String id, String value, String type, String format) {
-			params.add(new WsRequest.Parameter(id, value, type, format));
+		void addParameter(String id, String value, String type, String format, boolean transient_) {
+			params.add(new WsRequest.Parameter(id, value, type, format, transient_));
 		}
 
 		void addParserRef(ParserRefData pRef) {

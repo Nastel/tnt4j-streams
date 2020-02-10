@@ -271,7 +271,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag attribute {@value}.
 	 */
-	private static final String TRANSPARENT_ATTR = "transparent"; // NON-NLS
+	protected static final String TRANSPARENT_ATTR = "transparent"; // NON-NLS
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag attribute {@value}.
 	 */
@@ -323,7 +323,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag attribute {@value}.
 	 */
-	private static final String TRANSIENT_ATTR = "transient"; // NON-NLS
+	protected static final String TRANSIENT_ATTR = "transient"; // NON-NLS
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag attribute {@value}.
 	 */

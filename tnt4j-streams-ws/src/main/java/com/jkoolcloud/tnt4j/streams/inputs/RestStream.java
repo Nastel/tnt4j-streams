@@ -506,7 +506,10 @@ public class RestStream extends AbstractWsStream<String> {
 		List<NameValuePair> params = new ArrayList<>(request.getParameters().size());
 
 		for (Map.Entry<String, WsRequest.Parameter> param : request.getParameters().entrySet()) {
-			BasicNameValuePair httpParam = makeParam(param, request);
+			if (param.getValue().isTransient()) {
+				continue;
+			}
+
 			if (httpParam != null) {
 				params.add(httpParam);
 			}
