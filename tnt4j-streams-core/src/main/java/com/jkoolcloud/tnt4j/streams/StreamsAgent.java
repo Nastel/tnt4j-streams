@@ -422,6 +422,36 @@ public final class StreamsAgent {
 	}
 
 	/**
+	 * Pauses all streams within default streams thread group.
+	 */
+	public static void pauseStreams() {
+		pauseStreams(streamThreads);
+	}
+
+	/**
+	 * Pauses set of streams within default streams thread group.
+	 *
+	 * @param streamNames
+	 *            set of stream names to pause
+	 */
+	public static void pauseStreams(String... streamNames) {
+		pauseStreams(streamThreads, streamNames);
+	}
+
+	/**
+	 * Pauses set of streams within provided streams thread group.
+	 *
+	 * @param streamThreads
+	 *            streams thread group
+	 * @param streamNames
+	 *            set of stream names to pause
+	 */
+	public static void pauseStreams(ThreadGroup streamThreads, String... streamNames) {
+		// TODO:
+		LOGGER.log(OpLevel.INFO, "PAUSING TBD!");
+	}
+
+	/**
 	 * Performs actions on agent process completion.
 	 */
 	public static void complete() {
