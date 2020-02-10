@@ -194,6 +194,10 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 					"AbstractWsStream.null.scheduler", getName()));
 		}
 
+		if (isShotDown()) {
+			return;
+		}
+
 		String enabledProp = step.getProperty("Enabled"); // NON-NLS
 		if (StringUtils.equalsIgnoreCase("false", enabledProp)) { // NON-NLS
 			logger().log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -311,7 +315,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	 * Removes all inactive jobs from stream scheduler.
 	 */
 	protected void purgeInactiveSchedulerJobs() {
-		if (scheduler != null) {
+		if (scheduler != null && !isShotDown()) {
 			try {
 				int rCount = 0;
 				Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.anyGroup());
@@ -340,7 +344,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 
 	@Override
 	protected boolean isInputEnded() {
-		if (scheduler != null) {
+		if (scheduler != null && !isShotDown()) {
 			// Check if scheduler has any jobs executed - WS streams does not allow void schedulers.
 			try {
 				if (scheduler.getMetaData().getNumberOfJobsExecuted() == 0) {
@@ -680,6 +684,10 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 		public void execute(JobExecutionContext context) throws JobExecutionException {
 			JobDataMap dataMap = context.getJobDetail().getJobDataMap();
 			AbstractWsStream<?> stream = (AbstractWsStream<?>) dataMap.get(JOB_PROP_STREAM_KEY);
+
+			if (stream.isShotDown()) {
+				return;
+			}
 
 			stream.startProcessingTask();
 			try {

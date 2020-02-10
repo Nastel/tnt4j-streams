@@ -402,6 +402,10 @@ public class WsStream extends AbstractWsStream<String> {
 				Semaphore acquiredSemaphore = null;
 				for (WsRequest<String> request : scenarioStep.getRequests()) {
 					reqStr = null;
+					if (stream.isShotDown()) {
+						return;
+					}
+
 					respStr = null;
 					try {
 						acquiredSemaphore = stream.acquireSemaphore(request);

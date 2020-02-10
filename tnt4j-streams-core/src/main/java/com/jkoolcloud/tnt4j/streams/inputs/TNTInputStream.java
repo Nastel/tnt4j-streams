@@ -847,14 +847,13 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 		}
 
 		notifyFinished();
-
-		logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"TNTInputStream.thread.ended", Thread.currentThread().getName());
-
 		removeListeners();
 
 		new StreamStatisticsReporter(TNTInputStreamStatistics.getMetrics(this), null).report(logger());
 		TNTInputStreamStatistics.clear(this);
+
+		logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+				"TNTInputStream.thread.ended", Thread.currentThread().getName());
 
 		if (isOwned()) {
 			ownerThread.notifyCompleted();

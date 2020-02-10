@@ -124,6 +124,10 @@ public class CmdStream extends AbstractWsStream<String> {
 				String respStr;
 				Semaphore acquiredSemaphore = null;
 				for (WsRequest<String> request : scenarioStep.getRequests()) {
+					if (stream.isShotDown()) {
+						return;
+					}
+
 					respStr = null;
 					try {
 						acquiredSemaphore = stream.acquireSemaphore(request);

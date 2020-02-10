@@ -355,6 +355,10 @@ public class RestStream extends AbstractWsStream<String> {
 				Semaphore acquiredSemaphore = null;
 				for (WsRequest<String> request : scenarioStep.getRequests()) {
 					reqDataStr = null;
+					if (stream.isShotDown()) {
+						return;
+					}
+
 					respStr = null;
 					try {
 						acquiredSemaphore = stream.acquireSemaphore(request);
@@ -399,7 +403,10 @@ public class RestStream extends AbstractWsStream<String> {
 			String urlStr = scenarioStep.getUrlStr();
 			Semaphore acquiredSemaphore = null;
 			for (WsRequest<String> request : scenarioStep.getRequests()) {
-				reqUrl = null;
+				if (stream.isShotDown()) {
+					return;
+				}
+
 				respStr = null;
 				try {
 					acquiredSemaphore = stream.acquireSemaphore(request);

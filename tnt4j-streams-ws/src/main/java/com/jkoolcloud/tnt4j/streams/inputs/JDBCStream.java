@@ -662,6 +662,10 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 				Semaphore acquiredSemaphore = null;
 				String qName;
 				for (WsRequest<String> request : scenarioStep.getRequests()) {
+					if (stream.isShotDown()) {
+						return;
+					}
+
 					qName = scenarioStep.getName() + ":" + request.getId(); // NON-NLS
 					if (stream.dropRecurrentResultSets && stream.isQueryOngoing(qName)) {
 						continue;
