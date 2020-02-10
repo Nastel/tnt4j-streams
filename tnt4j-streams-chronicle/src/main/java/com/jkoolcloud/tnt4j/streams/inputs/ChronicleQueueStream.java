@@ -60,6 +60,7 @@ public class ChronicleQueueStream extends TNTParseableInputStream<ReadMarshallab
 	private ExcerptTailer tailer;
 	private Pauser pauser;
 	private Class<? extends ReadMarshallable> clazz;
+	private boolean startFromLatest = true;
 
 	/**
 	 * Constructs a new ChronicleQueueStream. Requires configuration settings to set input stream source.
@@ -84,6 +85,8 @@ public class ChronicleQueueStream extends TNTParseableInputStream<ReadMarshallab
 			}
 		} else if (ChronicleQueueProperties.PROP_MARSHALL_CLASS.equalsIgnoreCase(name)) {
 			className = value;
+		} else if (ChronicleQueueProperties.PROP_START_FROM_LATEST.equalsIgnoreCase(name)) {
+			startFromLatest = Utils.toBoolean(value);
 		}
 	}
 
@@ -120,8 +123,12 @@ public class ChronicleQueueStream extends TNTParseableInputStream<ReadMarshallab
 
 		queue = ChronicleQueue.singleBuilder(queuePath).build();
 		clazz = Class.forName(className).asSubclass(ReadMarshallable.class);
-
 		tailer = queue.createTailer();
+
+		if (startFromLatest) {
+			tailer.toEnd();
+		}
+
 		pauser = Pauser.balanced();
 	}
 

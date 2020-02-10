@@ -27,5 +27,4 @@ public interface ChronicleQueueProperties extends StreamProperties {
 	 * Constant for name of built-in stream {@value} property.
 	 */
 	String PROP_MARSHALL_CLASS = "MarshallClass"; // NON-NLS
-
 }
