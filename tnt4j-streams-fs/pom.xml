@@ -101,6 +101,16 @@
             <groupId>com.pastdev</groupId>
             <artifactId>jsch-nio</artifactId>
             <version>1.0.14</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jsch</artifactId>
+                    <groupId>com.jcraft</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.github.robtimus</groupId>

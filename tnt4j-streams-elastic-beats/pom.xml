@@ -20,8 +20,8 @@
         <java.target.version>${module.java.version}</java.target.version>
         <java.compiler.version>${module.java.version}</java.compiler.version>
 
-        <io.netty.version>4.1.43.Final</io.netty.version>
-        <logstash.input.beats.version>5.0.16</logstash.input.beats.version> <!-- new available: 5.0.16, 5.1.9, 6.0.3 -->
+        <io.netty.version>4.1.45.Final</io.netty.version>
+        <logstash.input.beats.version>6.0.3</logstash.input.beats.version> <!-- new available: 5.0.16, 5.1.9, 6.0.3 -->
     </properties>
 
     <build>
@@ -103,6 +103,24 @@
             <groupId>com.github.logstash-plugins</groupId>
             <artifactId>logstash-input-beats</artifactId>
             <version>${logstash.input.beats.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>netty-all</artifactId>
+                    <groupId>io.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-databind</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-annotations</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-core</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>

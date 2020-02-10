@@ -15,7 +15,7 @@
 
     <properties>
         <!-- module dependencies versions-->
-        <chronicle.version>5.17.28</chronicle.version>
+        <chronicle.version>5.17.39</chronicle.version>
     </properties>
 
     <build>
@@ -90,6 +90,12 @@
             <groupId>net.openhft</groupId>
             <artifactId>chronicle-queue</artifactId>
             <version>${chronicle.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

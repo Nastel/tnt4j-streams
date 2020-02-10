@@ -100,29 +100,47 @@
             <artifactId>activemq-client</artifactId>
             <version>5.15.11</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.solacesystems</groupId>
             <artifactId>sol-jms</artifactId>
             <version>10.6.4</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq.jms</groupId>
             <artifactId>rabbitmq-jms</artifactId>
             <version>1.14.0</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.zeromq</groupId>
-            <artifactId>jeromq-jms</artifactId>
-            <version>3.0.1-RELEASE</version>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>org.zeromq</groupId>-->
+        <!--<artifactId>jeromq-jms</artifactId>-->
+        <!--<version>3.0.1-RELEASE</version>-->
+        <!--<scope>test</scope>-->
+        <!--</dependency>-->
         <!--<dependency>-->
         <!--<groupId>org.apache.rocketmq</groupId>-->
         <!--<artifactId>rocketmq-client</artifactId>-->
-        <!--<version>4.5.2</version>-->
+        <!--<version>4.6.0</version>-->
         <!--<scope>test</scope>-->
         <!--</dependency>-->
     </dependencies>
