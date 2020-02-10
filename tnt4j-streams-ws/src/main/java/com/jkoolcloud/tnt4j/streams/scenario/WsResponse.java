@@ -16,15 +16,21 @@
 
 package com.jkoolcloud.tnt4j.streams.scenario;
 
+import java.util.concurrent.Semaphore;
+
 /**
  * This class defines TNT4J-Streams-WS response data container.
  *
- * @param <T>
+ * @param <RQ>
+ *            type of request data
+ * @param <RS>
  *            type of response data
  *
  * @version $Revision: 2 $
  */
-public class WsResponse<T> extends WsRequest<T> {
+public class WsResponse<RQ, RS> extends WsRequest<RS> {
+
+	private WsRequest<RQ> originalRequest;
 
 	/**
 	 * Constructs a new WsResponse. Defines response data and tag as {@code null}.
@@ -32,7 +38,7 @@ public class WsResponse<T> extends WsRequest<T> {
 	 * @param responseData
 	 *            response data package
 	 */
-	public WsResponse(T responseData) {
+	public WsResponse(RS responseData) {
 		super(responseData);
 	}
 
@@ -44,7 +50,63 @@ public class WsResponse<T> extends WsRequest<T> {
 	 * @param tags
 	 *            response tags
 	 */
-	public WsResponse(T responseData, String... tags) {
+	public WsResponse(RS responseData, String... tags) {
 		super(responseData, tags);
+	}
+
+	/**
+	 * Constructs a new WsResponse. Defines response and original request data.
+	 * 
+	 * @param responseData
+	 *            response data package
+	 * @param request
+	 *            original request data
+	 */
+	public WsResponse(RS responseData, WsRequest<RQ> request) {
+		super(responseData, request.getTags());
+		this.originalRequest = request;
+	}
+
+	/**
+	 * Constructs a new WsResponse. Defines response and original request data from interim response data.
+	 * 
+	 * @param responseData
+	 *            response data package
+	 * @param iResponse
+	 *            interim response data
+	 */
+	public WsResponse(RS responseData, WsResponse<RQ, RS> iResponse) {
+		super(responseData, iResponse.getTags());
+		this.originalRequest = iResponse.getOriginalRequest();
+	}
+
+	/**
+	 * Returns original request data.
+	 * 
+	 * @return original request data
+	 */
+	public WsRequest<RQ> getOriginalRequest() {
+		return originalRequest;
+	}
+
+	/**
+	 * Returns scenario step bound to this request over original request.
+	 * 
+	 * @return scenario step bound to this request
+	 */
+	@Override
+	public WsScenarioStep getScenarioStep() {
+		return originalRequest.getScenarioStep();
+	}
+
+	/**
+	 * Returns semaphore instance for this response from bound scenario step.
+	 * 
+	 * @return semaphore instance for this response from bound scenario step
+	 */
+	public Semaphore getSemaphore() {
+		WsScenarioStep step = getScenarioStep();
+
+		return step == null ? null : step.getSemaphore();
 	}
 }

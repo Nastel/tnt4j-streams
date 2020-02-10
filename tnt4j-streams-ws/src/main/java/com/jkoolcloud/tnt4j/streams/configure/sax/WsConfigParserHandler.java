@@ -178,7 +178,7 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 		}
 
 		if (currStep.getSchedulerData() != null) {
-			throw new SAXException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+			throw new SAXException(StreamsResources.getStringFormatted(WsStreamConstants.RESOURCE_BUNDLE_NAME,
 					"WsConfigParserHandler.element.has.multiple", STEP_ELMT, SCHED_CRON_ELMT, SCHED_SIMPLE_ELMT,
 					getLocationInfo()));
 		}
@@ -216,7 +216,7 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 		}
 
 		if (currStep.getSchedulerData() != null) {
-			throw new SAXException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+			throw new SAXException(StreamsResources.getStringFormatted(WsStreamConstants.RESOURCE_BUNDLE_NAME,
 					"WsConfigParserHandler.element.has.multiple", STEP_ELMT, SCHED_CRON_ELMT, SCHED_SIMPLE_ELMT,
 					getLocationInfo()));
 		}
@@ -346,23 +346,23 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 		try {
 			if (SCENARIO_ELMT.equals(qName)) {
 				if (currScenario.isEmpty()) {
-					throw new SAXException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+					throw new SAXException(StreamsResources.getStringFormatted(WsStreamConstants.RESOURCE_BUNDLE_NAME,
 							"WsConfigParserHandler.element.must.have.one", SCENARIO_ELMT, STEP_ELMT,
 							getLocationInfo()));
 				}
 
-				((AbstractWsStream<?>) currStream).addScenario(currScenario);
+				((AbstractWsStream<?, ?>) currStream).addScenario(currScenario);
 				currScenario = null;
 			} else if (STREAM_ELMT.equals(qName)) {
 				if (currStream instanceof AbstractWsStream) {
-					if (CollectionUtils.isEmpty(((AbstractWsStream<?>) currStream).getScenarios())) {
+					if (CollectionUtils.isEmpty(((AbstractWsStream<?, ?>) currStream).getScenarios())) {
 						throw new SAXException(StreamsResources.getStringFormatted(
-								StreamsResources.RESOURCE_BUNDLE_NAME, "WsConfigParserHandler.element.must.have.one",
+								WsStreamConstants.RESOURCE_BUNDLE_NAME, "WsConfigParserHandler.element.must.have.one",
 								STREAM_ELMT, SCENARIO_ELMT, getLocationInfo()));
 					}
 				}
 			} else if (STEP_ELMT.equals(qName)) {
-				if (CollectionUtils.isEmpty(currStep.getRequests()) && StringUtils.isEmpty(currStep.getUrlStr())) {
+				if (currStep.isEmpty() && StringUtils.isEmpty(currStep.getUrlStr())) {
 					throw new SAXParseException(
 							StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
 									"ConfigParserHandler.must.contain", STEP_ELMT, URL_ATTR, REQ_ELMT),

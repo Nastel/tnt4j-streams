@@ -39,19 +39,20 @@ public class CastIronWsStreamTest {
 				+ "\t\t <log:page>0</log:page>\n" + "\t\t <log:pageSize>${XDifference}</log:pageSize>\n"
 				+ "\t </log:searchLogs>\n" + "]]>";
 
-		StreamsCache.addEntry("XDifference", "XDifference", "17", null);
+		StreamsCache.addEntry("XDifference", "XDifference", "${XDifference}", "17");
+		StreamsCache.initialize();
 		ActivityInfo ai = Mockito.mock(ActivityInfo.class);
-		Mockito.when(ai.getFieldValue("XDifference")).thenReturn("10");
+		Mockito.when(ai.getFieldValue("${XDifference}")).thenReturn("10");
 		StreamsCache.cacheValues(ai, "Test");
 
-		String result = stream.preProcess(req);
+		String result = stream.fillInRequestData(req);
 
 		assertEquals(result,
 				"<![CDATA[\n" + "\t SOAPAction:https://192.168.3.3/ws/lognotif\n"
 						+ "\t <log:searchLogs xmlns:log=\"http://www.approuter.com/schemas/2008/1/lognotif\">\n"
 						+ "\t\t <log:logComponent>all</log:logComponent>\n" + "\t\t <log:logLevel>all</log:logLevel>\n"
 						+ "\t\t <log:maxDaysOld>-1</log:maxDaysOld>\n" + "\t\t <log:status>all</log:status>\n"
-						+ "\t\t <log:page>0</log:page>\n" + "\t\t <log:pageSize>17</log:pageSize>\n"
+						+ "\t\t <log:page>0</log:page>\n" + "\t\t <log:pageSize>10</log:pageSize>\n"
 						+ "\t </log:searchLogs>\n" + "]]>");
 
 	}

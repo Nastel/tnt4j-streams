@@ -33,7 +33,6 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.configure.WsStreamProperties;
-import com.jkoolcloud.tnt4j.streams.scenario.WsReqResponse;
 import com.jkoolcloud.tnt4j.streams.scenario.WsRequest;
 import com.jkoolcloud.tnt4j.streams.scenario.WsResponse;
 import com.jkoolcloud.tnt4j.streams.scenario.WsScenarioStep;
@@ -71,14 +70,14 @@ import com.zaxxer.hikari.HikariDataSource;
  * accessed in multi-thread manner.</li>
  * </ul>
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  * @see java.sql.DriverManager#getConnection(String, java.util.Properties)
  * @see java.sql.Connection#prepareStatement(String)
  * @see java.sql.PreparedStatement#executeQuery()
  */
-public class JDBCStream extends AbstractWsStream<ResultSet> {
+public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(JDBCStream.class);
 
 	private static final String QUERY_NAME_PROP = "QueryName"; // NON-NLS
@@ -177,7 +176,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	}
 
 	@Override
-	protected void setCurrentItem(WsResponse<ResultSet> item) {
+	protected void setCurrentItem(WsResponse<String, ResultSet> item) {
 		super.setCurrentItem(item);
 
 		if (item != null) {
@@ -186,7 +185,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	}
 
 	@Override
-	protected void cleanupItem(WsResponse<ResultSet> item) {
+	protected void cleanupItem(WsResponse<String, ResultSet> item) {
 		if (item != null && item.getData() != null) {
 			closeRS(item.getData());
 			queryConsumed(item);
@@ -194,7 +193,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	}
 
 	@Override
-	protected long getActivityItemByteSize(WsResponse<ResultSet> item) {
+	protected long getActivityItemByteSize(WsResponse<String, ResultSet> item) {
 		return 1; // TODO
 	}
 
@@ -204,7 +203,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	}
 
 	@Override
-	protected boolean isItemConsumed(WsResponse<ResultSet> item) {
+	protected boolean isItemConsumed(WsResponse<String, ResultSet> item) {
 		if (item == null || item.getData() == null) {
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"JDBCStream.rs.consumption.null");
@@ -212,7 +211,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 		}
 
 		if (dropRecurrentResultSets) {
-			WsResponse<ResultSet> recurringItem = getRecurrentResultSet(item, inputBuffer);
+			WsResponse<String, ResultSet> recurringItem = getRecurrentResultSet(item, inputBuffer);
 
 			if (recurringItem != null) {
 				logger().log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -270,7 +269,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 		Utils.close(conn);
 	}
 
-	private void queryParsingStarted(WsResponse<ResultSet> cItem) {
+	private void queryParsingStarted(WsResponse<String, ResultSet> cItem) {
 		String qName = cItem.getParameterValue(QUERY_NAME_PROP);
 		if (qName != null) {
 			synchronized (parsedQueries) {
@@ -279,7 +278,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 		}
 	}
 
-	private void queryConsumed(WsResponse<ResultSet> cItem) {
+	private void queryConsumed(WsResponse<String, ResultSet> cItem) {
 		String qName = cItem.getParameterValue(QUERY_NAME_PROP);
 		if (qName != null) {
 			synchronized (parsedQueries) {
@@ -299,10 +298,11 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	 *         in input buffer
 	 */
 	@SuppressWarnings("unchecked")
-	protected WsResponse<ResultSet> getRecurrentResultSet(WsResponse<ResultSet> cItem, Queue<?> buffer) {
+	protected WsResponse<String, ResultSet> getRecurrentResultSet(WsResponse<String, ResultSet> cItem,
+			Queue<?> buffer) {
 		for (Object item : buffer) {
 			if (item instanceof WsResponse) {
-				WsResponse<ResultSet> respItem = (WsResponse<ResultSet>) item;
+				WsResponse<String, ResultSet> respItem = (WsResponse<String, ResultSet>) item;
 
 				if (respItem.getParameterValue(QUERY_NAME_PROP).equals(cItem.getParameterValue(QUERY_NAME_PROP))) {
 					return respItem;
@@ -334,7 +334,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 
 		for (Object item : inputBuffer) {
 			if (item instanceof WsResponse) {
-				WsResponse<ResultSet> respItem = (WsResponse<ResultSet>) item;
+				WsResponse<String, ResultSet> respItem = (WsResponse<String, ResultSet>) item;
 
 				if (qName.equals(respItem.getParameterValue(QUERY_NAME_PROP))) {
 					LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -348,7 +348,7 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	}
 
 	@Override
-	protected boolean initItemForParsing(WsResponse<ResultSet> item) {
+	protected boolean initItemForParsing(WsResponse<String, ResultSet> item) {
 		return !isItemConsumed(item);
 	}
 
@@ -365,14 +365,12 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	 *            DB query
 	 * @param params
 	 *            DB query parameters map
-	 * @param stream
-	 *            stream instance to use for JDBC query execution
 	 * @return JDBC call returned result set {@link java.sql.ResultSet}
 	 * @throws SQLException
 	 *             if exception occurs while performing JDBC call
 	 */
-	protected static ResultSet executeJdbcCall(String url, String user, String pass, String query,
-			Map<String, WsRequest.Parameter> params, JDBCStream stream) throws SQLException {
+	protected ResultSet executeJdbcCall(String url, String user, String pass, String query,
+			Map<String, WsRequest.Parameter> params) throws SQLException {
 		if (StringUtils.isEmpty(url)) {
 			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"JDBCStream.db.conn.not.defined", url);
@@ -397,22 +395,23 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 
 		try {
 			Duration cod = Duration.arm();
-			dbConn = getDbConnection(url, user, pass, stream);
+			dbConn = getDbConnection(url, user, pass);
 			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"JDBCStream.db.connection.obtained", url, cod.durationHMS());
 
 			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"JDBCStream.preparing.query", query);
 
-			statement = dbConn.prepareStatement(query);
-			if (stream.fetchSize > 0) {
-				statement.setFetchSize(stream.fetchSize);
+			statement = dbConn.prepareStatement(query); // ResultSet.TYPE_SCROLL_INSENSITIVE,
+														// ResultSet.CONCUR_READ_ONLY);
+			if (fetchSize > 0) {
+				statement.setFetchSize(fetchSize);
 			}
-			if (stream.maxRows > 0) {
-				statement.setMaxRows(stream.maxRows);
+			if (maxRows > 0) {
+				statement.setMaxRows(maxRows);
 			}
 
-			addStatementParameters(statement, params, stream);
+			addStatementParameters(statement, params);
 
 			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"JDBCStream.executing.query", url);
@@ -442,19 +441,16 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	 *            DB user name
 	 * @param pass
 	 *            DB user password
-	 * @param stream
-	 *            stream instance to use for JDBC query execution
 	 * @return DB connection instance to be used to execute queries
 	 * @throws SQLException
 	 *             if data source fails to obtain database connection
 	 */
-	protected static Connection getDbConnection(String url, String user, String pass, JDBCStream stream)
-			throws SQLException {
-		DataSource hds = stream.dbDataSources.get(url);
+	protected Connection getDbConnection(String url, String user, String pass) throws SQLException {
+		DataSource hds = dbDataSources.get(url);
 
 		if (hds == null) {
 			Properties dbProps = new Properties();
-			dbProps.putAll(stream.jdbcProperties);
+			dbProps.putAll(jdbcProperties);
 
 			HikariConfig dbConfig = new HikariConfig(dbProps);
 			dbConfig.setJdbcUrl(url);
@@ -463,20 +459,10 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 
 			hds = new HikariDataSource(dbConfig);
 
-			stream.dbDataSources.put(url, hds);
+			dbDataSources.put(url, hds);
 		}
 
 		return hds.getConnection();
-	}
-
-	/**
-	 * Returns custom JDBC configuration properties stored in {@link #jdbcProperties} map.
-	 *
-	 * @return custom JDBC configuration properties
-	 */
-	@Override
-	protected Map<String, String> getConfigProperties() {
-		return jdbcProperties;
 	}
 
 	/**
@@ -486,13 +472,11 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 	 *            prepared SQL statement parameters to set
 	 * @param params
 	 *            SQL query parameters map
-	 * @param stream
-	 *            stream instance to use for JDBC query execution
 	 * @throws SQLException
 	 *             if exception occurs while setting prepared statement parameter
 	 */
-	protected static void addStatementParameters(PreparedStatement statement, Map<String, WsRequest.Parameter> params,
-			JDBCStream stream) throws SQLException {
+	protected void addStatementParameters(PreparedStatement statement, Map<String, WsRequest.Parameter> params)
+			throws SQLException {
 		if (params != null) {
 			for (Map.Entry<String, WsRequest.Parameter> param : params.entrySet()) {
 				if (param.getValue().isTransient()) {
@@ -511,8 +495,8 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 
 					switch (type.toUpperCase()) {
 					case "INTEGER": // NON-NLS
-						value = stream.fillInRequestData(value, format);
-						if ("null".equalsIgnoreCase(value)) {
+						value = fillInRequestData(value, format);
+						if (isNullValue(value)) {
 							setNullParameter(statement, pIdx, Types.INTEGER, type.toUpperCase());
 						} else {
 							int iValue = Integer.parseInt(value);
@@ -522,8 +506,8 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 						}
 						break;
 					case "BIGINT": // NON-NLS
-						value = stream.fillInRequestData(value, format);
-						if ("null".equalsIgnoreCase(value)) {
+						value = fillInRequestData(value, format);
+						if (isNullValue(value)) {
 							setNullParameter(statement, pIdx, Types.BIGINT, type.toUpperCase());
 						} else {
 							long lValue = Long.parseLong(value);
@@ -533,8 +517,8 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 						}
 						break;
 					case "FLOAT": // NON-NLS
-						value = stream.fillInRequestData(value, format);
-						if ("null".equalsIgnoreCase(value)) {
+						value = fillInRequestData(value, format);
+						if (isNullValue(value)) {
 							setNullParameter(statement, pIdx, Types.FLOAT, type.toUpperCase());
 						} else {
 							float fValue = Float.parseFloat(value);
@@ -546,8 +530,8 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 					case "DOUBLE": // NON-NLS
 					case "REAL": // NON-NLS
 					case "DECIMAL": // NON-NLS
-						value = stream.fillInRequestData(value, format);
-						if ("null".equalsIgnoreCase(value)) {
+						value = fillInRequestData(value, format);
+						if (isNullValue(value)) {
 							setNullParameter(statement, pIdx, Types.DOUBLE, "DOUBLE"); // NON-NLS
 						} else {
 							double dValue = Double.parseDouble(value);
@@ -557,9 +541,8 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 						}
 						break;
 					case "DATE": // NON-NLS
-						value = stream.fillInRequestData(value,
-								StringUtils.isEmpty(format) ? DEFAULT_DATE_PATTERN : format);
-						if ("null".equalsIgnoreCase(value)) {
+						value = fillInRequestData(value, StringUtils.isEmpty(format) ? DEFAULT_DATE_PATTERN : format);
+						if (isNullValue(value)) {
 							setNullParameter(statement, pIdx, Types.DATE, type.toUpperCase());
 						} else {
 							Date dtValue = Date.valueOf(value);
@@ -569,9 +552,8 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 						}
 						break;
 					case "TIME": // NON-NLS
-						value = stream.fillInRequestData(value,
-								StringUtils.isEmpty(format) ? DEFAULT_TIME_PATTERN : format);
-						if ("null".equalsIgnoreCase(value)) {
+						value = fillInRequestData(value, StringUtils.isEmpty(format) ? DEFAULT_TIME_PATTERN : format);
+						if (isNullValue(value)) {
 							setNullParameter(statement, pIdx, Types.TIME, type.toUpperCase());
 						} else {
 							Time tValue = Time.valueOf(value);
@@ -582,9 +564,9 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 						break;
 					case "TIMESTAMP": // NON-NLS
 					case "DATETIME": // NON-NLS
-						value = stream.fillInRequestData(value,
+						value = fillInRequestData(value,
 								StringUtils.isEmpty(format) ? DEFAULT_TIMESTAMP_PATTERN : format);
-						if ("null".equalsIgnoreCase(value)) {
+						if (isNullValue(value)) {
 							setNullParameter(statement, pIdx, Types.TIMESTAMP, type.toUpperCase());
 						} else {
 							Timestamp tsValue = Timestamp.valueOf(value);
@@ -594,8 +576,8 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 						}
 						break;
 					case "BOOLEAN": // NON-NLS
-						value = stream.fillInRequestData(value, format);
-						if ("null".equalsIgnoreCase(value)) {
+						value = fillInRequestData(value, format);
+						if (isNullValue(value)) {
 							setNullParameter(statement, pIdx, Types.BOOLEAN, type.toUpperCase());
 						} else {
 							boolean bValue = Boolean.parseBoolean(value);
@@ -605,8 +587,8 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 						}
 						break;
 					case "BINARY": // NON-NLS
-						value = stream.fillInRequestData(value, format);
-						if ("null".equalsIgnoreCase(value)) {
+						value = fillInRequestData(value, format);
+						if (isNullValue(value)) {
 							setNullParameter(statement, pIdx, Types.BINARY, type.toUpperCase());
 						} else {
 							byte[] baValue = Utils.decodeHex(value);
@@ -617,8 +599,8 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 						break;
 					case "VARCHAR": // NON-NLS
 					default:
-						value = stream.fillInRequestData(value, format);
-						if ("null".equalsIgnoreCase(value)) {
+						value = fillInRequestData(value, format);
+						if (isNullValue(value)) {
 							setNullParameter(statement, pIdx, Types.VARCHAR, "VARCHAR"); // NON-NLS
 						} else {
 							statement.setString(pIdx, value);
@@ -637,11 +619,30 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 		}
 	}
 
+	private static boolean isNullValue(String value) {
+		return "null".equalsIgnoreCase(value); // NON-NLS
+	}
+
 	private static void setNullParameter(PreparedStatement statement, int pIdx, int type, String typeName)
 			throws SQLException {
 		statement.setNull(pIdx, type);
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"JDBCStream.set.query.parameter.null", pIdx, typeName);
+	}
+
+	@Override
+	protected WsRequest<String> fillInRequest(WsRequest<String> req, RequestFillContext context) {
+		if (!req.isDynamic()) {
+			return req;
+		}
+
+		WsRequest<String> fReq = req.clone();
+		DataFillContext ctx = makeDataContext(fReq.getId(), null, context);
+
+		fReq.setId(fillInRequestData(ctx));
+		fReq.setData(fillInRequestData(ctx.setData(fReq.getData())));
+
+		return fReq;
 	}
 
 	/**
@@ -661,11 +662,11 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 			WsScenarioStep scenarioStep = (WsScenarioStep) dataMap.get(JOB_PROP_SCENARIO_STEP_KEY);
 
 			if (!scenarioStep.isEmpty()) {
-				String dbQuery;
 				ResultSet respRs;
 				Semaphore acquiredSemaphore = null;
+				WsRequest<String> processedRequest;
 				String qName;
-				for (WsRequest<String> request : scenarioStep.getRequests()) {
+				for (WsRequest<String> request : scenarioStep.requestsArray()) {
 					if (stream.isShotDown()) {
 						return;
 					}
@@ -676,22 +677,25 @@ public class JDBCStream extends AbstractWsStream<ResultSet> {
 					}
 
 					respRs = null;
+					acquiredSemaphore = null;
+					processedRequest = null;
 					try {
 						acquiredSemaphore = stream.acquireSemaphore(request);
-						dbQuery = stream.fillInRequestData(request.getData());
-						request.setSentData(dbQuery);
-						respRs = executeJdbcCall(scenarioStep.getUrlStr(), scenarioStep.getUsername(),
-								decPassword(scenarioStep.getPassword()), dbQuery, request.getParameters(), stream);
+						processedRequest = stream.fillInRequest(request);
+						respRs = stream.executeJdbcCall(scenarioStep.getUrlStr(), scenarioStep.getUsername(),
+								decPassword(scenarioStep.getPassword()), processedRequest.getData(),
+								processedRequest.getParameters());
 					} catch (Throwable exc) {
 						Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-								"JDBCStream.execute.exception", exc);
+								"JDBCStream.execute.exception", stream.getName(), processedRequest.getId(), exc);
 					} finally {
 						if (respRs != null) {
-							WsResponse<ResultSet> resp = new WsReqResponse<>(respRs, request);
-							resp.addParameter(new WsRequest.Parameter(QUERY_NAME_PROP, qName));
+							WsResponse<String, ResultSet> resp = new WsResponse<>(respRs, processedRequest);
+							resp.addParameter(QUERY_NAME_PROP, qName, true);
 							stream.addInputToBuffer(resp);
 						} else {
+							stream.requestFailed(processedRequest);
 							stream.releaseSemaphore(acquiredSemaphore, scenarioStep.getName(), request);
 						}
 					}

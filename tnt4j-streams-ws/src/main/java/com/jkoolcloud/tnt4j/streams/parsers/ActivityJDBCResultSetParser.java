@@ -87,10 +87,10 @@ public class ActivityJDBCResultSetParser extends GenericActivityParser<ResultSet
 					String[] nsFields = sqlJavaMapping.split("="); // NON-NLS
 					try {
 						typesMap.put(nsFields[0], Class.forName(nsFields[1]));
-						logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 								"ActivityJDBCResultSetParser.adding.mapping", name, sqlJavaMapping);
 					} catch (Throwable exc) {
-						logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 								"ActivityJDBCResultSetParser.resolve.class.failed", nsFields[1],
 								exc.getLocalizedMessage());
 					}
@@ -137,7 +137,7 @@ public class ActivityJDBCResultSetParser extends GenericActivityParser<ResultSet
 			Statement st = resultSet.getStatement();
 			Connection dbConn = st.getConnection();
 			connTypes = dbConn.getTypeMap();
-		} catch (Exception exc) {
+		} catch (Throwable exc) {
 			Utils.logThrowable(LOGGER, OpLevel.WARNING,
 					StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"ActivityJDBCResultSetParser.driver.type.mappings.failed", exc);
@@ -161,7 +161,7 @@ public class ActivityJDBCResultSetParser extends GenericActivityParser<ResultSet
 						val = getByName(locStr, resultSet, connTypes, dataType, tz);
 					}
 				}
-			} catch (Exception exc) {
+			} catch (Throwable exc) {
 				int row = getRsRow(resultSet);
 				ParseException pe = new ParseException(
 						StreamsResources.getStringFormatted(WsStreamConstants.RESOURCE_BUNDLE_NAME,

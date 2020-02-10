@@ -16,7 +16,6 @@
 
 package com.jkoolcloud.tnt4j.streams.inputs;
 
-import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +25,6 @@ import org.quartz.JobDetail;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
-import com.jkoolcloud.tnt4j.streams.scenario.WsReqResponse;
 import com.jkoolcloud.tnt4j.streams.scenario.WsRequest;
 import com.jkoolcloud.tnt4j.streams.scenario.WsResponse;
 import com.jkoolcloud.tnt4j.streams.scenario.WsScenarioStep;
@@ -46,12 +44,12 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  * <p>
  * This activity stream supports configuration properties from {@link AbstractWsStream} (and higher hierarchy streams).
  *
- * @version $Revision: 2 $
+ * @version $Revision: 3 $
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  * @see java.lang.Runtime#exec(String)
  */
-public class CmdStream extends AbstractWsStream<String> {
+public class CmdStream extends AbstractWsStream<String, String> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(CmdStream.class);
 
 	/**
@@ -67,7 +65,7 @@ public class CmdStream extends AbstractWsStream<String> {
 	}
 
 	@Override
-	protected long getActivityItemByteSize(WsResponse<String> item) {
+	protected long getActivityItemByteSize(WsResponse<String, String> item) {
 		return item == null || item.getData() == null ? 0 : item.getData().getBytes().length;
 	}
 
@@ -85,7 +83,7 @@ public class CmdStream extends AbstractWsStream<String> {
 	 * @throws Exception
 	 *             if exception occurs while performing system command call
 	 */
-	protected static String executeCommand(String cmdData) throws Exception {
+	protected String executeCommand(String cmdData) throws Exception {
 		if (StringUtils.isEmpty(cmdData)) {
 			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"CmdStream.cant.execute.cmd", cmdData);
@@ -122,31 +120,31 @@ public class CmdStream extends AbstractWsStream<String> {
 
 			if (!scenarioStep.isEmpty()) {
 				String respStr;
-				Semaphore acquiredSemaphore = null;
-				for (WsRequest<String> request : scenarioStep.getRequests()) {
+				Semaphore acquiredSemaphore;
+				WsRequest<String> processedRequest;
+				for (WsRequest<String> request : scenarioStep.requestsArray()) {
 					if (stream.isShotDown()) {
 						return;
 					}
 
 					respStr = null;
+					acquiredSemaphore = null;
+					processedRequest = null;
 					try {
 						acquiredSemaphore = stream.acquireSemaphore(request);
-						String processedRequest = request.getData();
-						for (Map.Entry<String, WsRequest.Parameter> req : request.getParameters().entrySet()) {
-							processedRequest = stream.fillInRequestData(processedRequest, req.getValue().getFormat());
-						}
-						request.setSentData(processedRequest);
-						respStr = executeCommand(processedRequest);
+						processedRequest = stream.fillInRequest(request);
+						respStr = stream.executeCommand(processedRequest.getData());
 					} catch (Throwable exc) {
 						Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-								"CmdStream.execute.exception", exc);
-					}
-
-					if (StringUtils.isNotEmpty(respStr)) {
-						stream.addInputToBuffer(new WsReqResponse<>(respStr, request));
-					} else {
-						stream.releaseSemaphore(acquiredSemaphore, scenarioStep.getName(), request);
+								"CmdStream.execute.exception", stream.getName(), processedRequest.getId(), exc);
+					} finally {
+						if (StringUtils.isNotEmpty(respStr)) {
+							stream.addInputToBuffer(new WsResponse<>(respStr, processedRequest));
+						} else {
+							stream.requestFailed(processedRequest);
+							stream.releaseSemaphore(acquiredSemaphore, scenarioStep.getName(), request);
+						}
 					}
 				}
 			}

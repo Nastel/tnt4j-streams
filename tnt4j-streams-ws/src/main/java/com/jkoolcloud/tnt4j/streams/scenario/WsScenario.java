@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * This class defines TNT4J-Streams-WS configuration scenario.
@@ -27,7 +28,7 @@ import org.apache.commons.collections4.CollectionUtils;
  * @version $Revision: 1 $
  */
 public class WsScenario extends WsScenarioEntity {
-	private List<WsScenarioStep> stepsList;
+	private final List<WsScenarioStep> stepsList = new ArrayList<>();
 	private WsScenarioStep loginStep;
 
 	/**
@@ -47,16 +48,33 @@ public class WsScenario extends WsScenarioEntity {
 	 *            scenario step to add
 	 */
 	public void addStep(WsScenarioStep scenarioStep) {
-		if (stepsList == null) {
-			stepsList = new ArrayList<>();
+		scenarioStep.setScenario(this);
+
+		synchronized (stepsList) {
+			if ("login".equalsIgnoreCase(scenarioStep.getName())) { // NON-NLS
+				loginStep = scenarioStep;
+			} else {
+				stepsList.add(scenarioStep);
+			}
+		}
+	}
+
+	/**
+	 * Removes scenario step from steps list.
+	 * 
+	 * @param scenarioStep
+	 *            scenario step to remove
+	 */
+	public void removeStep(WsScenarioStep scenarioStep) {
+		synchronized (stepsList) {
+			if ("login".equalsIgnoreCase(scenarioStep.getName())) { // NON-NLS
+				loginStep = null;
+			} else {
+				stepsList.remove(scenarioStep);
+			}
 		}
 
-		scenarioStep.setScenario(this);
-		if ("login".equalsIgnoreCase(scenarioStep.getName())) { // NON-NLS
-			loginStep = scenarioStep;
-		} else {
-			stepsList.add(scenarioStep);
-		}
+		scenarioStep.setScenario(null);
 	}
 
 	/**
@@ -74,15 +92,38 @@ public class WsScenario extends WsScenarioEntity {
 	 * @return flag indicating scenario has no steps defined
 	 */
 	public boolean isEmpty() {
-		return CollectionUtils.isEmpty(stepsList);
+		synchronized (stepsList) {
+			return CollectionUtils.isEmpty(stepsList);
+		}
 	}
 
 	/**
-	 * Returns scenario step defining SOAP login call.
+	 * Returns scenario step defining login call.
 	 *
 	 * @return login call step
 	 */
 	public WsScenarioStep getLoginStep() {
 		return loginStep;
+	}
+
+	/**
+	 * Returns scenario step instance having defined name {@code stepName}. Names comparison is case insensitive.
+	 * 
+	 * @param stepName
+	 *            scenario step name
+	 * @return scenario step instance having defined name
+	 */
+	public WsScenarioStep getStep(String stepName) {
+		if (StringUtils.isNotEmpty(stepName)) {
+			synchronized (stepsList) {
+				for (WsScenarioStep step : stepsList) {
+					if (stepName.equalsIgnoreCase(step.getName())) {
+						return step;
+					}
+				}
+			}
+		}
+
+		return null;
 	}
 }

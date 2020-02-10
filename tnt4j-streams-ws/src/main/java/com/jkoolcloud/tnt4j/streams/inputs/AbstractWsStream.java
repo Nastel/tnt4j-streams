@@ -24,7 +24,6 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -42,11 +41,11 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
 import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
 
 /**
- * Base class for scheduled service or system command request/call produced activity stream, where each call/request
- * response is assumed to represent a single activity or event which should be recorded.
+ * Base class for scheduled service or system command request/call/query produced activity stream, where each
+ * call/request//query response is assumed to represent a single activity or event which should be recorded.
  * <p>
- * This activity stream requires parsers that can support {@link String} data to parse
- * {@link com.jkoolcloud.tnt4j.streams.scenario.WsResponse#getData()} provided string.
+ * This activity stream requires parsers that can support {@code RS} defined type data to parse
+ * {@link com.jkoolcloud.tnt4j.streams.scenario.WsResponse#getData()} provided data.
  * <p>
  * This activity stream supports the following configuration properties (in addition to those supported by
  * {@link com.jkoolcloud.tnt4j.streams.inputs.AbstractBufferedStream}):
@@ -59,14 +58,16 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  * Reference</a> for details.</li>
  * </ul>
  *
- * @param <T>
+ * @param <RQ>
+ *            type of handled request data
+ * @param <RS>
  *            type of handled response data
  *
- * @version $Revision: 2 $
+ * @version $Revision: 3 $
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  */
-public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsResponse<T>> {
+public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<WsResponse<RQ, RS>> {
 
 	/**
 	 * Constant for name of built-in scheduler job property {@value}.
@@ -318,6 +319,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 		if (scheduler != null && !isShotDown()) {
 			try {
 				int rCount = 0;
+				int lCount = 0;
 				Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.anyGroup());
 				if (CollectionUtils.isNotEmpty(triggerKeys)) {
 					for (TriggerKey tKey : triggerKeys) {
@@ -333,6 +335,8 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 								logger().log(OpLevel.TRACE,
 										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 										"AbstractWsStream.scheduler.removed.inactive.job", getName(), tKey);
+							} else {
+								lCount++;
 							}
 						} catch (SchedulerException exc) {
 						}
@@ -340,7 +344,7 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 				}
 
 				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-						"AbstractWsStream.scheduler.removed.inactive.jobs", getName(), rCount);
+						"AbstractWsStream.scheduler.removed.inactive.jobs", getName(), rCount, lCount);
 			} catch (SchedulerException exc) {
 			}
 		}
@@ -417,12 +421,12 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 
 	@Override
 	public String[] getDataTags(Object data) {
-		return data instanceof WsResponse<?> ? ((WsResponse<?>) data).getTags() : super.getDataTags(data);
+		return data instanceof WsResponse<?, ?> ? ((WsResponse<?, ?>) data).getTags() : super.getDataTags(data);
 	}
 
 	@Override
 	protected ActivityInfo applyParsers(Object data, String... tags) throws IllegalStateException, ParseException {
-		return super.applyParsers(data instanceof WsResponse<?> ? ((WsResponse<?>) data).getData() : data, tags);
+		return super.applyParsers(data instanceof WsResponse<?, ?> ? ((WsResponse<?, ?>) data).getData() : data, tags);
 	}
 
 	/**
@@ -433,12 +437,12 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	 *
 	 * @see #postParse(com.jkoolcloud.tnt4j.streams.scenario.WsResponse)
 	 */
-	protected void pickAndPostParseItem(WsResponse<T> item) {
+	protected void pickAndPostParseItem(WsResponse<RQ, RS> item) {
 		postParse(item);
 	}
 
 	@Override
-	protected void setCurrentItem(WsResponse<T> item) {
+	protected void setCurrentItem(WsResponse<RQ, RS> item) {
 		pickAndPostParseItem(getCurrentItem());
 
 		super.setCurrentItem(item);
@@ -452,18 +456,16 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	 * @param item
 	 *            processed activity data item
 	 */
-	protected void postParse(WsResponse<T> item) {
-		if (item instanceof WsReqResponse) {
-			WsReqResponse<?, ?> resp = (WsReqResponse<?, ?>) item;
-
+	protected void postParse(WsResponse<RQ, RS> item) {
+		if (item != null) {
 			if (semaphore != null) {
-				releaseSemaphore(semaphore, getName(), resp.getOriginalRequest());
+				releaseSemaphore(semaphore, getName(), item.getOriginalRequest());
 			}
 
-			Semaphore reqSemaphore = resp.getSemaphore();
+			Semaphore reqSemaphore = item.getSemaphore();
 
 			if (reqSemaphore != null) {
-				releaseSemaphore(reqSemaphore, resp.getScenarioStep().getName(), resp.getOriginalRequest());
+				releaseSemaphore(reqSemaphore, item.getScenarioStep().getName(), item.getOriginalRequest());
 			}
 		} else {
 			if (semaphore != null) {
@@ -473,129 +475,185 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	}
 
 	/**
-	 * Performs pre-processing of request/command/query body data: it can be expressions evaluation, filling in variable
-	 * values and so on.
-	 *
-	 * @param requestData
-	 *            request/command/query body data
-	 * @return preprocessed request/command/query body data string
-	 */
-	protected String preProcess(String requestData) {
-		return requestData;
-	}
-
-	/**
-	 * Fills in request/query/command string having variable expressions with parameters stored in stream configuration
-	 * properties map and streams cache {@link com.jkoolcloud.tnt4j.streams.utils.StreamsCache}.
+	 * Fills-in request/query/command string having variable expressions with values stored in stream configuration
+	 * properties maps and streams cache {@link com.jkoolcloud.tnt4j.streams.utils.StreamsCache}.
 	 *
 	 * @param reqDataStr
-	 *            JDBC query string
-	 * @return variable values filled in JDBC query string
+	 *            request/query/command string
+	 * @return variable values filled-in request/query/command string
 	 *
 	 * @see #fillInRequestData(String, String)
 	 */
-	protected String fillInRequestData(String reqDataStr) {
+	public String fillInRequestData(String reqDataStr) {
 		return fillInRequestData(reqDataStr, (String) null);
 	}
 
 	/**
-	 * Fills in request/query/command string having variable expressions with parameters stored in stream configuration
-	 * properties map map and streams cache {@link com.jkoolcloud.tnt4j.streams.utils.StreamsCache}.
-	 *
-	 * @param reqDataStr
-	 *            JDBC query string
-	 * @param format
-	 *            format of value to fill
-	 * @return variable values filled in JDBC query string
-	 *
-	 * @see #fillInRequestData(String, java.util.Map)
-	 * @see #fillInRequestCacheData(String, String)
-	 */
-	protected String fillInRequestData(String reqDataStr, String format) {
-		String frd = fillInRequestData(reqDataStr, getConfigProperties());
-		frd = fillInRequestCacheData(frd, format);
-
-		return frd;
-	}
-
-	/**
-	 * Returns streams specific configuration properties map.
-	 *
-	 * @return streams specific configuration properties map
-	 */
-	protected Map<String, String> getConfigProperties() {
-		return null;
-	}
-
-	/**
-	 * Fills in request/query/command string having variable expressions with parameters stored in
-	 * {@code streamProperties} map.
-	 *
-	 * @param reqDataStr
-	 *            request/query/command string
-	 * @param streamProperties
-	 *            stream properties map
-	 * @return variable values filled in request/query/command string
-	 */
-	protected String fillInRequestData(String reqDataStr, Map<String, String> streamProperties) {
-		if (StringUtils.isEmpty(reqDataStr) || MapUtils.isEmpty(streamProperties)) {
-			return reqDataStr;
-		}
-
-		List<String> vars = new ArrayList<>();
-		Utils.resolveExpressionVariables(vars, reqDataStr);
-		// Utils.resolveCfgVariables(vars, reqDataStr);
-
-		String reqData = reqDataStr;
-		if (CollectionUtils.isNotEmpty(vars)) {
-			String varVal;
-			for (String rdVar : vars) {
-				varVal = streamProperties.get(Utils.getVarName(rdVar));
-				if (varVal != null) {
-					reqData = reqData.replace(rdVar, varVal);
-					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-							"AbstractWsStream.filling.req.data.variable", rdVar, Utils.toString(varVal));
-				}
-			}
-		}
-
-		return reqData;
-	}
-
-	/**
-	 * Fills in request/query/command string having variable expressions with parameters stored in streams cache
-	 * {@link com.jkoolcloud.tnt4j.streams.utils.StreamsCache}.
+	 * Fills-in request/query/command string having variable expressions with values stored in stream configuration
+	 * properties maps and streams cache {@link com.jkoolcloud.tnt4j.streams.utils.StreamsCache}.
 	 *
 	 * @param reqDataStr
 	 *            request/query/command string
 	 * @param format
 	 *            format of value to fill
-	 * @return variable values filled in request/query/command string
+	 * @return variable values filled-in request/query/command string
+	 *
+	 * @see #fillInRequestData(DataFillContext)
 	 */
-	protected String fillInRequestCacheData(String reqDataStr, String format) {
+	public String fillInRequestData(String reqDataStr, String format) {
 		if (StringUtils.isEmpty(reqDataStr)) {
 			return reqDataStr;
 		}
 
-		List<String> vars = new ArrayList<>();
-		Utils.resolveExpressionVariables(vars, reqDataStr);
-		// Utils.resolveCfgVariables(vars, reqDataStr);
+		DataFillContext ctx = makeDataContext(reqDataStr, format, null);
 
-		String reqData = reqDataStr;
+		return fillInRequestData(ctx);
+	}
+
+	/**
+	 * Fills-in request/query/command string having variable expressions with values configured over provided
+	 * {@code context}.
+	 *
+	 * @param context
+	 *            request data fill-in context to use
+	 * @return variable values filled-in request/query/command string
+	 * 
+	 * @see #getVariableValue(String, DataFillContext)
+	 * @see #formattedValue(Object, String)
+	 */
+	protected String fillInRequestData(DataFillContext context) {
+		if (context == null || StringUtils.isEmpty(context.getData())) {
+			return context.getData();
+		}
+
+		String reqData = context.getData();
+		Set<String> vars = new HashSet<>();
+		Utils.resolveExpressionVariables(vars, reqData);
+		// Utils.resolveCfgVariables(vars, reqData);
+
 		if (CollectionUtils.isNotEmpty(vars)) {
-			String varVal;
 			for (String rdVar : vars) {
-				Object cValue = StreamsCache.getValue(Utils.getVarName(rdVar));
-				varVal = formattedValue(cValue, format);
-				if (varVal != null) {
-					reqData = reqData.replace(rdVar, varVal);
-					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-							"AbstractWsStream.filling.req.data.variable", rdVar, Utils.toString(varVal));
-				}
+				Object cValue = getVariableValue(Utils.getVarName(rdVar), context);
+				String varVal = formattedValue(cValue, context.getFormat());
+				reqData = reqData.replace(rdVar, varVal);
+				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+						"AbstractWsStream.filling.req.data.variable", rdVar, Utils.toString(varVal));
+			}
+
+			if (!reqData.equals(context.getData())) {
+				context.setData(reqData);
+				reqData = fillInRequestData(context);
 			}
 		}
 
 		return reqData;
+	}
+
+	/**
+	 * Resolves variable defined value from:
+	 * <ul>
+	 * <li>streams cache - {@link com.jkoolcloud.tnt4j.streams.utils.StreamsCache#getValue(String)}</li>
+	 * <li>stream configuration properties - {@link #getProperty(String)}</li>
+	 * <li>{@code context} parameter passed entries. Value resolution from context provided entries is stream
+	 * dependent.</li>
+	 * </ul>
+	 * 
+	 * @param varName
+	 *            variable name to resolve
+	 * @param context
+	 *            variable value resolution context to use
+	 * @return variable resolved value
+	 */
+	protected Object getVariableValue(String varName, DataFillContext context) {
+		Object rValue = context.getReqParameter(varName);
+		if (rValue == null) {
+			rValue = StreamsCache.getValue(varName);
+		}
+		if (rValue == null) {
+			rValue = getProperty(varName);
+		}
+
+		return rValue;
+	}
+
+	/**
+	 * Fills-in request data and parameter values having variable expressions.
+	 * 
+	 * @param req
+	 *            request instance to fill-in data
+	 * @return request instance having filled-in values
+	 * 
+	 * @see #fillInRequest(WsRequest, RequestFillContext)
+	 */
+	protected WsRequest<String> fillInRequest(WsRequest<String> req) {
+		RequestFillContext context = new RequestFillContext(true);
+
+		return fillInRequest(req, context);
+	}
+
+	/**
+	 * Fills-in request data and parameter values having variable expressions.
+	 * <p>
+	 * Request entities filled-in:
+	 * <ul>
+	 * <li>parameters (identifiers and values)</li>
+	 * <li>identifier</li>
+	 * <li>data</li>
+	 * </ul>
+	 * 
+	 * @param req
+	 *            request instance to fill-in data
+	 * @param context
+	 *            request values fill-in context to use
+	 * @return request instance having filled-in values
+	 * 
+	 * @see #fillInRequestData(DataFillContext)
+	 */
+	protected WsRequest<String> fillInRequest(WsRequest<String> req, RequestFillContext context) {
+		if (!req.isDynamic()) {
+			return req;
+		}
+
+		WsRequest<String> fReq = req.clone();
+		DataFillContext ctx = makeDataContext(fReq.getId(), null, context);
+		ctx.setRequest(fReq);
+
+		for (Map.Entry<String, WsRequest.Parameter> reqParam : fReq.getParameters().entrySet()) {
+			reqParam.getValue().setValue(fillInRequestData(
+					ctx.setData(reqParam.getValue().getValue()).setFormat(reqParam.getValue().getFormat())));
+		}
+
+		fReq.setId(fillInRequestData(ctx));
+		fReq.setData(fillInRequestData(ctx.setData(fReq.getData())));
+
+		return fReq;
+	}
+
+	/**
+	 * Makes request data fill-in context instance for provided request entity data string, value format and request
+	 * fill-in context.
+	 * 
+	 * @param reqDataStr
+	 *            request entity data string
+	 * @param format
+	 *            format of value to fill
+	 * @param reqCtx
+	 *            request fill-in context to use
+	 * @return data fill-in context instance
+	 */
+	protected DataFillContext makeDataContext(String reqDataStr, String format, RequestFillContext reqCtx) {
+		DataFillContext dataCtx = new DataFillContext(reqDataStr);
+		dataCtx.setFormat(format);
+
+		if (reqCtx != null) {
+			for (Map.Entry<String, Object> rcme : reqCtx.entrySet()) {
+				if (rcme.getKey().startsWith(DataFillContext.KEY_PREFIX)) {
+					dataCtx.put(rcme.getKey(), rcme.getValue());
+				}
+			}
+		}
+
+		return dataCtx;
 	}
 
 	/**
@@ -640,9 +698,6 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	 *             if current thread got interrupted when acquiring semaphore
 	 */
 	protected Semaphore acquireSemaphore(WsRequest<?> request) throws InterruptedException {
-		WsScenarioStep scenarioStep = request.getScenarioStep();
-		Semaphore stepSemaphore = scenarioStep.getSemaphore();
-
 		if (semaphore != null) {
 			while (!semaphore.tryAcquire()) {
 				Thread.sleep(50);
@@ -651,6 +706,9 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 					"AbstractWsStream.semaphore.acquired.stream"), getName(), request.getId());
 			return semaphore;
 		}
+
+		WsScenarioStep scenarioStep = request.getScenarioStep();
+		Semaphore stepSemaphore = scenarioStep.getSemaphore();
 
 		if (stepSemaphore != null) {
 			while (!stepSemaphore.tryAcquire()) {
@@ -685,13 +743,22 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 	}
 
 	/**
+	 * Invokes actions to be done when request fails or response has no meaningful payload.
+	 * 
+	 * @param request
+	 *            failed request
+	 */
+	protected void requestFailed(WsRequest<?> request) {
+	}
+
+	/**
 	 * Base scheduler job class to be executing implementing stream calls.
 	 */
 	protected static abstract class CallJob implements Job {
 		@Override
 		public void execute(JobExecutionContext context) throws JobExecutionException {
 			JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-			AbstractWsStream<?> stream = (AbstractWsStream<?>) dataMap.get(JOB_PROP_STREAM_KEY);
+			AbstractWsStream<?, ?> stream = (AbstractWsStream<?, ?>) dataMap.get(JOB_PROP_STREAM_KEY);
 
 			if (stream.isShotDown()) {
 				return;
@@ -712,5 +779,165 @@ public abstract class AbstractWsStream<T> extends AbstractBufferedStream<WsRespo
 		 *            job data map instance
 		 */
 		protected abstract void executeCalls(JobDataMap dataMap);
+	}
+
+	/**
+	 * Request entity data fill-in context.
+	 */
+	protected static class DataFillContext extends HashMap<String, Object> {
+		private static final long serialVersionUID = 925353711026880141L;
+
+		/**
+		 * Constant for context key prefix {@value}.
+		 */
+		public static final String KEY_PREFIX = "REQ_DATA_CTX_"; // NON-NLS
+
+		private static final String DATA = KEY_PREFIX + "DATA"; // NON-NLS
+		private static final String FORMAT = KEY_PREFIX + "FORMAT"; // NON-NLS
+		private static final String REQUEST = KEY_PREFIX + "REQUEST"; // NON-NLS
+
+		/**
+		 * Constructs a new instance of DataFillContext.
+		 * 
+		 * @param reqData
+		 *            request entity data string
+		 */
+		public DataFillContext(String reqData) {
+			super();
+
+			put(DATA, reqData);
+		}
+
+		/**
+		 * Sets request entity data string.
+		 * 
+		 * @param data
+		 *            request entity data string
+		 * @return instance of this context
+		 */
+		public DataFillContext setData(String data) {
+			put(DATA, data);
+
+			return this;
+		}
+
+		/**
+		 * Returns request entity data string.
+		 * 
+		 * @return request entity data string
+		 */
+		public String getData() {
+			return (String) get(DATA);
+		}
+
+		/**
+		 * Sets value format.
+		 * 
+		 * @param format
+		 *            value format
+		 * @return instance of this context
+		 */
+		public DataFillContext setFormat(String format) {
+			put(FORMAT, format);
+
+			return this;
+		}
+
+		/**
+		 * Returns value format.
+		 * 
+		 * @return value format
+		 */
+		public String getFormat() {
+			return (String) get(FORMAT);
+		}
+
+		/**
+		 * Sets request instance bound to this context.
+		 * 
+		 * @param request
+		 *            request instance to bind
+		 * @return instance of this context
+		 */
+		public DataFillContext setRequest(WsRequest<String> request) {
+			put(REQUEST, request);
+
+			return this;
+		}
+
+		/**
+		 * Returns this context bound request instance.
+		 * 
+		 * @return bound request instance
+		 */
+		@SuppressWarnings("unchecked")
+		public WsRequest<String> getRequest() {
+			return (WsRequest<String>) get(REQUEST);
+		}
+
+		/**
+		 * Returns request parameter value.
+		 * 
+		 * @param pKey
+		 *            request parameter key
+		 * @return request parameter value, or {@code null} if request has no such property
+		 */
+		public Object getReqParameter(String pKey) {
+			WsRequest<?> request = getRequest();
+
+			return request == null ? null : request.getParameterValue(pKey);
+		}
+
+		/**
+		 * Returns boolean context property value.
+		 * 
+		 * @param key
+		 *            context property key
+		 * @param defValue
+		 *            default property value
+		 * @return resolved context property value or default value if context has no defined property
+		 */
+		public boolean getBoolean(String key, boolean defValue) {
+			Boolean val = (Boolean) get(key);
+
+			return val == null ? defValue : val;
+		}
+	}
+
+	/**
+	 * Request fill-in context.
+	 */
+	protected static class RequestFillContext extends HashMap<String, Object> {
+		private static final long serialVersionUID = 181407282124290094L;
+
+		/**
+		 * Constant for context key prefix {@value}.
+		 */
+		public static final String KEY_PREFIX = "REQ_CTX_"; // NON-NLS
+
+		private static final String FILL_PARAMS = KEY_PREFIX + "FILL_PARAMS"; // NON-NLS
+
+		/**
+		 * Constructs a new instance of RequestFillContext.
+		 * 
+		 * @param fillParams
+		 *            flag indicating whether to fill-in request parameters
+		 */
+		public RequestFillContext(boolean fillParams) {
+			super();
+
+			put(FILL_PARAMS, fillParams);
+		}
+
+		/**
+		 * Returns flag indicating whether to fill-in request parameters.
+		 * 
+		 * @return {@code true} if request parameters values shall be filled-in, {@code false} - otherwise
+		 */
+		public boolean isFillingParams() {
+			Boolean fp = (Boolean) get(FILL_PARAMS);
+
+			return fp == null ? true : fp;
+		}
 	}
 }

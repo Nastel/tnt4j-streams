@@ -18,8 +18,6 @@ package com.jkoolcloud.tnt4j.streams.custom.inputs;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -55,7 +53,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * it. Default value - {@code "login"}. (Optional)</li>
  * </ul>
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  */
 public class CastIronWsStream extends WsStream {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(CastIronWsStream.class);
@@ -91,31 +89,6 @@ public class CastIronWsStream extends WsStream {
 		}
 
 		return super.getProperty(name);
-	}
-
-	/**
-	 * Resolves variable expressions (e.g. ${name}) in {@code soapRequestData} and fills in with values from streams
-	 * cache entries.
-	 *
-	 * @param soapRequestData
-	 *            SOAP request body data
-	 * @return SOAP request body data filled in with values from streams cache
-	 */
-	@Override
-	protected String preProcess(String soapRequestData) {
-		List<String> vars = new ArrayList<>();
-		Utils.resolveCfgVariables(vars, soapRequestData);
-
-		for (String var : vars) {
-			if (var.length() < 3) {
-				continue;
-			}
-			Object cachedValue = StreamsCache.getValue(Utils.getVarName(var));
-			if (cachedValue != null) {
-				return soapRequestData.replace(var, Utils.toString(cachedValue));
-			}
-		}
-		return soapRequestData;
 	}
 
 	/**
@@ -179,9 +152,9 @@ public class CastIronWsStream extends WsStream {
 
 		try {
 			RequestDataAndHeaders requestDataAndHeaders = new RequestDataAndHeaders()
-					.resolve(fillInRequestData(loginStep.getRequests().get(0).getData()), this);
+					.resolve(fillInRequestData(loginStep.getRequests().get(0).getData()));
 			SOAPMessage soapRequest = createMessage(requestDataAndHeaders.getRequest(),
-					requestDataAndHeaders.getHeaders(), false, this);
+					requestDataAndHeaders.getHeaders(), false);
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"CastIronStream.login.request", toXMLString(soapRequest));
 
@@ -199,7 +172,7 @@ public class CastIronWsStream extends WsStream {
 					"CastIronStream.login.response", responseString);
 
 			applyParsers(responseString, securityResponseParserTag);
-		} catch (Exception exc) {
+		} catch (Throwable exc) {
 			Utils.logThrowable(logger(), OpLevel.ERROR,
 					StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME), "CastIronStream.login.failed",
 					exc);
@@ -224,7 +197,7 @@ public class CastIronWsStream extends WsStream {
 					"CastIronStream.parser.tag.resolved", currentMethod);
 
 			return new String[] { currentMethod };
-		} catch (Exception exc) {
+		} catch (Throwable exc) {
 			logger().log(OpLevel.ERROR, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"CastIronStream.parser.tag.resolve.failed", Utils.getExceptionMessages(exc), data);
 		}

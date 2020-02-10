@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2020 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.jkoolcloud.tnt4j.streams.scenario;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,14 +29,13 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * @param <T>
  *            type of request data
  *
- * @version $Revision: 2 $
+ * @version $Revision: 3 $
  */
-public class WsRequest<T> {
+public class WsRequest<T> implements Cloneable {
 	private String id;
 	private String[] tags;
 	private T data;
-	private T sentData;
-	private Map<String, Parameter> parameters = new HashMap<>();
+	private Map<String, Parameter> parameters = new LinkedHashMap<>();
 	private WsScenarioStep scenarioStep;
 
 	/**
@@ -112,14 +111,6 @@ public class WsRequest<T> {
 	@Override
 	public String toString() {
 		return String.valueOf(data);
-	}
-
-	public T getSentData() {
-		return sentData;
-	}
-
-	public void setSentData(T sentData) {
-		this.sentData = sentData;
 	}
 
 	/**
@@ -287,9 +278,70 @@ public class WsRequest<T> {
 	}
 
 	/**
+	 * Creates and returns a copy of this WS request.
+	 * <p>
+	 * Parameters collection elements are cloned into new collection. No changes made on cloned request instance
+	 * parameters values shall make impact for this instance values.
+	 * 
+	 * @return cloned instance of this WS request
+	 */
+	@Override
+	public WsRequest<T> clone() {
+		WsRequest<T> cReq = new WsRequest<>(data, tags);
+		cReq.id = id;
+		cReq.scenarioStep = scenarioStep;
+
+		if (isparametersDynamic()) {
+			for (Map.Entry<String, Parameter> param : parameters.entrySet()) {
+				cReq.addParameter(param.getValue().clone());
+			}
+		} else {
+			cReq.parameters.putAll(parameters);
+		}
+
+		return cReq;
+	}
+
+	/**
+	 * Checks if this request has any dynamically resolvable variable expressions within data or parameters definitions.
+	 * 
+	 * @return {@code true} if request data or parameters has variable expressions, {@code false} - otherwise
+	 * 
+	 * @see #isDataDynamic()
+	 * @see #isparametersDynamic()
+	 */
+	public boolean isDynamic() {
+		return isDataDynamic() || isparametersDynamic();
+	}
+
+	/**
+	 * Checks if this request has any dynamically resolvable variable expressions within data.
+	 * 
+	 * @return {@code true} if request data has variable expressions, {@code false} - otherwise
+	 */
+	public boolean isDataDynamic() {
+		return Utils.isVariableExpression(Utils.toString(data));
+	}
+
+	/**
+	 * Checks if this request has any dynamically resolvable variable expressions within parameters definitions.
+	 * 
+	 * @return {@code true} if request parameters has variable expressions, {@code false} - otherwise
+	 */
+	public boolean isparametersDynamic() {
+		for (Map.Entry<String, Parameter> pe : parameters.entrySet()) {
+			if (pe.getValue().isDynamic()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Class defining request parameter properties.
 	 */
-	public static class Parameter {
+	public static class Parameter implements Cloneable {
 		private String id;
 		private String value;
 		private String type;
@@ -384,6 +436,16 @@ public class WsRequest<T> {
 		}
 
 		/**
+		 * Sets parameter value.
+		 * 
+		 * @param value
+		 *            parameter value
+		 */
+		public void setValue(String value) {
+			this.value = value;
+		}
+
+		/**
 		 * Returns parameter value.
 		 *
 		 * @return parameter value
@@ -432,6 +494,28 @@ public class WsRequest<T> {
 			sb.append(", transient=").append(Utils.sQuote(transient_)); // NON-NLS
 			sb.append('}'); // NON-NLS
 			return sb.toString();
+		}
+
+		/**
+		 * Creates and returns a copy of this request parameter.
+		 * 
+		 * @return cloned instance of this request parameter
+		 */
+		@Override
+		public Parameter clone() {
+			Parameter cParam = new Parameter(id, value, type, format, transient_);
+
+			return cParam;
+		}
+
+		/**
+		 * Checks if this request parameter has any dynamically resolvable variable expressions within identifier or
+		 * value.
+		 * 
+		 * @return {@code true} if parameter identifier or value has variable expressions, {@code false} - otherwise
+		 */
+		public boolean isDynamic() {
+			return Utils.isVariableExpression(id) || Utils.isVariableExpression(value);
 		}
 	}
 }

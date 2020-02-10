@@ -47,7 +47,6 @@ import org.quartz.JobDetail;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.WsStreamProperties;
-import com.jkoolcloud.tnt4j.streams.scenario.WsReqResponse;
 import com.jkoolcloud.tnt4j.streams.scenario.WsRequest;
 import com.jkoolcloud.tnt4j.streams.scenario.WsResponse;
 import com.jkoolcloud.tnt4j.streams.scenario.WsScenarioStep;
@@ -68,7 +67,7 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  * {@link com.jkoolcloud.tnt4j.streams.scenario.WsResponse#getData()} provided string.
  * <p>
  * This activity stream supports the following configuration properties (in addition to those supported by
- * {@link AbstractWsStream}):
+ * {@link AbstractHttpStream}):
  * <ul>
  * <li>MaxTotalPoolConnections - defines the maximum number of total open connections in the HTTP connections pool.
  * Default value - {@code 5}. (Optional)</li>
@@ -76,12 +75,12 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  * value - {@code 2}. (Optional)</li>
  * </ul>
  *
- * @version $Revision: 2 $
+ * @version $Revision: 3 $
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  * @see org.apache.http.client.HttpClient#execute(HttpUriRequest)
  */
-public class RestStream extends AbstractWsStream<String> {
+public class RestStream extends AbstractHttpStream {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(RestStream.class);
 
 	private int maxTotalPoolConnections = 5;
@@ -129,11 +128,6 @@ public class RestStream extends AbstractWsStream<String> {
 	}
 
 	@Override
-	protected long getActivityItemByteSize(WsResponse<String> item) {
-		return item == null || item.getData() == null ? 0 : item.getData().getBytes().length;
-	}
-
-	@Override
 	protected JobDetail buildJob(String group, String jobId, JobDataMap jobAttrs) {
 		return JobBuilder.newJob(RestCallJob.class).withIdentity(jobId, group).usingJobData(jobAttrs).build();
 	}
@@ -143,6 +137,7 @@ public class RestStream extends AbstractWsStream<String> {
 		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
 		cm.setMaxTotal(maxTotalPoolConnections);
 		cm.setDefaultMaxPerRoute(defaultMaxPerRouteConnections);
+		// cm.setValidateAfterInactivity((int) TimeUnit.SECONDS.toMillis(4 * 60));
 		client = HttpClients.custom().setConnectionManager(cm).build();
 
 		super.initialize();
@@ -316,17 +311,22 @@ public class RestStream extends AbstractWsStream<String> {
 	}
 
 	/**
-	 * Performs pre-processing of request/command/query data provided over URL string: it can be expression evaluation,
-	 * filling in variable values and so on.
-	 *
-	 * @param requestData
-	 *            URL string having request/command/query data
-	 * @param escape
-	 *            flag indicating whether to escape URL
-	 * @return preprocessed request/command/query data URL string
+	 * {@inheritDoc}
+	 * 
+	 * @see #uriForGET(com.jkoolcloud.tnt4j.streams.scenario.WsRequest)
 	 */
-	protected String preProcessURL(String requestData, boolean escape) {
-		return preProcess(requestData);
+	@Override
+	protected WsRequest<String> fillInRequest(WsRequest<String> req, String url) throws VoidRequestException {
+		String reqData = req.getData();
+		if (StringUtils.isEmpty(reqData)) {
+			req.setData(url);
+		}
+
+		WsRequest<String> fReq = fillInRequest(req);
+		String uriStr = uriForGET(fReq);
+		fReq.setData(uriStr);
+
+		return fReq;
 	}
 
 	/**
@@ -350,35 +350,38 @@ public class RestStream extends AbstractWsStream<String> {
 		 */
 		protected void runPOST(WsScenarioStep scenarioStep, RestStream stream) {
 			if (!scenarioStep.isEmpty()) {
-				String reqDataStr;
 				String respStr;
-				Semaphore acquiredSemaphore = null;
-				for (WsRequest<String> request : scenarioStep.getRequests()) {
-					reqDataStr = null;
+				Semaphore acquiredSemaphore;
+				WsRequest<String> processedRequest;
+				for (WsRequest<String> request : scenarioStep.requestsArray()) {
 					if (stream.isShotDown()) {
 						return;
 					}
 
 					respStr = null;
+					acquiredSemaphore = null;
+					processedRequest = null;
 					try {
 						acquiredSemaphore = stream.acquireSemaphore(request);
-						reqDataStr = stream.preProcess(request.getData());
-						request.setSentData(reqDataStr);
-						respStr = stream.executePOST(stream.client, scenarioStep.getUrlStr(), reqDataStr,
-								scenarioStep.getUsername(), decPassword(scenarioStep.getPassword()));
+						processedRequest = stream.fillInRequest(request);
+						respStr = stream.executePOST(stream.client, scenarioStep.getUrlStr(),
+								processedRequest.getData(), scenarioStep.getUsername(),
+								decPassword(scenarioStep.getPassword()));
 					} catch (IOException exc) {
 						stream.logger().log(OpLevel.WARNING,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-								"RestStream.execute.exception", stream.getName(), request.getId(), exc.getMessage());
+								"RestStream.execute.exception", stream.getName(), processedRequest.getId(),
+								exc.getMessage());
 					} catch (Throwable exc) {
 						Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-								"RestStream.execute.exception", stream.getName(), request.getId(), exc);
+								"RestStream.execute.exception", stream.getName(), processedRequest.getId(), exc);
 					}
 
 					if (StringUtils.isNotEmpty(respStr)) {
-						stream.addInputToBuffer(new WsReqResponse<>(respStr, request));
+						stream.addInputToBuffer(new WsResponse<>(respStr, processedRequest));
 					} else {
+						stream.requestFailed(processedRequest);
 						stream.releaseSemaphore(acquiredSemaphore, scenarioStep.getName(), request);
 					}
 				}
@@ -398,39 +401,41 @@ public class RestStream extends AbstractWsStream<String> {
 				scenarioStep.addRequest(null, scenarioStep.getUrlStr());
 			}
 
-			String reqUrl;
 			String respStr;
-			String urlStr = scenarioStep.getUrlStr();
-			Semaphore acquiredSemaphore = null;
-			for (WsRequest<String> request : scenarioStep.getRequests()) {
+			Semaphore acquiredSemaphore;
+			WsRequest<String> processedRequest;
+			for (WsRequest<String> request : scenarioStep.requestsArray()) {
 				if (stream.isShotDown()) {
 					return;
 				}
 
 				respStr = null;
+				acquiredSemaphore = null;
+				processedRequest = null;
 				try {
 					acquiredSemaphore = stream.acquireSemaphore(request);
-					reqUrl = stream.preProcessURL(stream.uriForGET(urlStr, request), true);
-					request.setSentData(reqUrl);
-					respStr = stream.executeGET(stream.client, reqUrl, scenarioStep.getUsername(),
+					processedRequest = stream.fillInRequest(request, scenarioStep.getUrlStr());
+					respStr = stream.executeGET(stream.client, processedRequest.getData(), scenarioStep.getUsername(),
 							decPassword(scenarioStep.getPassword()));
 				} catch (VoidRequestException exc) {
 					stream.logger().log(OpLevel.INFO,
 							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-							"RestStream.void.request", request.getId(), exc.getMessage());
+							"AbstractHttpStream.void.request", processedRequest.getId(), exc.getMessage());
 				} catch (IOException exc) {
 					stream.logger().log(OpLevel.WARNING,
 							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-							"RestStream.execute.exception", stream.getName(), request.getId(), exc.getMessage());
+							"RestStream.execute.exception", stream.getName(), processedRequest.getId(),
+							exc.getMessage());
 				} catch (Throwable exc) {
 					Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-							"RestStream.execute.exception", stream.getName(), request.getId(), exc);
+							"RestStream.execute.exception", stream.getName(), processedRequest.getId(), exc);
 				}
 
 				if (StringUtils.isNotEmpty(respStr)) {
-					stream.addInputToBuffer(new WsReqResponse<>(respStr, request));
+					stream.addInputToBuffer(new WsResponse<>(respStr, processedRequest));
 				} else {
+					stream.requestFailed(processedRequest);
 					stream.releaseSemaphore(acquiredSemaphore, scenarioStep.getName(), request);
 				}
 			}
@@ -457,8 +462,6 @@ public class RestStream extends AbstractWsStream<String> {
 	/**
 	 * Appends JAX-RS endpoint URL with query parameter values from request data.
 	 *
-	 * @param stepUrl
-	 *            scenario step bound call endpoint URL string
 	 * @param request
 	 *            request data package
 	 * @return URL string appended with query parameter values
@@ -466,13 +469,8 @@ public class RestStream extends AbstractWsStream<String> {
 	 * @throws com.jkoolcloud.tnt4j.streams.inputs.VoidRequestException
 	 *             if request URL is meaningless or can't be build from request context data
 	 */
-	protected String uriForGET(String stepUrl, WsRequest<String> request) throws VoidRequestException {
-		if (StringUtils.isNotEmpty(stepUrl)) {
-			return stepUrl;
-		}
-
-		String uri = preProcessURL(request.getData(), false);
-
+	protected String uriForGET(WsRequest<String> request) throws VoidRequestException {
+		String uri = request.getData();
 		StringBuilder uriBuilder = new StringBuilder();
 		uriBuilder.append(uri);
 
@@ -485,7 +483,6 @@ public class RestStream extends AbstractWsStream<String> {
 		}
 
 		List<NameValuePair> params = makeParamsList(request);
-
 		String paramsStr = URLEncodedUtils.format(params, StandardCharsets.UTF_8);
 
 		if (StringUtils.isNotEmpty(paramsStr)) {
@@ -510,6 +507,7 @@ public class RestStream extends AbstractWsStream<String> {
 				continue;
 			}
 
+			BasicNameValuePair httpParam = makeParam(param);
 			if (httpParam != null) {
 				params.add(httpParam);
 			}
@@ -523,12 +521,10 @@ public class RestStream extends AbstractWsStream<String> {
 	 * 
 	 * @param param
 	 *            request parameter instance
-	 * @param request
-	 *            request data package
 	 * @return HTTP parameter instance, or {@code null} if parameter can't be built
 	 */
-	protected BasicNameValuePair makeParam(Map.Entry<String, WsRequest.Parameter> param, WsRequest<String> request) {
-		return new BasicNameValuePair(param.getKey(), preProcessURL(param.getValue().getValue(), false));
+	protected BasicNameValuePair makeParam(Map.Entry<String, WsRequest.Parameter> param) {
+		return new BasicNameValuePair(param.getKey(), param.getValue().getValue());
 	}
 
 	/**

@@ -18,6 +18,7 @@ package com.jkoolcloud.tnt4j.streams.scenario;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +32,8 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * @version $Revision: 1 $
  */
 public class WsScenarioStep extends WsScenarioEntity {
-	private List<WsRequest<String>> requests;
+	private final List<WsRequest<String>> requests = new ArrayList<>();
+	private AtomicInteger idCounter = new AtomicInteger();
 	private Map<String, String> properties;
 
 	private SchedulerData schedulerData;
@@ -51,12 +53,44 @@ public class WsScenarioStep extends WsScenarioEntity {
 	}
 
 	/**
-	 * Returns requests/commands data.
+	 * Returns requests/commands list for this step.
 	 *
-	 * @return request data
+	 * @return requests list for this step
 	 */
 	public List<WsRequest<String>> getRequests() {
 		return requests;
+	}
+
+	/**
+	 * Returns requests/commands array for this step.
+	 * 
+	 * @return requests array for this step
+	 */
+	@SuppressWarnings("unchecked")
+	public WsRequest<String>[] requestsArray() {
+		return requests.toArray(new WsRequest[requests.size()]);
+	}
+
+	/**
+	 * Returns request/command instance having defined identifier {@code reqId}. Identifiers comparison is case
+	 * insensitive.
+	 * 
+	 * @param reqId
+	 *            request identifier
+	 * @return request instance having defined identifier
+	 */
+	public WsRequest<String> getRequest(String reqId) {
+		synchronized (requests) {
+			if (StringUtils.isNotEmpty(reqId)) {
+				for (WsRequest<String> req : requests) {
+					if (reqId.equalsIgnoreCase(req.getId())) {
+						return req;
+					}
+				}
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -86,16 +120,44 @@ public class WsScenarioStep extends WsScenarioEntity {
 	 * @return constructed request instance
 	 */
 	public WsRequest<String> addRequest(String id, String request, String... tags) {
-		if (requests == null) {
-			requests = new ArrayList<>();
+		WsRequest<String> req = new WsRequest<>(request, tags);
+		synchronized (requests) {
+			req.setId(StringUtils.isEmpty(id) ? String.valueOf(idCounter.getAndIncrement()) : id);
+			req.setScenarioStep(this);
+			requests.add(req);
 		}
 
-		WsRequest<String> req = new WsRequest<>(request, tags);
-		req.setId(StringUtils.isEmpty(id) ? String.valueOf(requests.size()) : id);
-		req.setScenarioStep(this);
-		requests.add(req);
-
 		return req;
+	}
+
+	/**
+	 * Adds request/command data for this step.
+	 *
+	 * @param request
+	 *            request instance to add
+	 */
+	public void addRequest(WsRequest<String> request) {
+		synchronized (requests) {
+			if (StringUtils.isEmpty(request.getId())) {
+				request.setId(String.valueOf(idCounter.getAndIncrement()));
+			}
+			request.setScenarioStep(this);
+
+			requests.add(request);
+		}
+	}
+
+	/**
+	 * Removes request/command data from this step requests list.
+	 * 
+	 * @param request
+	 *            request instance to remove
+	 */
+	public void removeRequest(WsRequest<String> request) {
+		synchronized (requests) {
+			requests.remove(request);
+		}
+		request.setScenarioStep(null);
 	}
 
 	@Override
@@ -133,7 +195,9 @@ public class WsScenarioStep extends WsScenarioEntity {
 	 * @return flag indicating scenario has no requests defined
 	 */
 	public boolean isEmpty() {
-		return CollectionUtils.isEmpty(requests);
+		synchronized (requests) {
+			return CollectionUtils.isEmpty(requests);
+		}
 	}
 
 	/**
