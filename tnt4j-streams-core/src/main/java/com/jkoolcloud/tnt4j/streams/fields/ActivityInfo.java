@@ -54,6 +54,8 @@ public class ActivityInfo {
 	private static final TimeTracker ACTIVITY_TIME_TRACKER = TimeTracker.newTracker(1000, TimeUnit.HOURS.toMillis(8));
 
 	private static final Pattern CHILD_FIELD_PATTERN = Pattern.compile("child\\[(?<child>\\S+)\\]\\.(?<field>\\S+)"); // NON-NLS
+	private static final String KV_DELIM = "\\="; // NON-NLS
+	private static final String PATH_DELIM = "\\."; // NON-NLS
 
 	private static final Map<String, String> HOST_CACHE = new ConcurrentHashMap<>();
 	private static final String LOCAL_SERVER_NAME_KEY = "LOCAL_SERVER_NAME_KEY"; // NON-NLS
@@ -678,7 +680,7 @@ public class ActivityInfo {
 		StringBuilder fqnB = new StringBuilder();
 
 		for (String fqnT : fqnTokens) {
-			String[] pair = fqnT.split("=");
+			String[] pair = fqnT.split(KV_DELIM);
 			SourceType type = SourceType.valueOf(pair[0]);
 			addSourceValue(fqnB, type, getFQNValue(pair[1]));
 		}
@@ -1970,7 +1972,7 @@ public class ActivityInfo {
 	 * @param deepCollect
 	 *            indicates if all children of children entities shall be added to returned list (flattened children
 	 *            hierarchy)
-	 * 
+	 *
 	 * @return list of child activity entities
 	 *
 	 * @see #collectChildren(ActivityInfo, java.util.Collection, boolean)
@@ -2015,7 +2017,7 @@ public class ActivityInfo {
 	 * Returns root activity entity of this entity.
 	 * <p>
 	 * Root entity is the one having no parent defined.
-	 * 
+	 *
 	 * @return root entity of this entity
 	 */
 	protected ActivityInfo getRootActivity() {
@@ -2057,7 +2059,7 @@ public class ActivityInfo {
 
 	/**
 	 * Returns child activity entities count for defined group.
-	 * 
+	 *
 	 * @param groupName
 	 *            children group name
 	 * @return count of group child activity entities, or {@code 0} if there is no child activity entities
@@ -2200,22 +2202,22 @@ public class ActivityInfo {
 		ActivityInfo ai = last(ais);
 
 		try {
-			if (StreamsConstants.isParentEntityRef(fieldName)) {
-				return getParentFieldValue(fieldName, groupName, ais);
-			}
+		if (StreamsConstants.isParentEntityRef(fieldName)) {
+			return getParentFieldValue(fieldName, groupName, ais);
+		}
 
-			Matcher fnMatcher = CHILD_FIELD_PATTERN.matcher(fieldName);
-			if (fnMatcher.matches()) {
-				return getChildFieldValue(fnMatcher, fieldName, groupName, ais);
-			}
+		Matcher fnMatcher = CHILD_FIELD_PATTERN.matcher(fieldName);
+		if (fnMatcher.matches()) {
+			return getChildFieldValue(fnMatcher, fieldName, groupName, ais);
+		}
 
-			if (StreamsConstants.CHILD_ORDINAL_INDEX.equals(fieldName)) {
-				return ai.ordinalIdx;
-			}
+		if (StreamsConstants.CHILD_ORDINAL_INDEX.equals(fieldName)) {
+			return ai.ordinalIdx;
+		}
 
-			if (fieldName.startsWith(Utils.VAR_EXP_START_TOKEN)) {
-				fieldName = Utils.getVarName(fieldName);
-			}
+		if (fieldName.startsWith(Utils.VAR_EXP_START_TOKEN)) {
+			fieldName = Utils.getVarName(fieldName);
+		}
 
 			StreamFieldType sft = Utils.valueOfIgnoreCase(StreamFieldType.class, fieldName);
 			switch (sft) {
@@ -2337,6 +2339,9 @@ public class ActivityInfo {
 	 * <li>{@code 'child[groupName.childIndex].fieldName'} - where {@code 'child'} is predefined value to resolve child
 	 * entity, {@code 'groupName'} is activity children group name, {@code 'childIndex'} is child index in that group,
 	 * {@code 'fieldName'} is child entity field name</li>
+	 * <li>{@code 'child[groupName.matchExpression].fieldName'} - where {@code 'child'} is predefined value to resolve
+	 * child entity, {@code 'groupName'} is activity children group name, {@code 'matchExpression'} is child match
+	 * expression in that group (e.g.:fieldName=value) p, {@code 'fieldName'} is child entity field name</li></li>
 	 * </ul>
 	 *
 	 * @param fnMatcher
@@ -2357,32 +2362,42 @@ public class ActivityInfo {
 		String groupName = null;
 		int chIndex = -1;
 		int chtLength = 0;
+		String matchExpression = null;
 
 		try {
 			String chLocator = fnMatcher.group("child"); // NON-NLS
 			fName = fnMatcher.group("field"); // NON-NLS
-			String[] chTokens = chLocator == null ? null : chLocator.split("\\."); // NON-NLS
+			String[] chTokens = chLocator == null ? null : chLocator.split(PATH_DELIM);
 			chtLength = ArrayUtils.getLength(chTokens);
 			if (chtLength == 1) {
 				if (StringUtils.isNumeric(chTokens[0])) {
 					groupName = defaultGroupName;
 					chIndex = Integer.parseInt(chTokens[0]);
 				} else {
-					groupName = chTokens[0];
-					chIndex = ais[0].ordinalIdx > 0 ? ais[0].ordinalIdx - 1 : -1;
+					if (chTokens[0].contains("=")) { // NON-NLS
+						matchExpression = chTokens[0];
+					} else {
+						groupName = chTokens[0];
+						chIndex = ais[0].ordinalIdx > 0 ? ais[0].ordinalIdx - 1 : -1;
+					}
 				}
 			} else if (chtLength > 1) {
 				groupName = chTokens[0];
-				chIndex = Integer.parseInt(chTokens[1]);
+				try {
+					chIndex = Integer.parseInt(chTokens[1]);
+				} catch (NumberFormatException e) {
+					matchExpression = chTokens[1];
+				}
 			}
 		} catch (Exception exc) {
 		}
 
-		if (StringUtils.isEmpty(fName) || StringUtils.isEmpty(groupName) || chIndex < 0) {
+		if (StringUtils.isEmpty(fName) || StringUtils.isEmpty(groupName)
+				|| (chIndex < 0 && StringUtils.isEmpty(matchExpression))) {
 			throw new IllegalArgumentException(StreamsResources.getStringFormatted(
 					StreamsResources.RESOURCE_BUNDLE_NAME, "ActivityInfo.invalid.child.field.locator",
 					chtLength == 1 ? "child[childIndex].fieldName or child[groupName].fieldName" // NON-NLS
-							: "child[groupName.childIndex].fieldName", // NON-NLS
+							: "child[groupName.childIndex].fieldName or child[groupName.matchExpression].fieldName", // NON-NLS
 					fieldName));
 		}
 
@@ -2395,15 +2410,33 @@ public class ActivityInfo {
 
 		Map<String, List<ActivityInfo>> childMap = ai == null ? null : ai.children;
 		List<ActivityInfo> children = childMap == null ? null : childMap.get(groupName);
+		ActivityInfo child = null;
 
-		if (children == null || chIndex >= children.size()) {
-			LOGGER.log(OpLevel.TRACE,
-					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
-							"ActivityInfo.child.field.locator.children.bounds"),
-					groupName, chIndex, fieldName, children == null ? null : children.size());
+		if (chIndex >= 0) {
+			if (children == null || chIndex >= children.size()) {
+				LOGGER.log(OpLevel.TRACE,
+						StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+								"ActivityInfo.child.field.locator.children.bounds"),
+						groupName, chIndex, fieldName, children == null ? null : children.size());
+			} else {
+				child = children.get(chIndex);
+			}
+		} else {
+			if (children != null && StringUtils.isNotEmpty(matchExpression)) {
+				String[] varTokens = matchExpression.split(KV_DELIM);
+				if (varTokens.length > 1) {
+					for (ActivityInfo c : children) {
+						Object cfv = c.getFieldValue(varTokens[0]);
+						if (varTokens[1].equals(Utils.toString(cfv))) {
+							child = c;
+							break;
+						}
+					}
+				}
+			}
 		}
 
-		return children == null || chIndex >= children.size() ? null : children.get(chIndex).getFieldValue(fName);
+		return child == null ? null : child.getFieldValue(fName);
 	}
 
 	private static ActivityInfo[] addParent(ActivityInfo[] ais) {

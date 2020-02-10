@@ -83,8 +83,8 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 */
 	public static final String VAR_EXP_START_TOKEN = "${"; // NON-NLS
 	private static final String VAR_EXP_END_TOKEN = "}"; // NON-NLS
-	private static final Pattern CFG_VAR_PATTERN = Pattern.compile("\\$\\{[\\w.]+\\}"); // NON-NLS
-	private static final Pattern EXPR_VAR_PATTERN = CFG_VAR_PATTERN;// Pattern.compile("\\$(\\w+)"); // NON-NLS
+	private static final Pattern CFG_VAR_PATTERN = Pattern.compile("\\$\\{[\\w\\^\\[\\]\\=\\:.]+\\}"); // NON-NLS
+	private static final Pattern EXPR_VAR_PATTERN = CFG_VAR_PATTERN;
 
 	/**
 	 * Default floating point numbers equality comparison difference tolerance {@value}.
