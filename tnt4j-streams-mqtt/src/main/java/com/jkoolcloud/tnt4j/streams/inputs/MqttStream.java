@@ -48,6 +48,10 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>ActivityTopic - topic name message with activity data was received.</li>
  * <li>ActivityData - raw activity data as {@code byte[]} retrieved from message.</li>
  * <li>ActivityTransport - activity transport definition: 'Mqtt'.</li>
+ * <li>MessageId - message identifier number.</li>
+ * <li>Qos - message Quality of Service numeric value.</li>
+ * <li>Duplicate - message is duplicate flag value.</li>
+ * <li>Retained - message is retained flag value.</li>
  * </ul>
  * <p>
  * This activity stream supports the following configuration properties (in addition to those supported by
@@ -342,6 +346,10 @@ public class MqttStream extends AbstractBufferedStream<Map<String, ?>> {
 				msgDataMap.put(StreamsConstants.TOPIC_KEY, topic);
 				msgDataMap.put(StreamsConstants.ACTIVITY_DATA_KEY, message.getPayload());
 				msgDataMap.put(StreamsConstants.TRANSPORT_KEY, MqttStreamConstants.TRANSPORT_MQTT);
+				msgDataMap.put("MessageId", message.getId()); // NON-NLS
+				msgDataMap.put("Qos", message.getQos()); // NON-NLS
+				msgDataMap.put("Duplicate", message.isDuplicate()); // NON-NLS
+				msgDataMap.put("Retained", message.isRetained()); // NON-NLS
 			}
 
 			if (!msgDataMap.isEmpty()) {

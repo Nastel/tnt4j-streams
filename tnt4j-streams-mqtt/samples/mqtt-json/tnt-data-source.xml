@@ -13,6 +13,14 @@
     <parser name="MqttMessageParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="ResourceName" locator="ActivityTopic" locator-type="Label"/>
         <field name="Transport" locator="ActivityTransport" locator-type="Label"/>
+        <field name="MsgId" locator="MessageId" locator-type="Label" datatype="Number"/>
+        <field name="QoS" locator="Qos" locator-type="Label">
+            <field-map source="0" target="At most once"/>
+            <field-map source="1" target="At least once"/>
+            <field-map source="2" target="Exactly once"/>
+        </field>
+        <field name="Duplicate" locator="Duplicate" locator-type="Label" datatype="AsInput"/>
+        <field name="Retained" locator="Retained" locator-type="Label" datatype="AsInput"/>
         <field name="Message" locator="ActivityData" locator-type="Label">
             <parser-ref name="JSONEnvelopeParser"/>
         </field>
