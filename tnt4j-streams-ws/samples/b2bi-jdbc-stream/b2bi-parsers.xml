@@ -114,6 +114,9 @@
         <field name="CompCode" locator="EventCode" locator-type="Activity">
             <field-map-ref resource="EVENT_CODE_MAPPINGS.EventCompCode"/>
         </field>
+        <field name="Severity" locator="EventCode" locator-type="Activity">
+            <field-map-ref resource="EVENT_CODE_MAPPINGS.EventSeverity"/>
+        </field>
         <field name="EventType" value="">    <!-- TODO: maybe add more types over mapping like START, UPDATE etc -->
             <field-transform lang="groovy" name="DiffTransform"><![CDATA[
                 ${EventCode} == "FG_0425"
@@ -212,6 +215,9 @@
         </field>
         <field name="CompCode" locator="EventCode" locator-type="Activity">
             <field-map-ref resource="EVENT_CODE_MAPPINGS.EventCompCode"/>
+        </field>
+        <field name="Severity" locator="EventCode" locator-type="Activity">
+            <field-map-ref resource="EVENT_CODE_MAPPINGS.EventSeverity"/>
         </field>    
         <field name="EventType" value="">    <!-- TODO: maybe add more types over mapping like START, UPDATE etc -->
             <field-transform lang="groovy" name="DiffTransform"><![CDATA[
