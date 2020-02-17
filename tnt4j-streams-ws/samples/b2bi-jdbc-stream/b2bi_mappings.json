@@ -65,5 +65,16 @@
         "FG_0751": "Delivery Already In Terminal State",
         "FG_0752": "Async Transfer Failed",
         "": "UNKNOWN"
+    },
+    "EventCompCode": {
+        "FG_0050": "ERROR",
+        "FG_0250": "ERROR",
+        "FG_0455": "ERROR",
+        "FG_0456": "ERROR",
+        "FG_0457": "ERROR",
+        "FG_0650": "ERROR",
+        "FG_0651": "ERROR",
+        "FG_0752": "ERROR",
+        "": "SUCCESS"
     }
 }
