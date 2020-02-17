@@ -76,5 +76,28 @@
         "FG_0651": "ERROR",
         "FG_0752": "ERROR",
         "": "SUCCESS"
+    },
+    "EventSeverity": {
+        "FG_0050": "FAILURE",
+        "FG_0250": "FAILURE",
+        "FG_0424": "WARNING",
+        "FG_0450": "WARNING",
+        "FG_0451": "WARNING",
+        "FG_0455": "FAILURE",
+        "FG_0456": "FAILURE",
+        "FG_0457": "FAILURE",
+        "FG_0458": "WARNING",
+        "FG_0506": "WARNING",
+        "FG_0550": "WARNING",
+        "FG_0551": "WARNING",
+        "FG_0552": "WARNING",
+        "FG_0553": "WARNING",
+        "FG_0554": "WARNING",
+        "FG_0607": "WARNING",
+        "FG_0650": "FAILURE",
+        "FG_0651": "FAILURE",
+        "FG_0750": "WARNING",
+        "FG_0752": "FAILURE",
+        "": "INFO"
     }
 }
