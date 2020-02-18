@@ -34,6 +34,7 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.core.UsecTimestamp;
 import com.jkoolcloud.tnt4j.streams.configure.WsStreamProperties;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
+import com.jkoolcloud.tnt4j.streams.parsers.data.CommonActivityData;
 import com.jkoolcloud.tnt4j.streams.scenario.*;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsCache;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
@@ -81,6 +82,8 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 * Constant for name of built-in scheduler job property {@value}.
 	 */
 	protected static final String JOB_PROP_SEMAPHORE = "semaphoreObj"; // NON-NLS
+
+	private static final String OBJECT_TYPE = "OBJECT";// NON-NLS
 
 	/**
 	 * Semaphore for synchronizing stream requests.
@@ -425,8 +428,18 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected ActivityInfo applyParsers(Object data, String... tags) throws IllegalStateException, ParseException {
-		return super.applyParsers(data instanceof WsResponse<?, ?> ? ((WsResponse<?, ?>) data).getData() : data, tags);
+		if (data instanceof WsResponse) {
+			WsResponse<RQ, RS> response = (WsResponse<RQ, RS>) data;
+			RS respData = response.getData();
+			Map<String, ?> reqMetadata = response.getOriginalRequest().getParametersMap();
+			CommonActivityData<?> dataPack = new CommonActivityData<>(respData, reqMetadata);
+
+			return super.applyParsers(dataPack, tags);
+		}
+
+		return super.applyParsers(data, tags);
 	}
 
 	/**
@@ -507,7 +520,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 
 		DataFillContext ctx = makeDataContext(reqDataStr, format, null);
 
-		return fillInRequestData(ctx);
+		return (String) fillInRequestData(ctx);
 	}
 
 	/**
@@ -516,12 +529,12 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 *
 	 * @param context
 	 *            request data fill-in context to use
-	 * @return variable values filled-in request/query/command string
+	 * @return variable values filled-in request/query/command data entity
 	 * 
 	 * @see #getVariableValue(String, DataFillContext)
 	 * @see #formattedValue(Object, String)
 	 */
-	protected String fillInRequestData(DataFillContext context) {
+	protected Object fillInRequestData(DataFillContext context) {
 		if (context == null || StringUtils.isEmpty(context.getData())) {
 			return context.getData();
 		}
@@ -534,15 +547,21 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 		if (CollectionUtils.isNotEmpty(vars)) {
 			for (String rdVar : vars) {
 				Object cValue = getVariableValue(Utils.getVarName(rdVar), context);
-				String varVal = formattedValue(cValue, context.getFormat());
-				reqData = reqData.replace(rdVar, varVal);
-				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-						"AbstractWsStream.filling.req.data.variable", rdVar, Utils.toString(varVal));
+				if (OBJECT_TYPE.equals(context.getType())) {
+					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+							"AbstractWsStream.filling.req.data.variable", rdVar, Utils.toString(cValue));
+					return cValue;
+				} else {
+					String varVal = formattedValue(cValue, context.getFormat());
+					reqData = reqData.replace(rdVar, varVal);
+					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+							"AbstractWsStream.filling.req.data.variable", rdVar, varVal);
+				}
 			}
 
-			if (!reqData.equals(context.getData())) {
+			if (!reqData.equals(context.getData()) && Utils.isVariableExpression(reqData)) {
 				context.setData(reqData);
-				reqData = fillInRequestData(context);
+				return fillInRequestData(context);
 			}
 		}
 
@@ -615,16 +634,16 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 		}
 
 		WsRequest<String> fReq = req.clone();
-		DataFillContext ctx = makeDataContext(fReq.getId(), null, context);
+		DataFillContext ctx = makeDataContext(null, null, context);
 		ctx.setRequest(fReq);
 
 		for (Map.Entry<String, WsRequest.Parameter> reqParam : fReq.getParameters().entrySet()) {
-			reqParam.getValue().setValue(fillInRequestData(
-					ctx.setData(reqParam.getValue().getValue()).setFormat(reqParam.getValue().getFormat())));
+			reqParam.getValue().setValue(fillInRequestData(ctx.setData(reqParam.getValue().getStringValue())
+					.setFormat(reqParam.getValue().getFormat()).setType(reqParam.getValue().getType())));
 		}
 
-		fReq.setId(fillInRequestData(ctx));
-		fReq.setData(fillInRequestData(ctx.setData(fReq.getData())));
+		fReq.setId((String) fillInRequestData(ctx.setData(fReq.getId()).reset()));
+		fReq.setData((String) fillInRequestData(ctx.setData(fReq.getData())));
 
 		return fReq;
 	}
@@ -794,6 +813,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 
 		private static final String DATA = KEY_PREFIX + "DATA"; // NON-NLS
 		private static final String FORMAT = KEY_PREFIX + "FORMAT"; // NON-NLS
+		private static final String TYPE = KEY_PREFIX + "TYPE"; // NON-NLS
 		private static final String REQUEST = KEY_PREFIX + "REQUEST"; // NON-NLS
 
 		/**
@@ -850,6 +870,40 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 		 */
 		public String getFormat() {
 			return (String) get(FORMAT);
+		}
+
+		/**
+		 * Sets value type.
+		 * 
+		 * @param type
+		 *            value type
+		 * @return instance of this context
+		 */
+		public DataFillContext setType(String type) {
+			put(TYPE, type);
+
+			return this;
+		}
+
+		/**
+		 * Returns value type.
+		 * 
+		 * @return value type
+		 */
+		public String getType() {
+			return (String) get(TYPE);
+		}
+
+		/**
+		 * Removes context additional properties: format and type.
+		 * 
+		 * @return instance of this context
+		 */
+		public DataFillContext reset() {
+			remove(FORMAT);
+			remove(TYPE);
+
+			return this;
 		}
 
 		/**

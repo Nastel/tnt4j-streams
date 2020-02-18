@@ -29,6 +29,8 @@ import com.jkoolcloud.tnt4j.streams.configure.NamedObject;
 import com.jkoolcloud.tnt4j.streams.fields.*;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTParseableInputStream;
+import com.jkoolcloud.tnt4j.streams.parsers.data.ActivityData;
+import com.jkoolcloud.tnt4j.streams.parsers.data.CommonActivityData;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
@@ -133,8 +135,17 @@ public abstract class ActivityParser implements NamedObject {
 	 * @see #isDataClassSupported(Object)
 	 * @see GenericActivityParser#parsePreparedItem(com.jkoolcloud.tnt4j.streams.parsers.GenericActivityParser.ActivityContext)
 	 */
+	@SuppressWarnings("unchecked")
 	public ActivityInfo parse(TNTInputStream<?, ?> stream, Object data) throws IllegalStateException, ParseException {
-		return parse(stream, data, null);
+		ActivityData<Object> pData;
+
+		if (data instanceof ActivityData) {
+			pData = (ActivityData<Object>) data;
+		} else {
+			pData = new CommonActivityData<>(data);
+		}
+
+		return parse(stream, pData, null);
 	}
 
 	/**
@@ -155,8 +166,8 @@ public abstract class ActivityParser implements NamedObject {
 	 * @see #isDataClassSupported(Object)
 	 * @see GenericActivityParser#parsePreparedItem(com.jkoolcloud.tnt4j.streams.parsers.GenericActivityParser.ActivityContext)
 	 */
-	protected abstract ActivityInfo parse(TNTInputStream<?, ?> stream, Object data, ActivityParserContext cData)
-			throws IllegalStateException, ParseException;
+	protected abstract ActivityInfo parse(TNTInputStream<?, ?> stream, ActivityData<Object> data,
+			ActivityParserContext cData) throws IllegalStateException, ParseException;
 
 	/**
 	 * Returns whether this parser supports the given format of the activity data. This is used by activity streams to
@@ -284,7 +295,8 @@ public abstract class ActivityParser implements NamedObject {
 
 		if (parserMatch) {
 			cData.setParserRef(parserRef);
-			ActivityInfo sai = parserRef.getParser().parse(stream, value, cData);
+			ActivityData<Object> pData = new CommonActivityData<>(value);
+			ActivityInfo sai = parserRef.getParser().parse(stream, pData, cData);
 
 			if (sai != null) {
 				if (parserRef.getAggregationType() == AggregationType.Merge) {
@@ -477,5 +489,20 @@ public abstract class ActivityParser implements NamedObject {
 		 * @return currently used stacked parser reference
 		 */
 		ActivityField.FieldParserReference getParserRef();
+
+		/**
+		 * Sets activity entity metadata map.
+		 * 
+		 * @param metaMap
+		 *            activity entity metadata map
+		 */
+		void setMetadata(Map<String, ?> metaMap);
+
+		/**
+		 * Returns activity entity metadata map.
+		 * 
+		 * @return activity entity metadata map
+		 */
+		Map<String, ?> getMetadata();
 	}
 }

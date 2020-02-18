@@ -331,7 +331,7 @@ public class WsStream extends AbstractHttpStream {
 					try {
 						acquiredSemaphore = stream.acquireSemaphore(request);
 						processedRequest = stream.fillInRequest(request, scenarioStep.getUrlStr());
-						respStr = stream.callWebService(processedRequest.getParameterValue(REQ_URL_PARAM),
+						respStr = stream.callWebService(processedRequest.getParameterStringValue(REQ_URL_PARAM),
 								processedRequest.getData(), scenarioStep.getScenario());
 					} catch (VoidRequestException exc) {
 						stream.logger().log(OpLevel.INFO,

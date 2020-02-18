@@ -215,7 +215,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 
 			if (recurringItem != null) {
 				logger().log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-						"JDBCStream.rs.consumption.drop", item.getParameterValue(QUERY_NAME_PROP));
+						"JDBCStream.rs.consumption.drop", item.getParameterStringValue(QUERY_NAME_PROP));
 				inputBuffer.remove(recurringItem);
 				closeRS(recurringItem.getData());
 			}
@@ -270,7 +270,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	}
 
 	private void queryParsingStarted(WsResponse<String, ResultSet> cItem) {
-		String qName = cItem.getParameterValue(QUERY_NAME_PROP);
+		String qName = cItem.getParameterStringValue(QUERY_NAME_PROP);
 		if (qName != null) {
 			synchronized (parsedQueries) {
 				parsedQueries.add(qName);
@@ -279,7 +279,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	}
 
 	private void queryConsumed(WsResponse<String, ResultSet> cItem) {
-		String qName = cItem.getParameterValue(QUERY_NAME_PROP);
+		String qName = cItem.getParameterStringValue(QUERY_NAME_PROP);
 		if (qName != null) {
 			synchronized (parsedQueries) {
 				parsedQueries.remove(qName);
@@ -304,7 +304,8 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 			if (item instanceof WsResponse) {
 				WsResponse<String, ResultSet> respItem = (WsResponse<String, ResultSet>) item;
 
-				if (respItem.getParameterValue(QUERY_NAME_PROP).equals(cItem.getParameterValue(QUERY_NAME_PROP))) {
+				if (respItem.getParameterStringValue(QUERY_NAME_PROP)
+						.equals(cItem.getParameterStringValue(QUERY_NAME_PROP))) {
 					return respItem;
 				}
 			}
@@ -336,7 +337,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 			if (item instanceof WsResponse) {
 				WsResponse<String, ResultSet> respItem = (WsResponse<String, ResultSet>) item;
 
-				if (qName.equals(respItem.getParameterValue(QUERY_NAME_PROP))) {
+				if (qName.equals(respItem.getParameterStringValue(QUERY_NAME_PROP))) {
 					LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 							"JDBCStream.query.pending", qName);
 					return true;
@@ -486,7 +487,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 				try {
 					int pIdx = Integer.parseInt(param.getValue().getId());
 					String type = param.getValue().getType();
-					String value = param.getValue().getValue();
+					String value = param.getValue().getStringValue();
 					String format = param.getValue().getFormat();
 
 					if (type == null) {
@@ -637,10 +638,10 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 		}
 
 		WsRequest<String> fReq = req.clone();
-		DataFillContext ctx = makeDataContext(fReq.getId(), null, context);
+		DataFillContext ctx = makeDataContext(null, null, context);
 
-		fReq.setId(fillInRequestData(ctx));
-		fReq.setData(fillInRequestData(ctx.setData(fReq.getData())));
+		fReq.setId((String) fillInRequestData(ctx.setData(fReq.getId())));
+		fReq.setData((String) fillInRequestData(ctx.setData(fReq.getData())));
 
 		return fReq;
 	}

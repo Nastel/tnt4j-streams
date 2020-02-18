@@ -524,7 +524,7 @@ public class RestStream extends AbstractHttpStream {
 	 * @return HTTP parameter instance, or {@code null} if parameter can't be built
 	 */
 	protected BasicNameValuePair makeParam(Map.Entry<String, WsRequest.Parameter> param) {
-		return new BasicNameValuePair(param.getKey(), param.getValue().getValue());
+		return new BasicNameValuePair(param.getKey(), param.getValue().getStringValue());
 	}
 
 	/**

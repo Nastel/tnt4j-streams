@@ -37,6 +37,7 @@ import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityField;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
+import com.jkoolcloud.tnt4j.streams.parsers.data.ActivityData;
 import com.jkoolcloud.tnt4j.streams.reference.ParserReference;
 import com.jkoolcloud.tnt4j.tracker.Tracker;
 
@@ -333,8 +334,8 @@ public class TNTInputStreamTest {
 		}
 
 		@Override
-		protected ActivityInfo parse(TNTInputStream<?, ?> stream, Object data, ActivityParserContext cData)
-				throws IllegalStateException, ParseException {
+		protected ActivityInfo parse(TNTInputStream<?, ?> stream, ActivityData<Object> data,
+				ActivityParserContext cData) throws IllegalStateException, ParseException {
 			if (data.equals("TESTPARSEEXCEPTION")) { // NON-NLS
 				throw new ParseException("TESTPARSEEXCEPTION", 0); // NON-NLS
 			}

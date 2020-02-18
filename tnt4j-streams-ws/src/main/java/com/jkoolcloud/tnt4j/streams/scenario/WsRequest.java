@@ -16,6 +16,7 @@
 
 package com.jkoolcloud.tnt4j.streams.scenario;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -123,6 +124,21 @@ public class WsRequest<T> implements Cloneable {
 	}
 
 	/**
+	 * Returns request (command/query/etc.) parameter values map.
+	 * 
+	 * @return request parameters values map
+	 */
+	public Map<String, ?> getParametersMap() {
+		Map<String, Object> pMap = new HashMap<>(parameters.size());
+
+		for (Map.Entry<String, Parameter> me : parameters.entrySet()) {
+			pMap.put(me.getValue().id, me.getValue().value);
+		}
+
+		return pMap;
+	}
+
+	/**
 	 * Sets parameters map for this request.
 	 * 
 	 * @param params
@@ -155,10 +171,26 @@ public class WsRequest<T> implements Cloneable {
 	 * @see #getParameter(String)
 	 * @see com.jkoolcloud.tnt4j.streams.scenario.WsRequest.Parameter#getValue()
 	 */
-	public String getParameterValue(String pKey) {
+	public Object getParameterValue(String pKey) {
 		Parameter param = getParameter(pKey);
 
 		return param == null ? null : param.getValue();
+	}
+
+	/**
+	 * Returns request parameter value as string.
+	 * 
+	 * @param pKey
+	 *            parameter key
+	 * @return request parameter value as string, or {@code null} if request has no such parameter
+	 * 
+	 * @see #getParameter(String)
+	 * @see com.jkoolcloud.tnt4j.streams.scenario.WsRequest.Parameter#getStringValue()
+	 */
+	public String getParameterStringValue(String pKey) {
+		Parameter param = getParameter(pKey);
+
+		return param == null ? null : param.getStringValue();
 	}
 
 	/**
@@ -291,7 +323,7 @@ public class WsRequest<T> implements Cloneable {
 		cReq.id = id;
 		cReq.scenarioStep = scenarioStep;
 
-		if (isparametersDynamic()) {
+		if (isParametersDynamic()) {
 			for (Map.Entry<String, Parameter> param : parameters.entrySet()) {
 				cReq.addParameter(param.getValue().clone());
 			}
@@ -308,10 +340,10 @@ public class WsRequest<T> implements Cloneable {
 	 * @return {@code true} if request data or parameters has variable expressions, {@code false} - otherwise
 	 * 
 	 * @see #isDataDynamic()
-	 * @see #isparametersDynamic()
+	 * @see #isParametersDynamic()
 	 */
 	public boolean isDynamic() {
-		return isDataDynamic() || isparametersDynamic();
+		return isDataDynamic() || isParametersDynamic();
 	}
 
 	/**
@@ -328,7 +360,7 @@ public class WsRequest<T> implements Cloneable {
 	 * 
 	 * @return {@code true} if request parameters has variable expressions, {@code false} - otherwise
 	 */
-	public boolean isparametersDynamic() {
+	public boolean isParametersDynamic() {
 		for (Map.Entry<String, Parameter> pe : parameters.entrySet()) {
 			if (pe.getValue().isDynamic()) {
 				return true;
@@ -343,7 +375,7 @@ public class WsRequest<T> implements Cloneable {
 	 */
 	public static class Parameter implements Cloneable {
 		private String id;
-		private String value;
+		private Object value;
 		private String type;
 		private String format;
 		private boolean transient_ = false;
@@ -356,7 +388,7 @@ public class WsRequest<T> implements Cloneable {
 		 * @param value
 		 *            parameter value
 		 */
-		public Parameter(String id, String value) {
+		public Parameter(String id, Object value) {
 			this(id, value, null, null);
 		}
 
@@ -370,7 +402,7 @@ public class WsRequest<T> implements Cloneable {
 		 * @param type
 		 *            parameter type
 		 */
-		public Parameter(String id, String value, String type) {
+		public Parameter(String id, Object value, String type) {
 			this(id, value, type, null);
 		}
 
@@ -384,7 +416,7 @@ public class WsRequest<T> implements Cloneable {
 		 * @param transient_
 		 *            transiency flag
 		 */
-		public Parameter(String id, String value, boolean transient_) {
+		public Parameter(String id, Object value, boolean transient_) {
 			this(id, value, null, null, transient_);
 		}
 
@@ -400,7 +432,7 @@ public class WsRequest<T> implements Cloneable {
 		 * @param format
 		 *            parameter format
 		 */
-		public Parameter(String id, String value, String type, String format) {
+		public Parameter(String id, Object value, String type, String format) {
 			this(id, value, type, format, false);
 		}
 
@@ -418,7 +450,7 @@ public class WsRequest<T> implements Cloneable {
 		 * @param transient_
 		 *            transiency flag
 		 */
-		public Parameter(String id, String value, String type, String format, boolean transient_) {
+		public Parameter(String id, Object value, String type, String format, boolean transient_) {
 			this.id = id;
 			this.value = value;
 			this.type = type;
@@ -441,7 +473,7 @@ public class WsRequest<T> implements Cloneable {
 		 * @param value
 		 *            parameter value
 		 */
-		public void setValue(String value) {
+		public void setValue(Object value) {
 			this.value = value;
 		}
 
@@ -450,8 +482,17 @@ public class WsRequest<T> implements Cloneable {
 		 *
 		 * @return parameter value
 		 */
-		public String getValue() {
+		public Object getValue() {
 			return value;
+		}
+
+		/**
+		 * Returns parameter value as string.
+		 *
+		 * @return parameter value as string
+		 */
+		public String getStringValue() {
+			return Utils.toString(value);
 		}
 
 		/**
@@ -488,7 +529,7 @@ public class WsRequest<T> implements Cloneable {
 		public String toString() {
 			StringBuilder sb = new StringBuilder("Parameter{"); // NON-NLS
 			sb.append("id=").append(Utils.sQuote(id)); // NON-NLS
-			sb.append(", value=").append(Utils.sQuote(value)); // NON-NLS
+			sb.append(", value=").append(Utils.sQuote(getStringValue())); // NON-NLS
 			sb.append(", type=").append(Utils.sQuote(type)); // NON-NLS
 			sb.append(", format=").append(Utils.sQuote(format)); // NON-NLS
 			sb.append(", transient=").append(Utils.sQuote(transient_)); // NON-NLS
@@ -515,7 +556,7 @@ public class WsRequest<T> implements Cloneable {
 		 * @return {@code true} if parameter identifier or value has variable expressions, {@code false} - otherwise
 		 */
 		public boolean isDynamic() {
-			return Utils.isVariableExpression(id) || Utils.isVariableExpression(value);
+			return Utils.isVariableExpression(id) || Utils.isVariableExpression(getStringValue());
 		}
 	}
 }

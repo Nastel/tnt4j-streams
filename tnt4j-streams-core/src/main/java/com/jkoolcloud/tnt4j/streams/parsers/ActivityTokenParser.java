@@ -36,6 +36,7 @@ import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocator;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
+import com.jkoolcloud.tnt4j.streams.parsers.data.ActivityData;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
@@ -137,7 +138,7 @@ public class ActivityTokenParser extends GenericActivityParser<String[]> {
 	}
 
 	@Override
-	protected ActivityInfo parse(TNTInputStream<?, ?> stream, Object data, ActivityParserContext cData)
+	protected ActivityInfo parse(TNTInputStream<?, ?> stream, ActivityData<Object> data, ActivityParserContext cData)
 			throws IllegalStateException, ParseException {
 		if (fieldDelim == null) {
 			throw new IllegalStateException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,

@@ -33,6 +33,8 @@ import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.fields.StreamFieldType;
 import com.jkoolcloud.tnt4j.streams.outputs.JKCloudActivityOutput;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
+import com.jkoolcloud.tnt4j.streams.parsers.data.ActivityData;
+import com.jkoolcloud.tnt4j.streams.parsers.data.CommonActivityData;
 import com.jkoolcloud.tnt4j.streams.reference.MatchingParserReference;
 import com.jkoolcloud.tnt4j.streams.reference.ParserReference;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsCache;
@@ -235,8 +237,15 @@ public abstract class TNTParseableInputStream<T> extends TNTInputStream<T, Activ
 			return null;
 		}
 
+		ActivityData<?> pData;
+		if (data instanceof ActivityData) {
+			pData = (ActivityData<?>) data;
+		} else {
+			pData = new CommonActivityData<>(data);
+		}
+
 		for (ParserReference pRef : parsersSet) {
-			boolean dataMatch = pRef.getParser().isDataClassSupported(data);
+			boolean dataMatch = pRef.getParser().isDataClassSupported(pData.getData());
 			Boolean tagsMatch = null;
 			Boolean expMatch = null;
 
@@ -247,7 +256,7 @@ public abstract class TNTParseableInputStream<T> extends TNTInputStream<T, Activ
 				parserMatch = BooleanUtils.toBooleanDefaultIfNull(tagsMatch, true);
 
 				if (parserMatch && pRef instanceof MatchingParserReference) {
-					expMatch = ((MatchingParserReference) pRef).matchExp(this, data);
+					expMatch = ((MatchingParserReference) pRef).matchExp(this, pData.getData());
 					parserMatch = BooleanUtils.toBooleanDefaultIfNull(expMatch, true);
 				}
 			}

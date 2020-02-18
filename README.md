@@ -120,7 +120,7 @@ Mapping of streamed data to activity event fields are performed by parser. To ma
         * `base64Binary`
         * `hexBinary` 
         * `string`
-        * any decimal or date-time format pattern, e.g. `#####0.000`. Can be defined multiple date-time patterns delimited using `|` symbol.  
+        * any decimal or date-time format pattern, e.g. `#####0.000`. Can be defined multiple date-time patterns delimited using `|` symbol.
         * one of number type enumerators: `integer`/`int`, `long`, `double`, `float`, `short`, `byte`, `biginteger`/`bigint`/`bint`, 
         `bigdecimal`/`bigdec`/`bdec` and `any`. `any` will resolve any possible numeric value out of provided string, e.g. string `"30hj00"` 
         will result value `30`. It also allows to define casting mode, by adding prefix to number type enumerator (except enumerator `any`):
@@ -524,12 +524,16 @@ See [Parser matching data or parsing context](#parser-matching-data-or-parsing-c
     * `childIndex` - is child index in defined group, or if this token is missing - then child index is ordinal index of current stacked 
     parser produced activity entity
     * `fieldName` - is child activity entity field name
+ * `child[groupName.matchExpression].fieldName` (can be prefixed `^.` to access parent activity entity children) - resolves child activity 
+ entity matching expression `matchExpression` field `fieldName` value. Match expression can be field value comparison with variable or 
+ static value, like this: `fieldName=${variable}` e.g. `guid=${txHash}`
 
      Locator definition samples:
      ```xml
         <field name="mainReason" locator="^.child[0].reason" locator-type="Activity"/>
         <field name="mainReason" locator="^.child[OtherParser].reason" locator-type="Activity"/>
         <field name="mainReason" locator="^.child[InputsParser.0].reason" locator-type="Activity"/>
+        <field name="mainReason" locator="${child[TransactionParser.guid=${txHash}].tokenName}" locator-type="Activity"/>
      ```
 
      Parsers sample:
@@ -5189,7 +5193,7 @@ KeyStore/TrustStore, to run WMQ stream you'll need:
 ```
    **NOTE:** cipher suite value must match one configured for Server Connections Channel! 
 * to run stream instance using SSL communication, you'll have to define Java KeyStore/TrustStore credentials though system properties:
-```cmd  
+```cmd
   -Djavax.net.ssl.trustStore=[sysPath]/[ts_file].jks
   -Djavax.net.ssl.trustStorePassword=clientpass
   -Djavax.net.ssl.keyStore=[sysPath]/[ks_file].jks
@@ -5531,8 +5535,9 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 
 ##### Common locators
 
- * `$DATA$` - allows to set complete activity data package as field value and redirect it to stacked parser if such is defined for that 
- field.
+ * `$DATA$` - allows to set complete activity data as field value and redirect it to stacked parser if such is defined for that field.
+ * `$METADATA$` - allows to access activity bound meta-data map. Activity meta-data binding is stream specific: some streams may not provide 
+ any meta-data. To get list of stream provided meta-data entries, see particular stream documentation (both JavaDoc and readme).
 
 #### Activity Name-Value parser
 

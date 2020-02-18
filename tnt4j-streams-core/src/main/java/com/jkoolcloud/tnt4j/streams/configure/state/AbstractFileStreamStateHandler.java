@@ -508,7 +508,7 @@ public abstract class AbstractFileStreamStateHandler<T> {
 			return;
 		}
 
-		String lineStr = procLine.getText();
+		String lineStr = procLine.getData();
 		int lineNr = procLine.getLineNumber();
 
 		try {

@@ -19,7 +19,6 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.text.ParseException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -28,8 +27,8 @@ import org.apache.commons.lang3.StringUtils;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.configure.state.AbstractFileStreamStateHandler;
-import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
+import com.jkoolcloud.tnt4j.streams.parsers.data.CommonActivityData;
 import com.jkoolcloud.tnt4j.streams.utils.Duration;
 import com.jkoolcloud.tnt4j.streams.utils.IntRange;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
@@ -260,11 +259,6 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 	}
 
 	@Override
-	protected ActivityInfo applyParsers(Object data, String... tags) throws IllegalStateException, ParseException {
-		return super.applyParsers(data instanceof Line ? ((Line) data).text : data, tags);
-	}
-
-	@Override
 	public Line getNextItem() throws Exception {
 		Line nextItem = super.getNextItem();
 		if (stateHandler != null) {
@@ -291,7 +285,7 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 
 	@Override
 	protected long getActivityItemByteSize(Line activityItem) {
-		return activityItem == null || activityItem.text == null ? 0 : activityItem.text.getBytes().length;
+		return activityItem == null || activityItem.getData() == null ? 0 : activityItem.getData().getBytes().length;
 	}
 
 	/**
@@ -484,8 +478,7 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 	/**
 	 * File line data package defining line text string and line number in file.
 	 */
-	public static class Line {
-		private String text;
+	public static class Line extends CommonActivityData<String> {
 		private int lineNr;
 
 		/**
@@ -497,17 +490,8 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 		 *            line number in file
 		 */
 		public Line(String text, int lineNumber) {
-			this.text = text;
+			super(text);
 			this.lineNr = lineNumber;
-		}
-
-		/**
-		 * Returns file line text string.
-		 *
-		 * @return file line text string
-		 */
-		public String getText() {
-			return text;
 		}
 
 		/**
@@ -521,7 +505,7 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 
 		@Override
 		public String toString() {
-			return text;
+			return getData();
 		}
 	}
 

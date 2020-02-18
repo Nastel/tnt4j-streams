@@ -32,6 +32,7 @@ import com.jkoolcloud.tnt4j.streams.configure.ParserProperties;
 import com.jkoolcloud.tnt4j.streams.fields.*;
 import com.jkoolcloud.tnt4j.streams.filters.StreamFiltersGroup;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
+import com.jkoolcloud.tnt4j.streams.parsers.data.ActivityData;
 import com.jkoolcloud.tnt4j.streams.preparsers.ActivityDataPreParser;
 import com.jkoolcloud.tnt4j.streams.transform.ValueTransformation;
 import com.jkoolcloud.tnt4j.streams.utils.*;
@@ -71,6 +72,11 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 * redirect complete activity data to stacked parser.
 	 */
 	protected static final String LOC_FOR_COMPLETE_ACTIVITY_DATA = "$DATA$"; // NON-NLS
+
+	/**
+	 * Constant defining locator placeholder {@value}, used to resolve activity metadata package.
+	 */
+	protected static final String LOC_FOR_COMPLETE_ACTIVITY_METADATA = "$METADATA$"; // NON-NLS
 
 	/**
 	 * List of supported activity fields used to extract values from RAW activity data defined by field location(s).
@@ -606,21 +612,22 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	}
 
 	@Override
-	protected ActivityInfo parse(TNTInputStream<?, ?> stream, Object data, ActivityParserContext pContextData)
-			throws IllegalStateException, ParseException {
-		if (data == null) {
+	protected ActivityInfo parse(TNTInputStream<?, ?> stream, ActivityData<Object> data,
+			ActivityParserContext pContextData) throws IllegalStateException, ParseException {
+		if (data == null || data.getData() == null) {
 			return null;
 		}
 
 		logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"ActivityParser.activity.raw.data", getLogString(data));
+				"ActivityParser.activity.raw.data", getLogString(data.getData()));
 
-		data = preParse(stream, data);
+		data.setData(preParse(stream, data.getData()));
 
 		logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"ActivityParser.preparsed.data", getLogString(data));
+				"ActivityParser.preparsed.data", getLogString(data.getData()));
 
-		ActivityContext cData = prepareItem(stream, data);
+		ActivityContext cData = prepareItem(stream, data.getData());
+		cData.setMetadata(data.getMetadata());
 		if (cData == null || !cData.isValid()) {
 			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityParser.nothing.to.parse");
@@ -631,6 +638,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 			cData.setParentContext(pContextData);
 			cData.setParentActivity(pContextData.getActivity());
 			cData.setParserRef(pContextData.getParserRef());
+			cData.setMetadata(pContextData.getMetadata());
 		}
 
 		if (logger().isSet(OpLevel.DEBUG)) {
@@ -1105,8 +1113,13 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 					val = Utils.simplifyValue(StreamsCache.getValue(cData.getActivity(), locStr, getName()));
 				} else if (locator.getBuiltInType() == ActivityFieldLocatorType.Activity) {
 					val = resolveActivityValue(locator, cData);
-				} else if (LOC_FOR_COMPLETE_ACTIVITY_DATA.equals(locator.getLocator())) {
+				} else if (LOC_FOR_COMPLETE_ACTIVITY_DATA.equals(locStr)) {
 					val = cData.getData();
+				} else if (LOC_FOR_COMPLETE_ACTIVITY_METADATA.equals(locStr)) {
+					val = cData.getMetadata();
+				} else if (locStr.startsWith(LOC_FOR_COMPLETE_ACTIVITY_METADATA)) {
+					val = Utils.getMapValueByPath(locStr.substring(LOC_FOR_COMPLETE_ACTIVITY_METADATA.length() + 1),
+							cData.getMetadata());
 				} else {
 					val = resolveLocatorValue(locator, cData, formattingNeeded);
 				}
@@ -1351,6 +1364,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		private static final String PREPARED_DATA_KEY = "PREPARED_ACTIVITY_DATA"; // NON-NLS
 		private static final String ACTIVITY_DATA_KEY = "ACTIVITY_DATA"; // NON-NLS
 		private static final String MESSAGE_DATA_KEY = "ACT_MESSAGE_DATA"; // NON-NLS
+		private static final String METADATA_KEY = "ACT_METADATA_DATA"; // NON-NLS
 
 		private static final String FIELD_KEY = "PARSED_FIELD"; // NON-NLS
 
@@ -1430,6 +1444,17 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		@SuppressWarnings("unchecked")
 		public T getData() {
 			return (T) get(PREPARED_DATA_KEY);
+		}
+
+		@Override
+		public void setMetadata(Map<String, ?> metaMap) {
+			put(METADATA_KEY, metaMap);
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public Map<String, ?> getMetadata() {
+			return (Map<String, ?>) get(METADATA_KEY);
 		}
 
 		@Override
