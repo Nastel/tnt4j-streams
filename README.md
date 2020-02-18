@@ -6097,6 +6097,7 @@ Used configuration properties:
 * `lang` - transformation script language. (Optional)
 * `script` - code of transformation script (can't be mixed with `beanRef`). (Required)
 * `beanRef` - transformation bean reference (can't be mixed with `script`). (Required)
+* `useParserInput` - flag indicating whether to use parser provided input read function. Default value - `true`. (Optional)
 
 Sample stream configuration using `TransformationPreParser` pre-parser:
 ```xml
@@ -6107,11 +6108,10 @@ Sample stream configuration using `TransformationPreParser` pre-parser:
     <java-object name="UnescapePreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.TransformationPreParser">
         <property name="id" value="unescape"/>
         <property name="lang" value="groovy"/>
-        <property name="script">
-            <![CDATA[
-               StringEscapeUtils.unescapeJava($fieldValue)
-            ]]>
-        </property>
+        <property name="useParserInput" value="false"/>
+        <property name="script"><![CDATA[
+            StringEscapeUtils.unescapeJava($fieldValue)
+        ]]></property>
     </java-object>
 
     <parser name="XML_Data_Parser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">

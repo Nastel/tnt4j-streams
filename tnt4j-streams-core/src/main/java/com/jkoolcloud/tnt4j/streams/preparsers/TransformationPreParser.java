@@ -41,6 +41,8 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * <li>lang - transformation script language</li>
  * <li>script - code of transformation script (can't be mixed with {@code beanRef})</li>
  * <li>beanRef - transformation bean reference (can't be mixed with {@code script})</li>
+ * <li>useParserInput - flag indicating whether to use parser provided input read function. Default value -
+ * {@code true}</li>
  * </ul>
  *
  * @version $Revision: 1 $
@@ -64,15 +66,20 @@ public class TransformationPreParser extends AbstractPreParser<Object, Object> i
 	 * Constant for name of pre-parser configuration property {@value} defining transformation bean reference.
 	 */
 	protected static final String PROP_BEAN_REF = "beanRef"; // NON-NLS
+	/**
+	 * Constant for name of pre-parser configuration property {@value} defining flag indicating whether to use parser
+	 * provided input read function.
+	 */
+	protected static final String PROP_USE_PARSER_INPUT = "useParserInput"; // NON-NLS
 
 	private Map<String, ?> configuration;
 	private ValueTransformation<Object, Object> transformation;
+	private boolean useParserInput = true;
 
 	/**
-	 * Instantiates a new Transformation pre parser.
+	 * Constructs a new Transformation pre parser.
 	 */
 	public TransformationPreParser() {
-
 	}
 
 	@Override
@@ -124,6 +131,8 @@ public class TransformationPreParser extends AbstractPreParser<Object, Object> i
 
 			transformation = AbstractScriptTransformation.createScriptTransformation(id, lang, scriptCode, null);
 		}
+
+		useParserInput = Utils.getBoolean(PROP_USE_PARSER_INPUT, settings, true);
 	}
 
 	@Override
@@ -133,6 +142,6 @@ public class TransformationPreParser extends AbstractPreParser<Object, Object> i
 
 	@Override
 	public boolean isUsingParserForInput() {
-		return true;
+		return useParserInput;
 	}
 }

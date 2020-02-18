@@ -51,10 +51,9 @@ public class JsonLayoutTransformationPreParser extends AbstractPreParser<String,
 	private Expression jsltExpression;
 
 	/**
-	 * Instantiates a new JSON Layout Transformation pre parser.
+	 * Constructs a new JSON Layout Transformation pre parser.
 	 */
 	public JsonLayoutTransformationPreParser() {
-
 	}
 
 	@Override
