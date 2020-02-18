@@ -678,8 +678,7 @@ public final class StreamsCache {
 	 */
 	@XmlRootElement
 	public static class CacheRoot {
-
-		private Map<String, CacheValue> entriesMap;
+		private SortedMap<String, CacheValue> entriesMap;
 
 		@XmlJavaTypeAdapter(MapAdapter.class)
 		public Map<String, CacheValue> getEntriesMap() {
@@ -687,7 +686,7 @@ public final class StreamsCache {
 		}
 
 		public void setEntriesMap(Map<String, CacheValue> map) {
-			entriesMap = map;
+			entriesMap = new TreeMap<>(map);
 		}
 	}
 
