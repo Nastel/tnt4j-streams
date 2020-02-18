@@ -107,7 +107,6 @@ public class StreamThreadGroup extends ThreadGroup {
 			for (Runnable sht : staticShutdownHooks) {
 				sht.run();
 			}
-			staticShutdownHooks.clear();
 		} finally {
 			staticHooksLock.unlock();
 		}
@@ -128,7 +127,7 @@ public class StreamThreadGroup extends ThreadGroup {
 			try {
 				t.interrupt();
 				t.join(TimeUnit.SECONDS.toMillis(5));
-			} catch (Exception e) {
+			} catch (Throwable e) {
 			}
 			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"StreamThreadGroup.stopped.thread", t, t.isAlive(), tsd.duration());
