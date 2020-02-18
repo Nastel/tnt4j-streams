@@ -374,7 +374,7 @@ public class RedirectTNT4JStream extends TNTInputStream<String, String> {
 	@Override
 	protected void cleanupStreamInternals() {
 		if (feedsProducer != null) {
-			feedsProducer.halt();
+			feedsProducer.halt(true);
 		}
 
 		if (inputBuffer != null) {
@@ -392,7 +392,7 @@ public class RedirectTNT4JStream extends TNTInputStream<String, String> {
 		@Override
 		public void close() {
 			for (ActivitiesFeeder f : activeFeedersList) {
-				f.halt();
+				f.halt(true);
 			}
 
 			activeFeedersList.clear();
@@ -526,7 +526,7 @@ public class RedirectTNT4JStream extends TNTInputStream<String, String> {
 					if (line == null) {
 						logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 								"RedirectTNT4JStream.feeder.data.ended");
-						halt(); // no more data items to process
+						halt(true); // no more data items to process
 					} else {
 						if (line.isEmpty()) {
 							logger().log(OpLevel.WARNING,
@@ -545,7 +545,7 @@ public class RedirectTNT4JStream extends TNTInputStream<String, String> {
 					Utils.logThrowable(logger(), OpLevel.WARNING,
 							StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 							"RedirectTNT4JStream.feeder.failure", ioe);
-					halt();
+					halt(true);
 				} catch (Exception e) {
 					Utils.logThrowable(logger(), OpLevel.ERROR,
 							StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),

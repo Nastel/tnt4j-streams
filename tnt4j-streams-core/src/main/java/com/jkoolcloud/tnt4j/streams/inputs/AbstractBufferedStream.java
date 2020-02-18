@@ -447,7 +447,7 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 				return;
 			}
 
-			halt();
+			halt(true);
 			try {
 				close();
 			} catch (Exception exc) {

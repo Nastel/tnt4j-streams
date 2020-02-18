@@ -155,7 +155,7 @@ public class CastIronWsStream extends WsStream {
 					.resolve(fillInRequestData(loginStep.getRequests().get(0).getData()));
 			SOAPMessage soapRequest = createMessage(requestDataAndHeaders.getRequest(),
 					requestDataAndHeaders.getHeaders(), false);
-			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+			logger().log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"CastIronStream.login.request", toXMLString(soapRequest));
 
 			SOAPMessage soapResponse = createSOAPConnection().call(soapRequest,
@@ -168,7 +168,7 @@ public class CastIronWsStream extends WsStream {
 
 			String responseString = toXMLString(soapResponse);
 
-			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+			logger().log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"CastIronStream.login.response", responseString);
 
 			applyParsers(responseString, securityResponseParserTag);

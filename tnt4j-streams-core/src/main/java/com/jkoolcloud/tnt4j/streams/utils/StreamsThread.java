@@ -154,13 +154,6 @@ public class StreamsThread extends Thread {
 
 	/**
 	 * Stops this thread.
-	 */
-	public void halt() {
-		halt(true);
-	}
-
-	/**
-	 * Stops this thread.
 	 *
 	 * @param interrupt
 	 *            flag indicating whether to interrupt this thread

@@ -152,7 +152,7 @@ public class WsStream extends AbstractHttpStream {
 		SOAPMessage soapResponse = soapConnection.call(soapRequestMessage, url);
 		String respXML = toXMLString(soapResponse);
 
-		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"WsStream.received.response", url, respXML);
 
 		if (soapResponse.getSOAPBody().hasFault()) {

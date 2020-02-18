@@ -478,7 +478,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * @see #getCurrentActivity()
 	 */
 	public int getActivityPosition() {
-		return 0;
+		return getCurrentActivity();
 	}
 
 	/**
@@ -634,17 +634,6 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 */
 	public Date getDate() {
 		return new Date();
-	}
-
-	/**
-	 * Signals that this stream should stop processing so that controlling thread will terminate.
-	 *
-	 * @see #halt(boolean)
-	 * @deprecated this method has bean replaced by {@link #halt(boolean)}
-	 */
-	@Deprecated
-	public void halt() {
-		halt(true);
 	}
 
 	/**

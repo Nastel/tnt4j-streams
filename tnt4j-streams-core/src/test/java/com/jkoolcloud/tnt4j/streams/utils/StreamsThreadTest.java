@@ -40,21 +40,21 @@ public class StreamsThreadTest {
 
 	@Test
 	public void testStreamsThreadRunnableString() {
-		final String name = "TEST-NAME"; // NON-NLS
+		String name = "TEST-NAME"; // NON-NLS
 		StreamsThread thread = new StreamsThread(simpleRunnable, name);
 		assertNotNull(thread);
 		assertThreadNameCorrect(name, thread);
 	}
 
-	private void assertThreadNameCorrect(final String name, StreamsThread thread) {
-		final String actualName = thread.getName();
-		final int indexOfNameWithoutIdStart = String.valueOf(thread.getId()).length() + 1;
+	private void assertThreadNameCorrect(String name, StreamsThread thread) {
+		String actualName = thread.getName();
+		int indexOfNameWithoutIdStart = String.valueOf(thread.getId()).length() + 1;
 		assertEquals(name, actualName.substring(indexOfNameWithoutIdStart));
 	}
 
 	@Test
 	public void testStreamsThreadString() {
-		final String name = "TEST-NAME"; // NON-NLS
+		String name = "TEST-NAME"; // NON-NLS
 		StreamsThread thread = new StreamsThread(name);
 		assertNotNull(thread);
 		assertThreadNameCorrect(name, thread);
@@ -72,8 +72,8 @@ public class StreamsThreadTest {
 
 	@Test
 	public void testStreamsThreadThreadGroupRunnableString() {
-		final String name = "TEST-NAME"; // NON-NLS
-		final String name2 = "TEST-NAME2"; // NON-NLS
+		String name = "TEST-NAME"; // NON-NLS
+		String name2 = "TEST-NAME2"; // NON-NLS
 		ThreadGroup tGroup = new ThreadGroup("TEST"); // NON-NLS
 		StreamsThread thread = new StreamsThread(tGroup, simpleRunnable, name);
 		StreamsThread thread2 = new StreamsThread(tGroup, simpleRunnable, name2);
@@ -84,8 +84,8 @@ public class StreamsThreadTest {
 
 	@Test
 	public void testStreamsThreadThreadGroupString() {
-		final String name = "TEST-NAME"; // NON-NLS
-		final String name2 = "TEST-NAME2"; // NON-NLS
+		String name = "TEST-NAME"; // NON-NLS
+		String name2 = "TEST-NAME2"; // NON-NLS
 		ThreadGroup tGroup = new ThreadGroup("TEST"); // NON-NLS
 		StreamsThread thread = new StreamsThread(tGroup, name);
 		StreamsThread thread2 = new StreamsThread(tGroup, name2);
@@ -99,7 +99,7 @@ public class StreamsThreadTest {
 		StreamsThread thread = new StreamsThread();
 		thread.start();
 
-		thread.halt();
+		thread.halt(true);
 		assertTrue(thread.isStopRunning());
 	}
 
@@ -117,8 +117,8 @@ public class StreamsThreadTest {
 
 	@Test
 	public void testSleepFully() {
-		final int sleepTime = 5000;
-		final long testStartTime = System.currentTimeMillis();
+		int sleepTime = 5000;
+		long testStartTime = System.currentTimeMillis();
 
 		StreamsThread thread = new StreamsThread(new Runnable() {
 			@Override
@@ -144,8 +144,8 @@ public class StreamsThreadTest {
 
 	@Test
 	public void testWaitFor() {
-		final int sleepTime = 5000;
-		final long testStartTime = System.currentTimeMillis();
+		int sleepTime = 5000;
+		long testStartTime = System.currentTimeMillis();
 
 		StreamsThread thread = new StreamsThread(new Runnable() {
 			@Override

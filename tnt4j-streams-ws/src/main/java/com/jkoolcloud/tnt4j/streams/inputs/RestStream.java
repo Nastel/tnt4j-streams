@@ -196,7 +196,7 @@ public class RestStream extends AbstractHttpStream {
 		HttpGet get = new HttpGet(uriStr);
 		String respStr = executeRequest(client, get, username, password);
 
-		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"RestStream.received.response", uriStr, respStr);
 
 		return respStr;
@@ -262,7 +262,7 @@ public class RestStream extends AbstractHttpStream {
 
 		String respStr = executeRequest(client, post, username, password);
 
-		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"RestStream.received.response", uriStr, respStr);
 
 		return respStr;
