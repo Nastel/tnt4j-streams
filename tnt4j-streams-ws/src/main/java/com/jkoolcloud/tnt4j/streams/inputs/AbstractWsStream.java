@@ -629,21 +629,19 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 * @see #fillInRequestData(DataFillContext)
 	 */
 	protected WsRequest<String> fillInRequest(WsRequest<String> req, RequestFillContext context) {
-		if (!req.isDynamic()) {
-			return req;
-		}
-
 		WsRequest<String> fReq = req.clone();
-		DataFillContext ctx = makeDataContext(null, null, context);
-		ctx.setRequest(fReq);
+		if (req.isDynamic()) {
+			DataFillContext ctx = makeDataContext(null, null, context);
+			ctx.setRequest(fReq);
 
-		for (Map.Entry<String, WsRequest.Parameter> reqParam : fReq.getParameters().entrySet()) {
-			reqParam.getValue().setValue(fillInRequestData(ctx.setData(reqParam.getValue().getStringValue())
-					.setFormat(reqParam.getValue().getFormat()).setType(reqParam.getValue().getType())));
+			for (Map.Entry<String, WsRequest.Parameter> reqParam : fReq.getParameters().entrySet()) {
+				reqParam.getValue().setValue(fillInRequestData(ctx.setData(reqParam.getValue().getStringValue())
+						.setFormat(reqParam.getValue().getFormat()).setType(reqParam.getValue().getType())));
+			}
+
+			fReq.setId((String) fillInRequestData(ctx.setData(fReq.getId()).reset()));
+			fReq.setData((String) fillInRequestData(ctx.setData(fReq.getData())));
 		}
-
-		fReq.setId((String) fillInRequestData(ctx.setData(fReq.getId()).reset()));
-		fReq.setData((String) fillInRequestData(ctx.setData(fReq.getData())));
 
 		return fReq;
 	}

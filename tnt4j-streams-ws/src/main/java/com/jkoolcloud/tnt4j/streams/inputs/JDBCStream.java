@@ -633,15 +633,13 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 
 	@Override
 	protected WsRequest<String> fillInRequest(WsRequest<String> req, RequestFillContext context) {
-		if (!req.isDynamic()) {
-			return req;
-		}
-
 		WsRequest<String> fReq = req.clone();
-		DataFillContext ctx = makeDataContext(null, null, context);
+		if (req.isDynamic()) {
+			DataFillContext ctx = makeDataContext(null, null, context);
 
-		fReq.setId((String) fillInRequestData(ctx.setData(fReq.getId())));
-		fReq.setData((String) fillInRequestData(ctx.setData(fReq.getData())));
+			fReq.setId((String) fillInRequestData(ctx.setData(fReq.getId())));
+			fReq.setData((String) fillInRequestData(ctx.setData(fReq.getData())));
+		}
 
 		return fReq;
 	}
