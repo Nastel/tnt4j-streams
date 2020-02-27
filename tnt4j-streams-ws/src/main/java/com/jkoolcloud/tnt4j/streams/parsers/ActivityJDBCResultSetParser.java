@@ -57,7 +57,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Activity}</li>
  * </ul>
  *
- * @version $Revision : 1 $
+ * @version $Revision: 1 $
  */
 public class ActivityJDBCResultSetParser extends GenericActivityParser<ResultSet> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(ActivityJDBCResultSetParser.class);
