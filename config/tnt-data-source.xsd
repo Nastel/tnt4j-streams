@@ -2397,6 +2397,13 @@
                 </xs:documentation>
             </xs:annotation>
             <xs:sequence>
+                <xs:element name="property" type="Property" minOccurs="0" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Defines data source configuration property.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="resource-ref" type="ResourceReference" minOccurs="0" maxOccurs="unbounded">
                     <xs:annotation>
                         <xs:documentation>

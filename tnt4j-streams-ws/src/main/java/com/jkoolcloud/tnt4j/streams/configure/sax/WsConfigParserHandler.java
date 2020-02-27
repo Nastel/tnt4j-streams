@@ -329,11 +329,10 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 		try {
 			super.checkPropertyState();
 		} catch (SAXException exc) {
-			if (currStep == null) {
-				throw new SAXParseException(
-						StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
-								"ConfigParserHandler.malformed.configuration2", PROPERTY_ELMT,
-								Utils.arrayToString(STREAM_ELMT, PARSER_ELMT, JAVA_OBJ_ELMT, CACHE_ELMT, STEP_ELMT)),
+			if (!StringUtils.equalsAnyIgnoreCase(getParentElmt(PROPERTY_ELMT), STEP_ELMT)) {
+				throw new SAXParseException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+						"ConfigParserHandler.malformed.configuration2", PROPERTY_ELMT, Utils.arrayToString(
+								CONFIG_ROOT_ELMT, STREAM_ELMT, PARSER_ELMT, JAVA_OBJ_ELMT, CACHE_ELMT, STEP_ELMT)),
 						currParseLocation);
 			}
 		}

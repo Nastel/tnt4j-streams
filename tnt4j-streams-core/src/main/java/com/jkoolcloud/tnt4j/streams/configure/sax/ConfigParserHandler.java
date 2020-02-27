@@ -78,11 +78,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag {@value}.
 	 */
-	private static final String CONFIG_ROOT_ELMT_OLD = "tw-direct-feed"; // NON-NLS
-	/**
-	 * Constant for name of TNT4J-Streams XML configuration tag {@value}.
-	 */
-	private static final String CONFIG_ROOT_ELMT = "tnt-data-source"; // NON-NLS
+	protected static final String CONFIG_ROOT_ELMT = "tnt-data-source"; // NON-NLS
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag {@value}.
 	 */
@@ -363,7 +359,6 @@ public class ConfigParserHandler extends DefaultHandler {
 	private FieldTransformData currTransform = null;
 	private FilterValueData currFilterValue = null;
 	private FilterExpressionData currFilterExpression = null;
-	private boolean processingCache = false;
 	private CacheEntryData currCacheEntry = null;
 	private ParserRefData currParserRef = null;
 
@@ -421,7 +416,6 @@ public class ConfigParserHandler extends DefaultHandler {
 		currLocatorData = null;
 		streamsConfigData = new StreamsConfigData();
 		javaObjectsMap = new HashMap<>();
-		processingCache = false;
 
 		path = new Stack<>();
 	}
@@ -455,7 +449,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	 *             if malformed configuration found
 	 */
 	protected void startCfgElement(String qName, Attributes attributes) throws SAXException {
-		if (CONFIG_ROOT_ELMT.equals(qName) || CONFIG_ROOT_ELMT_OLD.equals(qName)) {
+		if (CONFIG_ROOT_ELMT.equals(qName)) {
 			if (streamsConfigData.isStreamsAvailable()) {
 				throw new SAXParseException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
 						"ConfigParserHandler.multiple.elements", qName), currParseLocation);
@@ -526,8 +520,6 @@ public class ConfigParserHandler extends DefaultHandler {
 		// String attName = attrs.getQName(i);
 		// String attValue = attrs.getValue(i);
 		// }
-
-		processingCache = true;
 	}
 
 	/**
@@ -545,7 +537,7 @@ public class ConfigParserHandler extends DefaultHandler {
 					"ConfigParserHandler.malformed.configuration", CACHE_ENTRY_ELMT), currParseLocation);
 		}
 
-		if (!processingCache) {
+		if (!StringUtils.equalsIgnoreCase(getParentElmt(CACHE_ENTRY_ELMT), CACHE_ELMT)) {
 			throw new SAXParseException(
 					StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
 							"ConfigParserHandler.malformed.configuration2", CACHE_ENTRY_ELMT, CACHE_ELMT),
@@ -1470,13 +1462,31 @@ public class ConfigParserHandler extends DefaultHandler {
 	 *             if no required parent elements found in configuration
 	 */
 	protected void checkPropertyState() throws SAXException {
-		if (currStream == null && currParser == null && javaObjectData == null && !processingCache) {
+		if (!StringUtils.equalsAnyIgnoreCase(getParentElmt(PROPERTY_ELMT), CONFIG_ROOT_ELMT, STREAM_ELMT, PARSER_ELMT,
+				JAVA_OBJ_ELMT, CACHE_ELMT)) {
 			throw new SAXParseException(
 					StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
 							"ConfigParserHandler.malformed.configuration2", PROPERTY_ELMT,
-							Utils.arrayToString(STREAM_ELMT, PARSER_ELMT, JAVA_OBJ_ELMT, CACHE_ELMT)),
+							Utils.arrayToString(CONFIG_ROOT_ELMT, STREAM_ELMT, PARSER_ELMT, JAVA_OBJ_ELMT, CACHE_ELMT)),
 					currParseLocation);
 		}
+	}
+
+	/**
+	 * Returns parent path element for current element.
+	 * 
+	 * @param chElement
+	 *            child element name
+	 * @return parent element name
+	 * @throws SAXParseException
+	 *             if path stack is less than 2 elements depth
+	 */
+	protected String getParentElmt(String chElement) throws SAXParseException {
+		if (path.size() < 2) {
+			throw new SAXParseException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+					"ConfigParserHandler.malformed.configuration3", chElement), currParseLocation);
+		}
+		return path.get(path.size() - 2);
 	}
 
 	/**
@@ -1797,7 +1807,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	 *             if error occurs parsing element
 	 */
 	private void processValue(Attributes attrs) throws SAXException {
-		if (processingCache) {
+		if (path.contains(CACHE_ELMT)) {
 			processCacheValue(attrs);
 		} else {
 			processFilterValue(attrs);
@@ -2042,7 +2052,6 @@ public class ConfigParserHandler extends DefaultHandler {
 				}
 			} else if (CACHE_ELMT.equals(qName)) {
 				StreamsCache.setProperties(applyVariableProperties(currProperties.remove(qName)));
-				processingCache = false;
 			} else if (CACHE_ENTRY_ELMT.equals(qName)) {
 				if (currCacheEntry != null) {
 					handleCacheEntry(currCacheEntry);
@@ -2242,15 +2251,13 @@ public class ConfigParserHandler extends DefaultHandler {
 
 		notNull(currProperty.value, PROPERTY_ELMT, VALUE_ATTR);
 
-		if (isProcessingTNT4JProperties()) {
+		String pParent = getParentElmt(PROPERTY_ELMT);
+		if (StringUtils.equalsIgnoreCase(pParent, TNT4J_PROPERTIES_ELMT)) {
 			Map.Entry<String, String> p = new AbstractMap.SimpleEntry<>(currProperty.name, currProperty.value);
 			currStream.output().setProperty(OutputProperties.PROP_TNT4J_PROPERTY, p);
+		} else if (StringUtils.equalsIgnoreCase(pParent, CONFIG_ROOT_ELMT)) {
+			streamsConfigData.addDataSourceProperty(currProperty.name, currProperty.value);
 		} else {
-			if (path.size() < 2) {
-				throw new SAXParseException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
-						"ConfigParserHandler.malformed.configuration3", PROPERTY_ELMT), currParseLocation);
-			}
-			String pParent = path.get(path.size() - 2);
 			Map<String, String> eProps = currProperties.get(pParent);
 			if (eProps == null) {
 				eProps = new HashMap<>();
@@ -2262,10 +2269,6 @@ public class ConfigParserHandler extends DefaultHandler {
 			}
 			eProps.put(currProperty.name, currProperty.value);
 		}
-	}
-
-	private boolean isProcessingTNT4JProperties() {
-		return path != null && path.contains(TNT4J_PROPERTIES_ELMT);
 	}
 
 	private static boolean isPropValueAlreadyAdded(String cpv, String propValue) {
@@ -2478,7 +2481,7 @@ public class ConfigParserHandler extends DefaultHandler {
 
 	private void handleCacheEntry(CacheEntryData currCacheEntry) throws SAXException {
 		StreamsCache.addEntry(currCacheEntry.id, currCacheEntry.key, currCacheEntry.value, currCacheEntry.defaultValue,
-				currCacheEntry.transientEntry);
+				currCacheEntry.dataType, currCacheEntry.transientEntry);
 	}
 
 	private void handleKey(CacheEntryData currCacheEntry) throws SAXException {

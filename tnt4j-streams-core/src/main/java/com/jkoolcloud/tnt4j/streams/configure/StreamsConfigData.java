@@ -34,11 +34,10 @@ public class StreamsConfigData {
 
 	private Map<String, ActivityParser> parsers = null;
 	private Map<String, TNTInputStream<?, ?>> streams = null;
+	private Map<String, String> dsProperties = new HashMap<>(5);
 
-	// public StreamsConfigData() {
-	// parsers = new HashMap<String, ActivityParser>();
-	// streams = new HashMap<String, TNTInputStream>();
-	// }
+	public StreamsConfigData() {
+	}
 
 	/**
 	 * Returns the collection of streams found in the configuration.
@@ -63,7 +62,7 @@ public class StreamsConfigData {
 	 *
 	 * @param streamName
 	 *            name of stream, as specified in configuration file
-	 * @return stream with specified name, or {@code null} if no such stream
+	 * @return stream with specified name, or {@code null} if there is no such stream
 	 */
 	public TNTInputStream<?, ?> getStream(String streamName) {
 		return streams == null ? null : streams.get(streamName);
@@ -74,7 +73,7 @@ public class StreamsConfigData {
 	 *
 	 * @param parserName
 	 *            name of parser, as specified in configuration file
-	 * @return parser with specified name, or {@code null} if no such parser
+	 * @return parser with specified name, or {@code null} if there is no such parser
 	 */
 	public ActivityParser getParser(String parserName) {
 		return parsers == null ? null : parsers.get(parserName);
@@ -83,7 +82,7 @@ public class StreamsConfigData {
 	/**
 	 * Checks if configuration has any streams defined.
 	 *
-	 * @return {@code true} if streams collection contains at least one stream object, {@code false} - otherwise.
+	 * @return {@code true} if streams collection contains at least one stream instance, {@code false} - otherwise
 	 */
 	public boolean isStreamsAvailable() {
 		return MapUtils.isNotEmpty(streams);
@@ -92,17 +91,17 @@ public class StreamsConfigData {
 	/**
 	 * Checks if configuration has any parsers defined.
 	 *
-	 * @return {@code true} if parsers collection contains at least one parser object, {@code false} - otherwise.
+	 * @return {@code true} if parsers collection contains at least one parser instance, {@code false} - otherwise
 	 */
 	public boolean isParsersAvailable() {
 		return MapUtils.isNotEmpty(parsers);
 	}
 
 	/**
-	 * Adds stream object to streams collection.
+	 * Adds stream instance to streams collection.
 	 *
 	 * @param stream
-	 *            stream object to add
+	 *            stream instance to add
 	 */
 	public void addStream(TNTInputStream<?, ?> stream) {
 		if (streams == null) {
@@ -113,10 +112,10 @@ public class StreamsConfigData {
 	}
 
 	/**
-	 * Adds activity parser object to parsers collection.
+	 * Adds activity parser instance to parsers collection.
 	 *
 	 * @param parser
-	 *            activity parser to add
+	 *            activity parser instance to add
 	 */
 	public void addParser(ActivityParser parser) {
 		if (parsers == null) {
@@ -125,4 +124,46 @@ public class StreamsConfigData {
 
 		parsers.put(parser.getName(), parser);
 	}
+
+	/**
+	 * Adds data source property.
+	 * 
+	 * @param key
+	 *            property key/name
+	 * @param value
+	 *            property value
+	 */
+	public void addDataSourceProperty(String key, String value) {
+		dsProperties.put(key, value);
+	}
+
+	/**
+	 * Returns data source properties map.
+	 * 
+	 * @return data source properties map
+	 */
+	public Map<String, String> getDataSourceProperties() {
+		return dsProperties;
+	}
+
+	/**
+	 * Returns data source property value.
+	 * 
+	 * @param pKey
+	 *            property key/name
+	 * @return property value, or {@code null} if there is no such property
+	 */
+	public String getDataSourceProperty(String pKey) {
+		return dsProperties.get(pKey);
+	}
+
+	/**
+	 * Checks if configuration has any data source properties defined.
+	 * 
+	 * @return {@code true} if configuration contains at least one data source property, {@code false} - otherwise
+	 */
+	public boolean isDataSourcePropertiesAvailable() {
+		return MapUtils.isNotEmpty(dsProperties);
+	}
+
 }

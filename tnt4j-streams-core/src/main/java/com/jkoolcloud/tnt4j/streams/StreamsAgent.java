@@ -67,6 +67,8 @@ public final class StreamsAgent {
 	private static ThreadGroup streamThreads;
 	private static boolean restarting = true;
 
+	private static final Map<String, String> dataSourceProperties = new HashMap<>(5);
+
 	private StreamsAgent() {
 	}
 
@@ -468,6 +470,7 @@ public final class StreamsAgent {
 	 *            streams builder to build streams context
 	 */
 	protected static void run(StreamsBuilder builder) {
+		dataSourceProperties.putAll(builder.getDataSourceProperties());
 		Collection<TNTInputStream<?, ?>> streams = builder.getStreams();
 
 		if (CollectionUtils.isEmpty(streams)) {

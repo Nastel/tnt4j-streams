@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.configure;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -273,5 +274,14 @@ public class StreamsConfigLoader {
 	 */
 	public boolean isErroneous() {
 		return erroneous;
+	}
+
+	/**
+	 * Returns the map of data source properties found in the configuration.
+	 * 
+	 * @return map of data source properties
+	 */
+	public Map<String, String> getDataSourceProperties() {
+		return streamsCfgData == null ? null : streamsCfgData.getDataSourceProperties();
 	}
 }

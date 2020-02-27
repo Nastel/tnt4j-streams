@@ -17,6 +17,7 @@
 package com.jkoolcloud.tnt4j.streams.configure.build;
 
 import java.util.Collection;
+import java.util.Map;
 
 import com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener;
 import com.jkoolcloud.tnt4j.streams.inputs.StreamTasksListener;
@@ -48,4 +49,11 @@ public interface StreamsBuilder {
 	 * @return streams tasks listener instance
 	 */
 	StreamTasksListener getTasksListener();
+
+	/**
+	 * Returns map of data source properties.
+	 * 
+	 * @return map of data source properties
+	 */
+	Map<String, String> getDataSourceProperties();
 }

@@ -129,6 +129,8 @@ public class CfgStreamsBuilder extends POJOStreamsBuilder {
 						"StreamsAgent.erroneous.configuration"));
 			}
 
+			addDataSourceProperties(cfg.getDataSourceProperties());
+
 			Collection<TNTInputStream<?, ?>> streams;
 			if (osPipeInput) {
 				streams = initPiping(cfg, haltOnUnparsed);

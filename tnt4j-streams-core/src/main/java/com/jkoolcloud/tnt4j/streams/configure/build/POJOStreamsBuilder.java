@@ -18,6 +18,8 @@ package com.jkoolcloud.tnt4j.streams.configure.build;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -34,6 +36,7 @@ public class POJOStreamsBuilder implements StreamsBuilder {
 	private InputStreamListener sListener;
 	private StreamTasksListener tListener;
 	private Collection<TNTInputStream<?, ?>> streams = new ArrayList<>();
+	private Map<String, String> dsProperties = new HashMap<>(5);
 
 	/**
 	 * Sets set of stream instances to be run.
@@ -117,5 +120,22 @@ public class POJOStreamsBuilder implements StreamsBuilder {
 	@Override
 	public StreamTasksListener getTasksListener() {
 		return tListener;
+	}
+
+	/**
+	 * Adds provided properties to data source properties map.
+	 * 
+	 * @param dsPropsMap
+	 *            properties map to add to data source properties
+	 */
+	public void addDataSourceProperties(Map<String, String> dsPropsMap) {
+		if (dsPropsMap != null) {
+			dsProperties.putAll(dsPropsMap);
+		}
+	}
+
+	@Override
+	public Map<String, String> getDataSourceProperties() {
+		return dsProperties;
 	}
 }
