@@ -17,27 +17,28 @@
 package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.ChronicleQueueProperties;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
-import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
-import com.jkoolcloud.tnt4j.streams.utils.Utils;
+import com.jkoolcloud.tnt4j.streams.utils.*;
 
 import net.openhft.chronicle.queue.ChronicleQueue;
 import net.openhft.chronicle.queue.ExcerptTailer;
 import net.openhft.chronicle.threads.Pauser;
-import net.openhft.chronicle.wire.ReadMarshallable;
+import net.openhft.chronicle.wire.DocumentContext;
+import net.openhft.chronicle.wire.ValueIn;
+import net.openhft.chronicle.wire.Wires;
 
 /**
  * Implements a Chronicle queue transported activity stream, where each Chronicle queue entry marshaled document payload
  * data is assumed to represent a single activity entity which should be recorded.
  * <p>
- * This activity stream requires parsers that can support Chronicle's
- * {@link net.openhft.chronicle.wire.ReadMarshallable} or {@link java.lang.Object} data.
+ * This activity stream requires parsers that can support {@link java.lang.Object} data.
  * <p>
  * This activity stream supports the following configuration properties (in addition to those supported by
  * {@link TNTParseableInputStream}):
@@ -46,20 +47,20 @@ import net.openhft.chronicle.wire.ReadMarshallable;
  * <li>MarshallClass - class name of marshaled Chronicle queue entries. (Required)</li>
  * </ul>
  *
- * @version $Revision: 1$
+ * @version $Revision: 2$
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  */
-public class ChronicleQueueStream extends TNTParseableInputStream<ReadMarshallable> {
+public class ChronicleQueueStream extends TNTParseableInputStream<Object> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(ChronicleQueueStream.class);
 
 	private File queuePath;
-	private String className;
+	private Map<String, Class<?>> classNameMap = new HashMap<>();
+	private String handlingClasses;
 
 	private ChronicleQueue queue;
 	private ExcerptTailer tailer;
 	private Pauser pauser;
-	private Class<? extends ReadMarshallable> clazz;
 	private boolean startFromLatest = true;
 
 	/**
@@ -84,7 +85,8 @@ public class ChronicleQueueStream extends TNTParseableInputStream<ReadMarshallab
 				queuePath = queuePath.getParentFile();
 			}
 		} else if (ChronicleQueueProperties.PROP_MARSHALL_CLASS.equalsIgnoreCase(name)) {
-			className = value;
+			handlingClasses = value;
+
 		} else if (ChronicleQueueProperties.PROP_START_FROM_LATEST.equalsIgnoreCase(name)) {
 			startFromLatest = Utils.toBoolean(value);
 		}
@@ -96,7 +98,7 @@ public class ChronicleQueueStream extends TNTParseableInputStream<ReadMarshallab
 			return queuePath;
 		}
 		if (ChronicleQueueProperties.PROP_MARSHALL_CLASS.equalsIgnoreCase(name)) {
-			return className;
+			return classNameMap;
 		}
 
 		return super.getProperty(name);
@@ -111,9 +113,14 @@ public class ChronicleQueueStream extends TNTParseableInputStream<ReadMarshallab
 					"TNTInputStream.property.undefined", StreamProperties.PROP_FILENAME));
 		}
 
-		if (StringUtils.isEmpty(className)) {
+		if (StringUtils.isEmpty(handlingClasses)) {
 			throw new IllegalStateException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
 					"TNTInputStream.property.undefined", ChronicleQueueProperties.PROP_MARSHALL_CLASS));
+		}
+
+		for (String className : StreamsConstants.getMultiProperties(handlingClasses)) {
+			Class<?> aClass = Class.forName(className);
+			classNameMap.put(aClass.getSimpleName(), aClass);
 		}
 	}
 
@@ -122,7 +129,6 @@ public class ChronicleQueueStream extends TNTParseableInputStream<ReadMarshallab
 		super.initialize();
 
 		queue = ChronicleQueue.singleBuilder(queuePath).build();
-		clazz = Class.forName(className).asSubclass(ReadMarshallable.class);
 		tailer = queue.createTailer();
 
 		if (startFromLatest) {
@@ -133,13 +139,28 @@ public class ChronicleQueueStream extends TNTParseableInputStream<ReadMarshallab
 	}
 
 	@Override
-	public ReadMarshallable getNextItem() throws Exception {
+	public String[] getDataTags(Object data) {
+		return new String[] { data.getClass().getSimpleName() };
+	}
+
+	@Override
+	public Object getNextItem() throws Exception {
 		while (true) {
-			ReadMarshallable readMarshallable = clazz.newInstance();
-			boolean s = tailer.readDocument(readMarshallable);
-			if (s) {
+			DocumentContext documentContext = tailer.readingDocument();
+			if (documentContext.isPresent() && documentContext.isData()) {
+				StringBuilder name = new StringBuilder();
+				ValueIn valueIn = documentContext.wire().readEventName(name);
+				Class<?> aClass = classNameMap.get(name.toString());
+				if (aClass == null) {
+					throw new IllegalArgumentException(
+							StreamsResources.getStringFormatted(ChronicleStreamConstants.RESOURCE_BUNDLE_NAME,
+									"ChronicleQueueStream.unsupported.class", name));
+				}
+				Object o = aClass.newInstance();
+				Object unmarshalObject = Wires.object0(valueIn, o, aClass);
 				pauser.reset();
-				return readMarshallable;
+
+				return unmarshalObject;
 			} else {
 				pauser.pause();
 			}
