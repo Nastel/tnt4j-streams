@@ -2205,13 +2205,18 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		} else {
 			val = dataMap.get(path[level]);
 
-			if (level < path.length - 1 && val instanceof Map) {
-				val = getMapValueByPath(path, (Map<String, ?>) val, ++level, accessedPaths);
-			} else if (level < path.length - 2 && val instanceof List) {
-				try {
-					int lii = Integer.parseInt(getItemIndexStr(path[level + 1]));
-					val = getMapValueByPath(path, (Map<String, ?>) ((List<?>) val).get(lii), level + 2, accessedPaths);
-				} catch (NumberFormatException exc) {
+			if (level < path.length - 1) {
+				if (val instanceof Map) {
+					val = getMapValueByPath(path, (Map<String, ?>) val, ++level, accessedPaths);
+				} else if (isIndexedCollection(val)) {
+					try {
+						int lii = Integer.parseInt(getItemIndexStr(path[level + 1]));
+						val = getCollectionElement(val, lii);
+						if (val instanceof Map) {
+							val = getMapValueByPath(path, (Map<String, ?>) val, level + 2, accessedPaths);
+						}
+					} catch (IllegalArgumentException | IndexOutOfBoundsException exc) {
+					}
 				}
 			}
 		}
@@ -2219,7 +2224,48 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		if (accessedPaths != null) {
 			accessedPaths.add(path);
 		}
+
 		return val;
+	}
+
+	/**
+	 * Checks if provided object is array or {@link java.util.List} and element of such collection can be accessed over
+	 * numeric index.
+	 * 
+	 * @param obj
+	 *            object to check
+	 * @return {@code true} if obj is {@link java.util.List} or array, {@code false} - otherwise
+	 */
+	public static boolean isIndexedCollection(Object obj) {
+		return isArray(obj) || obj instanceof List;
+	}
+
+	/**
+	 * Returns the element at the specified position in provided array/list object instance {@code obj}.
+	 * 
+	 * @param obj
+	 *            array/list instance to get element
+	 * @param index
+	 *            index of the element to return
+	 * @return it value of the indexed component in the specified array/list
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the specified object is not an array
+	 * @throws IndexOutOfBoundsException
+	 *             if the specified {@code index} argument is negative, or if it is greater than or equal to the
+	 *             length/size of the specified array/list
+	 */
+	public static Object getCollectionElement(Object obj, int index)
+			throws IllegalArgumentException, IndexOutOfBoundsException {
+		// return CollectionUtils.get(obj, index);
+		if (isArray(obj)) {
+			return Array.get(obj, index);
+		}
+		if (obj instanceof List) {
+			return ((List<?>) obj).get(index);
+		}
+
+		return null;
 	}
 
 	private static String getItemIndexStr(String indexToken) {
