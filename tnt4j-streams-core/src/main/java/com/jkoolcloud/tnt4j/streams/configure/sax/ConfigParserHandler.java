@@ -2481,7 +2481,7 @@ public class ConfigParserHandler extends DefaultHandler {
 
 	private void handleCacheEntry(CacheEntryData currCacheEntry) throws SAXException {
 		StreamsCache.addEntry(currCacheEntry.id, currCacheEntry.key, currCacheEntry.value, currCacheEntry.defaultValue,
-				currCacheEntry.dataType, currCacheEntry.transientEntry);
+				currCacheEntry.transientEntry);
 	}
 
 	private void handleKey(CacheEntryData currCacheEntry) throws SAXException {
