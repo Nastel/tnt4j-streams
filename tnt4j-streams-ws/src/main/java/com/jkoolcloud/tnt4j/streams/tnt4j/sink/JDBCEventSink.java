@@ -27,9 +27,11 @@ import java.util.Properties;
 
 import com.codahale.metrics.*;
 import com.jkoolcloud.tnt4j.core.KeyValueStats;
+import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.format.EventFormatter;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.sink.LoggedEventSink;
+import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.SecurityUtils;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 import com.zaxxer.hikari.HikariConfig;
@@ -44,6 +46,7 @@ import com.zaxxer.hikari.HikariDataSource;
  * @see com.jkoolcloud.tnt4j.streams.tnt4j.format.SQLFormatter
  */
 public class JDBCEventSink extends LoggedEventSink {
+	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(JDBCEventSink.class);
 
 	private String url = null;
 	private String user = null;
@@ -143,19 +146,34 @@ public class JDBCEventSink extends LoggedEventSink {
 	protected void _open() throws IOException {
 		_close();
 
+		LOGGER.log(OpLevel.DEBUG, "Open sink ''{0}'' DB data source url={1}, user={2}, pass={3}", getName(), url, user,
+				passwd == null ? null : "xxxxxx"); // NON-NLS
+
 		HikariConfig dbConfig = new HikariConfig(cpProperties);
 		dbConfig.setJdbcUrl(url);
 		dbConfig.setUsername(user);
 		dbConfig.setPassword(SecurityUtils.getPass2(passwd));
 
 		dbDataSource = new HikariDataSource(dbConfig);
+
+		super._open();
 	}
 
 	@Override
 	protected void _close() throws IOException {
 		if (dbDataSource != null) {
+			LOGGER.log(OpLevel.DEBUG, "Closing sink ''{0}'' DB data source url={1}, user={2}, pass={3}", getName(), url,
+					user, passwd == null ? null : "xxxxxx"); // NON-NLS
 			Utils.close(dbDataSource);
 		}
+
+		super._close();
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + "{url: " + url + ", user: " + user + ", pass: " + passwd == null ? null // NON-NLS
+				: "xxxxxx" + ", batchSize" + batchSize + ", handle: " + dbDataSource + "}"; // NON-NLS
 	}
 
 	@Override
@@ -216,6 +234,7 @@ public class JDBCEventSink extends LoggedEventSink {
 						executeQueries(dbConn, batch);
 					}
 				} catch (SQLException exc) {
+					Utils.logThrowable(LOGGER, OpLevel.ERROR, "Failed to process whole batch: {0}", exc);
 				} finally {
 					Utils.close(dbConn);
 				}
@@ -250,6 +269,7 @@ public class JDBCEventSink extends LoggedEventSink {
 				}
 				batch.remove(i--);
 			} catch (SQLException exc) {
+				Utils.logThrowable(LOGGER, OpLevel.ERROR, "Failed to process batch query: {0}", exc);
 			} finally {
 				Utils.close(dbSt);
 			}
