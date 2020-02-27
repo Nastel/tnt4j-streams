@@ -20,6 +20,7 @@
         <commons.daemon.version>1.2.2</commons.daemon.version>
         <gson.version>2.8.6</gson.version>
         <json.path.version>2.4.0</json.path.version>
+        <jackson.version>2.10.2</jackson.version>
         <jaxb.version>2.3.2</jaxb.version>
 
         <jesl.version>0.10-SNAPSHOT</jesl.version>
@@ -117,10 +118,6 @@
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-simple</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpclient</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
 
@@ -158,6 +155,11 @@
                     <artifactId>asm</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
 
         <!--dependency>
@@ -246,6 +248,10 @@
             <version>${dropwizard.metrics.version}</version>
             <exclusions>
                 <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+                <exclusion>
                     <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>
                 </exclusion>
@@ -280,19 +286,6 @@
             <artifactId>jaxb-runtime</artifactId>
             <version>${jaxb.version}</version>
             <scope>runtime</scope>
-        </dependency>
-
-        <!-- used by HTTP stream and required by JESL anyway -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${httpcomponents.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-codec</groupId>
-                    <artifactId>commons-codec</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- logging dependencies -->
@@ -355,6 +348,12 @@
             <artifactId>httpmime</artifactId>
             <version>${httpcomponents.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

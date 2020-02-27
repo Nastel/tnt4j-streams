@@ -22,7 +22,8 @@ import java.util.Map;
 import org.logstash.beats.IMessageListener;
 import org.logstash.beats.Message;
 import org.logstash.beats.Server;
-import org.logstash.netty.SslSimpleBuilder;
+import org.logstash.netty.SslContextBuilder;
+import org.logstash.netty.SslHandlerProvider;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
@@ -198,7 +199,9 @@ public class ElasticBeatsStream extends AbstractBufferedStream<Map<?, ?>> {
 			server = new Server(host, port, timeout, threadCount);
 			if (sslCertificateFilePath != null && sslKeyFilePath != null && passPhrase != null) {
 				try {
-					server.enableSSL(new SslSimpleBuilder(sslCertificateFilePath, sslKeyFilePath, passPhrase));
+					server.setSslHandlerProvider(new SslHandlerProvider(
+							new SslContextBuilder(sslCertificateFilePath, sslKeyFilePath, passPhrase).buildContext(),
+							timeout * 1000));
 				} catch (FileNotFoundException e) {
 					LOGGER.log(OpLevel.ERROR, StreamsResources.getBundle(BeatsStreamConstants.RESOURCE_BUNDLE_NAME),
 							"ElasticBeatsStream.ssl.file.not.found.error", e);
