@@ -40,14 +40,14 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
  * @author akausinis
  * @version 1.0
  */
-public class KafkaStreamTest {
+public class KafkaConsumerStreamTest {
 	private static final String DEFAULT_TEST_TOPIC = "TNT4JKafkaTestTopic"; // NON-NLS
 
-	KafkaStream input;
+	KafkaConsumerStream input;
 
 	@Test
 	public void testProperties() {
-		input = new KafkaStream();
+		input = new KafkaConsumerStream();
 
 		Map<String, String> props = new HashMap<>(3);
 		props.put(StreamProperties.PROP_TOPIC_NAME, DEFAULT_TEST_TOPIC);
@@ -65,7 +65,7 @@ public class KafkaStreamTest {
 
 	@Test
 	public void testRB() {
-		String keyModule = "KafkaStream.empty.messages.buffer";
+		String keyModule = "KafkaConsumerStream.next.message";
 		String keyCore = "ActivityField.field.type.name.empty";
 		String brbStr;
 

@@ -14,10 +14,7 @@
     <artifactId>tnt4j-streams-kafka</artifactId>
 
     <properties>
-        <!--<kafka.version>2.2.2</kafka.version>-->
-        <!--<kafka.version>2.3.1</kafka.version>-->
-        <kafka.version>2.4.0</kafka.version>
-        <kafka.clients.version>${kafka.version}</kafka.clients.version>
+        <kafka.clients.version>2.4.0</kafka.clients.version>
     </properties>
 
     <build>
@@ -174,25 +171,6 @@
             <artifactId>kafka-clients</artifactId>
             <version>${kafka.clients.version}</version>
             <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.12</artifactId>
-            <version>${kafka.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>scala-library</artifactId>
-                    <groupId>org.scala-lang</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>scala-reflect</artifactId>
-                    <groupId>org.scala-lang</groupId>
-                </exclusion>
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>

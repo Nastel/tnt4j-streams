@@ -34,8 +34,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
 /**
  * Implements a Kafka topics transmitted activity stream, where each message body is assumed to represent a single
  * activity or event which should be recorded. Topic to listen is defined using "Topic" property in stream
- * configuration. Difference from {@link com.jkoolcloud.tnt4j.streams.inputs.KafkaStream} is that this stream uses
- * "kafka-clients" library to implement Kafka consumer part of the stream.
+ * configuration.
  * <p>
  * This activity stream requires parsers that can support {@link ConsumerRecord} data like
  * {@link com.jkoolcloud.tnt4j.streams.parsers.KafkaConsumerRecordParser}.
@@ -57,7 +56,6 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  * @see com.jkoolcloud.tnt4j.streams.parsers.KafkaConsumerRecordParser
- * @see com.jkoolcloud.tnt4j.streams.inputs.KafkaStream
  */
 public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?, ?>> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(KafkaConsumerStream.class);
@@ -247,7 +245,7 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 		super.initialize();
 
 		logger().log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-				"KafkaStream.consumer.starting");
+				"KafkaConsumerStream.consumer.starting");
 
 		kafkaDataReceiver = new KafkaDataReceiver();
 		kafkaDataReceiver.initialize(getScopeProps(PROP_SCOPE_CONSUMER), Collections.singleton(topicName));
@@ -335,7 +333,7 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 										Collections.singletonMap(partition, new OffsetAndMetadata(lastOffset + 1)));
 								logger().log(OpLevel.DEBUG,
 										StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-										"KafkaStream.committing.offset", partition, lastOffset);
+										"KafkaConsumerStream.committing.offset", partition, lastOffset);
 							}
 						}
 					}
@@ -359,7 +357,7 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 			for (ConsumerRecord<?, ?> record : records) {
 				String msgData = Utils.toString(record.value());
 				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-						"KafkaStream.next.message", msgData);
+						"KafkaConsumerStream.next.message", msgData);
 
 				addInputToBuffer(record);
 			}

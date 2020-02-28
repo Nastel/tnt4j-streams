@@ -2508,12 +2508,12 @@ names as labels.
 
 #### Kafka client stream
 
-This sample shows how to stream activity events received over Apache Kafka transport as messages. Sample also shows
-how to use stacked parsers technique to extract message payload data.
+This sample shows how to stream activity events received over Apache Kafka transport as messages. Sample also shows how to use stacked 
+parsers technique to extract message payload data.
 
 Stream runs as Apache Kafka consumer.
 
-Sample files can be found in `samples/kafka` directory.
+Sample files can be found in `samples/kafka-client` directory.
 
 Sample stream configuration:
 ```xml
@@ -2541,35 +2541,47 @@ Sample stream configuration:
         <field name="MsgValue" locator="13" locator-type="Index"/>
     </parser>
 
-    <parser name="KafkaMessageParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="Topic" locator="ActivityTopic" locator-type="Label"/>
-        <field name="Transport" locator="ActivityTransport" locator-type="Label"/>
-        <field name="MsgBody" locator="ActivityData" locator-type="Label">
+    <parser name="KafkaMessageParser" class="com.jkoolcloud.tnt4j.streams.parsers.KafkaConsumerRecordParser">
+        <field name="Topic" locator="topic" locator-type="Label"/>
+        <field name="Partition" locator="partition" locator-type="Label" datatype="Number"/>
+        <field name="Offset" locator="offset" locator-type="Label" datatype="Number"/>
+        <field name="Timestamp" locator="timestamp" locator-type="Label" datatype="Timestamp"/>
+        <field name="TimestampType" locator="timestampType" locator-type="Label"/>
+        <field name="Checksum" locator="checksum" locator-type="Label"/>
+        <field name="KeySize" locator="serializedKeySize" locator-type="Label" datatype="Number"/>
+        <field name="ValueSize" locator="serializedValueSize" locator-type="Label" datatype="Number"/>
+        <field name="Key" locator="key" locator-type="Label"/>
+        <field name="MsgBody" locator="value" locator-type="Label">
             <parser-ref name="AccessLogParserCommon"/>
         </field>
     </parser>
 
-    <stream name="SampleKafkaStream" class="com.jkoolcloud.tnt4j.streams.inputs.KafkaStream">
-            <property name="HaltIfNoParser" value="false"/>
-            <property name="Topic" value="TNT4JStreams"/>
+    <stream name="SampleKafkaClientStream" class="com.jkoolcloud.tnt4j.streams.inputs.KafkaConsumerStream">
+        <property name="HaltIfNoParser" value="false"/>
+        <property name="Topic" value="TNT4JStreams"/>
+        
+        <!-- Kafka consumer properties -->
+        <property name="bootstrap.servers" value="localhost:9092"/>
+        <property name="group.id" value="0"/>
+        <property name="key.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer"/>
+        <property name="value.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer"/>
+        <property name="enable.auto.commit" value="true"/>
+        <property name="auto.commit.interval.ms" value="1000"/>
+        <property name="session.timeout.ms" value="30000"/>
+        <property name="client.id" value="tnt4j-streams-kafka-consumer"/>
 
-            <!-- Kafka consumer properties -->
-            <property name="zookeeper.connect" value="127.0.0.1:2181/tnt4j_kafka"/>
-            <property name="group.id" value="0"/>
-
-            <parser-ref name="KafkaMessageParser"/>
-        </stream>
+        <parser-ref name="KafkaMessageParser"/>
+    </stream>
 </tnt-data-source>
-
 ```
 
-Stream configuration states that `KafkaStream` referencing `KafkaMessageParser` shall be used.
+Stream configuration states that `SampleKafkaClientStream` referencing `KafkaMessageParser` shall be used.
 
-`KafkaStream` connects to server defined using `zookeeper.connect` property, and takes messages from topic defined
+`SampleKafkaClientStream` connects to server defined using `bootstrap.servers` property, and takes messages from topic defined
 `Topic` property. `HaltIfNoParser` property indicates that stream should skip unparseable entries.
 Stream puts received message data to map and passes it to parser.
 
-Details on ['Apache Kafka configuration'](https://kafka.apache.org/08/configuration.html).
+Details on ['Apache Kafka Consumer configuration'](https://kafka.apache.org/documentation/#consumerconfigs).
 
 `KafkaMessageParser` maps metadata to activity event data. `ActivityData` entry value is passed to stacked parser named
 `AccessLogParserCommon`.
@@ -2579,100 +2591,6 @@ Details on `AccessLogParserCommon` (or `ApacheAccessLogParser` in general) can b
 
 **NOTE:** to parse some other data instead of Apache Access Log, replace `AccessLogParserCommon` with parser which
 complies your data format.
-
-**NOTE:** Stream stops only when critical runtime error/exception occurs or application gets terminated.
-
-#### Kafka server stream
-
-This sample shows how to stream activity events received over Apache Kafka transport as messages. Sample also shows
-how to use stacked parsers technique to extract message payload data.
-
-Stream starts Apache Kafka server and binds consumer to it to receive and process messages.
-
-Sample files can be found in `samples/kafka-server` directory.
-
-`tnt4j-streams-kafka/config` directory contains default configuration properties files for ZooKeeper (`zookeeper.propertoes`) and Kafka 
-(`kafka-server.properties`) servers. Kafka stream is using those files referenced over Java system properties 
-`-Dtnt4j.zookeeper.config=tnt4j-streams-kafka/config/zookeeper.properties` for ZooKeeper server and 
-`-Dtnt4j.kafka.srv.config=tnt4j-streams-kafka/config/kafka-server.properties` for Kafka server (see `samples/kafka-server/run.bat` or `.sh` 
-files as sample). **NOTE:** those file defined Kafka server properties gets merged with ones defined in stream configuration.
-
-Sample stream configuration:
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<tnt-data-source
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
-
-    <parser name="AccessLogParserCommon" class="com.jkoolcloud.tnt4j.streams.custom.parsers.ApacheAccessLogParser">
-        <property name="LogPattern" value="%h %l %u %t &quot;%r&quot; %s %b"/>
-
-        <field name="Location" locator="1" locator-type="Index"/>
-        <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
-        <field name="EventType" value="SEND"/>
-        <field name="EventName" locator="7" locator-type="Index"/>
-        <field name="ResourceName" locator="8" locator-type="Index"/>
-        <field name="CompCode" locator="12" locator-type="Index">
-            <field-map source="100:206" target="SUCCESS" type="Range"/>
-            <field-map source="300:308" target="WARNING" type="Range"/>
-            <field-map source="400:417" target="ERROR" type="Range"/>
-            <field-map source="500:511" target="ERROR" type="Range"/>
-        </field>
-        <field name="ReasonCode" locator="12" locator-type="Index"/>
-        <field name="MsgValue" locator="13" locator-type="Index"/>
-    </parser>
-
-    <parser name="KafkaMessageParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="Topic" locator="ActivityTopic" locator-type="Label"/>
-        <field name="Transport" locator="ActivityTransport" locator-type="Label"/>
-        <field name="MsgBody" locator="ActivityData" locator-type="Label">
-            <parser-ref name="AccessLogParserCommon"/>
-        </field>
-    </parser>
-
-    <stream name="SampleKafkaStream" class="com.jkoolcloud.tnt4j.streams.inputs.KafkaStream">
-        <property name="HaltIfNoParser" value="false"/>
-        <property name="Topic" value="TNT4JStreams"/>
-        <property name="StartServer" value="true"/>
-        <property name="StartZooKeeper" value="true"/>
-
-        <!-- Common Kafka server/consumer properties -->
-        <property name="zookeeper.connect" value="127.0.0.1:2181/tnt4j_kafka"/>
-        <property name="zookeeper.connection.timeout.ms" value="5000"/>
-
-        <!-- Kafka consumer properties -->
-        <property name="consumer:group.id" value="0"/>
-        <!--<property name="consumer:zookeeper.connection.timeout.ms" value="6000"/>-->
-        <property name="consumer:consumer.timeout.ms" value="1000"/>
-        <property name="consumer:auto.commit.interval.ms" value="1000"/>
-
-        <!-- Kafka server properties -->
-        <property name="server:broker.id" value="684231"/>
-        <property name="server:host.name" value="localhost"/>
-        <property name="server:port" value="9092"/>
-        <!--<property name="server:log.flush.interval.messages" value="1"/>-->
-        <!--<property name="server:log.flush.interval.ms" value="1000"/>-->
-        <property name="server:zookeeper.session.timeout.ms" value="4000"/>
-        <!--<property name="server:zookeeper.connection.timeout.ms" value="3000"/>-->
-        <property name="server:zookeeper.sync.time.ms" value="200"/>
-
-        <parser-ref name="KafkaMessageParser"/>
-    </stream>
-</tnt-data-source>
-```
-
-Stream configuration in general is mostly same as for ['Kafka client stream'](#kafka-client-stream).
-
-Difference is `StartServer` stream property set to `true` stating that Apache Kafka server should be started by stream and messages consumer 
-has to bind to it. `StartZooKeeper` stream property set to `true` states that ZooKeeper server shall be started on stream startup.
-
-Also there is extended set of Apache Kafka configuration properties used by server and consumer. Kafka server dedicated properties starts 
-with prefix `server:` while Kafka consumer properties - with `consumer:`. Properties having no prefix (or prefixes `:`, `common:`) are 
-applied for both - server and consumer. Those properties gets merged with ones defined in properties files. **NOTE:** Stream configuration 
-defined properties has priority over property files defined properties - thus property files defines **default** values used by stream.
-
-Details on ['Apache Kafka configuration'](https://kafka.apache.org/08/configuration.html).
 
 **NOTE:** Stream stops only when critical runtime error/exception occurs or application gets terminated.
 
