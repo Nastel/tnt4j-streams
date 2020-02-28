@@ -632,7 +632,8 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	}
 
 	@Override
-	protected WsRequest<String> fillInRequest(WsRequest<String> req, RequestFillContext context) {
+	protected WsRequest<String> fillInRequest(WsRequest<String> req, RequestFillContext context)
+			throws VoidRequestException {
 		WsRequest<String> fReq = req.clone();
 		if (req.isDynamic()) {
 			DataFillContext ctx = makeDataContext(null, null, context);
@@ -684,6 +685,10 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 						respRs = stream.executeJdbcCall(scenarioStep.getUrlStr(), scenarioStep.getUsername(),
 								decPassword(scenarioStep.getPassword()), processedRequest.getData(),
 								processedRequest.getParameters());
+					} catch (VoidRequestException exc) {
+						stream.logger().log(OpLevel.INFO,
+								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+								"AbstractWsStream.void.request", processedRequest.getId(), exc.getMessage());
 					} catch (Throwable exc) {
 						Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),

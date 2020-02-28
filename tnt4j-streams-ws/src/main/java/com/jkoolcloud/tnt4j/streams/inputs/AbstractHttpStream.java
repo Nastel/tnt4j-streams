@@ -140,9 +140,9 @@ public abstract class AbstractHttpStream extends AbstractWsStream<String, String
 	 *            optional request URL
 	 * @return request instance having filled in values
 	 * @throws VoidRequestException
-	 *             if request URL is meaningless or can't be build from request context data
+	 *             if request can't be build from request context data or built URL is meaningless
 	 * 
-	 * @see #fillInRequestData(String)
+	 * @see #fillInRequest(com.jkoolcloud.tnt4j.streams.scenario.WsRequest)
 	 */
 	protected WsRequest<String> fillInRequest(WsRequest<String> req, String url) throws VoidRequestException {
 		WsRequest.Parameter urlParam = req.getParameter(REQ_URL_PARAM);

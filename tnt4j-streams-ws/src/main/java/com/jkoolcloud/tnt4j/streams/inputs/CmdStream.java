@@ -134,6 +134,10 @@ public class CmdStream extends AbstractWsStream<String, String> {
 						acquiredSemaphore = stream.acquireSemaphore(request);
 						processedRequest = stream.fillInRequest(request);
 						respStr = stream.executeCommand(processedRequest.getData());
+					} catch (VoidRequestException exc) {
+						stream.logger().log(OpLevel.INFO,
+								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+								"AbstractWsStream.void.request", processedRequest.getId(), exc.getMessage());
 					} catch (Throwable exc) {
 						Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),

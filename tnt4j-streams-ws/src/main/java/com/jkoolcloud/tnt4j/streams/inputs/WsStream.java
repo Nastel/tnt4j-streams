@@ -336,7 +336,7 @@ public class WsStream extends AbstractHttpStream {
 					} catch (VoidRequestException exc) {
 						stream.logger().log(OpLevel.INFO,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-								"AbstractHttpStream.void.request", processedRequest.getId(), exc.getMessage());
+								"AbstractWsStream.void.request", processedRequest.getId(), exc.getMessage());
 					} catch (IOException exc) {
 						stream.logger().log(OpLevel.WARNING,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),

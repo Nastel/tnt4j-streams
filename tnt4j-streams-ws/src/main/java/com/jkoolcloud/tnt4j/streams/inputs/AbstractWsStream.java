@@ -602,9 +602,12 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 *            request instance to fill-in data
 	 * @return request instance having filled-in values
 	 * 
+	 * @throws VoidRequestException
+	 *             if request can't be build from request context data or is meaningless
+	 * 
 	 * @see #fillInRequest(WsRequest, RequestFillContext)
 	 */
-	protected WsRequest<String> fillInRequest(WsRequest<String> req) {
+	protected WsRequest<String> fillInRequest(WsRequest<String> req) throws VoidRequestException {
 		RequestFillContext context = new RequestFillContext(true);
 
 		return fillInRequest(req, context);
@@ -626,9 +629,13 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 *            request values fill-in context to use
 	 * @return request instance having filled-in values
 	 * 
+	 * @throws VoidRequestException
+	 *             if request can't be build from request context data or is meaningless
+	 * 
 	 * @see #fillInRequestData(DataFillContext)
 	 */
-	protected WsRequest<String> fillInRequest(WsRequest<String> req, RequestFillContext context) {
+	protected WsRequest<String> fillInRequest(WsRequest<String> req, RequestFillContext context)
+			throws VoidRequestException {
 		WsRequest<String> fReq = req.clone();
 		if (req.isDynamic()) {
 			DataFillContext ctx = makeDataContext(null, null, context);

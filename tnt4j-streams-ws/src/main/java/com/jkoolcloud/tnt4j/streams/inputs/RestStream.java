@@ -367,6 +367,10 @@ public class RestStream extends AbstractHttpStream {
 						respStr = stream.executePOST(stream.client, scenarioStep.getUrlStr(),
 								processedRequest.getData(), scenarioStep.getUsername(),
 								decPassword(scenarioStep.getPassword()));
+					} catch (VoidRequestException exc) {
+						stream.logger().log(OpLevel.INFO,
+								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+								"AbstractWsStream.void.request", processedRequest.getId(), exc.getMessage());
 					} catch (IOException exc) {
 						stream.logger().log(OpLevel.WARNING,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -420,7 +424,7 @@ public class RestStream extends AbstractHttpStream {
 				} catch (VoidRequestException exc) {
 					stream.logger().log(OpLevel.INFO,
 							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-							"AbstractHttpStream.void.request", processedRequest.getId(), exc.getMessage());
+							"AbstractWsStream.void.request", processedRequest.getId(), exc.getMessage());
 				} catch (IOException exc) {
 					stream.logger().log(OpLevel.WARNING,
 							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -466,8 +470,8 @@ public class RestStream extends AbstractHttpStream {
 	 *            request data package
 	 * @return URL string appended with query parameter values
 	 * 
-	 * @throws com.jkoolcloud.tnt4j.streams.inputs.VoidRequestException
-	 *             if request URL is meaningless or can't be build from request context data
+	 * @throws VoidRequestException
+	 *             if request can't be build from request context data or built URL is meaningless
 	 */
 	protected String uriForGET(WsRequest<String> request) throws VoidRequestException {
 		String uri = request.getData();
