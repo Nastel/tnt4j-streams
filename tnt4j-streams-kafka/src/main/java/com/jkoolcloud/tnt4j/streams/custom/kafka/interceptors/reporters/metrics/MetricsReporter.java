@@ -366,7 +366,9 @@ public class MetricsReporter implements InterceptionsReporter {
 			topicMetrics.consumeM.mark();
 			topicMetrics.consumeC.inc();
 
-			topicMetrics.offset.update(record.offset(), record.timestamp(), System.currentTimeMillis());
+			topicMetrics.offset.update(record.offset(), record.timestamp(),
+					record.timestampType() == null ? null : record.timestampType().toString(),
+					System.currentTimeMillis());
 		}
 	}
 
@@ -379,7 +381,7 @@ public class MetricsReporter implements InterceptionsReporter {
 					clientId, "commit"); // NON-NLS
 			topicMetrics.commitC.inc();
 
-			topicMetrics.offset.update(tpom.getValue().offset(), -1, System.currentTimeMillis());
+			topicMetrics.offset.update(tpom.getValue().offset(), -1, null, System.currentTimeMillis());
 		}
 	}
 
@@ -658,6 +660,7 @@ public class MetricsReporter implements InterceptionsReporter {
 	 * Defines metrics "jackson-databind" serializer.
 	 */
 	protected static class MetricsRegistrySerializer extends StdSerializer<TopicMetrics> {
+		private static final long serialVersionUID = -4078902193304449876L;
 
 		/**
 		 * Constructs a new MetricsRegistrySerializer.
@@ -718,7 +721,7 @@ public class MetricsReporter implements InterceptionsReporter {
 		/**
 		 * Topic offset values map.
 		 */
-		final Map<String, Long> values = new HashMap<>(2);
+		final Map<String, Object> values = new HashMap<>(2);
 
 		/**
 		 * Constructs a new Offset.
@@ -782,17 +785,18 @@ public class MetricsReporter implements InterceptionsReporter {
 		 * @param c_timestamp
 		 *            message consumption timestamp
 		 */
-		void update(long offset, long p_timestamp, long c_timestamp) {
+		void update(long offset, long p_timestamp, String tType, long c_timestamp) {
 			synchronized (values) {
 				values.put("offset", offset); // NON-NLS
 				values.put("p_timestamp", p_timestamp); // NON-NLS
+				values.put("p_timestamp_type", tType); // NON-NLS
 				values.put("c_timestamp", c_timestamp); // NON-NLS
 			}
 		}
 
 		@Override
 		void reset() {
-			update(-1L, -1L, -1L);
+			update(-1L, -1L, null, -1L);
 		}
 	}
 

@@ -9,8 +9,8 @@
         <field name="All" locator="*" locator-type="Label"/>
     </parser>
 
-    <parser name="SendMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser"
-            default-data-type="AsInput" manualFieldsOrder="true">
+    <parser name="SendMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser" default-data-type="AsInput"
+            manualFieldsOrder="true">
         <property name="ActivityDelim" value="EOF"/>
 
         <field name="topic" locator="$.Topic" locator-type="Label" required="true"/>
@@ -36,8 +36,8 @@
         <field name="Timestamp" locator="$.Offset.p_timestamp" locator-type="Label"/>
     </parser>
 
-    <parser name="AckMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser"
-            default-data-type="AsInput" manualFieldsOrder="true">
+    <parser name="AckMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser" default-data-type="AsInput"
+            manualFieldsOrder="true">
         <property name="ActivityDelim" value="EOF"/>
 
         <field name="topic" locator="$.Topic" locator-type="Label" required="true"/>
@@ -65,19 +65,21 @@
         <field name="Offset" locator="$.Offset.offset" locator-type="Label"/>
         <field name="Timestamp" locator="$.Offset.p_timestamp" locator-type="Label"/>
 
-        <field name="LatestPOffset" locator="$.Offset.offset" locator-type="Label" transparent="true">
-            <field-transform lang="groovy" name="DiffTransform">
-                <![CDATA[
-                        ${LastOffset} == null ? $fieldValue : Math.max(${LastOffset}, $fieldValue)
-    				]]>
-            </field-transform>
+        <field name="LatestPOffset" locator="Offset" locator-type="Activity" transparent="true">
+            <field-transform lang="groovy" name="DiffTransform"><![CDATA[
+                ${LastOffset} == null
+                    ? $fieldValue
+                    : Math.max(${LastOffset}, $fieldValue)
+            ]]></field-transform>
         </field>
-        <field name="LatestPTimestamp" locator="$.Offset.p_timestamp" locator-type="Label" transparent="true">
-            <field-transform lang="groovy" name="DiffTransform">
-                <![CDATA[
-                        ${LastOffset} == null ? null : (${Offset} >= ${LastOffset} ? $fieldValue: ${LastOffsetTime})
-    				]]>
-            </field-transform>
+        <field name="LatestPTimestamp" locator="Timestamp" locator-type="Activity" transparent="true">
+            <field-transform lang="groovy" name="DiffTransform"><![CDATA[
+                ${LastOffset} == null
+                    ? null
+                    : (${Offset} >= ${LastOffset}
+                        ? $fieldValue
+                        : ${LastOffsetTime})
+            ]]></field-transform>
         </field>
     </parser>
 
@@ -109,43 +111,44 @@
 
         <field name="Offset" locator="$.Offset.offset" locator-type="Label"/>
         <field name="PTimestamp" locator="$.Offset.p_timestamp" locator-type="Label"/>
+        <field name="PTimestampType" locator="$.Offset.p_timestamp_type" locator-type="Label"/>
         <field name="Timestamp" locator="$.Offset.c_timestamp" locator-type="Label"/>
 
-        <field name="MessagesLag" locator="$.Offset.offset" locator-type="Label">
-            <field-transform lang="groovy" name="DiffTransform">
-                <![CDATA[
-                     ${LastOffset} != null && ${Offset} > 0 ? ${LastOffset} - ${Offset} : 0
-				]]>
-            </field-transform>
+        <field name="MessagesLag" locator="Offset" locator-type="Activity">
+            <field-transform lang="groovy" name="DiffTransform"><![CDATA[
+                ${LastOffset} != null && $fieldValue > 0
+                    ? ${LastOffset} - $fieldValue
+                    : 0
+            ]]></field-transform>
         </field>
 
-        <field name="MessagesLagTime" locator="$.Offset.c_timestamp" locator-type="Label">
-            <field-transform lang="groovy" name="DiffTransform">
-                <![CDATA[
-                      ${LastOffsetTime} != null && $fieldValue >= 0 ? $fieldValue - ${LastOffsetTime} : 0
-				]]>
-            </field-transform>
+        <field name="MessagesLagTime" locator="Timestamp" locator-type="Activity">
+            <field-transform lang="groovy" name="DiffTransform"><![CDATA[
+                ${LastOffsetTime} != null && $fieldValue >= 0
+                    ? $fieldValue - ${LastOffsetTime}
+                    : 0
+            ]]></field-transform>
         </field>
 
-        <field name="CommitLagTime" locator="$.Offset.c_timestamp" locator-type="Label">
-            <field-transform lang="groovy" name="DiffTransform">
-                <![CDATA[
-                      $fieldValue >= 0 ? $fieldValue - ${PTimestamp} : 0
-				]]>
-            </field-transform>
+        <field name="CommitLagTime" locator="Timestamp" locator-type="Activity">
+            <field-transform lang="groovy" name="DiffTransform"><![CDATA[
+                $fieldValue >= 0
+                    ? $fieldValue - ${PTimestamp}
+                    : 0
+            ]]></field-transform>
         </field>
 
-        <field name="AppendLagTime" locator="$.Offset.p_timestamp" locator-type="Label">
-            <field-transform lang="groovy" name="DiffTransform">
-                <![CDATA[
-                      ${LastOffsetTime} != null && $fieldValue >= 0 ? $fieldValue - ${LastOffsetTime} : 0
-				]]>
-            </field-transform>
+        <field name="AppendLagTime" locator="PTimestamp" locator-type="Activity">
+            <field-transform lang="groovy" name="DiffTransform"><![CDATA[
+                ${LastOffsetTime} != null && $fieldValue >= 0
+                    ? $fieldValue - ${LastOffsetTime}
+                    : 0
+            ]]></field-transform>
         </field>
     </parser>
 
-    <parser name="CommitMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser"
-            default-data-type="AsInput" manualFieldsOrder="true">
+    <parser name="CommitMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser" default-data-type="AsInput"
+            manualFieldsOrder="true">
         <property name="ActivityDelim" value="EOF"/>
 
         <field name="topic" locator="$.Topic" locator-type="Label" required="true"/>
