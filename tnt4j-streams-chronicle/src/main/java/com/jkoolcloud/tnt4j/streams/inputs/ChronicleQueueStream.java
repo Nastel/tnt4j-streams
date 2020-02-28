@@ -22,16 +22,19 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.ChronicleQueueProperties;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.utils.*;
 
+import net.openhft.chronicle.bytes.Bytes;
 import net.openhft.chronicle.queue.ChronicleQueue;
 import net.openhft.chronicle.queue.ExcerptTailer;
 import net.openhft.chronicle.threads.Pauser;
 import net.openhft.chronicle.wire.DocumentContext;
 import net.openhft.chronicle.wire.ValueIn;
+import net.openhft.chronicle.wire.Wire;
 import net.openhft.chronicle.wire.Wires;
 
 /**
@@ -62,6 +65,7 @@ public class ChronicleQueueStream extends TNTParseableInputStream<Object> {
 	private ExcerptTailer tailer;
 	private Pauser pauser;
 	private boolean startFromLatest = true;
+	private Object lastRead;
 
 	/**
 	 * Constructs a new ChronicleQueueStream. Requires configuration settings to set input stream source.
@@ -120,7 +124,7 @@ public class ChronicleQueueStream extends TNTParseableInputStream<Object> {
 
 		for (String className : StreamsConstants.getMultiProperties(handlingClasses)) {
 			Class<?> aClass = Class.forName(className);
-			classNameMap.put(aClass.getSimpleName(), aClass);
+			classNameMap.put(aClass.getSimpleName().toUpperCase(), aClass);
 		}
 	}
 
@@ -140,31 +144,64 @@ public class ChronicleQueueStream extends TNTParseableInputStream<Object> {
 
 	@Override
 	public String[] getDataTags(Object data) {
-		return new String[] { data.getClass().getSimpleName() };
+		return new String[] { data.getClass().getSimpleName().toUpperCase() };
 	}
 
 	@Override
 	public Object getNextItem() throws Exception {
 		while (true) {
-			DocumentContext documentContext = tailer.readingDocument();
-			if (documentContext.isPresent() && documentContext.isData()) {
-				StringBuilder name = new StringBuilder();
-				ValueIn valueIn = documentContext.wire().readEventName(name);
-				Class<?> aClass = classNameMap.get(name.toString());
-				if (aClass == null) {
-					throw new IllegalArgumentException(
-							StreamsResources.getStringFormatted(ChronicleStreamConstants.RESOURCE_BUNDLE_NAME,
-									"ChronicleQueueStream.unsupported.class", name));
-				}
-				Object o = aClass.newInstance();
-				Object unmarshalObject = Wires.object0(valueIn, o, aClass);
-				pauser.reset();
-
-				return unmarshalObject;
+			if (readOne0(tailer)) {
+				return lastRead;
 			} else {
 				pauser.pause();
 			}
 		}
+	}
+
+	private boolean readOne0(ExcerptTailer in) throws InstantiationException, IllegalAccessException {
+		try (DocumentContext context = in.readingDocument()) {
+			if (!context.isPresent()) {
+				return false;
+			}
+
+			if (context.isMetaData()) {
+				readOneMetaData(context);
+
+				return true;
+			}
+
+			assert context.isData();
+			accept(context.wire());
+		}
+
+		return true;
+	}
+
+	private void accept(Wire wire) throws IllegalAccessException, InstantiationException {
+		StringBuilder sb = new StringBuilder();
+		Class<?> aClass = classNameMap.get(sb.toString().toUpperCase());
+
+		if (aClass == null) {
+			logger().log(OpLevel.ERROR, StreamsResources.getString(ChronicleStreamConstants.RESOURCE_BUNDLE_NAME,
+					"ChronicleQueueStream.unsupported.class"), sb.toString());
+			lastRead = null;
+		} else {
+			ValueIn valueIn = wire.readEventName(sb);
+			Object entry = aClass.newInstance();
+			lastRead = Wires.object0(valueIn, entry, aClass);
+		}
+	}
+
+	private static boolean readOneMetaData(DocumentContext context) {
+		StringBuilder sb = Wires.acquireStringBuilder();
+		Wire wire = context.wire();
+		Bytes<?> bytes = wire.bytes();
+		long r = bytes.readPosition();
+		wire.readEventName(sb);
+		// roll back position to where is was before we read the SB
+		bytes.readPosition(r);
+
+		return true;
 	}
 
 	@Override
