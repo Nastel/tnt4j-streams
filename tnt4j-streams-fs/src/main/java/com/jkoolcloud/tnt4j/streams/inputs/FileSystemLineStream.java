@@ -43,7 +43,7 @@ public class FileSystemLineStream extends FileLineStream {
 	private FileSystemAdapter fsAdapter;
 
 	/**
-	 * Constructs a new FileSystemLineStream.
+	 * Constructs a new FileSystemLineStream. Requires configuration settings to set input stream source.
 	 */
 	public FileSystemLineStream() {
 		super();
@@ -65,8 +65,8 @@ public class FileSystemLineStream extends FileLineStream {
 
 	@Override
 	public Object getProperty(String name) {
-		Object pVal = fsAdapter.getProperty(name);
-		return pVal == null ? super.getProperty(name) : pVal;
+		Object pValue = fsAdapter.getProperty(name);
+		return pValue == null ? super.getProperty(name) : pValue;
 	}
 
 	@Override

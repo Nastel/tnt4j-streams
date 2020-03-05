@@ -172,8 +172,13 @@ public class JDBCEventSink extends LoggedEventSink {
 
 	@Override
 	public String toString() {
-		return super.toString() + "{url: " + url + ", user: " + user + ", pass: " + passwd == null ? null // NON-NLS
-				: "xxxxxx" + ", batchSize" + batchSize + ", handle: " + dbDataSource + "}"; // NON-NLS
+		return super.toString() //
+				+ "{url: " + url // NON-NLS
+				+ ", user: " + user // NON-NLS
+				+ ", pass: " + (passwd == null ? null : "xxxxxx") // NON-NLS
+				+ ", batchSize" + batchSize // NON-NLS
+				+ ", handle: " + dbDataSource // NON-NLS
+				+ "}"; // NON-NLS
 	}
 
 	@Override
@@ -197,24 +202,28 @@ public class JDBCEventSink extends LoggedEventSink {
 	@Override
 	public KeyValueStats getStats(Map<String, Object> stats) { // TODO: improve
 		super.getStats(stats);
+
 		if (isOpen()) {
 			MetricRegistry mRegistry = (MetricRegistry) dbDataSource.getMetricRegistry();
-			for (Map.Entry<String, Gauge> cpMetric : mRegistry.getGauges().entrySet()) {
-				stats.put(Utils.qualify(this, cpMetric.getKey()), cpMetric.getValue().getValue());
-			}
-			for (Map.Entry<String, Counter> cpMetric : mRegistry.getCounters().entrySet()) {
-				stats.put(Utils.qualify(this, cpMetric.getKey()), cpMetric.getValue().getCount());
-			}
-			for (Map.Entry<String, Histogram> cpMetric : mRegistry.getHistograms().entrySet()) {
-				stats.put(Utils.qualify(this, cpMetric.getKey()), cpMetric.getValue().getSnapshot().getMean());
-			}
-			for (Map.Entry<String, Timer> cpMetric : mRegistry.getTimers().entrySet()) {
-				stats.put(Utils.qualify(this, cpMetric.getKey()), cpMetric.getValue().getSnapshot().getMean());
-			}
-			for (Map.Entry<String, Meter> cpMetric : mRegistry.getMeters().entrySet()) {
-				stats.put(Utils.qualify(this, cpMetric.getKey()), cpMetric.getValue().getMeanRate());
+			if (mRegistry != null) {
+				for (Map.Entry<String, Gauge> cpMetric : mRegistry.getGauges().entrySet()) {
+					stats.put(Utils.qualify(this, cpMetric.getKey()), cpMetric.getValue().getValue());
+				}
+				for (Map.Entry<String, Counter> cpMetric : mRegistry.getCounters().entrySet()) {
+					stats.put(Utils.qualify(this, cpMetric.getKey()), cpMetric.getValue().getCount());
+				}
+				for (Map.Entry<String, Histogram> cpMetric : mRegistry.getHistograms().entrySet()) {
+					stats.put(Utils.qualify(this, cpMetric.getKey()), cpMetric.getValue().getSnapshot().getMean());
+				}
+				for (Map.Entry<String, Timer> cpMetric : mRegistry.getTimers().entrySet()) {
+					stats.put(Utils.qualify(this, cpMetric.getKey()), cpMetric.getValue().getSnapshot().getMean());
+				}
+				for (Map.Entry<String, Meter> cpMetric : mRegistry.getMeters().entrySet()) {
+					stats.put(Utils.qualify(this, cpMetric.getKey()), cpMetric.getValue().getMeanRate());
+				}
 			}
 		}
+
 		return this;
 	}
 
