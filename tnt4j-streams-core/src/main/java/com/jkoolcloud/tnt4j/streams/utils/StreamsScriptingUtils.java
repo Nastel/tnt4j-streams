@@ -246,7 +246,7 @@ public final class StreamsScriptingUtils {
 	 *            variables binding map
 	 * @return string describing script based evaluation expression
 	 */
-	public static String describeExpression(String userExpression, Map<String, Object> vars, String lang,
+	public static String describeExpression(String userExpression, Map<String, ?> vars, String lang,
 			Collection<String> expVars, Map<String, String> phMap) {
 		StringBuilder expDescStr = new StringBuilder();
 		expDescStr.append("'").append(lang).append(":").append(userExpression).append("'"); // NON-NLS
@@ -312,7 +312,7 @@ public final class StreamsScriptingUtils {
 	}
 
 	/**
-	 * Compiles Groovy script code ready for later execution.
+	 * Compiles Groovy script code to be ready for later execution.
 	 *
 	 * @param scriptCode
 	 *            Groovy script code string
@@ -342,7 +342,7 @@ public final class StreamsScriptingUtils {
 	}
 
 	/**
-	 * Compiles JavaScript script code ready for later execution.
+	 * Compiles JavaScript script code to be ready for later execution.
 	 *
 	 * @param scriptCode
 	 *            JavaScript script code string
@@ -367,6 +367,32 @@ public final class StreamsScriptingUtils {
 		ScriptEngine engine = factory.getEngineByName(JAVA_SCRIPT_LANG);
 
 		return engine;
+	}
+
+	/**
+	 * Compiles provided script code to be ready for later execution.
+	 * 
+	 * @param lang
+	 *            script code language
+	 * @param scriptCode
+	 *            script code string to compile
+	 * @return compiled instance of script code
+	 * 
+	 * @throws ScriptException
+	 *             if compilation fails or script language is not supported
+	 * 
+	 * @see #compileGroovyScript(String)
+	 * @see #compileJSScript(String)
+	 */
+	public static CompiledScript compileScript(String lang, String scriptCode) throws ScriptException {
+		switch (lang.toLowerCase()) {
+		case GROOVY_LANG:
+			return compileGroovyScript(scriptCode);
+		case JAVA_SCRIPT_LANG:
+			return compileJSScript(scriptCode);
+		default:
+			throw new ScriptException("Unknown script language"); // NON-NLS
+		}
 	}
 
 	/**

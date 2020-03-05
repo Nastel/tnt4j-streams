@@ -60,6 +60,8 @@ public class XPathTransformation extends AbstractScriptTransformation<Object> {
 	 */
 	public XPathTransformation(String name, String scriptCode) {
 		super(name, scriptCode);
+
+		initTransformation();
 	}
 
 	/**
@@ -74,6 +76,8 @@ public class XPathTransformation extends AbstractScriptTransformation<Object> {
 	 */
 	public XPathTransformation(String name, String scriptCode, Phase phase) {
 		super(name, scriptCode, phase);
+
+		initTransformation();
 	}
 
 	@Override

@@ -40,8 +40,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  *
  * @version $Revision: 2 $
  *
- * @see JavaScriptTransformation
- * @see GroovyTransformation
+ * @see ScriptTransformation
  * @see XPathTransformation
  */
 public abstract class AbstractScriptTransformation<V> extends AbstractValueTransformation<V, Object> {
@@ -87,8 +86,6 @@ public abstract class AbstractScriptTransformation<V> extends AbstractValueTrans
 		this.scriptCode = scriptCode;
 		setName(StringUtils.isEmpty(name) ? scriptCode : name);
 		setPhase(phase);
-
-		initTransformation();
 	}
 
 	/**
@@ -164,10 +161,9 @@ public abstract class AbstractScriptTransformation<V> extends AbstractValueTrans
 		}
 
 		if (StreamsScriptingUtils.GROOVY_LANG.equalsIgnoreCase(lang)) {
-			return new GroovyTransformation(name, code, phase);
-		} else if (StringUtils.equalsAnyIgnoreCase(lang, StreamsScriptingUtils.JAVA_SCRIPT_LANG, "js", "jscript")) // NON-NLS
-		{
-			return new JavaScriptTransformation(name, code, phase);
+			return new ScriptTransformation(StreamsScriptingUtils.GROOVY_LANG, name, code, phase);
+		} else if (StringUtils.equalsAnyIgnoreCase(lang, StreamsScriptingUtils.JAVA_SCRIPT_LANG, "js", "jscript")) { // NON-NLS
+			return new ScriptTransformation(StreamsScriptingUtils.JAVA_SCRIPT_LANG, name, code, phase);
 		} else if (StreamsScriptingUtils.XPATH_SCRIPT_LANG.equalsIgnoreCase(lang)) {
 			return new XPathTransformation(name, code, phase);
 		}
@@ -219,7 +215,7 @@ public abstract class AbstractScriptTransformation<V> extends AbstractValueTrans
 	}
 
 	/**
-	 * Resolved activity entity field value for a expression variable defined field name.
+	 * Resolves activity entity field value for expression variable defined field name.
 	 *
 	 * @param eVar
 	 *            expression variable containing field name

@@ -31,33 +31,47 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils;
 
 /**
- * Data value transformation based on JavaScript code/expressions.
+ * Data value transformation based on script expressions.
+ * <p>
+ * Supported scripting languages:
+ * <ul>
+ * <li>{@value StreamsScriptingUtils#GROOVY_LANG}</li>
+ * <li>{@value StreamsScriptingUtils#JAVA_SCRIPT_LANG}</li>
+ * </ul>
  * 
- * @version $Revision: 2 $
+ * @version $Revision: 1 $
  *
- * @see com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils#compileJSScript(String)
+ * @see com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils#compileScript(String, String)
  * @see javax.script.CompiledScript#eval(javax.script.Bindings)
  */
-public class JavaScriptTransformation extends AbstractScriptTransformation<Object> {
-	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(JavaScriptTransformation.class);
+public class ScriptTransformation extends AbstractScriptTransformation<Object> {
+	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(ScriptTransformation.class);
 
+	private final String lang;
 	private CompiledScript script;
 
 	/**
-	 * Constructs a new JavaScriptTransformation.
+	 * Constructs a new ScriptTransformation.
 	 *
+	 * @param lang
+	 *            handled script language
 	 * @param name
 	 *            transformation name
 	 * @param scriptCode
 	 *            transformation script code
 	 */
-	public JavaScriptTransformation(String name, String scriptCode) {
+	public ScriptTransformation(String lang, String name, String scriptCode) {
 		super(name, scriptCode);
+		this.lang = lang;
+
+		initTransformation();
 	}
 
 	/**
-	 * Constructs a new JavaScriptTransformation.
+	 * Constructs a new ScriptTransformation.
 	 *
+	 * @param lang
+	 *            handled script language
 	 * @param name
 	 *            transformation name
 	 * @param scriptCode
@@ -65,8 +79,11 @@ public class JavaScriptTransformation extends AbstractScriptTransformation<Objec
 	 * @param phase
 	 *            activity data value resolution phase
 	 */
-	public JavaScriptTransformation(String name, String scriptCode, Phase phase) {
+	public ScriptTransformation(String lang, String name, String scriptCode, Phase phase) {
 		super(name, scriptCode, phase);
+		this.lang = lang;
+
+		initTransformation();
 	}
 
 	@Override
@@ -76,7 +93,7 @@ public class JavaScriptTransformation extends AbstractScriptTransformation<Objec
 
 	@Override
 	protected String getHandledLanguage() {
-		return StreamsScriptingUtils.JAVA_SCRIPT_LANG;
+		return lang;
 	}
 
 	@Override
@@ -84,7 +101,7 @@ public class JavaScriptTransformation extends AbstractScriptTransformation<Objec
 		super.initTransformation();
 
 		try {
-			script = StreamsScriptingUtils.compileJSScript(getExpression());
+			script = StreamsScriptingUtils.compileScript(lang, getExpression());
 		} catch (ScriptException exc) {
 			throw new IllegalArgumentException(
 					StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
