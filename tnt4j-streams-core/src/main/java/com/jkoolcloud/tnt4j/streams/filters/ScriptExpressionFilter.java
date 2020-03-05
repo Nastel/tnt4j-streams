@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2020 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package com.jkoolcloud.tnt4j.streams.filters;
 
+import java.util.Map;
+
 import javax.script.Bindings;
 import javax.script.CompiledScript;
 import javax.script.ScriptException;
@@ -31,39 +33,56 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils;
 
 /**
- * Data value filtering based on Groovy code/expressions.
- *
- * @version $Revision: 2 $
- *
- * @see com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils#compileGroovyScript(String)
+ * Data value filtering based on script expressions.
+ * <p>
+ * Supported scripting languages:
+ * <ul>
+ * <li>{@value StreamsScriptingUtils#GROOVY_LANG}</li>
+ * <li>{@value StreamsScriptingUtils#JAVA_SCRIPT_LANG}</li>
+ * </ul>
+ * 
+ * @version $Revision: 1 $
+ * 
+ * @see com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils#compileScript(String, String)
  * @see javax.script.CompiledScript#eval(javax.script.Bindings)
  */
-public class GroovyExpressionFilter extends AbstractExpressionFilter<Object> {
-	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(GroovyExpressionFilter.class);
+public class ScriptExpressionFilter extends AbstractExpressionFilter<Object> {
+	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(ScriptExpressionFilter.class);
 
+	private final String lang;
 	private CompiledScript script;
 
 	/**
-	 * Constructs a new GroovyExpressionFilter. Handle type is set to
+	 * Constructs a new ScriptExpressionFilter. Handle type is set to
 	 * {@link com.jkoolcloud.tnt4j.streams.filters.HandleType#INCLUDE}.
 	 *
+	 * @param lang
+	 *            handled script language
 	 * @param filterExpression
 	 *            filter expression string
 	 */
-	public GroovyExpressionFilter(String filterExpression) {
+	public ScriptExpressionFilter(String lang, String filterExpression) {
 		super(filterExpression);
+		this.lang = lang;
+
+		initFilter();
 	}
 
 	/**
-	 * Constructs a new GroovyExpressionFilter.
+	 * Constructs a new ScriptExpressionFilter.
 	 *
+	 * @param lang
+	 *            handled script language
 	 * @param handleType
 	 *            filter {@link com.jkoolcloud.tnt4j.streams.filters.HandleType} name
 	 * @param filterExpression
 	 *            filter expression string
 	 */
-	public GroovyExpressionFilter(String handleType, String filterExpression) {
+	public ScriptExpressionFilter(String lang, String handleType, String filterExpression) {
 		super(handleType, filterExpression);
+		this.lang = lang;
+
+		initFilter();
 	}
 
 	@Override
@@ -73,7 +92,7 @@ public class GroovyExpressionFilter extends AbstractExpressionFilter<Object> {
 
 	@Override
 	protected String getHandledLanguage() {
-		return StreamsScriptingUtils.GROOVY_LANG;
+		return lang;
 	}
 
 	@Override
@@ -81,11 +100,11 @@ public class GroovyExpressionFilter extends AbstractExpressionFilter<Object> {
 		super.initFilter();
 
 		try {
-			script = StreamsScriptingUtils.compileGroovyScript(getExpression());
+			script = StreamsScriptingUtils.compileScript(lang, getExpression());
 		} catch (ScriptException exc) {
 			throw new IllegalArgumentException(
 					StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
-							"ExpressionFilter.invalid.script", getHandledLanguage(), filterExpression),
+							"ExpressionFilter.invalid.script", lang, filterExpression),
 					exc);
 		}
 	}
@@ -103,6 +122,25 @@ public class GroovyExpressionFilter extends AbstractExpressionFilter<Object> {
 			}
 		}
 
+		return evaluate(bindings);
+	}
+
+	@Override
+	public boolean doFilter(Map<String, ?> valBindings) throws FilterException {
+		Bindings bindings = new SimpleBindings();
+
+		if (valBindings != null && CollectionUtils.isNotEmpty(exprVars)) {
+			for (String eVar : exprVars) {
+				Property eKV = resolveFieldKeyAndValue(eVar, valBindings);
+
+				bindings.put(eKV.getKey(), eKV.getValue());
+			}
+		}
+
+		return evaluate(bindings);
+	}
+
+	private boolean evaluate(Bindings bindings) throws FilterException {
 		try {
 			boolean match = (boolean) script.eval(bindings);
 

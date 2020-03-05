@@ -131,6 +131,12 @@ public class DefaultValueFilter extends AbstractEntityFilter<Object> {
 		return isFilteredOut(handleType, match);
 	}
 
+	@Override
+	public boolean doFilter(Map<String, ?> valBindings) throws FilterException {
+		throw new FilterException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+				"DefaultValueFilter.unsupported.operation"));
+	}
+
 	/**
 	 * Applies formatting of filtered object value before evaluation.
 	 * 

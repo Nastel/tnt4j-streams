@@ -18,6 +18,7 @@ package com.jkoolcloud.tnt4j.streams.filters;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -96,6 +97,31 @@ public class StreamFiltersGroup<T> implements StreamEntityFilter<T> {
 				boolean filtered;
 				try {
 					filtered = aFilter.doFilter(value, ai);
+				} catch (Throwable e) {
+					filtered = filteredByDefault;
+				}
+				if (filtered) {
+					if (aFilter.getHandleType() == HandleType.EXCLUDE) {
+						return true;
+					}
+				} else {
+					if (aFilter.getHandleType() == HandleType.INCLUDE) {
+						return false;
+					}
+				}
+			}
+		}
+
+		return filteredByDefault;
+	}
+
+	@Override
+	public boolean doFilter(Map<String, ?> valBindings) throws FilterException {
+		if (CollectionUtils.isNotEmpty(activityFilters)) {
+			for (AbstractEntityFilter<T> aFilter : activityFilters) {
+				boolean filtered;
+				try {
+					filtered = aFilter.doFilter(valBindings);
 				} catch (Throwable e) {
 					filtered = filteredByDefault;
 				}

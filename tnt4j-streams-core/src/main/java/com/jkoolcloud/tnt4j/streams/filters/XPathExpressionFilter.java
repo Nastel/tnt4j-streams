@@ -59,6 +59,8 @@ public class XPathExpressionFilter extends AbstractExpressionFilter<Object> {
 	 */
 	public XPathExpressionFilter(String filterExpression) {
 		super(filterExpression);
+
+		initFilter();
 	}
 
 	/**
@@ -71,6 +73,8 @@ public class XPathExpressionFilter extends AbstractExpressionFilter<Object> {
 	 */
 	public XPathExpressionFilter(String handleType, String filterExpression) {
 		super(handleType, filterExpression);
+
+		initFilter();
 	}
 
 	@Override
@@ -96,6 +100,25 @@ public class XPathExpressionFilter extends AbstractExpressionFilter<Object> {
 			}
 		}
 
+		return evaluate(valuesMap);
+	}
+
+	@Override
+	public boolean doFilter(Map<String, ?> valBindings) throws FilterException {
+		Map<String, Object> valuesMap = new HashMap<>();
+
+		if (valBindings != null && CollectionUtils.isNotEmpty(exprVars)) {
+			for (String eVar : exprVars) {
+				Property eKV = resolveFieldKeyAndValue(eVar, valBindings);
+
+				valuesMap.put(eKV.getKey(), eKV.getValue());
+			}
+		}
+
+		return evaluate(valuesMap);
+	}
+
+	private boolean evaluate(Map<String, ?> valuesMap) throws FilterException {
 		XPath xPath = StreamsXMLUtils.getStreamsXPath();
 		xPath.setXPathVariableResolver(new StreamsVariableResolver(valuesMap));
 
@@ -112,9 +135,9 @@ public class XPathExpressionFilter extends AbstractExpressionFilter<Object> {
 	}
 
 	private static class StreamsVariableResolver implements XPathVariableResolver {
-		private Map<String, Object> valuesMap;
+		private Map<String, ?> valuesMap;
 
-		private StreamsVariableResolver(Map<String, Object> valuesMap) {
+		private StreamsVariableResolver(Map<String, ?> valuesMap) {
 			this.valuesMap = valuesMap;
 		}
 

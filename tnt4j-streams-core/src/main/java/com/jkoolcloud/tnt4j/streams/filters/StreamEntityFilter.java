@@ -16,6 +16,8 @@
 
 package com.jkoolcloud.tnt4j.streams.filters;
 
+import java.util.Map;
+
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 
 /**
@@ -37,8 +39,22 @@ public interface StreamEntityFilter<T> {
 	 * @param ai
 	 *            activity entity instance
 	 * @return {@code true} if filter matching value should be excluded from streaming, {@code false} - otherwise
+	 * 
 	 * @throws com.jkoolcloud.tnt4j.streams.filters.FilterException
 	 *             if evaluation of filter fails
 	 */
 	boolean doFilter(T value, ActivityInfo ai) throws FilterException;
+
+	/**
+	 * Applies filtering operation for a provided data values map and returns flag indicating whether it should be
+	 * excluded from streaming.
+	 * 
+	 * @param valBindings
+	 *            expresion variable and value bindings map
+	 * @return {@code true} if filter matching value should be excluded from streaming, {@code false} - otherwise
+	 * 
+	 * @throws com.jkoolcloud.tnt4j.streams.filters.FilterException
+	 *             if evaluation of filter fails
+	 */
+	boolean doFilter(Map<String, ?> valBindings) throws FilterException;
 }

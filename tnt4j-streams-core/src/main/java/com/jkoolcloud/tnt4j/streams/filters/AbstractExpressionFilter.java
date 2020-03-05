@@ -40,8 +40,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  *
  * @version $Revision: 2 $
  *
- * @see com.jkoolcloud.tnt4j.streams.filters.JavaScriptExpressionFilter
- * @see com.jkoolcloud.tnt4j.streams.filters.GroovyExpressionFilter
+ * @see com.jkoolcloud.tnt4j.streams.filters.ScriptExpressionFilter
  * @see com.jkoolcloud.tnt4j.streams.filters.XPathExpressionFilter
  */
 public abstract class AbstractExpressionFilter<T> extends AbstractEntityFilter<T> {
@@ -94,8 +93,6 @@ public abstract class AbstractExpressionFilter<T> extends AbstractEntityFilter<T
 		}
 
 		this.filterExpression = filterExpression;
-
-		initFilter();
 	}
 
 	/**
@@ -184,10 +181,9 @@ public abstract class AbstractExpressionFilter<T> extends AbstractEntityFilter<T
 		}
 
 		if (StreamsScriptingUtils.GROOVY_LANG.equalsIgnoreCase(lang)) {
-			return new GroovyExpressionFilter(handleType, expression);
-		} else if (StringUtils.equalsAnyIgnoreCase(lang, StreamsScriptingUtils.JAVA_SCRIPT_LANG, "js", "jscript")) // NON-NLS
-		{
-			return new JavaScriptExpressionFilter(handleType, expression);
+			return new ScriptExpressionFilter(StreamsScriptingUtils.GROOVY_LANG, handleType, expression);
+		} else if (StringUtils.equalsAnyIgnoreCase(lang, StreamsScriptingUtils.JAVA_SCRIPT_LANG, "js", "jscript")) { // NON-NLS
+			return new ScriptExpressionFilter(StreamsScriptingUtils.JAVA_SCRIPT_LANG, handleType, expression);
 		} else if (StreamsScriptingUtils.XPATH_SCRIPT_LANG.equalsIgnoreCase(lang)) {
 			return new XPathExpressionFilter(handleType, expression);
 		}
@@ -197,7 +193,7 @@ public abstract class AbstractExpressionFilter<T> extends AbstractEntityFilter<T
 	}
 
 	/**
-	 * Resolved activity entity field value for a expression variable defined field name.
+	 * Resolves activity entity field value for expression variable defined field name.
 	 *
 	 * @param eVar
 	 *            expression variable containing field name
@@ -207,6 +203,22 @@ public abstract class AbstractExpressionFilter<T> extends AbstractEntityFilter<T
 	 */
 	protected Property resolveFieldKeyAndValue(String eVar, ActivityInfo activityInfo) {
 		Object fValue = activityInfo.getFieldValue(eVar);
+		String fieldName = placeHoldersMap.get(eVar);
+
+		return new Property(StringUtils.isEmpty(fieldName) ? eVar : fieldName, fValue);
+	}
+
+	/**
+	 * Resolves value bound for expression variable.
+	 * 
+	 * @param eVar
+	 *            expression variable
+	 * @param valBindings
+	 *            expresion variable and value bindings map
+	 * @return resolved expression variable bound value
+	 */
+	protected Property resolveFieldKeyAndValue(String eVar, Map<String, ?> valBindings) {
+		Object fValue = valBindings.get(eVar);
 		String fieldName = placeHoldersMap.get(eVar);
 
 		return new Property(StringUtils.isEmpty(fieldName) ? eVar : fieldName, fValue);
@@ -235,7 +247,7 @@ public abstract class AbstractExpressionFilter<T> extends AbstractEntityFilter<T
 	 * @see com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils#describeExpression(String, java.util.Map, String,
 	 *      java.util.Collection, java.util.Map)
 	 */
-	protected void logEvaluationResult(Map<String, Object> varsMap, boolean match) {
+	protected void logEvaluationResult(Map<String, ?> varsMap, boolean match) {
 		if (getLogger().isSet(OpLevel.TRACE)) {
 			getLogger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ExpressionFilter.evaluation.result", StreamsScriptingUtils.describeExpression(filterExpression,
