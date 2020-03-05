@@ -128,7 +128,7 @@
         <!--<dependency>-->
         <!--<groupId>com.ibm.db2</groupId>-->
         <!--<artifactId>jcc</artifactId>-->
-        <!--<version>11.1.4.4</version>-->
+        <!--<version>11.5.0.0</version>-->
         <!--<scope>runtime</scope>-->
         <!--</dependency>-->
 
@@ -136,12 +136,6 @@
         <!-- Oracle does not distribute JDBC drivers over public Maven repo, so you'll have to download it manually -->
 
         <!-- MS SQL JDBC Drivers -->
-        <!--<dependency>-->
-        <!--<groupId>com.microsoft.sqlserver</groupId>-->
-        <!--<artifactId>mssql-jdbc</artifactId>-->
-        <!--<version>6.4.0.jre7</version>-->
-        <!--<scope>runtime</scope>-->
-        <!--</dependency>-->
         <!--<dependency>-->
         <!--<groupId>com.microsoft.sqlserver</groupId>-->
         <!--<artifactId>mssql-jdbc</artifactId>-->
