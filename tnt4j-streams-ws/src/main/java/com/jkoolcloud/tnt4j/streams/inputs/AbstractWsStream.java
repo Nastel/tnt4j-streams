@@ -34,6 +34,7 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.core.UsecTimestamp;
 import com.jkoolcloud.tnt4j.streams.configure.WsStreamProperties;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
+import com.jkoolcloud.tnt4j.streams.matchers.Matchers;
 import com.jkoolcloud.tnt4j.streams.parsers.data.CommonActivityData;
 import com.jkoolcloud.tnt4j.streams.scenario.*;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsCache;
@@ -189,6 +190,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 *
 	 * @param step
 	 *            scenario step instance to schedule
+	 *
 	 * @throws SchedulerException
 	 *             if scheduler fails to schedule job for defined step
 	 */
@@ -271,6 +273,14 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 * @return scheduler job detail object.
 	 */
 	protected abstract JobDetail buildJob(String group, String jobId, JobDataMap jobAttrs);
+
+	@Override
+	public void addReference(Object refObject) throws IllegalStateException {
+		if (refObject instanceof WsScenario) {
+			addScenario((WsScenario) refObject);
+		}
+		super.addReference(refObject);
+	}
 
 	/**
 	 * Adds scenario to scenarios list.
@@ -608,9 +618,20 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 * @see #fillInRequest(WsRequest, RequestFillContext)
 	 */
 	protected WsRequest<String> fillInRequest(WsRequest<String> req) throws VoidRequestException {
-		RequestFillContext context = new RequestFillContext(true);
+		RequestFillContext context = new RequestFillContext(isDirectRequestUse());
 
 		return fillInRequest(req, context);
+	}
+
+	/**
+	 * Returns flag indicating if stream will use filled-in request directly. Indirect use is when some additional
+	 * object (e.g. SQL statement) is created from provided request data.
+	 * 
+	 * @return {@code true} if stream uses request directly, {@code false} - if stream will make additional request
+	 *         object from request data
+	 */
+	protected boolean isDirectRequestUse() { // TODO: clear naming
+		return true;
 	}
 
 	/**
@@ -636,14 +657,19 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 */
 	protected WsRequest<String> fillInRequest(WsRequest<String> req, RequestFillContext context)
 			throws VoidRequestException {
+		DataFillContext ctx = makeDataContext(null, null, context);
+		ctx.setRequest(req);
+		checkConditions(req, ctx);
+
 		WsRequest<String> fReq = req.clone();
 		if (req.isDynamic()) {
-			DataFillContext ctx = makeDataContext(null, null, context);
 			ctx.setRequest(fReq);
 
-			for (Map.Entry<String, WsRequest.Parameter> reqParam : fReq.getParameters().entrySet()) {
-				reqParam.getValue().setValue(fillInRequestData(ctx.setData(reqParam.getValue().getStringValue())
-						.setFormat(reqParam.getValue().getFormat()).setType(reqParam.getValue().getType())));
+			if (context.isFillingParams()) {
+				for (Map.Entry<String, WsRequest.Parameter> reqParam : fReq.getParameters().entrySet()) {
+					reqParam.getValue().setValue(fillInRequestData(ctx.setData(reqParam.getValue().getStringValue())
+							.setFormat(reqParam.getValue().getFormat()).setType(reqParam.getValue().getType())));
+				}
 			}
 
 			fReq.setId((String) fillInRequestData(ctx.setData(fReq.getId()).reset()));
@@ -708,6 +734,76 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	}
 
 	/**
+	 * Checks if request matches any of defined conditions.
+	 * 
+	 * @param req
+	 *            request instance to check conditions against
+	 * @param context
+	 *            variable values resolution context to use
+	 * 
+	 * @throws VoidRequestException
+	 *             if request matched any of conditions and resolution is to skip or to stop
+	 */
+	protected void checkConditions(WsRequest<String> req, DataFillContext context) throws VoidRequestException {
+		List<Condition> reqConditions = req.getConditions();
+
+		if (CollectionUtils.isNotEmpty(reqConditions)) {
+			for (Condition condition : reqConditions) {
+				if (!condition.isEmpty()) {
+					for (String matchExp : condition.getMatchExpressions()) {
+						boolean match = false;
+
+						try {
+							match = matchExpression(matchExp, context);
+						} catch (Exception exc) {
+							Utils.logThrowable(logger(), OpLevel.WARNING,
+									StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+									"AbstractWsStream.condition.match.failed", req.getId(), condition.getId(), exc);
+						}
+
+						if (match) {
+							if (condition.getResolution() == Condition.Resolution.STOP) {
+								offerDieMarker();
+							}
+
+							throw new VoidRequestException(StreamsResources.getStringFormatted(
+									WsStreamConstants.RESOURCE_BUNDLE_NAME, "AbstractWsStream.condition.match",
+									condition.getId(), condition.getResolution()));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Evaluates provided match expressions {@code matchExp} against {@code context} provided data.
+	 * 
+	 * @param matchExp
+	 *            match expression to evaluate
+	 * @param context
+	 *            variable values resolution context to use
+	 * @return {@code true} if expressions matches context provided data, {@code false} - otherwise
+	 * 
+	 * @throws Exception
+	 *             if evaluation expression is empty or evaluation of match expression fails
+	 */
+	protected boolean matchExpression(String matchExp, DataFillContext context) throws Exception {
+		Set<String> vars = new HashSet<>();
+		Utils.resolveExpressionVariables(vars, matchExp);
+		// Utils.resolveCfgVariables(vars, reqData);
+
+		Map<String, Object> valBindings = new HashMap<>(vars.size());
+		if (CollectionUtils.isNotEmpty(vars)) {
+			for (String rdVar : vars) {
+				Object vValue = getVariableValue(Utils.getVarName(rdVar), context);
+				valBindings.put(rdVar, vValue);
+			}
+		}
+		return Matchers.evaluateBindings(matchExp, valBindings);
+	}
+
+	/**
 	 * Acquires semaphore to be used for requests synchronization. Semaphore can be bound to stream or scenario step.
 	 * Stream semaphore has preference against scenario step semaphore.
 	 * <p>
@@ -718,6 +814,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 * @param request
 	 *            request semaphore is obtained for
 	 * @return acquired semaphore instance or {@code null} if no semaphore was acquired
+	 * 
 	 * @throws InterruptedException
 	 *             if current thread got interrupted when acquiring semaphore
 	 */

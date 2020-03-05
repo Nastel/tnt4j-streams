@@ -139,6 +139,7 @@ public abstract class AbstractHttpStream extends AbstractWsStream<String, String
 	 * @param url
 	 *            optional request URL
 	 * @return request instance having filled in values
+	 * 
 	 * @throws VoidRequestException
 	 *             if request can't be build from request context data or built URL is meaningless
 	 * 

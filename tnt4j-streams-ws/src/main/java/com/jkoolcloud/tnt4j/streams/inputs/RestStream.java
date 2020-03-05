@@ -158,6 +158,7 @@ public class RestStream extends AbstractHttpStream {
 	 * @param uriStr
 	 *            JAX-RS service URI
 	 * @return service response string
+	 * 
 	 * @throws Exception
 	 *             if exception occurs while performing JAX-RS service call
 	 */
@@ -179,6 +180,7 @@ public class RestStream extends AbstractHttpStream {
 	 *            password used to perform request if service authentication is needed, or {@code null} if no
 	 *            authentication
 	 * @return service response string
+	 * 
 	 * @throws Exception
 	 *             if exception occurs while performing JAX-RS service call
 	 */
@@ -212,6 +214,7 @@ public class RestStream extends AbstractHttpStream {
 	 * @param reqData
 	 *            request data
 	 * @return service response string
+	 * 
 	 * @throws Exception
 	 *             if exception occurs while performing JAX-RS service call
 	 */
@@ -235,6 +238,7 @@ public class RestStream extends AbstractHttpStream {
 	 *            password used to perform request if service authentication is needed, or {@code null} if no
 	 *            authentication
 	 * @return service response string
+	 * 
 	 * @throws Exception
 	 *             if exception occurs while performing JAX-RS service call
 	 */
@@ -370,7 +374,7 @@ public class RestStream extends AbstractHttpStream {
 					} catch (VoidRequestException exc) {
 						stream.logger().log(OpLevel.INFO,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-								"AbstractWsStream.void.request", processedRequest.getId(), exc.getMessage());
+								"AbstractWsStream.void.request", request.getId(), exc.getMessage());
 					} catch (IOException exc) {
 						stream.logger().log(OpLevel.WARNING,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -424,7 +428,7 @@ public class RestStream extends AbstractHttpStream {
 				} catch (VoidRequestException exc) {
 					stream.logger().log(OpLevel.INFO,
 							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-							"AbstractWsStream.void.request", processedRequest.getId(), exc.getMessage());
+							"AbstractWsStream.void.request", request.getId(), exc.getMessage());
 				} catch (IOException exc) {
 					stream.logger().log(OpLevel.WARNING,
 							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),

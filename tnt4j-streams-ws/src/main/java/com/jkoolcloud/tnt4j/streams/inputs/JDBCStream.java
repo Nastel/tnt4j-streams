@@ -367,6 +367,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	 * @param params
 	 *            DB query parameters map
 	 * @return JDBC call returned result set {@link java.sql.ResultSet}
+	 * 
 	 * @throws SQLException
 	 *             if exception occurs while performing JDBC call
 	 */
@@ -443,6 +444,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	 * @param pass
 	 *            DB user password
 	 * @return DB connection instance to be used to execute queries
+	 * 
 	 * @throws SQLException
 	 *             if data source fails to obtain database connection
 	 */
@@ -473,6 +475,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	 *            prepared SQL statement parameters to set
 	 * @param params
 	 *            SQL query parameters map
+	 * 
 	 * @throws SQLException
 	 *             if exception occurs while setting prepared statement parameter
 	 */
@@ -632,17 +635,8 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	}
 
 	@Override
-	protected WsRequest<String> fillInRequest(WsRequest<String> req, RequestFillContext context)
-			throws VoidRequestException {
-		WsRequest<String> fReq = req.clone();
-		if (req.isDynamic()) {
-			DataFillContext ctx = makeDataContext(null, null, context);
-
-			fReq.setId((String) fillInRequestData(ctx.setData(fReq.getId())));
-			fReq.setData((String) fillInRequestData(ctx.setData(fReq.getData())));
-		}
-
-		return fReq;
+	protected boolean isDirectRequestUse() {
+		return false;
 	}
 
 	/**
@@ -688,7 +682,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 					} catch (VoidRequestException exc) {
 						stream.logger().log(OpLevel.INFO,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-								"AbstractWsStream.void.request", processedRequest.getId(), exc.getMessage());
+								"AbstractWsStream.void.request", request.getId(), exc.getMessage());
 					} catch (Throwable exc) {
 						Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),

@@ -18,7 +18,6 @@ package com.jkoolcloud.tnt4j.streams.scenario;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,9 +30,8 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  *
  * @version $Revision: 1 $
  */
-public class WsScenarioStep extends WsScenarioEntity {
+public class WsScenarioStep extends WsScenarioEntity implements AutoIdGenerator {
 	private final List<WsRequest<String>> requests = new ArrayList<>();
-	private AtomicInteger idCounter = new AtomicInteger();
 	private Map<String, String> properties;
 
 	private SchedulerData schedulerData;
@@ -122,7 +120,7 @@ public class WsScenarioStep extends WsScenarioEntity {
 	public WsRequest<String> addRequest(String id, String request, String... tags) {
 		WsRequest<String> req = new WsRequest<>(request, tags);
 		synchronized (requests) {
-			req.setId(StringUtils.isEmpty(id) ? String.valueOf(idCounter.getAndIncrement()) : id);
+			req.setId(StringUtils.isEmpty(id) ? getAutoId() : id);
 			req.setScenarioStep(this);
 			requests.add(req);
 		}
@@ -139,7 +137,7 @@ public class WsScenarioStep extends WsScenarioEntity {
 	public void addRequest(WsRequest<String> request) {
 		synchronized (requests) {
 			if (StringUtils.isEmpty(request.getId())) {
-				request.setId(String.valueOf(idCounter.getAndIncrement()));
+				request.setId(getAutoId());
 			}
 			request.setScenarioStep(this);
 

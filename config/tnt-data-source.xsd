@@ -950,7 +950,7 @@
                 <xs:annotation>
                     <xs:documentation>
                         Property defines strategy used to verify if RegEx 'pattern' created 'Matcher' matches input data string. Can be
-                        "MATCH" (pattern should match complete input string), or "FIND" (pattern has to match subsequence within input
+                        "MATCH" (pattern should match complete input string), or "FIND" (pattern has to match sub-sequence within input
                         string).
                     </xs:documentation>
                 </xs:annotation>
@@ -1598,66 +1598,19 @@
             </xs:documentation>
         </xs:annotation>
         <xs:choice maxOccurs="unbounded">
-            <xs:element name="value" minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="value" type="ValueType" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
                         Defines value type filter entity.
                     </xs:documentation>
                 </xs:annotation>
-                <xs:complexType>
-                    <xs:simpleContent>
-                        <xs:extension base="xs:string">
-                            <xs:attribute name="handle" use="required" type="HandleTypes">
-                                <xs:annotation>
-                                    <xs:documentation>
-                                        Filter matching value handling type - include or exclude.
-                                    </xs:documentation>
-                                </xs:annotation>
-                            </xs:attribute>
-                            <xs:attribute name="evaluation" use="optional" type="EvaluationTypes" default="is">
-                                <xs:annotation>
-                                    <xs:documentation>
-                                        Defines value evaluation method used by filter.
-                                    </xs:documentation>
-                                </xs:annotation>
-                            </xs:attribute>
-                            <xs:attribute name="format" use="optional" type="DataFormatsAll">
-                                <xs:annotation>
-                                    <xs:documentation>
-                                        Defines what data format should be used for comparison.
-                                    </xs:documentation>
-                                </xs:annotation>
-                            </xs:attribute>
-                        </xs:extension>
-                    </xs:simpleContent>
-                </xs:complexType>
             </xs:element>
-            <xs:element name="expression" minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="expression" type="ExpressionType" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>
                         Defines expression type filter entity.
                     </xs:documentation>
                 </xs:annotation>
-                <xs:complexType>
-                    <xs:simpleContent>
-                        <xs:extension base="xs:string">
-                            <xs:attribute name="handle" use="required" type="HandleTypes">
-                                <xs:annotation>
-                                    <xs:documentation>
-                                        Filter matching value handling type - include or exclude.
-                                    </xs:documentation>
-                                </xs:annotation>
-                            </xs:attribute>
-                            <xs:attribute name="lang" use="required" type="ScriptLangs">
-                                <xs:annotation>
-                                    <xs:documentation>
-                                        Filter expression evaluation language.
-                                    </xs:documentation>
-                                </xs:annotation>
-                            </xs:attribute>
-                        </xs:extension>
-                    </xs:simpleContent>
-                </xs:complexType>
             </xs:element>
         </xs:choice>
 
@@ -1668,6 +1621,67 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+    </xs:complexType>
+
+    <!-- Element <value> definition -->
+    <xs:complexType name="ValueType">
+        <xs:annotation>
+            <xs:documentation>
+                Defines value type entity.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="handle" use="required" type="HandleTypes">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Filter matching value handling type - include or exclude.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="evaluation" use="optional" type="EvaluationTypes" default="is">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Defines value evaluation method used by filter.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="format" use="optional" type="DataFormatsAll">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Defines what data format should be used for comparison.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- Element <expression> definition -->
+    <xs:complexType name="ExpressionType">
+        <xs:annotation>
+            <xs:documentation>
+                Defines expression type entity.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="handle" use="required" type="HandleTypes">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Expression matching value handling type - include or exclude.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="lang" use="required" type="ScriptLangs">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Expression evaluation language.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
     <!-- Filter handle types enumeration definition -->

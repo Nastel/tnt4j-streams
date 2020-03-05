@@ -80,6 +80,7 @@ public class CmdStream extends AbstractWsStream<String, String> {
 	 * @param cmdData
 	 *            command data: name and parameters
 	 * @return command response string
+	 * 
 	 * @throws Exception
 	 *             if exception occurs while performing system command call
 	 */
@@ -137,7 +138,7 @@ public class CmdStream extends AbstractWsStream<String, String> {
 					} catch (VoidRequestException exc) {
 						stream.logger().log(OpLevel.INFO,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-								"AbstractWsStream.void.request", processedRequest.getId(), exc.getMessage());
+								"AbstractWsStream.void.request", request.getId(), exc.getMessage());
 					} catch (Throwable exc) {
 						Utils.logThrowable(stream.logger(), OpLevel.ERROR,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),

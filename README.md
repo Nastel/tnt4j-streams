@@ -2559,7 +2559,7 @@ Sample stream configuration:
     <stream name="SampleKafkaClientStream" class="com.jkoolcloud.tnt4j.streams.inputs.KafkaConsumerStream">
         <property name="HaltIfNoParser" value="false"/>
         <property name="Topic" value="TNT4JStreams"/>
-        
+
         <!-- Kafka consumer properties -->
         <property name="bootstrap.servers" value="localhost:9092"/>
         <property name="group.id" value="0"/>
@@ -5168,8 +5168,28 @@ request/invocation/execution parameters and scheduler. Steps are invoked/execute
         define XML contents it is recommended to use `<![CDATA[]]>`. It has optional attribute `id` to define request identifier string 
         used to identify request when i.e. example formatting log messages. 
             * `parser-ref`  tag is used to map received response data and parser to parse it. This tag has attributes:
-                * `name` - referenced parser name
-                * `tags` - parser tags set, used to map parser with parser activity data by some particular values
+                * `name` - referenced parser name. (Required)
+                * `tags` - parser tags set, used to map parser with parser activity data by some particular values. (Optional)
+
+                and child tags:
+                * `matchExp` tag is used to define evaluation expression to check if input data or parsing context matches it and referenced 
+                parser shall parse provided data.
+            * `req-param` tag is used to define request parameter. This tag has attributes:
+                * `id` - parameter identifier. (Optional)
+                * `value` - parameter value. (Required)
+                * `type` - parameter value type. (Optional)
+                * `format` - parameter value format. (Optional)
+                * `transient` - flag indicating whether to add (when value `false`) parameter to service request or just keep it to be used 
+                for internal aggregations (when value `true`), e.g. request/response mapping. Default value - `false`. (Optional) 
+            * `condition` tag is used to define request state condition. This tag has attributes:
+                * `id` - condition identifier. (Optional)
+                * `resolution` - condition resolution. (Required) Can be one of enumeration values:
+                    * `SKIP` - skip request execution when condition matches expression
+                    * `STOP` - stop and exit stream when condition matches expression
+
+                and child tags:
+                * `matchExp` tag is used to define evaluation match expression to check if request context (request parameters value, stream 
+                properties, cache values) matches it
 
     sample:
 ```xml
@@ -5246,6 +5266,12 @@ request/invocation/execution parameters and scheduler. Steps are invoked/execute
                     FETCH FIRST 100 ROWS ONLY
                 ]]>
                 <req-param id="1" value="${LastRecordCDate}" type="TIMESTAMP"/>
+
+                <condition id="When to stop stream" resolution="STOP">
+                    <matchExp><![CDATA[
+                        {LastRecordIndex} > 2000
+                    ]]></matchExp>
+                </condition>
 
                 <parser-ref name="SampleResultSetParser"/>
             </request>

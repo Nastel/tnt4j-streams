@@ -25,7 +25,7 @@
         </xs:complexType>
     </xs:redefine>
 
-    <!-- Common scheduler attributes group definition-->
+    <!-- Common scheduler attributes group definition -->
     <xs:attributeGroup name="SchedulerAttributeGroup">
         <xs:annotation>
             <xs:documentation>
@@ -217,7 +217,7 @@
 
     </xs:attributeGroup>
 
-    <!-- Element <request> definition-->
+    <!-- Element <request> definition -->
     <xs:complexType name="RequestType" mixed="true">
         <xs:annotation>
             <xs:documentation>
@@ -245,6 +245,13 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="condition" type="ConditionType" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Request condition definition.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
 
             <xs:element name="parser-ref" type="ParserReference" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
@@ -264,7 +271,7 @@
         </xs:attribute>
     </xs:complexType>
 
-    <!-- Element <req-param> definition-->
+    <!-- Element <req-param> definition -->
     <xs:complexType name="ReqParameterType">
         <xs:annotation>
             <xs:documentation>
@@ -300,7 +307,7 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="transient" use="optional" type="xs:boolean">
+        <xs:attribute name="transient" use="optional" type="xs:boolean" default="false">
             <xs:annotation>
                 <xs:documentation>
                     Parameter transiency flag indicating whether to add parameter to service request or just keep it to be used between
@@ -309,6 +316,76 @@
             </xs:annotation>
         </xs:attribute>
     </xs:complexType>
+
+    <!-- Element <condition> definition -->
+    <xs:complexType name="ConditionType">
+        <xs:annotation>
+            <xs:documentation>
+                Defines scenario step request state condition.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="matchExp" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Defines evaluation match expression to check if request context matches it.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:choice>
+
+        <xs:attribute name="id" use="optional" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    Condition identifier.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="resolution" use="required" type="ResolutionsAll">
+            <xs:annotation>
+                <xs:documentation>
+                    Condition resolution.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <!-- Condition resolutions enumeration definition -->
+    <xs:simpleType name="Resolutions">
+        <xs:annotation>
+            <xs:documentation>
+                Set of predefined TNT4J-Streams condition resolution values.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="SKIP">
+                <xs:annotation>
+                    <xs:documentation>
+                        Resolution to skip.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="STOP">
+                <xs:annotation>
+                    <xs:documentation>
+                        Resolution to stop.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Allow user-defined resolutions in addition to built-in resolution values -->
+    <xs:simpleType name="ResolutionsAll">
+        <xs:annotation>
+            <xs:documentation>
+                Can be either one of the internally-supported condition resolutions or a custom one.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:union memberTypes="Resolutions xs:string"/>
+    </xs:simpleType>
 
     <!-- Element <scenario> definition -->
     <xs:complexType name="Scenario">

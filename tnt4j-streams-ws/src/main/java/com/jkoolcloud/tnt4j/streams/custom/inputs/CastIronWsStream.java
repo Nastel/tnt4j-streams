@@ -97,6 +97,7 @@ public class CastIronWsStream extends WsStream {
 	 *
 	 * @param soapRequest
 	 *            SOAP request message instance
+	 * 
 	 * @throws javax.xml.soap.SOAPException
 	 *             if there was an error adding the SOAP message header
 	 */

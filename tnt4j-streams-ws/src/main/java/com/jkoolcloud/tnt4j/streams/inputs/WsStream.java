@@ -125,6 +125,7 @@ public class WsStream extends AbstractHttpStream {
 	 * @param scenario
 	 *            scenario of executed request
 	 * @return service response string
+	 * 
 	 * @throws Exception
 	 *             if exception occurs while performing JAX-WS service call
 	 */
@@ -169,6 +170,7 @@ public class WsStream extends AbstractHttpStream {
 	 * Create a new {@link SOAPConnection} instance.
 	 *
 	 * @return SOAP connection instance
+	 * 
 	 * @throws SOAPException
 	 *             if there was an exception creating the SOAP connection object
 	 */
@@ -189,6 +191,7 @@ public class WsStream extends AbstractHttpStream {
 	 * @param addStreamHeaders
 	 *            flag indicating whether to add stream specific additional SOAP headers
 	 * @return SOAP message instance created using provided request data
+	 * 
 	 * @throws SOAPException
 	 *             if there was a problem saving changes to this message
 	 * @throws SAXException
@@ -233,6 +236,7 @@ public class WsStream extends AbstractHttpStream {
 	 *
 	 * @param soapRequest
 	 *            SOAP request message instance
+	 * 
 	 * @throws SOAPException
 	 *             if there was an error adding the SOAP message header
 	 */
@@ -247,6 +251,7 @@ public class WsStream extends AbstractHttpStream {
 	 *            SOAP message body element
 	 * @param soapRequestData
 	 *            SOAP request body data string
+	 * 
 	 * @throws SAXException
 	 *             if any parse errors occur
 	 * @throws IOException
@@ -274,6 +279,7 @@ public class WsStream extends AbstractHttpStream {
 	 * @param soapMsg
 	 *            SOAP message instance to convert
 	 * @return SOAP message XML representation string
+	 * 
 	 * @throws SOAPException
 	 *             if there was a problem in externalizing this SOAP message
 	 * @throws IOException
@@ -336,7 +342,7 @@ public class WsStream extends AbstractHttpStream {
 					} catch (VoidRequestException exc) {
 						stream.logger().log(OpLevel.INFO,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-								"AbstractWsStream.void.request", processedRequest.getId(), exc.getMessage());
+								"AbstractWsStream.void.request", request.getId(), exc.getMessage());
 					} catch (IOException exc) {
 						stream.logger().log(OpLevel.WARNING,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -390,6 +396,7 @@ public class WsStream extends AbstractHttpStream {
 		 * @param soapRequestData
 		 *            JAX-WS service request data: headers and body XML string
 		 * @return instance of this request data container
+		 * 
 		 * @throws IOException
 		 *             if an I/O error occurs reading request data
 		 */

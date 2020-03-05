@@ -178,7 +178,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag {@value}.
 	 */
-	private static final String MATCH_EXP_ELMT = "matchExp"; // NON-NLS
+	protected static final String MATCH_EXP_ELMT = "matchExp"; // NON-NLS
 
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag attribute {@value}.
@@ -363,9 +363,9 @@ public class ConfigParserHandler extends DefaultHandler {
 	private ParserRefData currParserRef = null;
 
 	/**
-	 * Buffer to put current configuration element (token) data value
+	 * Buffers stack to put current configuration element (token) characters data value.
 	 */
-	protected StringBuilder elementData;
+	protected Stack<StringBuilder> elementDataStack;
 
 	private boolean include = false;
 	private Stack<String> path;
@@ -418,6 +418,7 @@ public class ConfigParserHandler extends DefaultHandler {
 		javaObjectsMap = new HashMap<>();
 
 		path = new Stack<>();
+		elementDataStack = new Stack<>();
 	}
 
 	@Override
@@ -580,7 +581,7 @@ public class ConfigParserHandler extends DefaultHandler {
 					currParseLocation);
 		}
 
-		elementData = new StringBuilder();
+		elementDataStack.push(new StringBuilder());
 	}
 
 	/**
@@ -600,7 +601,7 @@ public class ConfigParserHandler extends DefaultHandler {
 					currParseLocation);
 		}
 
-		elementData = new StringBuilder();
+		elementDataStack.push(new StringBuilder());
 	}
 
 	/**
@@ -1081,7 +1082,7 @@ public class ConfigParserHandler extends DefaultHandler {
 		}
 		// currField.hasLocElmt = true;
 
-		elementData = new StringBuilder();
+		elementDataStack.push(new StringBuilder());
 	}
 
 	/**
@@ -1369,7 +1370,7 @@ public class ConfigParserHandler extends DefaultHandler {
 
 		handleFieldLocatorCDATA();
 
-		elementData = new StringBuilder();
+		elementDataStack.push(new StringBuilder());
 	}
 
 	/**
@@ -1452,7 +1453,7 @@ public class ConfigParserHandler extends DefaultHandler {
 
 		notEmpty(currProperty.name, PROPERTY_ELMT, NAME_ATTR);
 
-		elementData = new StringBuilder();
+		elementDataStack.push(new StringBuilder());
 	}
 
 	/**
@@ -1853,7 +1854,7 @@ public class ConfigParserHandler extends DefaultHandler {
 			}
 		}
 
-		elementData = new StringBuilder();
+		elementDataStack.push(new StringBuilder());
 	}
 
 	/**
@@ -1873,7 +1874,7 @@ public class ConfigParserHandler extends DefaultHandler {
 					currParseLocation);
 		}
 
-		elementData = new StringBuilder();
+		elementDataStack.push(new StringBuilder());
 	}
 
 	/**
@@ -1914,7 +1915,7 @@ public class ConfigParserHandler extends DefaultHandler {
 			}
 		}
 
-		elementData = new StringBuilder();
+		elementDataStack.push(new StringBuilder());
 	}
 
 	/**
@@ -1926,15 +1927,15 @@ public class ConfigParserHandler extends DefaultHandler {
 	 * @throws SAXException
 	 *             if error occurs parsing element
 	 */
-	private void processMatchExpression(Attributes attrs) throws SAXException {
-		if (currParserRef == null) {
+	protected void processMatchExpression(Attributes attrs) throws SAXException {
+		if (!StringUtils.equalsAnyIgnoreCase(getParentElmt(MATCH_EXP_ELMT), PARSER_REF_ELMT)) {
 			throw new SAXParseException(
 					StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
 							"ConfigParserHandler.malformed.configuration2", MATCH_EXP_ELMT, PARSER_REF_ELMT),
 					currParseLocation);
 		}
 
-		elementData = new StringBuilder();
+		elementDataStack.push(new StringBuilder());
 	}
 
 	private void processTNT4JProperties(Attributes attrs) throws SAXException {
@@ -1948,11 +1949,10 @@ public class ConfigParserHandler extends DefaultHandler {
 
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
-
 		String cdata = new String(ch, start, length);
 
-		if (elementData != null) {
-			elementData.append(cdata);
+		if (CollectionUtils.isNotEmpty(elementDataStack)) {
+			elementDataStack.peek().append(cdata);
 		}
 	}
 
@@ -1962,7 +1962,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	 * @return configuration element (token) data string value, or {@code null} if no element data
 	 */
 	protected String getElementData() {
-		return elementData == null ? null : elementData.toString().trim();
+		return CollectionUtils.isEmpty(elementDataStack) ? null : elementDataStack.pop().toString().trim();
 	}
 
 	@Override
@@ -2004,7 +2004,6 @@ public class ConfigParserHandler extends DefaultHandler {
 					handleFieldLocator(currLocatorData);
 
 					currLocatorData = null;
-					elementData = null;
 				}
 			} else if (TNT4J_PROPERTIES_ELMT.equals(qName)) {
 			} else if (JAVA_OBJ_ELMT.equals(qName)) {
@@ -2017,14 +2016,12 @@ public class ConfigParserHandler extends DefaultHandler {
 					handleProperty(currProperty);
 
 					currProperty = null;
-					elementData = null;
 				}
 			} else if (FIELD_TRANSFORM_ELMT.equals(qName)) {
 				if (currTransform != null) {
 					handleFieldTransform(currTransform);
 
 					currTransform = null;
-					elementData = null;
 				}
 			} else if (FILTER_ELMT.equals(qName)) {
 				if (currFilter != null) {
@@ -2037,18 +2034,14 @@ public class ConfigParserHandler extends DefaultHandler {
 					handleFilterValue(currFilterValue);
 
 					currFilterValue = null;
-					elementData = null;
 				} else if (currCacheEntry != null) {
 					handleValue(currCacheEntry);
-
-					elementData = null;
 				}
 			} else if (EXPRESSION_ELMT.equals(qName)) {
 				if (currFilterExpression != null) {
 					handleFilterExpression(currFilterExpression);
 
 					currFilterExpression = null;
-					elementData = null;
 				}
 			} else if (CACHE_ELMT.equals(qName)) {
 				StreamsCache.setProperties(applyVariableProperties(currProperties.remove(qName)));
@@ -2061,20 +2054,14 @@ public class ConfigParserHandler extends DefaultHandler {
 			} else if (CACHE_KEY_ELMT.equals(qName)) {
 				if (currCacheEntry != null) {
 					handleKey(currCacheEntry);
-
-					elementData = null;
 				}
 			} else if (CACHE_DEFAULT_VALUE_ELMT.equals(qName)) {
 				if (currCacheEntry != null) {
 					handleDefault(currCacheEntry);
-
-					elementData = null;
 				}
 			} else if (MATCH_EXP_ELMT.equals(qName)) {
 				if (currParserRef != null) {
 					handleMatchExp(currParserRef);
-
-					elementData = null;
 				}
 			} else if (PARSER_REF_ELMT.equals(qName)) {
 				if (currParserRef != null) {
@@ -2405,7 +2392,16 @@ public class ConfigParserHandler extends DefaultHandler {
 		}
 	}
 
-	private void checkScriptExpression(String expString) throws SAXException {
+	/**
+	 * Checks if provided script expressions string is valid.
+	 * 
+	 * @param expString
+	 *            expression string to check
+	 * 
+	 * @throws SAXException
+	 *             if script expression is invalid
+	 */
+	protected void checkScriptExpression(String expString) throws SAXException {
 		if (!validateScriptExpressions) {
 			return;
 		}

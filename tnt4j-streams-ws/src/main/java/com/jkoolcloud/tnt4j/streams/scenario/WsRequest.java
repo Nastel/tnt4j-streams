@@ -16,9 +16,7 @@
 
 package com.jkoolcloud.tnt4j.streams.scenario;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,11 +30,12 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  *
  * @version $Revision: 3 $
  */
-public class WsRequest<T> implements Cloneable {
+public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 	private String id;
 	private String[] tags;
 	private T data;
 	private Map<String, Parameter> parameters = new LinkedHashMap<>();
+	private List<Condition> conditions = new ArrayList<>();
 	private WsScenarioStep scenarioStep;
 
 	/**
@@ -63,7 +62,7 @@ public class WsRequest<T> implements Cloneable {
 	}
 
 	/**
-	 * Returns request identifier
+	 * Returns request identifier.
 	 * 
 	 * @return request identifier
 	 */
@@ -207,6 +206,35 @@ public class WsRequest<T> implements Cloneable {
 	}
 
 	/**
+	 * Adds condition for this request.
+	 * 
+	 * @param id
+	 *            condition identifier
+	 * @param resolution
+	 *            condition resolution name
+	 * @param matchExps
+	 *            condition match expressions list
+	 * @return constructed condition instance
+	 */
+	public Condition addCondition(String id, String resolution, List<String> matchExps) {
+		Condition cond = new Condition(StringUtils.isEmpty(id) ? getAutoId() : id, resolution);
+		cond.setMatchExpressions(matchExps);
+
+		conditions.add(cond);
+
+		return cond;
+	}
+
+	/**
+	 * Returns request (command/query/etc.) conditions list.
+	 * 
+	 * @return request bound conditions list
+	 */
+	public List<Condition> getConditions() {
+		return conditions;
+	}
+
+	/**
 	 * Adds request (command/query/etc.) parameter.
 	 *
 	 * @param id
@@ -330,6 +358,8 @@ public class WsRequest<T> implements Cloneable {
 		} else {
 			cReq.parameters.putAll(parameters);
 		}
+
+		cReq.conditions.addAll(conditions);
 
 		return cReq;
 	}

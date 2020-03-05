@@ -51,6 +51,7 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 	private static final String SCHED_SIMPLE_ELMT = "schedule-simple"; // NON-NLS
 	private static final String REQ_ELMT = "request"; // NON-NLS
 	private static final String REQ_PARAM_ELMT = "req-param"; // NON-NLS
+	private static final String CONDITION_ELMT = "condition"; // NON-NLS
 
 	private static final String URL_ATTR = "url"; // NON-NLS
 	private static final String METHOD_ATTR = "method"; // NON-NLS
@@ -58,6 +59,7 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 	private static final String PASSWORD_ATTR = "password"; // NON-NLS
 
 	private static final String EXPRESSION_ATTR = "expression"; // NON-NLS
+	private static final String RESOLUTION_ATTR = "resolution"; // NON-NLS
 
 	private static final String INTERVAL_ATTR = "interval"; // NON-NLS
 	private static final String REPEATS_ATTR = "repeatCount"; // NON-NLS
@@ -67,6 +69,7 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 	private WsScenario currScenario;
 	private WsScenarioStep currStep;
 	private RequestData currRequest;
+	private ConditionData currCondition;
 
 	@Override
 	public void startDocument() throws SAXException {
@@ -90,6 +93,8 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 			processRequest(attributes);
 		} else if (REQ_PARAM_ELMT.equals(qName)) {
 			processReqParam(attributes);
+		} else if (CONDITION_ELMT.equals(qName)) {
+			processCondition(attributes);
 		} else {
 			super.startCfgElement(qName, attributes);
 		}
@@ -284,7 +289,7 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 
 		currRequest.setId(id);
 
-		elementData = new StringBuilder();
+		elementDataStack.push(new StringBuilder());
 	}
 
 	private void processReqParam(Attributes attrs) throws SAXException {
@@ -324,6 +329,66 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 		currRequest.addParameter(id, value, type, format, transient_);
 	}
 
+	private void processCondition(Attributes attrs) throws SAXException {
+		if (currRequest == null) {
+			throw new SAXParseException(
+					StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+							"ConfigParserHandler.malformed.configuration2", CONDITION_ELMT, REQ_ELMT),
+					currParseLocation);
+		}
+
+		currCondition = new ConditionData();
+
+		String id = null;
+		String resolution = null;
+		for (int i = 0; i < attrs.getLength(); i++) {
+			String attName = attrs.getQName(i);
+			String attValue = attrs.getValue(i);
+			if (ID_ATTR.equals(attName)) {
+				id = attValue;
+			} else if (RESOLUTION_ATTR.equals(attName)) {
+				resolution = attValue;
+			} else {
+				unknownAttribute(REQ_PARAM_ELMT, attName);
+			}
+		}
+
+		// notEmpty(id, REQ_PARAM_ELMT, ID_ATTR);
+		notEmpty(resolution, CONDITION_ELMT, RESOLUTION_ATTR);
+
+		currCondition.setId(id);
+		currCondition.setResolution(resolution);
+	}
+
+	@Override
+	protected void processMatchExpression(Attributes attrs) throws SAXException {
+		if (!StringUtils.equalsAnyIgnoreCase(getParentElmt(MATCH_EXP_ELMT), PARSER_REF_ELMT, CONDITION_ELMT)) {
+			throw new SAXParseException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+					"ConfigParserHandler.malformed.configuration2", MATCH_EXP_ELMT,
+					Utils.arrayToString(PARSER_REF_ELMT, CONDITION_ELMT)), currParseLocation);
+		}
+
+		elementDataStack.push(new StringBuilder());
+	}
+
+	private void handleMatchExp(ConditionData currCondition) throws SAXException {
+		String eDataVal = getElementData();
+		checkScriptExpression(eDataVal);
+
+		if (StringUtils.isNotEmpty(eDataVal)) {
+			currCondition.addMatcherExp(eDataVal);
+		}
+	}
+
+	private void handleCondition(ConditionData currCondition) throws SAXException {
+		if (CollectionUtils.isEmpty(currCondition.matchExps)) {
+			throw new SAXException(StreamsResources.getStringFormatted(WsStreamConstants.RESOURCE_BUNDLE_NAME,
+					"WsConfigParserHandler.element.must.have.one", CONDITION_ELMT, MATCH_EXP_ELMT, getLocationInfo()));
+		}
+
+		currRequest.addCondition(currCondition);
+	}
+
 	@Override
 	protected void checkPropertyState() throws SAXException {
 		try {
@@ -352,7 +417,7 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 							getLocationInfo()));
 				}
 
-				((AbstractWsStream<?, ?>) currStream).addScenario(currScenario);
+				currStream.addReference(currScenario);
 				currScenario = null;
 			} else if (STREAM_ELMT.equals(qName)) {
 				if (currStream instanceof AbstractWsStream) {
@@ -375,16 +440,30 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 				currScenario.addStep(currStep);
 				currStep = null;
 			} else if (REQ_ELMT.equals(qName)) {
-				if (elementData != null) {
-					WsRequest<?> currReq = currStep.addRequest(currRequest.id, getElementData(), currRequest.getTags());
-					elementData = null;
+				String eDataVal = getElementData();
+				if (StringUtils.isNotEmpty(eDataVal)) {
+					WsRequest<?> currReq = currStep.addRequest(currRequest.id, eDataVal, currRequest.getTags());
 
 					for (WsRequest.Parameter param : currRequest.params) {
 						currReq.addParameter(param);
 					}
+
+					for (ConditionData condition : currRequest.conditions) {
+						currReq.addCondition(condition.id, condition.resolution, condition.matchExps);
+					}
 				}
 
 				currRequest = null;
+			} else if (MATCH_EXP_ELMT.equals(qName)) {
+				if (currCondition != null) {
+					handleMatchExp(currCondition);
+				}
+			} else if (CONDITION_ELMT.equals(qName)) {
+				if (currCondition != null) {
+					handleCondition(currCondition);
+
+					currCondition = null;
+				}
 			}
 		} catch (SAXException exc) {
 			throw exc;
@@ -412,6 +491,7 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 		private String id;
 		private List<WsRequest.Parameter> params = new ArrayList<>();
 		private List<ParserRefData> parserRefs = new ArrayList<>();
+		private List<ConditionData> conditions = new ArrayList<>();
 
 		void setId(String id) {
 			this.id = id;
@@ -425,6 +505,10 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 			parserRefs.add(pRef);
 		}
 
+		void addCondition(ConditionData cond) {
+			conditions.add(cond);
+		}
+
 		String[] getTags() {
 			String[] tags = new String[parserRefs.size()];
 
@@ -433,6 +517,24 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 			}
 
 			return tags;
+		}
+	}
+
+	private static class ConditionData {
+		private String id;
+		private String resolution;
+		private List<String> matchExps = new ArrayList<>();
+
+		void setId(String id) {
+			this.id = id;
+		}
+
+		void setResolution(String resolution) {
+			this.resolution = resolution;
+		}
+
+		void addMatcherExp(String matchExp) {
+			matchExps.add(matchExp);
 		}
 	}
 
