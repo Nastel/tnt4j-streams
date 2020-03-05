@@ -20,7 +20,7 @@
         <property name="EntryPattern"><![CDATA[\{(?<key>.*?):(?<value>(?s).[^{]*)\}]]></property>
         <property name="ActivityDelim" value="EOF"/>
 
-        <field name="SWIFTContent" locator="4" locator-type="label" transparent="true">
+        <field name="SWIFTContent" locator="4" locator-type="Label" transparent="true">
             <parser-ref name="MYBANK_UserData_Parser" aggregation="Merge"/>
         </field>
     </parser>

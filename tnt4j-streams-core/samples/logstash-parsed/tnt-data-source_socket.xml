@@ -30,6 +30,6 @@
         <property name="RestartOnInputClose" value="true"/>
         <property name="Port" value="9595"/>
 
-        <parser-ref name="JSONEnvelopeParser"/>
+        <parser-ref name="LogstashJSONParser"/>
     </stream>
 </tnt-data-source>

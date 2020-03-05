@@ -33,6 +33,7 @@ import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -98,7 +99,12 @@ public class ConfigParserHandlerTest {
 		}
 
 		for (File sampleConfiguration : sampleConfigurationsFiltered) {
+			if (StringUtils.containsAny(sampleConfiguration.getAbsolutePath(), "_dev\\", "_dev/", "_dev.")) {
+				continue;
+			}
+
 			System.out.println("Reading configuration file: " + sampleConfiguration.getAbsolutePath()); // NON-NLS
+			StreamsConfigSAXParser.cfgFilePath = sampleConfiguration.getAbsolutePath();
 			Reader testReader = new FileReader(sampleConfiguration);
 			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 			SAXParser parser = parserFactory.newSAXParser();
@@ -129,31 +135,35 @@ public class ConfigParserHandlerTest {
 	@Test
 	public void startElementTest() throws Exception {
 		ConfigParserHandler test = Mockito.mock(ConfigParserHandler.class, Mockito.CALLS_REAL_METHODS);
+		test.startDocument();
 		AttributesImpl attrs = new AttributesImpl();
 		test.startDocument();
 		attrs.addAttribute("", "", "name", "", "Stream attr name"); // NON-NLS
-		attrs.addAttribute("", "", "type", "", "java.lang.String"); // NON-NLS
 		attrs.addAttribute("", "", "class", "", "Stream attr class"); // NON-NLS
+		test.startElement("TEST_URL", "TEST_LOCALNAME", "java-object", attrs); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "name", "", "Stream attr name"); // NON-NLS
+		attrs.addAttribute("", "", "type", "", "java.lang.String"); // NON-NLS
+		attrs.addAttribute("", "", "value", "", "Stream attr value"); // NON-NLS
+		test.startElement("TEST_URL", "TEST_LOCALNAME", "param", attrs); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "name", "", "Stream attr name"); // NON-NLS
+		attrs.addAttribute("", "", "type", "", "java.lang.String"); // NON-NLS
 		attrs.addAttribute("", "", "filter", "", "Stream attr filter"); // NON-NLS
-		// attrs.addAttribute("", "", "rule", "", "Stream attr rule"); // NON-NLS
-		// attrs.addAttribute("", "", "step", "", "Stream attr step"); // NON-NLS
 		attrs.addAttribute("", "", "tnt4j-properties", "", "Stream attr tnt4j-properties"); // NON-NLS
 		attrs.addAttribute("", "", "java-object", "", "Stream attr java-object"); // NON-NLS
 		attrs.addAttribute("", "", "param", "", "Stream attr param"); // NON-NLS
 		attrs.addAttribute("", "", "tags", "", "Stream attr tags"); // NON-NLS
 		attrs.addAttribute("", "", "value", "", "Stream attr value"); // NON-NLS
-
-		// test.startElement("TEST_URL", "TEST_LOCALNAME", "filter", attrs); // NON-NLS
-		// test.startElement("TEST_URL", "TEST_LOCALNAME", "rule", attrs); // NON-NLS
-		// test.startElement("TEST_URL", "TEST_LOCALNAME", "step", attrs); // NON-NLS
-		test.startElement("TEST_URL", "TEST_LOCALNAME", "java-object", attrs); // NON-NLS
-		test.startElement("TEST_URL", "TEST_LOCALNAME", "param", attrs); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "tnt-data-source", attrs); // NON-NLS
 	}
 
 	@Test(expected = SAXParseException.class)
 	public void processParserTest1() throws Exception {
 		ConfigParserHandler test = Mockito.mock(ConfigParserHandler.class, Mockito.CALLS_REAL_METHODS);
+		test.startDocument();
 		AttributesImpl attrs = new AttributesImpl();
 		attrs.addAttribute("", "", "name", "", "Stream attr name"); // NON-NLS
 		attrs.addAttribute("", "", "type", "", "Stream attr type"); // NON-NLS
@@ -170,6 +180,7 @@ public class ConfigParserHandlerTest {
 	@Test(expected = SAXParseException.class)
 	public void processParserTest2() throws Exception {
 		ConfigParserHandler test = Mockito.mock(ConfigParserHandler.class, Mockito.CALLS_REAL_METHODS);
+		test.startDocument();
 		AttributesImpl attrs = new AttributesImpl();
 		attrs.addAttribute("", "", "type", "", "Stream attr type"); // NON-NLS
 		attrs.addAttribute("", "", "class", "", "Stream attr class"); // NON-NLS
@@ -207,6 +218,11 @@ public class ConfigParserHandlerTest {
 		test.startDocument();
 		AttributesImpl attrs = new AttributesImpl();
 		attrs.addAttribute("", "", "name", "", "Stream attr name"); // NON-NLS
+		attrs.addAttribute("", "", "class", "", "com.jkoolcloud.tnt4j.streams.parsers.ActivityTokenParser"); // NON-NLS
+		test.startElement("TEST_URL", "TEST_LOCALNAME", "parser", attrs); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "name", "", "Stream attr name"); // NON-NLS
 		attrs.addAttribute("", "", "radix", "", "555"); // NON-NLS
 		attrs.addAttribute("", "", "required", "", "Requered"); // NON-NLS
 		attrs.addAttribute("", "", "value", "", "555"); // NON-NLS
@@ -214,14 +230,13 @@ public class ConfigParserHandlerTest {
 		attrs.addAttribute("", "", "format", "", "yyyy-MM-dd HH:mm:ss"); // NON-NLS
 		attrs.addAttribute("", "", "locale", "", "lt_LT"); // NON-NLS
 		attrs.addAttribute("", "", "timezone", "", "Europe/Vilnius"); // NON-NLS
-		attrs.addAttribute("", "", "class", "", "com.jkoolcloud.tnt4j.streams.parsers.ActivityTokenParser"); // NON-NLS
-		test.startElement("TEST_URL", "TEST_LOCALNAME", "parser", attrs); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "field", attrs); // NON-NLS
 	}
 
 	@Test(expected = SAXParseException.class)
 	public void processFieldExceptionTest() throws Exception {
 		ConfigParserHandler test = Mockito.mock(ConfigParserHandler.class, Mockito.CALLS_REAL_METHODS);
+		test.startDocument();
 		AttributesImpl attrs = new AttributesImpl();
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "field", attrs); // NON-NLS
 	}
@@ -240,14 +255,17 @@ public class ConfigParserHandlerTest {
 	}
 
 	@Test
-	public void locatorSplitingEmptyElementTest() throws Exception {
+	public void locatorSplittingEmptyElementTest() throws Exception {
 		ConfigParserHandler test = Mockito.mock(ConfigParserHandler.class, Mockito.CALLS_REAL_METHODS);
 		test.startDocument();
 		AttributesImpl attrs = new AttributesImpl();
 		attrs.addAttribute("", "", "name", "", "Stream attr name"); // NON-NLS
-		attrs.addAttribute("", "", "locator", "", "|555"); // NON-NLS
 		attrs.addAttribute("", "", "class", "", "com.jkoolcloud.tnt4j.streams.parsers.ActivityTokenParser"); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "parser", attrs); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "name", "", "Stream attr name"); // NON-NLS
+		attrs.addAttribute("", "", "locator", "", "|555"); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "field", attrs); // NON-NLS
 	}
 
@@ -277,6 +295,11 @@ public class ConfigParserHandlerTest {
 		test.startDocument();
 		AttributesImpl attrs = new AttributesImpl();
 		attrs.addAttribute("", "", "name", "", "Stream attr name"); // NON-NLS
+		attrs.addAttribute("", "", "class", "", "com.jkoolcloud.tnt4j.streams.parsers.ActivityTokenParser"); // NON-NLS
+		test.startElement("TEST_URL", "TEST_LOCALNAME", "parser", attrs); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "name", "", "Stream attr name"); // NON-NLS
 		attrs.addAttribute("", "", "datatype", "", "Timestamp"); // NON-NLS
 		attrs.addAttribute("", "", "radix", "", "555"); // NON-NLS
 		attrs.addAttribute("", "", "required", "", "Requered"); // NON-NLS
@@ -284,9 +307,16 @@ public class ConfigParserHandlerTest {
 		attrs.addAttribute("", "", "format", "", "yyyy-MM-dd HH:mm:ss"); // NON-NLS
 		attrs.addAttribute("", "", "locale", "", "lt_LT"); // NON-NLS
 		attrs.addAttribute("", "", "timezone", "", "Europe/Vilnius"); // NON-NLS
-		attrs.addAttribute("", "", "class", "", "com.jkoolcloud.tnt4j.streams.parsers.ActivityTokenParser"); // NON-NLS
-		test.startElement("TEST_URL", "TEST_LOCALNAME", "parser", attrs); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "field", attrs); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "datatype", "", "Timestamp"); // NON-NLS
+		attrs.addAttribute("", "", "radix", "", "555"); // NON-NLS
+		attrs.addAttribute("", "", "required", "", "Requered"); // NON-NLS
+		attrs.addAttribute("", "", "units", "", "Kb"); // NON-NLS
+		attrs.addAttribute("", "", "format", "", "yyyy-MM-dd HH:mm:ss"); // NON-NLS
+		attrs.addAttribute("", "", "locale", "", "lt_LT"); // NON-NLS
+		attrs.addAttribute("", "", "timezone", "", "Europe/Vilnius"); // NON-NLS
 		attrs.addAttribute("", "", "value", "", "TEST_VALUE"); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "field-locator", attrs); // NON-NLS
 	}
@@ -307,16 +337,23 @@ public class ConfigParserHandlerTest {
 	}
 
 	@Test
-	public void processFieldLocatorNotNullFromatTest() throws Exception {
+	public void processFieldLocatorNotNullFormatTest() throws Exception {
 		ConfigParserHandler test = Mockito.mock(ConfigParserHandler.class, Mockito.CALLS_REAL_METHODS);
 		test.startDocument();
 		AttributesImpl attrs = new AttributesImpl();
 		attrs.addAttribute("", "", "name", "", "Stream attr name");// NON-NLS
 		attrs.addAttribute("", "", "class", "", "com.jkoolcloud.tnt4j.streams.parsers.ActivityTokenParser"); // NON-NLS
+		test.startElement("TEST_URL", "TEST_LOCALNAME", "parser", attrs); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "name", "", "Stream attr name");// NON-NLS
 		attrs.addAttribute("", "", "datatype", "", "DateTime"); // NON-NLS
 		attrs.addAttribute("", "", "format", "", "yyyy-MM-dd"); // NON-NLS
-		test.startElement("TEST_URL", "TEST_LOCALNAME", "parser", attrs); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "field", attrs); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "datatype", "", "DateTime"); // NON-NLS
+		attrs.addAttribute("", "", "format", "", "yyyy-MM-dd"); // NON-NLS
 		attrs.addAttribute("", "", "value", "", null); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "field-locator", attrs); // NON-NLS
 	}
@@ -508,15 +545,21 @@ public class ConfigParserHandlerTest {
 		test.startDocument();
 		AttributesImpl attrs = new AttributesImpl();
 		attrs.addAttribute("", "", "name", "", "Stream name value"); // NON-NLS
-		attrs.addAttribute("", "", "source", "", "Stream source value"); // NON-NLS
-		attrs.addAttribute("", "", "target", "", "Stream target value"); // NON-NLS
-		attrs.addAttribute("", "", "value", "", ""); // NON-NLS
 		attrs.addAttribute("", "", "class", "", "com.jkoolcloud.tnt4j.streams.parsers.ActivityTokenParser"); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "parser", attrs); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "name", "", "Stream name value"); // NON-NLS
+		attrs.addAttribute("", "", "value", "", ""); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "field", attrs); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "name", "", "Stream name value"); // NON-NLS
 		attrs.addAttribute("", "", "class", "", "com.jkoolcloud.tnt4j.streams.inputs.RedirectTNT4JStream"); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "stream", attrs); // NON-NLS
-		attrs.addAttribute("", "", "class", "", ""); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "name", "", "Stream name value"); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "reference", attrs); // NON-NLS
 	}
 
@@ -610,14 +653,23 @@ public class ConfigParserHandlerTest {
 		test.startDocument();
 		AttributesImpl attrs = new AttributesImpl();
 		attrs.addAttribute("", "", "name", "", "Stream name value"); // NON-NLS
-		attrs.addAttribute("", "", "source", "", "Stream source value"); // NON-NLS
-		attrs.addAttribute("", "", "target", "", "Stream target value"); // NON-NLS
-		attrs.addAttribute("", "", "value", "", ""); // NON-NLS
 		attrs.addAttribute("", "", "class", "", "com.jkoolcloud.tnt4j.streams.parsers.ActivityTokenParser"); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "parser", attrs); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "name", "", "Stream name value"); // NON-NLS
+		attrs.addAttribute("", "", "value", "", ""); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "field", attrs); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "name", "", "Stream name value"); // NON-NLS
+		attrs.addAttribute("", "", "class", "", "com.jkoolcloud.tnt4j.streams.parsers.ActivityTokenParser"); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "java-object", attrs); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "name", "", "Stream name value"); // NON-NLS
 		attrs.addAttribute("", "", "type", "", "java.lang.String"); // NON-NLS
+		attrs.addAttribute("", "", "value", "", ""); // NON-NLS
 		attrs.addAttribute("", "", "value", "", ""); // NON-NLS
 		test.startElement("TEST_URL", "TEST_LOCALNAME", "param", attrs); // NON-NLS
 	}
@@ -643,16 +695,18 @@ public class ConfigParserHandlerTest {
 	@Test
 	public void charactersTest() throws Exception {
 		ConfigParserHandler test = Mockito.mock(ConfigParserHandler.class, Mockito.CALLS_REAL_METHODS);
-		char[] charArray = { 'a', 'b', 'c', 'd', 'e' };
-		test.elementData = new StringBuilder();
-		test.characters(charArray, 0, 5);
-		assertEquals("abcde", test.getElementData());
+		test.startDocument();
+		test.elementDataStack.push(new StringBuilder());
+		String cData = "abcde"; // NON-NLS
+		test.characters(cData.toCharArray(), 0, cData.length());
+		assertEquals("abcde", test.getElementData()); // NON-NLS
+		assertEquals(0, test.elementDataStack.size());
 	}
 
 	@Test
 	public void charactersNullTest() throws Exception {
 		ConfigParserHandler test = Mockito.mock(ConfigParserHandler.class, Mockito.CALLS_REAL_METHODS);
-		test.elementData = null;
+		test.startDocument();
 		assertNull(test.getElementData());
 	}
 
@@ -666,6 +720,15 @@ public class ConfigParserHandlerTest {
 	public void endElementExceptionTest() throws Exception {
 		ConfigParserHandler test = Mockito.mock(ConfigParserHandler.class, Mockito.CALLS_REAL_METHODS);
 		test.startDocument();
+		AttributesImpl attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "name", "", "Stream name value"); // NON-NLS
+		attrs.addAttribute("", "", "class", "", "com.jkoolcloud.tnt4j.streams.parsers.ActivityTokenParser"); // NON-NLS
+		test.startElement("TEST_URL", "TEST_LOCALNAME", "parser", attrs); // NON-NLS
+
+		attrs = new AttributesImpl();
+		attrs.addAttribute("", "", "name", "", "Stream name value"); // NON-NLS
+		test.startElement("TEST_URL", "TEST_LOCALNAME", "field", attrs); // NON-NLS
+
 		test.endElement("TEST_URL", "TEST_LOCALNAME", "field"); // NON-NLS
 	}
 
@@ -678,9 +741,13 @@ public class ConfigParserHandlerTest {
 	@Test
 	public void endElementHandlePropertyTest() throws Exception {
 		ConfigParserHandler test = Mockito.mock(ConfigParserHandler.class, Mockito.CALLS_REAL_METHODS);
-		test.elementData = new StringBuilder();
-		test.elementData.append("TEST_STRING"); // NON-NLS
+		test.startDocument();
+		test.elementDataStack.push(new StringBuilder());
+		String cData = "TEST_STRING"; // NON-NLS
+		test.characters(cData.toCharArray(), 0, cData.length());
 		test.endElement("TEST_URL", "TEST_LOCALNAME", "property"); // NON-NLS
+		assertEquals("TEST_STRING", test.getElementData());
+		assertEquals(0, test.elementDataStack.size());
 	}
 
 	@Test(expected = SAXParseException.class)
@@ -717,8 +784,8 @@ public class ConfigParserHandlerTest {
 
 	@Test
 	public void applyVariablePropertiesTest() {
-		final String VALUE = "${user.home}/abc/bcd";
-		final String VALUE1 = "file://${JAVA_HOME}/abc/bcd";
+		String VALUE = "${user.home}/abc/bcd";
+		String VALUE1 = "file://${JAVA_HOME}/abc/bcd";
 
 		HashMap<String, String> propertiesMap = new HashMap<String, String>() {
 			private static final long serialVersionUID = 1L;

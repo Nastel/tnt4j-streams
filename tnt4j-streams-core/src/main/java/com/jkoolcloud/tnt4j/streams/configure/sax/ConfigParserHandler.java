@@ -118,7 +118,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag {@value}.
 	 */
-	private static final String TNT4J_PROPERTIES_ELMT = "tnt4j-properties"; // NON-NLS
+	protected static final String TNT4J_PROPERTIES_ELMT = "tnt4j-properties"; // NON-NLS
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag {@value}.
 	 */
@@ -523,7 +523,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	}
 
 	/**
-	 * Processes a {@code <key>} element under <entry> element.
+	 * Processes a {@code <key>} element under {@code <entry>} element.
 	 *
 	 * @param attrs
 	 *            List of element attributes
@@ -564,7 +564,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	}
 
 	/**
-	 * Processes a {@code <key>} element under <entry> element.
+	 * Processes a {@code <key>} element under {@code <entry>} element.
 	 *
 	 * @param attrs
 	 *            List of element attributes
@@ -584,7 +584,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	}
 
 	/**
-	 * Processes a {@code <default>} element under <entry> element.
+	 * Processes a {@code <default>} element under {@code <entry>} element.
 	 *
 	 * @param attrs
 	 *            List of element attributes
@@ -1463,11 +1463,10 @@ public class ConfigParserHandler extends DefaultHandler {
 	 */
 	protected void checkPropertyState() throws SAXException {
 		if (!StringUtils.equalsAnyIgnoreCase(getParentElmt(PROPERTY_ELMT), CONFIG_ROOT_ELMT, STREAM_ELMT, PARSER_ELMT,
-				JAVA_OBJ_ELMT, CACHE_ELMT)) {
-			throw new SAXParseException(
-					StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
-							"ConfigParserHandler.malformed.configuration2", PROPERTY_ELMT,
-							Utils.arrayToString(CONFIG_ROOT_ELMT, STREAM_ELMT, PARSER_ELMT, JAVA_OBJ_ELMT, CACHE_ELMT)),
+				JAVA_OBJ_ELMT, CACHE_ELMT, TNT4J_PROPERTIES_ELMT)) {
+			throw new SAXParseException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+					"ConfigParserHandler.malformed.configuration2", PROPERTY_ELMT, Utils.arrayToString(CONFIG_ROOT_ELMT,
+							STREAM_ELMT, PARSER_ELMT, JAVA_OBJ_ELMT, CACHE_ELMT, TNT4J_PROPERTIES_ELMT)),
 					currParseLocation);
 		}
 	}
@@ -1815,7 +1814,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	}
 
 	/**
-	 * Processes a {@code <value>} element under <filter> element.
+	 * Processes a {@code <value>} element under {@code <filter>} element.
 	 *
 	 * @param attrs
 	 *            List of element attributes
@@ -1858,7 +1857,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	}
 
 	/**
-	 * Processes a {@code <value>} element under <cache> element.
+	 * Processes a {@code <value>} element under {@code <cache>} element.
 	 *
 	 * @param attrs
 	 *            List of element attributes
@@ -1919,7 +1918,7 @@ public class ConfigParserHandler extends DefaultHandler {
 	}
 
 	/**
-	 * Processes a {@code <match>} element.
+	 * Processes a {@code <matchExp>} element.
 	 *
 	 * @param attrs
 	 *            List of element attributes
@@ -1945,7 +1944,6 @@ public class ConfigParserHandler extends DefaultHandler {
 							"ConfigParserHandler.malformed.configuration2", TNT4J_PROPERTIES_ELMT, STREAM_ELMT),
 					currParseLocation);
 		}
-
 	}
 
 	@Override
@@ -1972,7 +1970,9 @@ public class ConfigParserHandler extends DefaultHandler {
 		try {
 			endCfgElement(qName);
 		} finally {
-			path.pop();
+			if (CollectionUtils.isNotEmpty(path)) {
+				path.pop();
+			}
 		}
 	}
 
