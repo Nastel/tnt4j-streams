@@ -45,15 +45,16 @@ public class RegExMatcher implements Matcher {
 	}
 
 	/**
-	 * Evaluates match <tt>expression</tt> against provided <tt>data</tt> using RegEx.
+	 * Evaluates match {@code expression} against provided {@code data} using RegEx.
 	 *
 	 * @param expression
 	 *            Regex expression to check
 	 * @param data
 	 *            data {@link String} to evaluate expression to
 	 * @return {@code true} if expression matches, {@code false} - otherwise
+	 * 
 	 * @throws java.util.regex.PatternSyntaxException
-	 *             if the <tt>expression</tt>'s syntax is invalid
+	 *             if the {@code expression}'s syntax is invalid
 	 */
 	@Override
 	public boolean evaluate(String expression, Object data) throws PatternSyntaxException {

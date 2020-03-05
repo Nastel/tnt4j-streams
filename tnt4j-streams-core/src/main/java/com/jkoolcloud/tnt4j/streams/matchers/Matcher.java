@@ -23,13 +23,14 @@ package com.jkoolcloud.tnt4j.streams.matchers;
  */
 public interface Matcher {
 	/**
-	 * Evaluates match <tt>expression</tt> against provided <tt>data</tt>.
+	 * Evaluates match {@code expression} against provided {@code data}.
 	 *
 	 * @param expression
 	 *            match evaluation expression
 	 * @param data
 	 *            data to evaluate expression
-	 * @return {@code true} if <tt>data</tt> matches <tt>expression</tt>, {@code false} - otherwise
+	 * @return {@code true} if {@code data} matches {@code expression}, {@code false} - otherwise
+	 * 
 	 * @throws Exception
 	 *             if evaluation of matcher expression fails
 	 */

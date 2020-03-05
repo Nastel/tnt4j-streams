@@ -68,7 +68,7 @@ public class XPathMatcher implements Matcher {
 	}
 
 	/**
-	 * Evaluates match <tt>expression</tt> against provided <tt>data</tt> using XPath.
+	 * Evaluates match {@code expression} against provided {@code data} using XPath.
 	 *
 	 * @param expression
 	 *            XPath expression to check

@@ -75,16 +75,17 @@ public class StringMatcher implements Matcher {
 	 *
 	 * @param expression
 	 *            expression to check - it must contain method name from {@link StringUtils} class, and arguments. First
-	 *            method parameter is always <tt>data</tt> value, so only subsequent parameters shall be defined in
+	 *            method parameter is always {@code data} value, so only subsequent parameters shall be defined in
 	 *            expression e.g. {@code "contains(PAYMENT)"}, {@code "isEmpty()"}. To invert evaluation value start
 	 *            expression definition with {@code '!'} char.
 	 * @param data
 	 *            data string to evaluate expression against
 	 * @return {@code true} if {@link StringUtils} method returned {@code true} (or in case of compare returns
 	 *         {@code 0}), {@code false} - otherwise
+	 * 
 	 * @throws java.lang.Exception
 	 *             if there is no specified method found in {@link org.apache.commons.lang3.StringUtils} class or
-	 *             <tt>expression</tt> can't be evaluated for other reasons
+	 *             {@code expression} can't be evaluated for other reasons
 	 */
 	@Override
 	public boolean evaluate(String expression, Object data) throws Exception {

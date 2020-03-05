@@ -49,7 +49,7 @@ public class Matchers {
 	private static Map<String, StreamEntityFilter<Object>> langEvaluatorsCache = new HashMap<>(5);
 
 	/**
-	 * Evaluates match <tt>expression</tt> against provided activity <tt>data</tt>.
+	 * Evaluates match {@code expression} against provided activity {@code data}.
 	 *
 	 * @param expression
 	 *            match expression string defining type of expression and evaluation expression delimited by
@@ -57,7 +57,8 @@ public class Matchers {
 	 *            {@code "string"}
 	 * @param data
 	 *            data to evaluate expression
-	 * @return {@code true} if <tt>data</tt> matches <tt>expression</tt>, {@code false} - otherwise
+	 * @return {@code true} if {@code data} matches {@code expression}, {@code false} - otherwise
+	 * 
 	 * @throws Exception
 	 *             if evaluation expression is empty or evaluation of match expression fails
 	 */
@@ -106,7 +107,7 @@ public class Matchers {
 	}
 
 	/**
-	 * Evaluates match <tt>expression</tt> against provided activity entity <tt>ai</tt> data.
+	 * Evaluates match {@code expression} against provided activity entity {@code ai} data.
 	 * 
 	 * @param expression
 	 *            match expression string defining language used to evaluate expression and evaluation expression
@@ -114,12 +115,19 @@ public class Matchers {
 	 *            default is {@link com.jkoolcloud.tnt4j.streams.configure.jaxb.ScriptLangs#GROOVY}
 	 * @param ai
 	 *            activity entity instance to get context values for evaluation
-	 * @return {@code true} if activity entity <tt>ai</tt> data values matches <tt>expression</tt>, {@code false} -
+	 * @return {@code true} if activity entity {@code ai} data values matches {@code expression}, {@code false} -
 	 *         otherwise
+	 * 
 	 * @throws java.lang.Exception
 	 *             if evaluation expression is empty or evaluation of match expression fails
 	 */
 	public static boolean evaluate(String expression, ActivityInfo ai) throws Exception {
+		StreamEntityFilter<Object> ef = getFilterForExpression(expression);
+
+		return ef.doFilter(null, ai);
+	}
+
+	private static StreamEntityFilter<Object> getFilterForExpression(String expression) {
 		StreamEntityFilter<Object> ef = langEvaluatorsCache.get(expression);
 		if (ef == null) {
 			String[] expTokens = tokenizeExpression(expression);
@@ -134,7 +142,7 @@ public class Matchers {
 			langEvaluatorsCache.put(expression, ef);
 		}
 
-		return ef.doFilter(null, ai);
+		return ef;
 	}
 
 	private static String[] tokenizeExpression(String expression) {
@@ -156,7 +164,7 @@ public class Matchers {
 	}
 
 	/**
-	 * Evaluates match <tt>expression</tt> against provided activity entity <tt>ai</tt> data or activity <tt>data</tt>
+	 * Evaluates match {@code expression} against provided activity entity {@code ai} data or activity {@code data}
 	 * value.
 	 * 
 	 * @param expression
@@ -165,8 +173,9 @@ public class Matchers {
 	 *            data to evaluate expression
 	 * @param ai
 	 *            activity entity instance to get context values for evaluation
-	 * @return {@code true} if activity entity <tt>ai</tt> data <tt>data</tt> values matches <tt>expression</tt>,
+	 * @return {@code true} if activity entity {@code ai} data {@code data} values matches {@code expression},
 	 *         {@code false} - otherwise
+	 * 
 	 * @throws Exception
 	 *             if evaluation expression is empty or evaluation of match expression fails
 	 *
@@ -178,5 +187,23 @@ public class Matchers {
 			return evaluate(expression, ai);
 		}
 		return evaluate(expression, data);
+	}
+
+	/**
+	 * Evaluates match {@code expression} against provided value bindings {@code valBindings} map.
+	 * 
+	 * @param expression
+	 *            match expression string
+	 * @param valBindings
+	 *            expresion variable and value bindings map
+	 * @return {@code true} if {@code valBindings} filled-in {@code expression} matches, {@code false} - otherwise
+	 * 
+	 * @throws Exception
+	 *             if evaluation expression is empty or evaluation of match expression fails
+	 */
+	public static boolean evaluateBindings(String expression, Map<String, ?> valBindings) throws Exception {
+		StreamEntityFilter<Object> ef = getFilterForExpression(expression);
+
+		return ef.doFilter(valBindings);
 	}
 }

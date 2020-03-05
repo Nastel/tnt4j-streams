@@ -55,13 +55,14 @@ public class JsonPathMatcher implements Matcher {
 	}
 
 	/**
-	 * Evaluates match <tt>expression</tt> against provided <tt>data</tt> using JsonPath.
+	 * Evaluates match {@code expression} against provided {@code data} using JsonPath.
 	 *
 	 * @param expression
 	 *            JsonPath expression to check
 	 * @param data
 	 *            data {@link String} or {@link com.jayway.jsonpath.DocumentContext} to evaluate expression to
 	 * @return {@code true} if expression matches, {@code false} - otherwise
+	 * 
 	 * @throws com.jayway.jsonpath.JsonPathException
 	 *             if any JsonPath parsing/evaluation exception occurs
 	 */
