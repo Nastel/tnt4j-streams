@@ -627,13 +627,13 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 				"ActivityParser.preparsed.data", getLogString(data.getData()));
 
 		ActivityContext cData = prepareItem(stream, data.getData());
-		cData.setMetadata(data.getMetadata());
 		if (cData == null || !cData.isValid()) {
 			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityParser.nothing.to.parse");
 			return null;
 		}
 
+		cData.setMetadata(data.getMetadata());
 		if (pContextData != null) {
 			cData.setParentContext(pContextData);
 			cData.setParentActivity(pContextData.getActivity());
