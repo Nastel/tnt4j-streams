@@ -11,6 +11,9 @@
         <property name="autoCommit" value="false"/>
         <property name="readOnly" value="true"/>
         <property name="maximumPoolSize" value="5"/>
+        <property name="maxLifetime" value="1680000"/> <!-- 28 minutes -->
+        <property name="idleTimeout" value="600000"/> <!-- 10 minutes -->
+        <property name="connectionTimeout" value="30000"/> <!-- 30 seconds -->
         <!-- Query returned ResultSet configuration -->
         <property name="QueryFetchRows" value="500"/>
         <!--<property name="QueryMaxRows" value="50000"/>-->
