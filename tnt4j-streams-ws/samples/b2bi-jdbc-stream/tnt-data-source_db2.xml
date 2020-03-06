@@ -16,7 +16,7 @@
         <property name="connectionTimeout" value="30000"/> <!-- 30 seconds -->
         <!-- Query returned ResultSet configuration -->
         <property name="QueryFetchRows" value="500"/>
-        <!--<property name="QueryMaxRows" value="50000"/>-->
+        <!--<property name="QueryMaxRows" value="10000"/>-->
 
         <tnt4j-properties>
             <property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://test.jkoolcloud.com:6585"/>
