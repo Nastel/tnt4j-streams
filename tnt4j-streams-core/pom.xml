@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.jkoolcloud.tnt4j.streams</groupId>
         <artifactId>tnt4j-streams</artifactId>
-        <version>1.11.0-SNAPSHOT</version>
+        <version>1.11.0</version>
     </parent>
     <packaging>jar</packaging>
 
@@ -23,7 +23,7 @@
         <jackson.version>2.10.2</jackson.version>
         <jaxb.version>2.3.2</jaxb.version>
 
-        <jesl.version>0.10-SNAPSHOT</jesl.version>
+        <jesl.version>0.9.5</jesl.version>
 
         <httpcomponents.version>4.5.11</httpcomponents.version>
         <zookeeper.version>3.5.7</zookeeper.version>
