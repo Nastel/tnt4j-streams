@@ -1371,14 +1371,14 @@ public class ActivityInfo {
 		if (endTime == null) {
 			if (startTime != null) {
 				endTime = new UsecTimestamp(startTime);
-				endTime.add(0L, elapsedTime);
+				endTime.add(elapsedTime);
 			} else {
 				endTime = UsecTimestamp.now();
 			}
 		}
 		if (startTime == null) {
 			startTime = new UsecTimestamp(endTime);
-			startTime.subtract(0L, elapsedTime);
+			startTime.add(-elapsedTime);
 		}
 	}
 
