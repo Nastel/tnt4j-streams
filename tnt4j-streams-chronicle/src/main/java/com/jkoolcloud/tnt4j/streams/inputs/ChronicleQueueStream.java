@@ -174,11 +174,12 @@ public class ChronicleQueueStream extends TNTParseableInputStream<Object> {
 			accept(context.wire());
 		}
 
-		return true;
+		return lastRead != null;
 	}
 
 	private void accept(Wire wire) throws IllegalAccessException, InstantiationException {
 		StringBuilder sb = new StringBuilder();
+		ValueIn valueIn = wire.readEventName(sb);
 		Class<?> aClass = classNameMap.get(sb.toString().toUpperCase());
 
 		if (aClass == null) {
@@ -186,7 +187,6 @@ public class ChronicleQueueStream extends TNTParseableInputStream<Object> {
 					"ChronicleQueueStream.unsupported.class"), sb.toString());
 			lastRead = null;
 		} else {
-			ValueIn valueIn = wire.readEventName(sb);
 			Object entry = aClass.newInstance();
 			lastRead = Wires.object0(valueIn, entry, aClass);
 		}
