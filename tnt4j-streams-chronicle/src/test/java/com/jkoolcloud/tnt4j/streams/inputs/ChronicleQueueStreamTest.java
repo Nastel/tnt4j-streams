@@ -42,7 +42,7 @@ public class ChronicleQueueStreamTest {
 				return item;
 			}
 		};
-		stream.setOutput(new NullActivityOutput());
+		stream.addReference(new NullActivityOutput());
 
 		Path testQueue = Files.createTempDirectory("testQueue");
 		ChronicleQueue queue = ChronicleQueue.single(testQueue.toFile().getAbsolutePath());
@@ -53,7 +53,6 @@ public class ChronicleQueueStreamTest {
 				"com.jkoolcloud.tnt4j.streams.inputs.ChronicleQueueStreamTest$EntryDefinition");
 		stream.setProperty(ChronicleQueueProperties.PROP_START_FROM_LATEST, "true");
 
-		stream.addReference(new NullActivityOutput());
 		stream.addParser(new ActivityJavaObjectParser());
 
 		stream.addStreamItemAccountingListener(new StreamItemAccountingListener() {

@@ -15,7 +15,7 @@
 
     <properties>
         <!-- module dependencies versions-->
-        <chronicle.version>5.19.1</chronicle.version>
+        <chronicle.version>5.19.2</chronicle.version>
     </properties>
 
     <build>
@@ -94,6 +94,10 @@
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>annotations</artifactId>
+                    <groupId>com.intellij</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
