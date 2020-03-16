@@ -36,17 +36,17 @@
         <field name="FileName" locator="AFILE_FILE_NAME" locator-type="Label"/>
         <field name="FileSize" locator="AFILE_FILE_SIZE" locator-type="Label" datatype="Number" format="long"/>
         <field name="MailboxPath" locator="AFILE_MAILBOX_PATH" locator-type="Label"/>
-        <field name="DataFlowId" locator="AFILE_DATA_FLOW_ID" locator-type="Label"/>
+        <field name="DataFlowId" locator="AFILE_DATA_FLOW_ID" locator-type="Label" datatype="Number" format="long"/>
         <!--field name="ProdOrgKey" locator="AFILE_PROD_ORG_KEY" locator-type="Label"/-->
         <field name="ProdOrgName" locator="AFILE_PROD_ORG_NAME" locator-type="Label"/>
         <field name="State" locator="AFILE_STATE" locator-type="Label"/>
         <field name="DocumentId" locator="AFILE_DOCUMENT_ID" locator-type="Label"/>
         <field name="WorkflowId" locator="AFILE_WFID" locator-type="Label" datatype="Number" format="long"/>
-        <field name="Reviewed" locator="AFILE_REVIEWED" locator-type="Label" datatype="Number" format="integer"/>
+        <field name="Reviewed" locator="AFILE_REVIEWED" locator-type="Label" datatype="Number" format="int"/>
         <field name="ReplayAfKey" locator="AFILE_REPLAY_AF_KEY" locator-type="Label"/>
         <field name="ReplayComment" locator="AFILE_REPLAY_COMMENT" locator-type="Label"/>
-        <field name="RoutesRemain" locator="AFILE_ROUTES_REMAIN" locator-type="Label" datatype="Number" format="integer"/>
-        <field name="LockId" locator="AFILE_LOCKID" locator-type="Label" datatype="Number" format="integer"/>
+        <field name="RoutesRemain" locator="AFILE_ROUTES_REMAIN" locator-type="Label" datatype="Number" format="int"/>
+        <field name="LockId" locator="AFILE_LOCKID" locator-type="Label" datatype="Number" format="int"/>
         <field name="CreateUserId" locator="AFILE_CREATEUSERID" locator-type="Label"/>
         <field name="ModifyUserId" locator="AFILE_MODIFYUSERID" locator-type="Label"/>
         <field name="CreateProgId" locator="AFILE_CREATEPROGID" locator-type="Label"/>
@@ -97,10 +97,10 @@
         <field name="EndTime" locator="EVENT_TIME" locator-type="Label" datatype="Number" units="Milliseconds" timezone="GMT-04:00"/>
 
         <field name="EntityKey" locator="EVENT_ENTITY_KEY" locator-type="Label"/>
-        <field name="DataFlowId" locator="EVENT_DATA_FLOW_ID" locator-type="Label"/>
+        <field name="DataFlowId" locator="EVENT_DATA_FLOW_ID" locator-type="Label" datatype="Number" format="long"/>
         <field name="Counter" locator="EVENT_COUNTER" locator-type="Label" datatype="Number" format="long"/>
         <field name="EventCode" locator="EVENT_EVENT_CODE" locator-type="Label"/>
-        <field name="LockId" locator="EVENT_LOCKID" locator-type="Label" datatype="Number" format="integer"/>
+        <field name="LockId" locator="EVENT_LOCKID" locator-type="Label" datatype="Number" format="int"/>
         <field name="CreateTs" locator="EVENT_CREATETS" locator-type="Label"/>
         <field name="ModifyTs" locator="EVENT_MODIFYTS" locator-type="Label"/>
         <field name="CreateUserId" locator="EVENT_CREATEUSERID" locator-type="Label"/>
@@ -199,10 +199,10 @@
         <field name="EndTime" locator="EVENT_TIME" locator-type="Label" datatype="Number" units="Milliseconds" timezone="GMT-04:00"/>
 
         <field name="EntityKey" locator="EVENT_ENTITY_KEY" locator-type="Label"/>
-        <field name="DataFlowId" locator="EVENT_DATA_FLOW_ID" locator-type="Label"/>
+        <field name="DataFlowId" locator="EVENT_DATA_FLOW_ID" locator-type="Label" datatype="Number" format="long"/>
         <field name="Counter" locator="EVENT_COUNTER" locator-type="Label" datatype="Number" format="long"/>
         <field name="EventCode" locator="EVENT_EVENT_CODE" locator-type="Label"/>
-        <field name="LockId" locator="EVENT_LOCKID" locator-type="Label" datatype="Number" format="integer"/>
+        <field name="LockId" locator="EVENT_LOCKID" locator-type="Label" datatype="Number" format="int"/>
         <field name="CreateTs" locator="EVENT_CREATETS" locator-type="Label"/>
         <field name="ModifyTs" locator="EVENT_MODIFYTS" locator-type="Label"/>
         <field name="CreateUserId" locator="EVENT_CREATEUSERID" locator-type="Label"/>
@@ -311,14 +311,14 @@
             </field-transform>
         </field>
 
-        <field name="DataFlowId" locator="ROUTE_DATA_FLOW_ID" locator-type="Label"/>
+        <field name="DataFlowId" locator="ROUTE_DATA_FLOW_ID" locator-type="Label" datatype="Number" format="long"/>
         <field name="RoutchanKey" locator="ROUTE_ROUTCHAN_KEY" locator-type="Label"/>
         <field name="ConsOrgKey" locator="ROUTE_CONS_ORG_KEY" locator-type="Label"/>
         <field name="ConsOrgName" locator="ROUTE_CONS_ORG_NAME" locator-type="Label"/>
         <field name="PFstructKey" locator="ROUTE_P_FSTRUCT_KEY" locator-type="Label"/>
         <field name="State" locator="ROUTE_STATE" locator-type="Label"/>
-        <field name="DelivsRemain" locator="ROUTE_DELIVS_REMAIN" locator-type="Label" datatype="Number" format="integer"/>
-        <field name="LockId" locator="ROUTE_LOCKID" locator-type="Label" datatype="Number" format="integer"/>
+        <field name="DelivsRemain" locator="ROUTE_DELIVS_REMAIN" locator-type="Label" datatype="Number" format="int"/>
+        <field name="LockId" locator="ROUTE_LOCKID" locator-type="Label" datatype="Number" format="int"/>
         <field name="CreateTs" locator="ROUTE_CREATETS" locator-type="Label"/>
         <field name="ModifyTs" locator="ROUTE_MODIFYTS" locator-type="Label"/>
         <field name="CreateUserId" locator="ROUTE_CREATEUSERID" locator-type="Label"/>
@@ -358,7 +358,7 @@
         <field name="StartTime" locator="DELIVERY_CREATETS" locator-type="Label"/>
         <field name="EndTime" locator="DELIVERY_MODIFYTS" locator-type="Label"/>
 
-        <field name="DataFlowId" locator="DELIVERY_DATA_FLOW_ID" locator-type="Label"/>
+        <field name="DataFlowId" locator="DELIVERY_DATA_FLOW_ID" locator-type="Label" datatype="Number" format="long"/>
         <field name="State" locator="DELIVERY_STATE" locator-type="Label"/>
         <field name="DelivChanKey" locator="DELIVERY_DELIVCHAN_KEY" locator-type="Label"/>
         <field name="ConsumerDocId" locator="DELIVERY_CONSUMER_DOCID" locator-type="Label"/>
@@ -369,7 +369,7 @@
         <field name="LateCreateMbx" locator="DELIVERY_LATE_CREATE_MBX" locator-type="Label"/>
         <field name="ConsumerMsgId" locator="DELIVERY_CONSUMER_MSGID" locator-type="Label" datatype="Number" format="long"/>
         <field name="AsyncXrefId" locator="DELIVERY_ASYNC_XFER_ID" locator-type="Label"/>
-        <field name="LockId" locator="DELIVERY_LOCKID" locator-type="Label" datatype="Number" format="integer"/>
+        <field name="LockId" locator="DELIVERY_LOCKID" locator-type="Label" datatype="Number" format="int"/>
         <field name="CreateUserId" locator="DELIVERY_CREATEUSERID" locator-type="Label"/>
         <field name="ModifyUserId" locator="DELIVERY_MODIFYUSERID" locator-type="Label"/>
         <field name="CreateProgId" locator="DELIVERY_CREATEPROGID" locator-type="Label"/>
@@ -470,7 +470,7 @@
         <field name="WFEStatus" locator="WORKFLOW_WFE_STATUS" locator-type="Label" datatype="Number" format="int"/>
         <field name="WFEStatusRPT" locator="WORKFLOW_WFE_STATUS_RPT" locator-type="Label"/>
         <field name="SVCParamVersion" locator="WORKFLOW_SVC_PARM_VER" locator-type="Label" datatype="Number" format="long"/>
-        <field name="Lifespan" locator="WORKFLOW_LIFE_SPAN" locator-type="Label"/>
+        <field name="Lifespan" locator="WORKFLOW_LIFE_SPAN" locator-type="Label" datatype="Number" format="long"/>
         <field name="PersistenceLevel" locator="WORKFLOW_PERSISTENCE_LEVEL" locator-type="Label" datatype="Number" format="int"/>
         <field name="ArchiveFlag" locator="WORKFLOW_ARCHIVE_FLAG" locator-type="Label" datatype="Number" format="int"/>
         <field name="ArchiveDate" locator="WORKFLOW_ARCHIVE_DATE" locator-type="Label"/>
@@ -527,7 +527,7 @@
         <!--<field name="Body" locator="DOCUMENT_BODY" locator-type="Label"/>-->
         <field name="CharEncoding" locator="DOCUMENT_CHAR_ENCODING" locator-type="Label"/>
         <field name="DocumentName" locator="DOCUMENT_DOC_NAME" locator-type="Label"/>
-        <field name="WorkflowId" locator="DOCUMENT_WORKFLOW_ID" locator-type="Label" datatype="Number" format="int"/>
+        <field name="WorkflowId" locator="DOCUMENT_WORKFLOW_ID" locator-type="Label" datatype="Number" format="long"/>
         <field name="PurgeAfter" locator="DOCUMENT_PURGE_AFTER" locator-type="Label" datatype="Timestamp"/>
         <field name="ArchiveFlag" locator="DOCUMENT_ARCHIVE_FLAG" locator-type="Label" datatype="Number" format="int"/>
         <field name="ArchiveDate" locator="DOCUMENT_ARCHIVE_DATE" locator-type="Label" datatype="Timestamp"/>
@@ -536,11 +536,11 @@
         <field name="EncodingAlg" locator="DOCUMENT_ENC_ALG" locator-type="Label"/>
         <field name="EncodingIv" locator="DOCUMENT_ENC_IV" locator-type="Label"/>
         <field name="EncodingKey" locator="DOCUMENT_ENC_KEY" locator-type="Label"/>
-        <field name="DataFlowId" locator="DATA_FLOW_DATA_FLOW_ID" locator-type="Label" datatype="Number" format="int"/>
+        <field name="DataFlowId" locator="DATA_FLOW_DATA_FLOW_ID" locator-type="Label" datatype="Number" format="long"/>
         <field name="DataFlowState" locator="DATA_FLOW_STATE" locator-type="Label"/>
         <field name="DataFlowCreateTime" locator="DATA_FLOW_CREATE_TIME" locator-type="Label" datatype="Timestamp"/>
         <field name="DataFlowDocName" locator="DATA_FLOW_ROOT_DOC_NAME" locator-type="Label"/>
-        <field name="DataFlowDocSize" locator="DATA_FLOW_ROOT_DOC_SIZE" locator-type="Label" datatype="Number" format="int"/>
+        <field name="DataFlowDocSize" locator="DATA_FLOW_ROOT_DOC_SIZE" locator-type="Label" datatype="Number" format="long"/>
 
         <!-- Correlators to build flow context -->
         <field name="Correlator">
