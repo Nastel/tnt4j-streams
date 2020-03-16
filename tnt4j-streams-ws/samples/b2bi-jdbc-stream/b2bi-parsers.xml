@@ -508,7 +508,7 @@
 
     <parser name="B2BiDocumentsResultSetParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJDBCResultSetParser">
         <field name="Guid" formattingPattern="Document_{0}">
-            <field-locator id="WorkflowDocId" locator="DOCUMENT_ID" locator-type="Label"/>
+            <field-locator id="DocumentId" locator="DOCUMENT_ID" locator-type="Label"/>
         </field>
         <field name="EventType" value="EVENT"/>
         <field name="EventName" separator=":">
@@ -527,7 +527,7 @@
         <!--<field name="Body" locator="DOCUMENT_BODY" locator-type="Label"/>-->
         <field name="CharEncoding" locator="DOCUMENT_CHAR_ENCODING" locator-type="Label"/>
         <field name="DocumentName" locator="DOCUMENT_DOC_NAME" locator-type="Label"/>
-        <field name="WFId" locator="DOCUMENT_WORKFLOW_ID" locator-type="Label" datatype="Number" format="int"/>
+        <field name="WorkflowId" locator="DOCUMENT_WORKFLOW_ID" locator-type="Label" datatype="Number" format="int"/>
         <field name="PurgeAfter" locator="DOCUMENT_PURGE_AFTER" locator-type="Label" datatype="Timestamp"/>
         <field name="ArchiveFlag" locator="DOCUMENT_ARCHIVE_FLAG" locator-type="Label" datatype="Number" format="int"/>
         <field name="ArchiveDate" locator="DOCUMENT_ARCHIVE_DATE" locator-type="Label" datatype="Timestamp"/>
