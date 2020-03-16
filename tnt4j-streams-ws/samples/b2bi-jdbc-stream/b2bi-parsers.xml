@@ -420,7 +420,7 @@
         <field name="ObjectId" locator="CORRELATION_OBJECT_ID" locator-type="Label"/>
         <field name="ArchiveFlag" locator="CORRELATION_ARCHIVE_FLAG" locator-type="Label" datatype="Number" format="int"/>
         <field name="ArchiveDate" locator="CORRELATION_ARCHIVE_DATE" locator-type="Label"/>
-        <field name="WorkFlowId" locator="CORRELATION_WF_ID" locator-type="Label" datatype="Number" format="long"/>
+        <field name="WorkflowId" locator="CORRELATION_WF_ID" locator-type="Label" datatype="Number" format="long"/>
         <field name="KeyId" locator="CORRELATION_KEY_ID" locator-type="Label" datatype="Number" format="long"/>
         <field name="ValueUpperCase" locator="CORRELATION_VALUE_UPPER" locator-type="Label"/>
         <field name="KeyName" locator="CORR_KEY_NAME" locator-type="Label"/>
