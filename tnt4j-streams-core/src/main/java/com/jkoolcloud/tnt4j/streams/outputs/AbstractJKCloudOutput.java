@@ -295,15 +295,15 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 	 */
 	protected Tracker getTracker(Thread t) throws IllegalStateException {
 		synchronized (trackersMap) {
-			Tracker tracker = trackersMap.get(getTrackersMapKey(t));
+			String tKey = getTrackersMapKey(t);
+			Tracker tracker = trackersMap.get(tKey);
 			if (tracker == null) {
 				tracker = TrackingLogger.getInstance(trackerConfig.build());
 				tracker.getEventSink().addSinkErrorListener(this);
 				checkTracker(tracker);
-				trackersMap.put(getTrackersMapKey(t), tracker);
+				trackersMap.put(tKey, tracker);
 				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"TNTStreamOutput.built.new.tracker", getName(), getTrackerId(tracker),
-						(t == null ? "null" : t.getId()), tracker);
+						"TNTStreamOutput.built.new.tracker", getName(), getTrackerId(tracker), tKey, tracker);
 			}
 
 			return tracker;
