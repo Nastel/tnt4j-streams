@@ -73,6 +73,15 @@
         <field name="Correlator" formattingPattern="Document_{0}">
             <field-locator id="DocumentId" locator="AFILE_DOCUMENT_ID" locator-type="Label"/>
         </field>
+        <field name="Correlator" formattingPattern="Workflow_{0}">
+            <field-locator id="WorkflowId" locator="WorkflowId" locator-type="Activity">
+                <filter name="AF_WFCorrFilter">
+                    <expression handle="include" lang="groovy"><![CDATA[
+                        $fieldValue > 0
+                    ]]></expression>
+                </filter>
+            </field-locator>
+        </field>
 
         <!-- Store latest value to cache -->
         <field name="AF_ModifyTs" locator="AFILE_MODIFYTS" locator-type="Label" transparent="true"/>
@@ -157,6 +166,7 @@
             <field-locator id="ConsumerFilename" locator="FG_E_Attr_ConsumerFilename" locator-type="Activity" required="false"/>
         </field>
         <field name="ResourceName" locator="ResourceNameTemp" locator-type="Activity" formattingPattern="FILE={0}"/>
+        <field name="WorkflowId" locator="FG_E_Attr_WorkflowId" locator-type="Activity" datatype="Number" format="long"/>
 
         <!-- Correlators to build flow context -->
         <field name="Correlator">
@@ -178,12 +188,21 @@
             <field-locator id="ProducerFilename" locator="FG_E_Attr_ProducerFilename" locator-type="Activity" required="false"/>
             <field-locator id="ConsumerFilename" locator="FG_E_Attr_ConsumerFilename" locator-type="Activity" required="false"/>
         </field>
+        <field name="Correlator" formattingPattern="Workflow_{0}">
+            <field-locator id="WorkflowId" locator="WorkflowId" locator-type="Activity">
+                <filter name="FGE_WFCorrFilter">
+                    <expression handle="include" lang="groovy"><![CDATA[
+                        $fieldValue > 0
+                    ]]></expression>
+                </filter>
+            </field-locator>
+        </field>
 
         <!-- Store latest value to cache -->
         <field name="E_ModifyTs" locator="EVENT_MODIFYTS" locator-type="Label" transparent="true"/>
 
         <!-- Filter out events having no DATA_FLOW_ID or equal to 0 -->
-        <filter name="EventDFFilter">
+        <filter name="FGE_DFFilter">
             <expression handle="exclude" lang="groovy"><![CDATA[
                ${DataFlowId} == null || ${DataFlowId} == 0
             ]]></expression>
@@ -259,6 +278,7 @@
             <field-locator id="ConsumerFilename" locator="FG_E_Attr_ConsumerFilename" locator-type="Activity" required="false"/>
         </field>
         <field name="ResourceName" locator="ResourceNameTemp" locator-type="Activity" formattingPattern="FILE={0}"/>
+        <field name="WorkflowId" locator="FG_E_Attr_WorkflowId" locator-type="Activity" datatype="Number" format="long"/>
 
         <!-- Correlators to build flow context -->
         <field name="Correlator">
@@ -280,6 +300,15 @@
             <field-locator id="ProducerFilename" locator="FG_E_Attr_ProducerFilename" locator-type="Activity" required="false"/>
             <field-locator id="ConsumerFilename" locator="FG_E_Attr_ConsumerFilename" locator-type="Activity" required="false"/>
         </field>
+        <field name="Correlator" formattingPattern="Workflow_{0}">
+            <field-locator id="WorkflowId" locator="WorkflowId" locator-type="Activity">
+                <filter name="FGE_WFCorrFilter">
+                    <expression handle="include" lang="groovy"><![CDATA[
+                        $fieldValue > 0
+                    ]]></expression>
+                </filter>
+            </field-locator>
+        </field>
 
         <!-- Store latest value to cache -->
         <field name="E_App_ModifyTs" locator="REF_EVENT_MODIFYTS" locator-type="Label" transparent="true"/>
@@ -287,7 +316,7 @@
         <!-- Filter out events having: -->
         <!--        * no DATA_FLOW_ID or equal to 0 -->
         <!--        * APPL_NAME undefined -->
-        <filter name="EventDFFilter">
+        <filter name="FGE_DFFilter">
             <expression handle="exclude" lang="groovy"><![CDATA[
                ${DataFlowId} == null || ${DataFlowId} == 0 || ${ApplLookUp} == null
             ]]></expression>
@@ -338,7 +367,7 @@
         <field name="R_ModifyTs" locator="ROUTE_MODIFYTS" locator-type="Label" transparent="true"/>
 
         <!-- Filter out routes having no channel key defined -->
-        <!--filter name="EventDFFilter">
+        <!--filter name="R_RCKeyFilter">
             <expression handle="exclude" lang="groovy"><![CDATA[
                ${RoutchanKey} == null
             ]]></expression>
@@ -395,7 +424,7 @@
         <field name="D_ModifyTs" locator="DELIVERY_MODIFYTS" locator-type="Label" transparent="true"/>
 
         <!-- Filter out deliveries having no filename defined -->
-        <!--filter name="EventDFFilter">
+        <!--filter name="D_FNFilter">
             <expression handle="exclude" lang="groovy"><![CDATA[
                ${FileName} == null
             ]]></expression>
@@ -432,6 +461,15 @@
         <field name="Correlator" formattingPattern="CorrelatorsSet_{0}">
             <field-locator id="ObjectId" locator="CORRELATION_OBJECT_ID" locator-type="Label"/>
         </field>
+        <field name="Correlator" formattingPattern="Workflow_{0}">
+            <field-locator id="WorkflowId" locator="WorkflowId" locator-type="Activity">
+                <filter name="CS_WFCorrFilter">
+                    <expression handle="include" lang="groovy"><![CDATA[
+                        $fieldValue > 0
+                    ]]></expression>
+                </filter>
+            </field-locator>
+        </field>
 
         <!-- Store latest value to cache -->
         <field name="CS_RecTime" locator="CORRELATION_REC_TIME" locator-type="Label" transparent="true"/>
@@ -440,7 +478,7 @@
     </parser>
 
     <parser name="B2BiWorkflowContextResultSetParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJDBCResultSetParser">
-        <field name="Guid" formattingPattern="Workflow_{0}">
+        <field name="Guid" formattingPattern="WorkflowCtx_{0}">
             <field-locator id="WorkflowWFCId" locator="WORKFLOW_WFC_ID" locator-type="Label"/>
         </field>
         <field name="EventType" value="EVENT"/>
@@ -487,6 +525,15 @@
         </field>
         <field name="Correlator" formattingPattern="Document_{0}">
             <field-locator id="DocumentId" locator="WORKFLOW_DOC_ID" locator-type="Label"/>
+        </field>
+        <field name="Correlator" formattingPattern="Workflow_{0}">
+            <field-locator id="WorkflowId" locator="WorkflowId" locator-type="Activity">
+                <filter name="WFC_WFCorrFilter">
+                    <expression handle="include" lang="groovy"><![CDATA[
+                        $fieldValue > 0
+                    ]]></expression>
+                </filter>
+            </field-locator>
         </field>
 
         <!-- Store latest value to cache -->
@@ -552,6 +599,15 @@
         </field>
         <field name="Correlator" formattingPattern="CorrelatorsSet_{0}">
             <field-locator id="DocumentId" locator="DOCUMENT_ID" locator-type="Label"/>
+        </field>
+        <field name="Correlator" formattingPattern="Workflow_{0}">
+            <field-locator id="WorkflowId" locator="WorkflowId" locator-type="Activity">
+                <filter name="DOC_WFCorrFilter">
+                    <expression handle="include" lang="groovy"><![CDATA[
+                       $fieldValue > 0
+                   ]]></expression>
+                </filter>
+            </field-locator>
         </field>
 
         <!-- Store latest value to cache -->
