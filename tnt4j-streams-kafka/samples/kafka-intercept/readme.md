@@ -13,7 +13,7 @@ All the rest configuration is for advanced use cases: different kafka server hos
 ```properties
 source: com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics
 ```
-if there is no such it must be you have an old build of streams or you have not built `tnt4j-streams-kafka` module.
+if there is no such, it must be you have an old build of TNT4J-Streams or you have not built `tnt4j-streams-kafka` module.
 
 ### Advanced
 
@@ -31,7 +31,10 @@ interceptor.classes=com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.TNTKa
 ```
 #### Interceptors collected metrics streaming
 
-To configure interceptors collected metrics streaming to dedicated Kafka topic use file `./config/intercept/tnt4j_kafka.properties`
+To configure interceptors collected metrics streaming to dedicated Kafka topic use TNT4J configuration stanza from file 
+`./config/intercept/tnt4j_kafka.properties`. This dedicated configuration stanza shall be merged into TNT4J configuration file 
+(e.g. `./config/tnt4j.properties`), used by TNT4J-Streams over system property `tnt4j.config`. When building TNT4J-Streams deliverable 
+package with `tnt4j-streams-kafka` module included - this merge is performed automatically.
 
 * Define stanza for source `com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics` (without this metrics will not be 
 reported to dedicated Kafka topic):
