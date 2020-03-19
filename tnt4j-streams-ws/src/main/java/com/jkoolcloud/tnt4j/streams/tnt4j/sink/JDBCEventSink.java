@@ -176,7 +176,7 @@ public class JDBCEventSink extends LoggedEventSink {
 				+ "{url: " + url // NON-NLS
 				+ ", user: " + user // NON-NLS
 				+ ", pass: " + (passwd == null ? null : "xxxxxx") // NON-NLS
-				+ ", batchSize" + batchSize // NON-NLS
+				+ ", batchSize: " + batchSize // NON-NLS
 				+ ", handle: " + dbDataSource // NON-NLS
 				+ "}"; // NON-NLS
 	}

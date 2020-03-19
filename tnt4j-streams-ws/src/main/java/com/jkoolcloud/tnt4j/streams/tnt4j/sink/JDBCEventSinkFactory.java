@@ -31,7 +31,7 @@ import com.jkoolcloud.tnt4j.utils.Utils;
  * {@link EventSink}. This factory uses {@link com.jkoolcloud.tnt4j.streams.tnt4j.sink.JDBCEventSink} as the underlying
  * sink provider and by default uses {@link com.jkoolcloud.tnt4j.streams.tnt4j.format.SQLFormatter} to format messages.
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  * 
  * @see com.jkoolcloud.tnt4j.streams.tnt4j.sink.JDBCEventSink
  * @see com.jkoolcloud.tnt4j.streams.tnt4j.format.SQLFormatter
@@ -44,7 +44,10 @@ public class JDBCEventSinkFactory extends LoggedEventSinkFactory {
 	private String user = null;
 	private String passwd = null;
 	private int batchSize = 10;
-	private Properties cpProperties = new Properties();
+	private boolean synchronizedWrites = false;
+	private final Properties cpProperties = new Properties();
+
+	private static EventSink sinkInstance;
 
 	/**
 	 * Constructs a new JDBC Event Sink factory.
@@ -64,8 +67,19 @@ public class JDBCEventSinkFactory extends LoggedEventSinkFactory {
 
 	@Override
 	public EventSink getEventSink(String name, Properties props, EventFormatter frmt) {
-		EventSink outSink = getLogSink(name, props, frmt);
-		return configureSink(new JDBCEventSink(name, props, frmt, outSink));
+		if (synchronizedWrites) {
+			synchronized (cpProperties) {
+				if (sinkInstance == null) {
+					EventSink outSink = getLogSink(name, props, frmt);
+					sinkInstance = configureSink(new JDBCEventSink(name, props, frmt, outSink));
+				}
+
+				return sinkInstance;
+			}
+		} else {
+			EventSink outSink = getLogSink(name, props, frmt);
+			return configureSink(new JDBCEventSink(name, props, frmt, outSink));
+		}
 	}
 
 	@Override
@@ -84,6 +98,7 @@ public class JDBCEventSinkFactory extends LoggedEventSinkFactory {
 		user = Utils.getString("User", settings, user);// NON-NLS
 		passwd = Utils.getString("Passwd", settings, passwd); // NON-NLS
 		batchSize = Utils.getInt("BatchSize", settings, batchSize); // NON-NLS
+		synchronizedWrites = Utils.getBoolean("SynchronizedWrites", settings, synchronizedWrites); // NON-NLS
 
 		_applyConfig(settings);
 	}
