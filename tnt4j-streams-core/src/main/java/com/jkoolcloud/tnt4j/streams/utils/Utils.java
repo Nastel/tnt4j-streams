@@ -48,6 +48,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.w3c.dom.Document;
@@ -2139,7 +2140,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @return path resolved map contained value
 	 *
 	 * @see #getNodePath(String, String)
-	 * @see #getMapValueByPath(String[], Map, int, Set)
+	 * @see #getMapValueByPath(String[], Object, int, java.util.Set)
 	 */
 	public static Object getMapValueByPath(String path, String pathDelim, Map<String, ?> dataMap, int level,
 			Set<String[]> accessedPaths) {
@@ -2165,7 +2166,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *            set of accessed map paths
 	 * @return path resolved map contained value
 	 *
-	 * @see #getMapValueByPath(String[], Map, int, Set)
+	 * @see #getMapValueByPath(String[], Object, int, java.util.Set)
 	 */
 	public static Object getMapValueByPath(String[] path, Map<String, ?> dataMap, Set<String[]> accessedPaths) {
 		return getMapValueByPath(path, dataMap, 0, accessedPaths);
@@ -2182,8 +2183,8 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *
 	 * @param path
 	 *            map keys path tokens array referencing wanted value
-	 * @param dataMap
-	 *            data map to get value from
+	 * @param dataSet
+	 *            data map/collection to get value from
 	 * @param level
 	 *            path level
 	 * @param accessedPaths
@@ -2191,33 +2192,39 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @return path resolved map contained value
 	 */
 	@SuppressWarnings("unchecked")
-	public static Object getMapValueByPath(String[] path, Map<String, ?> dataMap, int level,
-			Set<String[]> accessedPaths) {
-		if (ArrayUtils.isEmpty(path) || dataMap == null) {
+	public static Object getMapValueByPath(String[] path, Object dataSet, int level, Set<String[]> accessedPaths) {
+		if (ArrayUtils.isEmpty(path) || dataSet == null) {
 			return null;
 		}
 
 		Object val;
 		if (StreamsConstants.MAP_NODE_TOKEN.equals(path[level])) {
-			val = dataMap;
-		} else if (StreamsConstants.MAP_UNMAPPED_TOKEN.equals(path[level])) {
-			return getUnaccessedMapEntries(accessedPaths, dataMap);
+			val = dataSet;
 		} else {
-			val = dataMap.get(path[level]);
+			if (dataSet instanceof Map) {
+				Map<String, ?> dataMap = (Map<String, ?>) dataSet;
+				if (StreamsConstants.MAP_UNMAPPED_TOKEN.equals(path[level])) {
+					return getUnaccessedMapEntries(Arrays.copyOfRange(path, 0, level), accessedPaths, dataMap);
+				} else {
+					val = dataMap.get(path[level]);
 
-			if (level < path.length - 1) {
-				if (val instanceof Map) {
-					val = getMapValueByPath(path, (Map<String, ?>) val, ++level, accessedPaths);
-				} else if (isIndexedCollection(val)) {
-					try {
-						int lii = Integer.parseInt(getItemIndexStr(path[level + 1]));
-						val = getCollectionElement(val, lii);
-						if (val instanceof Map) {
-							val = getMapValueByPath(path, (Map<String, ?>) val, level + 2, accessedPaths);
-						}
-					} catch (IllegalArgumentException | IndexOutOfBoundsException exc) {
+					if (val != null && level < path.length - 1) {
+						val = getMapValueByPath(path, val, level + 1, accessedPaths);
 					}
 				}
+			} else if (isIndexedCollection(dataSet)) {
+				try {
+					int lii = Integer.parseInt(getItemIndexStr(path[level]));
+					val = getCollectionElement(dataSet, lii);
+				} catch (IllegalArgumentException | IndexOutOfBoundsException exc) {
+					val = null;
+				}
+
+				if (val != null && level < path.length - 1) {
+					val = getMapValueByPath(path, val, level + 1, accessedPaths);
+				}
+			} else {
+				val = dataSet;
 			}
 		}
 
@@ -2272,18 +2279,37 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		return indexToken.replaceAll("\\D+", ""); // NON-NLS
 	}
 
-	private static Map<String, ?> getUnaccessedMapEntries(Set<String[]> accessedPaths, Map<String, ?> dataMap) {
+	private static Map<String, ?> getUnaccessedMapEntries(String[] pathPrefix, Set<String[]> accessedPaths,
+			Map<String, ?> dataMap) {
 		if (CollectionUtils.isEmpty(accessedPaths)) {
 			return dataMap;
 		}
 
 		Map<String, ?> unaccessedMap = copyMap(dataMap);
 
-		for (String[] ap : accessedPaths) {
-			removeMapValueByPath(ap, unaccessedMap);
+		for (String[] accessedPath : accessedPaths) {
+			removeMapValueByPath(trimPathPrefix(pathPrefix, accessedPath), unaccessedMap);
 		}
 
 		return unaccessedMap;
+	}
+
+	private static String[] trimPathPrefix(String[] prefix, String[] fullPath) {
+		if (ArrayUtils.isEmpty(prefix)) {
+			return fullPath;
+		}
+
+		if (prefix.length >= fullPath.length) {
+			return null;
+		}
+
+		for (int i = 0; i < prefix.length; i++) {
+			if (!prefix[i].equals(fullPath[i])) {
+				return null;
+			}
+		}
+
+		return Arrays.copyOfRange(fullPath, prefix.length, fullPath.length);
 	}
 
 	/**
@@ -2333,11 +2359,9 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
-	 * Makes a true copy of provided {@code oMap} instance. Map copy instance entries do not have references to original
+	 * Makes a deep copy of provided {@code oMap} instance. Map copy instance entries do not have references to original
 	 * map, so altering copy map entries will not affect original map.
-	 * <p>
-	 * Note: copied map is always a {@link java.util.HashMap}.
-	 *
+	 * 
 	 * @param oMap
 	 *            original map instance to copy
 	 * @param <K>
@@ -2351,16 +2375,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		if (oMap == null) {
 			return null;
 		}
-
-		Map<K, V> cMap = new HashMap<>(oMap.size());
-
-		for (Map.Entry<K, V> ome : oMap.entrySet()) {
-			V oVal = ome.getValue();
-			if (oVal instanceof Map) {
-				oVal = (V) copyMap((Map<K, V>) oVal);
-			}
-			cMap.put(ome.getKey(), oVal);
-		}
+		Map<K, V> cMap = (Map<K, V>) SerializationUtils.clone((Serializable) oMap);
 
 		return cMap;
 	}

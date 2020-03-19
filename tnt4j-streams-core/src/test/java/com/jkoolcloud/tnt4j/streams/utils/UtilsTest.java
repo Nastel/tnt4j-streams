@@ -298,4 +298,77 @@ public class UtilsTest {
 		assertTrue(cArray instanceof Object[]);
 	}
 
+	@Test
+	public void testMapValueByPath() {
+		Map<String, Object> map = new HashMap<>();
+		map.put("address", "0x0d8775f648430679a709e98d2b0cb6250d2887ef");
+		map.put("blockHash", "0xb99d79fb25389f56ae10adedf74215628b1d39762f1150d3e7772540d42bbb05");
+		map.put("blockNumber", "0x6acfe7");
+		map.put("data", "0x00000000000000000000000000000000000000000000000e076e3e7507c77c00");
+		map.put("logIndex", "0x5d");
+		map.put("topics",
+				new String[] { "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+						"0x00000000000000000000000051b6548d47bf263cfca5603a0c5f28f1063ef072",
+						"0x0000000000000000000000006fea7f12b33b41087fe3e4038d4002bff6e83bbb" });
+		map.put("transactionHash", "0x760e9517678120de00c3d19374990259cfe510bbec10eaae2edf5606506e69f6");
+		map.put("transactionIndex", "0x90");
+
+		Map<String, Object> innerMap = new HashMap<>();
+		innerMap.put("InnerMapKey1", "MapValue1");
+		innerMap.put("InnerMapKey2", "MapValue2");
+		innerMap.put("InnerMapKey3", "MapValue3");
+		innerMap.put("InnerMapKey4",
+				new String[] { "inner_inner_array_item1", "inner_inner_array_item2", "inner_inner_array_item3" });
+
+		map.put("additionalItem1",
+				new String[] { "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef" });
+		map.put("additionalItem2", new Object[] { "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+				new Object[] { "inner_array_item1", "inner_array_item2", innerMap } });
+
+		Set<String[]> accessedPaths = new HashSet<>();
+
+		Object mValue = Utils.getMapValueByPath(Utils.getNodePath("address", "."), map, 0, accessedPaths);
+		assertEquals(mValue, "0x0d8775f648430679a709e98d2b0cb6250d2887ef");
+
+		mValue = Utils.getMapValueByPath(Utils.getNodePath("topics.2", "."), map, 0, accessedPaths);
+		assertEquals(mValue, "0x0000000000000000000000006fea7f12b33b41087fe3e4038d4002bff6e83bbb");
+
+		mValue = Utils.getMapValueByPath(Utils.getNodePath("additionalItem1.2", "."), map, 0, accessedPaths);
+		assertEquals(mValue, null);
+
+		assertEquals(accessedPaths.size(), 3);
+
+		mValue = Utils.getMapValueByPath(Utils.getNodePath("additionalItem2.1.1", "."), map, 0, accessedPaths);
+		assertEquals(mValue, "inner_array_item2");
+
+		mValue = Utils.getMapValueByPath(Utils.getNodePath("additionalItem2.1.2.InnerMapKey1", "."), map, 0,
+				accessedPaths);
+		assertEquals(mValue, "MapValue1");
+
+		mValue = Utils.getMapValueByPath(Utils.getNodePath("additionalItem2.1.2.InnerMapKey4.0", "."), map, 0,
+				accessedPaths);
+		assertEquals(mValue, "inner_inner_array_item1");
+
+		mValue = Utils.getMapValueByPath(Utils.getNodePath("topics", "."), map, 0, accessedPaths);
+		assertEquals(ArrayUtils.getLength(mValue), 3);
+
+		mValue = Utils.getMapValueByPath(Utils.getNodePath("topics.*", "."), map, 0, accessedPaths);
+		assertEquals(ArrayUtils.getLength(mValue), 3);
+
+		mValue = Utils.getMapValueByPath(Utils.getNodePath("address.*", "."), map, 0, accessedPaths);
+		assertEquals(mValue, "0x0d8775f648430679a709e98d2b0cb6250d2887ef");
+
+		mValue = Utils.getMapValueByPath(Utils.getNodePath("additionalItem2.1.0.InnerMapKey1", "."), map, 0,
+				accessedPaths);
+		assertEquals(mValue, "inner_array_item1");
+
+		assertEquals(accessedPaths.size(), 10);
+
+		mValue = Utils.getMapValueByPath(Utils.getNodePath("#", "."), map, 0, accessedPaths);
+		assertEquals(((Map<?, ?>) mValue).size(), 8);
+
+		mValue = Utils.getMapValueByPath(Utils.getNodePath("additionalItem2.1.2.#", "."), map, 0, accessedPaths);
+		assertEquals(((Map<?, ?>) mValue).size(), 3);
+	}
+
 }
