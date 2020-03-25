@@ -278,7 +278,7 @@ public class MetricsReporter implements InterceptionsReporter {
 		long delay = reportingDelay == null ? period : TimeUnit.SECONDS.toMillis(reportingDelay);
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 				"MetricsReporter.schedule.reporting", delay, period);
-		metricsReportingTimer = new java.util.Timer();
+		metricsReportingTimer = new java.util.Timer("KafkaInterceptorMetricsReporterTimer", true); // NON-NLS
 		metricsReportingTimer.scheduleAtFixedRate(mrt, delay, period);
 	}
 

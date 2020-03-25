@@ -199,7 +199,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 			long period = TimeUnit.SECONDS.toMillis(POOL_TIME_SECONDS);
 			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 					"MsgTraceReporter.schedule.commands.polling", TNT_TRACE_CONFIG_TOPIC, period, period);
-			pollTimer = new Timer();
+			pollTimer = new Timer("KafkaInterceptorTracesPollTimer", true);
 			pollTimer.scheduleAtFixedRate(mrt, period, period);
 		}
 	}
