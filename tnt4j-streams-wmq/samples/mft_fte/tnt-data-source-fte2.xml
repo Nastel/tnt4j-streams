@@ -3,7 +3,10 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
+    <java-object name="MQMsgToStringPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.MQMessageToStringPreParser"/>
+
     <parser name="MQFTEParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
+        <!--<reference name="MQMsgToStringPreParser"/>-->
 
         <field name="EventName" locator="/transaction/action" locator-type="Label"/>
         <field name="ApplName" separator=":">

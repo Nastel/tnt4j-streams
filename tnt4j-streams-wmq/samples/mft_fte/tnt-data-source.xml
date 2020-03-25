@@ -3,9 +3,13 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
+    <java-object name="MQMsgToStringPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.MQMessageToStringPreParser"/>
+
     <!-- completed: SUCCESSFUL, FAILED MFT event -->
     <parser name="MQFTEParserNormal" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
         <property name="RequireDefault" value="true"/>
+
+        <reference name="MQMsgToStringPreParser"/>
 
         <field name="EventName" locator="/transaction/action" locator-type="Label"/>
         <field name="EventType" locator="/transaction/action" locator-type="Label">
@@ -74,6 +78,8 @@
     <!-- STARTED and PROGRESS MFT event -->
     <parser name="MQFTEParserProgress" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
         <property name="RequireDefault" value="false"/>
+
+        <reference name="MQMsgToStringPreParser"/>
 
         <field name="EventName" locator="/transaction/action" locator-type="Label"/>
         <field name="EventType" locator="/transaction/action" locator-type="Label">

@@ -17,20 +17,19 @@
 package com.jkoolcloud.tnt4j.streams.inputs;
 
 import com.ibm.mq.MQMessage;
-import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
-import com.jkoolcloud.tnt4j.streams.utils.*;
+import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 
 /**
- * Implements a WebSphere MQ activity stream, where activity data is {@link String} made from {@link MQMessage} payload.
+ * Implements a WebSphere MQ activity stream, where activity data is {@link com.ibm.mq.MQMessage}.
  * <p>
- * This activity stream requires parsers that can support {@link String} data.
+ * This activity stream requires parsers that can support {@link com.ibm.mq.MQMessage} data.
  * <p>
  * This activity stream supports configuration properties from {@link AbstractWmqStream} (and higher hierarchy streams).
  *
- * @version $Revision: 2 $
+ * @version $Revision: 3 $
  */
-public class WmqStream extends AbstractWmqStream<String> {
+public class WmqStream extends AbstractWmqStream<MQMessage> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(WmqStream.class);
 
 	/**
@@ -46,11 +45,7 @@ public class WmqStream extends AbstractWmqStream<String> {
 	}
 
 	@Override
-	protected String getActivityDataFromMessage(MQMessage mqMsg) throws Exception {
-		String msgData = mqMsg.readStringOfByteLength(mqMsg.getDataLength());
-		logger().log(OpLevel.TRACE,
-				StreamsResources.getString(WmqStreamConstants.RESOURCE_BUNDLE_NAME, "WmqStream.message.data"),
-				msgData.length(), msgData);
-		return msgData;
+	protected MQMessage getActivityDataFromMessage(MQMessage mqMsg) throws Exception {
+		return mqMsg;
 	}
 }

@@ -24,9 +24,9 @@
     </parser>
 
     <parser name="MFTWorkflowParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
-        <reference name="XMLFromMsgPreParser"/>
-
         <property name="RequireDefault" value="false"/>
+
+        <reference name="XMLFromMsgPreParser"/>
 
         <field name="EventType" value="ACTIVITY"/>
         <field name="Correlator" value="/Workflow/processId" locator-type="Label"/>

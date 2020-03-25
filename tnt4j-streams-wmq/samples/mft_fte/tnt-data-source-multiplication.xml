@@ -5,6 +5,9 @@
 
     <resource-ref id="MFT_MAPPINGS" type="ValuesMap" uri="mft_mappings.json"/>
     <resource-ref id="MFT_SDS_MAPPINGS" type="ValuesMap" uri="mft_SDS_mappings.json"/>
+
+    <java-object name="MQMsgToStringPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.MQMessageToStringPreParser"/>
+
     <!-- Splits Job Name into tokens  -->
     <parser name="JobNameParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityRegExParser">
         <property name="Pattern" value="(.*)\.(.*)\.(.*)\.(.*)"/>
@@ -229,6 +232,8 @@
     </parser>
 
     <parser name="MsgSwitchParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
+        <reference name="MQMsgToStringPreParser"/>
+
         <field name="EventType" value="NOOP"/>
 
         <field name="message-text" locator="/transaction" locator-type="Label" transparent="true">

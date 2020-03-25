@@ -4562,8 +4562,8 @@ under `java-object` tag referring output type class and referred from `stream` l
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
     <parser name="ProgressEventParser">
-            ...
-        </parser>
+        ...
+    </parser>
 
     <stream name="WmqStream" class="com.jkoolcloud.tnt4j.streams.inputs.WmqStream">
         <property name="SplitRelatives" value="true"/>
