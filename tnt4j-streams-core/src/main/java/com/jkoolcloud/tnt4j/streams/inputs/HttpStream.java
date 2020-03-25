@@ -16,6 +16,7 @@
 
 package com.jkoolcloud.tnt4j.streams.inputs;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -205,7 +206,11 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 		}
 	}
 
-	private class HttpStreamRequestHandler extends InputProcessor implements HttpRequestHandler {
+	/**
+	 * Runs {@link org.apache.http.impl.bootstrap.HttpServer} and handles server received
+	 * {@link org.apache.http.HttpRequest}s.
+	 */
+	protected class HttpStreamRequestHandler extends InputProcessor implements HttpRequestHandler {
 
 		private HttpServer server;
 
@@ -313,25 +318,32 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 				boolean added = false;
 
 				if (reqEntity != null) {
-					Map<String, Object> reqMap = new HashMap<>();
-					if (URLEncodedUtils.isEncoded(reqEntity)) {
-						List<NameValuePair> reqParams = URLEncodedUtils.parse(reqEntity);
-						if (reqParams != null) {
-							for (NameValuePair param : reqParams) {
-								reqMap.put(param.getName(), param.getValue());
+					try {
+						Map<String, Object> reqMap = new HashMap<>();
+						if (URLEncodedUtils.isEncoded(reqEntity)) {
+							List<NameValuePair> reqParams = URLEncodedUtils.parse(reqEntity);
+							if (reqParams != null) {
+								for (NameValuePair param : reqParams) {
+									reqMap.put(param.getName(), param.getValue());
+								}
+							}
+						} else {
+							byte[] bytes = EntityUtils.toByteArray(reqEntity);
+							if (ArrayUtils.isNotEmpty(bytes)) {
+								reqMap.put(StreamsConstants.ACTIVITY_DATA_KEY, bytes);
 							}
 						}
-					} else {
-						byte[] bytes = EntityUtils.toByteArray(reqEntity);
-						if (ArrayUtils.isNotEmpty(bytes)) {
-							reqMap.put(StreamsConstants.ACTIVITY_DATA_KEY, bytes);
-						}
-					}
 
-					if (!reqMap.isEmpty()) {
-						activityAvailable = true;
-						reqMap.put(StreamsConstants.TRANSPORT_KEY, StreamsConstants.TRANSPORT_HTTP);
-						added = addInputToBuffer(reqMap);
+						if (!reqMap.isEmpty()) {
+							activityAvailable = true;
+							reqMap.put(StreamsConstants.TRANSPORT_KEY, StreamsConstants.TRANSPORT_HTTP);
+							added = addInputToBuffer(reqMap);
+						}
+					} finally {
+						EntityUtils.consumeQuietly(reqEntity);
+						if (reqEntity instanceof Closeable) {
+							((Closeable) reqEntity).close();
+						}
 					}
 				}
 
