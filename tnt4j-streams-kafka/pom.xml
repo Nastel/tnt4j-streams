@@ -14,7 +14,7 @@
     <artifactId>tnt4j-streams-kafka</artifactId>
 
     <properties>
-        <kafka.clients.version>2.4.0</kafka.clients.version>
+        <kafka.clients.version>2.4.1</kafka.clients.version>
     </properties>
 
     <build>
@@ -180,7 +180,7 @@
         <!--<dependency>-->
         <!--<groupId>io.confluent</groupId>-->
         <!--<artifactId>monitoring-interceptors</artifactId>-->
-        <!--<version>3.2.2</version>-->
+        <!--<version>5.4.1</version>-->
         <!--</dependency>-->
 
         <dependency>
