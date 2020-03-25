@@ -16,8 +16,7 @@
 
 package com.jkoolcloud.tnt4j.streams.utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -26,6 +25,8 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+
+import com.jkoolcloud.tnt4j.core.UsecTimestamp;
 
 /**
  * @author akausinis
@@ -116,5 +117,39 @@ public class TimestampFormatterTest {
 		assertEquals(TimeUnit.DAYS, tu);
 		tu = TimestampFormatter.shiftUp(tu);
 		assertEquals(TimeUnit.DAYS, tu);
+	}
+
+	@Test
+	public void testMultiplePatterns() throws Exception {
+		String t1 = "20191120 14:02:16.208";
+		String t2 = "20191120 14:02:16";
+
+		UsecTimestamp ts1 = TimestampFormatter.parse("yyyyMMdd HH:mm:ss.SSS|yyyyMMdd HH:mm:ss", t1, null, null);
+		UsecTimestamp ts2 = TimestampFormatter.parse("yyyyMMdd HH:mm:ss.SSS|yyyyMMdd HH:mm:ss", t2, null, null);
+
+		assertEquals(ts1.getTimeUsec(), 1574251336208000L);
+		assertEquals(ts2.getTimeUsec(), 1574251336000000L);
+
+		Throwable tpe = null;
+		try {
+			UsecTimestamp ts3 = TimestampFormatter.parse(null, t2, null, null);
+		} catch (ParseException pe) {
+			tpe = pe;
+		}
+		assertTrue(tpe != null);
+		tpe = null;
+		try {
+			UsecTimestamp ts4 = TimestampFormatter.parse("", t2, null, null);
+		} catch (ParseException pe) {
+			tpe = pe;
+		}
+		assertTrue(tpe != null);
+		tpe = null;
+		try {
+			UsecTimestamp ts5 = TimestampFormatter.parse("yyyyMMdd HH:mm:ss.SSS|yyyyMMdd HH:mm:ss.SSS", t2, null, null);
+		} catch (ParseException pe) {
+			tpe = pe;
+		}
+		assertTrue(tpe != null);
 	}
 }

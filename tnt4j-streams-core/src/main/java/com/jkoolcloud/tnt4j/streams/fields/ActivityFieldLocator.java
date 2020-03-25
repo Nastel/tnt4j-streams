@@ -601,6 +601,7 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 			case Timestamp:
 				value = formatDateValue(value);
 				break;
+			case AsInput:
 			default:
 				break;
 			}
@@ -696,7 +697,7 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	 * @see com.jkoolcloud.tnt4j.streams.utils.NumericFormatter#toString(String, Object, String)
 	 * @see Utils#toString(Object)
 	 */
-	protected Object formatStringValue(Object value) {
+	protected String formatStringValue(Object value) {
 		if (value instanceof byte[]) {
 			if (builtInFormat == ActivityFieldFormatType.base64Binary) {
 				return Utils.base64EncodeStr((byte[]) value);

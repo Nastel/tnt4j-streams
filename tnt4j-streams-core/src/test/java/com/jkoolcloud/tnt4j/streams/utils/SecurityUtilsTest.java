@@ -24,9 +24,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * @author slb
+ * @author akausinis
  * @version 1.0
- * @created 2019-10-15 12:30
  */
 public class SecurityUtilsTest {
 
