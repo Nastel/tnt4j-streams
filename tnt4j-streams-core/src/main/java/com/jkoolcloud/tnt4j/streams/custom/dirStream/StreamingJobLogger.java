@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.custom.dirStream;
 import java.io.File;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
+import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.inputs.StreamingStatus;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStreamStatistics;
 
@@ -61,6 +62,11 @@ public class StreamingJobLogger implements StreamingJobListener, JobFilesListene
 	public void onStreamEvent(StreamingJob job, OpLevel level, String message, Object source) {
 		System.out.println("Streaming job event occurred: job=" + job + " level=" + level + " msg=" + message // NON-NLS
 				+ " source=" + source); // NON-NLS
+	}
+
+	@Override
+	public void onSendEvent(StreamingJob job, ActivityInfo ai) {
+		System.out.println("Streaming send event occurred: job=" + job + " activity =" + ai); // NON-NLS
 	}
 
 	@Override

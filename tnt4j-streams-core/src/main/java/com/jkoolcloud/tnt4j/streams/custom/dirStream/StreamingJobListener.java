@@ -17,6 +17,7 @@
 package com.jkoolcloud.tnt4j.streams.custom.dirStream;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
+import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.inputs.StreamingStatus;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStreamStatistics;
 
@@ -100,4 +101,14 @@ public interface StreamingJobListener {
 	 *            event source
 	 */
 	void onStreamEvent(StreamingJob job, OpLevel level, String message, Object source);
+
+	/**
+	 * This method gets called when streaming job sends activity entity to output.
+	 * 
+	 * @param job
+	 *            job sending notification
+	 * @param ai
+	 *            activity entity to send
+	 */
+	void onSendEvent(StreamingJob job, ActivityInfo ai);
 }
