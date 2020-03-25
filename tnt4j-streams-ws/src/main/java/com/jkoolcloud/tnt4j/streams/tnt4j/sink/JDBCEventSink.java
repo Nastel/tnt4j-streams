@@ -20,12 +20,11 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import com.codahale.metrics.*;
+import com.codahale.metrics.Timer;
 import com.jkoolcloud.tnt4j.core.KeyValueStats;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.format.EventFormatter;
@@ -40,7 +39,7 @@ import com.zaxxer.hikari.HikariDataSource;
 /**
  * This class implements {@link EventSink} with JDBC and HikariCP as the underlying sink implementation.
  *
- * @version $Revision : 1 $
+ * @version $Revision : 3 $
  * 
  * @see com.jkoolcloud.tnt4j.streams.tnt4j.sink.JDBCEventSinkFactory
  * @see com.jkoolcloud.tnt4j.streams.tnt4j.format.SQLFormatter
@@ -52,9 +51,12 @@ public class JDBCEventSink extends LoggedEventSink {
 	private String user = null;
 	private String passwd = null;
 	private int batchSize = 10;
+	private long batchPeriod = TimeUnit.SECONDS.toMillis(30);
 	private Properties cpProperties = new Properties();
 
 	private HikariDataSource dbDataSource;
+	private java.util.Timer batchTimer;
+	private BatchTask batchTask;
 	private final List<String> batch = new ArrayList<>();
 
 	/**
@@ -126,6 +128,19 @@ public class JDBCEventSink extends LoggedEventSink {
 	}
 
 	/**
+	 * Sets batch upsert execution period in seconds. Value {@code <=0} turns off timed batch processing.
+	 *
+	 * @param batchPeriod
+	 *            the batch upsert execution period
+	 * @return instance of this sink
+	 */
+	public JDBCEventSink setBatchPeriod(int batchPeriod) {
+		this.batchPeriod = batchPeriod > 0 ? TimeUnit.SECONDS.toMillis(batchPeriod) : batchPeriod;
+
+		return this;
+	}
+
+	/**
 	 * Sets HikariCP configuration properties.
 	 *
 	 * @param cpConfig
@@ -144,24 +159,45 @@ public class JDBCEventSink extends LoggedEventSink {
 
 	@Override
 	protected void _open() throws IOException {
-		_close();
+		try {
+			if (isOpen()) {
+				_close();
+			}
 
-		LOGGER.log(OpLevel.DEBUG, "Open sink ''{0}'' DB data source url={1}, user={2}, pass={3}", getName(), url, user,
-				passwd == null ? null : "xxxxxx"); // NON-NLS
+			LOGGER.log(OpLevel.DEBUG, "Open sink ''{0}'' DB data source url={1}, user={2}, pass={3}", getName(), url,
+					user, passwd == null ? null : "xxxxxx"); // NON-NLS
 
-		HikariConfig dbConfig = new HikariConfig(cpProperties);
-		dbConfig.setJdbcUrl(url);
-		dbConfig.setUsername(user);
-		dbConfig.setPassword(SecurityUtils.getPass2(passwd));
+			HikariConfig dbConfig = new HikariConfig(cpProperties);
+			dbConfig.setJdbcUrl(url);
+			dbConfig.setUsername(user);
+			dbConfig.setPassword(SecurityUtils.getPass2(passwd));
 
-		dbDataSource = new HikariDataSource(dbConfig);
+			dbDataSource = new HikariDataSource(dbConfig);
 
-		super._open();
+			if (batchPeriod > 0) {
+				batchTimer = new java.util.Timer("JDBCSinkBatchProcessingTimer", true);
+			}
+
+			super._open();
+		} catch (Throwable e) {
+			LOGGER.log(OpLevel.ERROR, "Failed to open sink name={0}, url={1}, user={2}, pass={3}", getName(), url, user,
+					passwd == null ? null : "xxxxxx", e);
+			_close();
+			throw new IOException(e.getMessage(), e);
+		}
 	}
 
 	@Override
 	protected void _close() throws IOException {
+		if (batchTimer != null) {
+			batchTimer.cancel();
+			batchTimer = null;
+		}
+
 		if (dbDataSource != null) {
+			LOGGER.log(OpLevel.DEBUG, "Triggering upsert queries batch execution on sink close");
+			processBatch();
+
 			LOGGER.log(OpLevel.DEBUG, "Closing sink ''{0}'' DB data source url={1}, user={2}, pass={3}", getName(), url,
 					user, passwd == null ? null : "xxxxxx"); // NON-NLS
 			Utils.close(dbDataSource);
@@ -177,6 +213,7 @@ public class JDBCEventSink extends LoggedEventSink {
 				+ ", user: " + user // NON-NLS
 				+ ", pass: " + (passwd == null ? null : "xxxxxx") // NON-NLS
 				+ ", batchSize: " + batchSize // NON-NLS
+				+ ", batchPeriod: " + batchPeriod // NON-NLS
 				+ ", handle: " + dbDataSource // NON-NLS
 				+ "}"; // NON-NLS
 	}
@@ -185,8 +222,9 @@ public class JDBCEventSink extends LoggedEventSink {
 	protected void writeLine(String sql) throws IOException {
 		synchronized (batch) {
 			batch.add(sql);
+			armTimerTask();
 		}
-		processBatch();
+		checkBatchSize();
 	}
 
 	@Override
@@ -227,31 +265,65 @@ public class JDBCEventSink extends LoggedEventSink {
 		return this;
 	}
 
-	/**
-	 * Performs JDBC update/insert (upsert) queries batch processing.
-	 */
-	protected void processBatch() {
+	private void checkBatchSize() {
 		synchronized (batch) {
-			if (batch.size() >= batchSize) {
-				Connection dbConn = null;
-				try {
-					dbConn = dbDataSource.getConnection();
-					boolean useBatch = dbConn.getMetaData().supportsBatchUpdates();
-					if (useBatch) {
-						batchQueries(dbConn, batch);
-					} else {
-						executeQueries(dbConn, batch);
-					}
-				} catch (SQLException exc) {
-					Utils.logThrowable(LOGGER, OpLevel.ERROR, "Failed to process whole batch: {0}", exc);
-				} finally {
-					Utils.close(dbConn);
+			if (isBatchSizeHit()) {
+				cancelTimerTask();
+				LOGGER.log(OpLevel.DEBUG, "Triggering upsert queries batch execution on bath max. size hit");
+				processBatch();
+				if (!batch.isEmpty()) {
+					armTimerTask();
 				}
 			}
 		}
 	}
 
-	private void batchQueries(Connection dbConn, List<String> batch) throws SQLException {
+	private void triggerBatchPeriod(String taskId) {
+		synchronized (batch) {
+			LOGGER.log(OpLevel.DEBUG, "Triggering upsert queries batch execution from timer task ''{0}''", taskId);
+			processBatch();
+			batchTask = null;
+			if (!batch.isEmpty()) {
+				armTimerTask();
+			}
+		}
+	}
+
+	private boolean isBatchSizeHit() {
+		return batch.size() >= batchSize;
+	}
+
+	/**
+	 * Performs JDBC update/insert (upsert) queries batch processing.
+	 */
+	protected void processBatch() {
+		synchronized (batch) {
+			if (batch.isEmpty()) {
+				LOGGER.log(OpLevel.INFO, "Noting to upsert, batch is empty.");
+				return;
+			}
+
+			LOGGER.log(OpLevel.DEBUG, "Will send {0} upsert queries to database", batch.size());
+			Connection dbConn = null;
+			try {
+				dbConn = dbDataSource.getConnection();
+				boolean useBatch = dbConn.getMetaData().supportsBatchUpdates();
+				int qCount;
+				if (useBatch) {
+					qCount = batchQueries(dbConn, batch);
+				} else {
+					qCount = executeQueries(dbConn, batch);
+				}
+				LOGGER.log(OpLevel.INFO, "Sent {0} upsert queries to database", qCount);
+			} catch (SQLException exc) {
+				Utils.logThrowable(LOGGER, OpLevel.ERROR, "Failed to process whole upsert batch: {0}", exc);
+			} finally {
+				Utils.close(dbConn);
+			}
+		}
+	}
+
+	private int batchQueries(Connection dbConn, List<String> batch) throws SQLException {
 		Statement dbSt = dbConn.createStatement(); // TODO: prepared statements batching
 		for (String sql : batch) {
 			dbSt.addBatch(sql);
@@ -261,12 +333,16 @@ public class JDBCEventSink extends LoggedEventSink {
 		if (!dbConn.getAutoCommit()) {
 			dbConn.commit();
 		}
+		int qCount = batch.size();
 		Utils.close(dbSt);
 		batch.clear();
+
+		return qCount;
 	}
 
-	private void executeQueries(Connection dbConn, List<String> batch) {
+	private int executeQueries(Connection dbConn, List<String> batch) {
 		Statement dbSt = null;
+		int qCount = 0;
 		for (int i = 0; i < batch.size(); i++) {
 			try {
 				String sql = batch.get(i);
@@ -277,11 +353,53 @@ public class JDBCEventSink extends LoggedEventSink {
 					dbConn.commit();
 				}
 				batch.remove(i--);
+				qCount++;
 			} catch (SQLException exc) {
-				Utils.logThrowable(LOGGER, OpLevel.ERROR, "Failed to process batch query: {0}", exc);
+				Utils.logThrowable(LOGGER, OpLevel.ERROR, "Failed to process batch upsert query: {0}", exc);
 			} finally {
 				Utils.close(dbSt);
 			}
+		}
+
+		return qCount;
+	}
+
+	private void armTimerTask() {
+		if (batchTimer != null) {
+			if (batchTask == null) {
+				batchTimer.purge();
+				batchTimer.schedule(batchTask = new BatchTask(Thread.currentThread().getName(), this), batchPeriod);
+				LOGGER.log(OpLevel.DEBUG, "Armed upsert queries batch timer task ''{0}'' on batch sized {1}",
+						batchTask.getId(), batch.size());
+			}
+		}
+	}
+
+	private void cancelTimerTask() {
+		if (batchTask != null) {
+			batchTask.cancel();
+			LOGGER.log(OpLevel.DEBUG, "Canceled upsert queries batch timer task ''{0}'' on batch sized {1}",
+					batchTask.getId(), batch.size());
+			batchTask = null;
+		}
+	}
+
+	private static class BatchTask extends TimerTask {
+		private final String id;
+		private final JDBCEventSink sink;
+
+		BatchTask(String id, JDBCEventSink sink) {
+			this.id = id;
+			this.sink = sink;
+		}
+
+		String getId() {
+			return id;
+		}
+
+		@Override
+		public void run() {
+			sink.triggerBatchPeriod(id);
 		}
 	}
 }

@@ -31,7 +31,7 @@ import com.jkoolcloud.tnt4j.utils.Utils;
  * {@link EventSink}. This factory uses {@link com.jkoolcloud.tnt4j.streams.tnt4j.sink.JDBCEventSink} as the underlying
  * sink provider and by default uses {@link com.jkoolcloud.tnt4j.streams.tnt4j.format.SQLFormatter} to format messages.
  *
- * @version $Revision: 2 $
+ * @version $Revision: 3 $
  * 
  * @see com.jkoolcloud.tnt4j.streams.tnt4j.sink.JDBCEventSink
  * @see com.jkoolcloud.tnt4j.streams.tnt4j.format.SQLFormatter
@@ -44,6 +44,7 @@ public class JDBCEventSinkFactory extends LoggedEventSinkFactory {
 	private String user = null;
 	private String passwd = null;
 	private int batchSize = 10;
+	private int batchPeriod = 30;
 	private boolean synchronizedWrites = false;
 	private final Properties cpProperties = new Properties();
 
@@ -85,7 +86,8 @@ public class JDBCEventSinkFactory extends LoggedEventSinkFactory {
 	@Override
 	protected EventSink configureSink(EventSink sink) {
 		JDBCEventSink jdbcSink = (JDBCEventSink) super.configureSink(sink);
-		jdbcSink.setUrl(url).setUser(user).setPassword(passwd).setBatchSize(batchSize).setCPConfig(cpProperties);
+		jdbcSink.setUrl(url).setUser(user).setPassword(passwd).setBatchSize(batchSize).setBatchPeriod(batchPeriod)
+				.setCPConfig(cpProperties);
 
 		return jdbcSink;
 	}
@@ -98,6 +100,7 @@ public class JDBCEventSinkFactory extends LoggedEventSinkFactory {
 		user = Utils.getString("User", settings, user);// NON-NLS
 		passwd = Utils.getString("Passwd", settings, passwd); // NON-NLS
 		batchSize = Utils.getInt("BatchSize", settings, batchSize); // NON-NLS
+		batchPeriod = Utils.getInt("BatchPeriod", settings, batchPeriod); // NON-NLS
 		synchronizedWrites = Utils.getBoolean("SynchronizedWrites", settings, synchronizedWrites); // NON-NLS
 
 		_applyConfig(settings);
