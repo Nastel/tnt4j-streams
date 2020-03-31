@@ -63,10 +63,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
+                <version>3.2.2</version>
                 <configuration>
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                     <shadedClassifierName>all</shadedClassifierName>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
                     <transformers>
                         <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                             <manifestEntries>
@@ -80,14 +81,24 @@
                     </transformers>
                     <artifactSet>
                         <excludes>
+                            <!-- Kafka dependency and its transitives -->
                             <exclude>org.apache.kafka:*</exclude>
-                            <exclude>org.apache.zookeeper:*</exclude>
                             <exclude>org.scala*:*</exclude>
+                            <exclude>com.github.luben:zstd-jni</exclude>
+                            <exclude>org.lz4:lz4-java</exclude>
+                            <exclude>org.xerial.snappy:snappy-java</exclude>
+                            <!-- Zookeeper dependency and its transitives -->
+                            <exclude>org.apache.zookeeper:*</exclude>
+                            <exclude>io.netty:*</exclude>
+                            <exclude>org.apache.yetus:audience-annotations</exclude>
+                            <!-- SLF4J logger dependency and transitives -->
                             <exclude>org.slf4j*:*</exclude>
                             <exclude>log4j*:*</exclude>
+                            <!-- Common dependencies and its transitives-->
+                            <exclude>com.google.guava:guava</exclude>
+                            <exclude>com.fasterxml.jackson.core:*</exclude>
                         </excludes>
                     </artifactSet>
-                    <createDependencyReducedPom>false</createDependencyReducedPom>
                     <filters>
                         <filter>
                             <artifact>*:*</artifact>
