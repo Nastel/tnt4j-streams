@@ -172,13 +172,13 @@ public class MsgTraceReporter implements InterceptionsReporter {
 			streamName = interceptorProperties.getProperty("messages.tracer.kafka.client.id");
 		}
 
-		if (StringUtils.isNotEmpty(streamName)) {
-			stream.setName(streamName); // NON-NLS
-		}
+		stream.setName(StringUtils.isEmpty(streamName) ? "kafka-x-ray-trace-stream_" + System.currentTimeMillis() // NON-NLS
+				: streamName); // NON-NLS
 
 		String parserCfg = Utils.getString("messages.tracer.stream.parser", interceptorProperties,
 				DEFAULT_PARSER_CONFIG_FILE + PARSER_DELIM + DEFAULT_PARSER_NAME);
 		mainParser = getParser(parserCfg);
+		stream.addParser(mainParser);
 
 		StreamsAgent.runFromAPI(new POJOStreamsBuilder().addStream(stream));
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -199,7 +199,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 			long period = TimeUnit.SECONDS.toMillis(POOL_TIME_SECONDS);
 			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 					"MsgTraceReporter.schedule.commands.polling", TNT_TRACE_CONFIG_TOPIC, period, period);
-			pollTimer = new Timer("KafkaInterceptorTracesPollTimer", true);
+			pollTimer = new Timer("KafkaInterceptorTracesPollTimer", true); // NON-NLS
 			pollTimer.scheduleAtFixedRate(mrt, period, period);
 		}
 	}
@@ -408,7 +408,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 * @return {@code true} if message should be traced, {@code false} - otherwise
 	 */
 	protected boolean shouldSendTrace(String topic, boolean count, String opName) {
-		if (!isOpTraceEnabled(opName)) {
+		if (!isOpTraceEnabled(opName) || TNT_TRACE_CONFIG_TOPIC.equals(topic)) {
 			return false;
 		}
 
