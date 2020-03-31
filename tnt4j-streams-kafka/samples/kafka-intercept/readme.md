@@ -100,7 +100,7 @@ properties in `interceptor.properties` file.
 
 Use standard Kafka consumer keys with prefix `messages.tracer.kafka.`, e.g:
 ```properties
-messages.tracer.kafka.group.id=13
+messages.tracer.kafka.group.id=kafka-x-ray-interceptors
 messages.tracer.kafka.bootstrap.servers=localhost:9092
 messages.tracer.kafka.client.id=kafka-x-ray-intercept-test-producer
 ```

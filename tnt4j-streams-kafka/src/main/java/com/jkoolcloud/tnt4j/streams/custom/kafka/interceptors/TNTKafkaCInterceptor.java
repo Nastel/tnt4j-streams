@@ -35,6 +35,7 @@ public class TNTKafkaCInterceptor implements ConsumerInterceptor<Object, Object>
 	private ClusterResource clusterResource;
 	private Map<String, ?> configs;
 	private String groupId = "";
+	private String clientId = "";
 
 	private InterceptionsManager iManager;
 
@@ -64,9 +65,13 @@ public class TNTKafkaCInterceptor implements ConsumerInterceptor<Object, Object>
 	@Override
 	public void configure(Map<String, ?> configs) {
 		this.configs = configs;
-		Object groupIdValue = configs.get(ConsumerConfig.GROUP_ID_CONFIG);
-		if (groupIdValue instanceof String) {
-			groupId = (String) groupIdValue;
+		Object cfgValue = configs.get(ConsumerConfig.GROUP_ID_CONFIG);
+		if (cfgValue instanceof String) {
+			groupId = (String) cfgValue;
+		}
+		cfgValue = configs.get(ConsumerConfig.CLIENT_ID_CONFIG);
+		if (cfgValue instanceof String) {
+			clientId = (String) cfgValue;
 		}
 	}
 
@@ -85,6 +90,7 @@ public class TNTKafkaCInterceptor implements ConsumerInterceptor<Object, Object>
 		StringBuilder sb = new StringBuilder("TNTKafkaCInterceptor{"); // NON-NLS
 		sb.append("clusterResource=").append(clusterResource); // NON-NLS
 		sb.append(", configs=").append(configs); // NON-NLS
+		sb.append(", clientId='").append(clientId).append('\''); // NON-NLS
 		sb.append(", groupId='").append(groupId).append('\''); // NON-NLS
 		sb.append('}');
 

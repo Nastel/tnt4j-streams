@@ -18,6 +18,7 @@ package com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors;
 
 import java.util.Map;
 
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerInterceptor;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
@@ -33,6 +34,7 @@ public class TNTKafkaPInterceptor implements ProducerInterceptor<Object, Object>
 	private ClusterResource clusterResource;
 	private Map<String, ?> configs;
 	private InterceptionsManager iManager;
+	private String clientId = "";
 
 	/**
 	 * Constructs a new TNTKafkaPInterceptor.
@@ -60,6 +62,10 @@ public class TNTKafkaPInterceptor implements ProducerInterceptor<Object, Object>
 	@Override
 	public void configure(Map<String, ?> configs) {
 		this.configs = configs;
+		Object cfgValue = configs.get(ConsumerConfig.GROUP_ID_CONFIG);
+		if (cfgValue instanceof String) {
+			clientId = (String) cfgValue;
+		}
 	}
 
 	@Override
@@ -77,6 +83,7 @@ public class TNTKafkaPInterceptor implements ProducerInterceptor<Object, Object>
 		StringBuilder sb = new StringBuilder("TNTKafkaPInterceptor{"); // NON-NLS
 		sb.append("clusterResource=").append(clusterResource); // NON-NLS
 		sb.append(", configs=").append(configs); // NON-NLS
+		sb.append(", clientId='").append(clientId).append('\''); // NON-NLS
 		sb.append('}');
 
 		return sb.toString();

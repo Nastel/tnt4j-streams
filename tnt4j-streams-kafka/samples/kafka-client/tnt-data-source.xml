@@ -44,13 +44,13 @@
 
         <!-- Kafka consumer properties -->
         <property name="bootstrap.servers" value="localhost:9092"/>
-        <property name="group.id" value="0"/>
+        <property name="group.id" value="tnt4j-streams-kafka"/>
         <property name="key.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer"/>
         <property name="value.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer"/>
         <property name="enable.auto.commit" value="true"/>
         <property name="auto.commit.interval.ms" value="1000"/>
         <property name="session.timeout.ms" value="30000"/>
-        <property name="client.id" value="tnt4j-streams-kafka-consumer"/>
+        <property name="client.id" value="tnt4j-streams-kafka-consumer-stream"/>
 
         <parser-ref name="KafkaMessageParser"/>
     </stream>

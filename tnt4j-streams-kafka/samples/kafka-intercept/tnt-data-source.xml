@@ -135,7 +135,7 @@
                 $fieldValue >= 0
                     ? $fieldValue - ${PTimestamp}
                     : 0
-            ]]></field-transform>
+			]]></field-transform>
         </field>
 
         <field name="AppendLagTime" locator="PTimestamp" locator-type="Activity">
@@ -143,7 +143,7 @@
                 ${LastOffsetTime} != null && $fieldValue >= 0
                     ? $fieldValue - ${LastOffsetTime}
                     : 0
-            ]]></field-transform>
+		    ]]></field-transform>
         </field>
     </parser>
 
@@ -249,10 +249,10 @@
 
         <!-- Kafka consumer properties -->
         <property name="bootstrap.servers" value="localhost:9092"/>
-        <property name="group.id" value="13"/>
+        <property name="group.id" value="kafka-x-ray-metrics-consumers"/>
         <property name="key.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer"/>
         <property name="value.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer"/>
-        <property name="client.id" value="kafka-x-ray-metrics-reader"/>
+        <property name="client.id" value="kafka-x-ray-metrics-stream"/>
 
         <parser-ref name="KafkaMessageParser"/>
     </stream>
