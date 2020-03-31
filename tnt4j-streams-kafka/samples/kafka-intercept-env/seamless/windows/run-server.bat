@@ -1,4 +1,4 @@
-set KAFKA_HOME=D:\tmp\kafka_install\kafka_2.12-2.4.1_
+set KAFKA_HOME=C:\kafka\kafka_2.12-2.4.1
 
 rmdir /S /Q "%KAFKA_HOME%\logs"
 
