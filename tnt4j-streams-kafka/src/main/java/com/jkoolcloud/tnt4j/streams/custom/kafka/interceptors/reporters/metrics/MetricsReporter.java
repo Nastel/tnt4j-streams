@@ -417,9 +417,6 @@ public class MetricsReporter implements InterceptionsReporter {
 			TrackingActivity metricsJMX = collectJVMMetricsJMX(tracker);
 			metricsJMX.setCorrelator(metricsCorrelator);
 			prepareAndSend(metricsJMX);
-		} catch (UnsupportedOperationException exc) {
-			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-					"MetricsReporter.clients.jmx.unsupported", Utils.getExceptionMessages(exc));
 		} catch (Exception exc) {
 			Utils.logThrowable(LOGGER, OpLevel.WARNING,
 					StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -476,13 +473,14 @@ public class MetricsReporter implements InterceptionsReporter {
 	private TrackingActivity collectKafkaConsumerMetricsJMX(Tracker tracker) {
 		TrackingActivity activity = tracker.newActivity(OpLevel.INFO, "Kafka consumer JMX metrics"); // NON-NLS
 
+		String objName = "kafka.consumer:*"; // NON-NLS
 		MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
 		try {
-			collectMetricsJMX("kafka.consumer:*", mBeanServer, activity); // NON-NLS
+			collectMetricsJMX(objName, mBeanServer, activity);
 		} catch (Exception exc) {
 			Utils.logThrowable(LOGGER, OpLevel.WARNING,
 					StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-					"MetricsReporter.consumer.jmx.fail", exc);
+					"MetricsReporter.scope.jmx.fail", objName, exc);
 		}
 
 		return activity;
@@ -500,13 +498,14 @@ public class MetricsReporter implements InterceptionsReporter {
 	public TrackingActivity collectKafkaProducerMetricsJMX(Tracker tracker) {
 		TrackingActivity activity = tracker.newActivity(OpLevel.INFO, "Kafka producer JMX metrics"); // NON-NLS
 
+		String objName = "kafka.producer:*"; // NON-NLS
 		MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
 		try {
-			collectMetricsJMX("kafka.producer:*", mBeanServer, activity); // NON-NLS
+			collectMetricsJMX(objName, mBeanServer, activity);
 		} catch (Exception exc) {
 			Utils.logThrowable(LOGGER, OpLevel.WARNING,
 					StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-					"MetricsReporter.producer.jmx.fail", exc);
+					"MetricsReporter.scope.jmx.fail", objName, exc);
 		}
 		return activity;
 	}
@@ -523,13 +522,14 @@ public class MetricsReporter implements InterceptionsReporter {
 	public TrackingActivity collectJVMMetricsJMX(Tracker tracker) {
 		TrackingActivity activity = tracker.newActivity(OpLevel.INFO, "JVM JMX metrics"); // NON-NLS
 
+		String objName = "java.lang:*"; // NON-NLS
 		MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
 		try {
-			collectMetricsJMX("java.lang:*", mBeanServer, activity); // NON-NLS
+			collectMetricsJMX(objName, mBeanServer, activity);
 		} catch (Exception exc) {
 			Utils.logThrowable(LOGGER, OpLevel.WARNING,
 					StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-					"MetricsReporter.jvm.jmx.fail", exc);
+					"MetricsReporter.scope.jmx.fail", objName, exc);
 		}
 		return activity;
 	}
@@ -561,9 +561,16 @@ public class MetricsReporter implements InterceptionsReporter {
 						Object attrValue = mBeanServer.getAttribute(mBeanName, attrName);
 						processAttrValue(snapshot, new PropertyNameBuilder(pMetricsAttr.getName()), attrValue);
 					} catch (Exception exc) {
-						Utils.logThrowable(LOGGER, OpLevel.WARNING,
-								StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-								"MetricsReporter.bean.attr.fail", mBeanName, pMetricsAttr.getName(), exc);
+						if (exc.getCause() instanceof UnsupportedOperationException) {
+							LOGGER.log(OpLevel.WARNING,
+									StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
+									"MetricsReporter.bean.attr.unsupported", mBeanName, pMetricsAttr.getName(),
+									exc.getCause().getMessage());
+						} else {
+							Utils.logThrowable(LOGGER, OpLevel.WARNING,
+									StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
+									"MetricsReporter.bean.attr.fail", mBeanName, pMetricsAttr.getName(), exc);
+						}
 					}
 				}
 
