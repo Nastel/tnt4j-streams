@@ -145,7 +145,7 @@ public class InterceptorsTest {
 
 		eventsToProduce = Utils.getInt("events.count", props, 10);
 		props.remove("events.count");
-		topicName = props.getProperty("test.app.topic.name", "tnt4j_streams_kafka_intercept_test_page_visits"); // NON-NLS
+		topicName = props.getProperty("test.app.topic.name", topicName); // NON-NLS
 		props.remove("test.app.topic.name");
 
 		Producer<String, String> producer = new KafkaProducer<>(props);
@@ -178,7 +178,7 @@ public class InterceptorsTest {
 	private static Consumer<String, String> initConsumer() throws Exception {
 		Properties props = new Properties();
 		props.load(new FileReader(System.getProperty("consumer.config"))); // NON-NLS
-		topicName = props.getProperty("test.app.topic.name", "tnt4j_streams_kafka_intercept_test_page_visits"); // NON-NLS
+		topicName = props.getProperty("test.app.topic.name", topicName); // NON-NLS
 		props.remove("test.app.topic.name");
 
 		Consumer<String, String> consumer = new KafkaConsumer<>(props);

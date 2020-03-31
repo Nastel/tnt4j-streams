@@ -67,7 +67,7 @@ reported to dedicated Kafka topic):
 
 #### Interceptors configuration
 
-To configure interceptors use file `./config/intercept/interceptors.properties`. Configuration properties are:
+To configure interceptors use sample file `./config/intercept/interceptors.properties`. Configuration properties are:
 * `metrics.report.period` - period (in seconds) of Kafka interceptors (and JMX) collected metrics reporting to dedicated Kafka topic. 
 Default value - `30`.
 * `metrics.report.delay` - delay (in seconds) before first metrics reporting is invoked. If not defined, it is equal to 
@@ -85,7 +85,8 @@ producer/consumer intercepted operations:
 * `messages.tracer.stream.parser` - parser reference, used to parse Kafka interceptors trace events (of class 
 `com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.KafkaTraceEventData`). Reference is defined using pattern 
 `parsers_cfg_file_name_path#parserName`, where:
-    * `parsers_cfg_file_path` - is parsers configuration file path. (Optional). Default value - `tnt-data-source_kafka_msg_trace.xml`. 
+    * `parsers_cfg_file_path` - is parsers configuration file path (absolute or relative to interceptors configuration file). (Optional). 
+    Default value - `tnt-data-source_kafka_msg_trace.xml`. 
     * `parserName` - primary parser name from referenced parsers configuration file. Default value - `KafkaTraceParser`.
 
   To define only parser name from file under default parsers configuration file path - use `#parserName` pattern. Default value - 
@@ -160,9 +161,9 @@ set it to match yours in those files:
 
 ### Using run scripts
 
-1. run `runMetricsStreaming.bat(.sh)` - starts stream reading Kafka topic containing interceptors collected metrics and sending to jKool 
-2. run `runInterceptions.bat(.sh)` - starts producer and consumer applications having bound interceptors to collect Kafka metrics and post 
-it to Kafka stream listened topic.
+1. run `runMetricsStreaming.bat(.sh)` - starts stream reading Kafka topic containing interceptors collected metrics and sending to jKool. 
+2. run `runInterceptionsTest.bat(.sh)` - starts producer and consumer test applications, having bound interceptors to collect Kafka metrics 
+and post it to Kafka stream listened topic.
 
 ### Using JUnit (for advanced users, like developers)
 
