@@ -18,7 +18,7 @@ package com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors;
 
 import java.util.Map;
 
-import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerInterceptor;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
@@ -62,7 +62,7 @@ public class TNTKafkaPInterceptor implements ProducerInterceptor<Object, Object>
 	@Override
 	public void configure(Map<String, ?> configs) {
 		this.configs = configs;
-		Object cfgValue = configs.get(ConsumerConfig.GROUP_ID_CONFIG);
+		Object cfgValue = configs.get(ProducerConfig.CLIENT_ID_CONFIG);
 		if (cfgValue instanceof String) {
 			clientId = (String) cfgValue;
 		}

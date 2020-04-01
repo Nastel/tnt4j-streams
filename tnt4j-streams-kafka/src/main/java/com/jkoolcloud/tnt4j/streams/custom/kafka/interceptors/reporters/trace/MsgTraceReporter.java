@@ -567,7 +567,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 			if (shouldSendTrace(cr.topic(), true, CONSUME)) {
 				try {
 					KafkaTraceEventData kafkaTraceData = new KafkaTraceEventData(cr,
-							MapUtils.getString(interceptor.getConfig(), ProducerConfig.CLIENT_ID_CONFIG));
+							MapUtils.getString(interceptor.getConfig(), ConsumerConfig.CLIENT_ID_CONFIG));
 					kafkaTraceData.setParentId(tid);
 					stream.addInputToBuffer(mainParser.parse(stream, kafkaTraceData));
 				} catch (Exception exc) {
@@ -607,7 +607,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 			if (shouldSendTrace(me.getKey().topic(), false, COMMIT)) {
 				try {
 					KafkaTraceEventData kafkaTraceData = new KafkaTraceEventData(me.getKey(), me.getValue(),
-							MapUtils.getString(interceptor.getConfig(), ProducerConfig.CLIENT_ID_CONFIG));
+							MapUtils.getString(interceptor.getConfig(), ConsumerConfig.CLIENT_ID_CONFIG));
 					kafkaTraceData.setParentId(tid);
 					stream.addInputToBuffer(mainParser.parse(stream, kafkaTraceData));
 				} catch (Exception exc) {

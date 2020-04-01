@@ -1,6 +1,5 @@
 package com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace;
 
-import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
@@ -55,13 +54,13 @@ public class MsgTraceReporterTest {
 			private static final long serialVersionUID = 964697684935570302L;
 
 			{
-				put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-				put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
-				put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
-				put(GROUP_ID_CONFIG, "Test");
-				put(ENABLE_AUTO_COMMIT_CONFIG, "false");
-				put(AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
-				put(SESSION_TIMEOUT_MS_CONFIG, "30000");
+				put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+				put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+				put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+				put(ConsumerConfig.GROUP_ID_CONFIG, "Test");
+				put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+				put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
+				put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");
 			}
 		};
 		while (true) {
