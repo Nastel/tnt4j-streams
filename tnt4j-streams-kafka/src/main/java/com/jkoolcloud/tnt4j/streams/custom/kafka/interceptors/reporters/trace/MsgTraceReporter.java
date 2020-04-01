@@ -53,6 +53,10 @@ import com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.Intercep
 import com.jkoolcloud.tnt4j.streams.fields.ActivityField;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.fields.StreamFieldType;
+import com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener;
+import com.jkoolcloud.tnt4j.streams.inputs.StreamStatus;
+import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
+import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStreamStatistics;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
 import com.jkoolcloud.tnt4j.streams.utils.KafkaStreamConstants;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
@@ -115,7 +119,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	private ActivityParser mainParser;
 
 	private KafkaObjTraceStream<ActivityInfo> stream;
-	private Map<String, TraceCommandDeserializer.TopicTraceCommand> traceConfig = new HashMap<>();
+	private final Map<String, TraceCommandDeserializer.TopicTraceCommand> traceConfig = new HashMap<>();
 	private Timer pollTimer;
 	private Set<String> traceOptions;
 
@@ -180,7 +184,54 @@ public class MsgTraceReporter implements InterceptionsReporter {
 		mainParser = getParser(parserCfg);
 		stream.addParser(mainParser);
 
+		Object x = new Object();
+		InputStreamListener y = new InputStreamListener() {
+			@Override
+			public void onProgressUpdate(TNTInputStream<?, ?> stream, int current, int total) {
+			}
+
+			@Override
+			public void onSuccess(TNTInputStream<?, ?> stream) {
+			}
+
+			@Override
+			public void onFailure(TNTInputStream<?, ?> stream, String msg, Throwable exc, String code) {
+			}
+
+			@Override
+			public void onStatusChange(TNTInputStream<?, ?> stream, StreamStatus status) {
+				if (status.ordinal() >= StreamStatus.STARTED.ordinal()) {
+					try {
+						synchronized (x) {
+							x.notify();
+						}
+					} catch (Throwable t) {
+						LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
+								"MsgTraceReporter.stream.start.notify.interrupted", stream.getName(), t);
+					}
+				}
+			}
+
+			@Override
+			public void onFinish(TNTInputStream<?, ?> stream, TNTInputStreamStatistics stats) {
+			}
+
+			@Override
+			public void onStreamEvent(TNTInputStream<?, ?> stream, OpLevel level, String message, Object source) {
+			}
+		};
+		stream.addStreamListener(y);
 		StreamsAgent.runFromAPI(new POJOStreamsBuilder().addStream(stream));
+		try {
+			synchronized (x) {
+				x.wait();
+			}
+		} catch (Throwable t) {
+			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
+					"MsgTraceReporter.stream.start.wait.interrupted", stream.getName(), t);
+		}
+		stream.removeStreamListener(y);
+
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 				"MsgTraceReporter.stream.started", stream.getName());
 

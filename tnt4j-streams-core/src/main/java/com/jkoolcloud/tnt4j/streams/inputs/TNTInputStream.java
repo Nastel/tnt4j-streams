@@ -89,10 +89,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 	private TNTInputStreamStatistics statistics;
 
-	private List<InputStreamListener> streamListeners;
-	private List<StreamTasksListener> streamTasksListeners;
+	private final List<InputStreamListener> streamListeners = new ArrayList<>(3);
+	private final List<StreamTasksListener> streamTasksListeners = new ArrayList<>(3);
 	private final Map<StreamItemProcessingListener<Timer.Context>, StreamItemProcessingListener.Context<Timer.Context>> streamItemProcessingListeners = new HashMap<>();
-	private List<StreamItemAccountingListener> streamItemAccountingListeners;
+	private final List<StreamItemAccountingListener> streamItemAccountingListeners = new ArrayList<>(3);
 
 	private boolean useExecutorService = false;
 	private ExecutorService streamExecutorService = null;
@@ -541,8 +541,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * Increments processing skipped activity items count.
 	 */
 	protected void incrementSkippedActivitiesCount() {
-		for (StreamItemAccountingListener streamItemAccountingListener : streamItemAccountingListeners) {
-			streamItemAccountingListener.onItemSkipped();
+		synchronized (streamItemAccountingListeners) {
+			for (StreamItemAccountingListener streamItemAccountingListener : streamItemAccountingListeners) {
+				streamItemAccountingListener.onItemSkipped();
+			}
 		}
 	}
 
@@ -550,8 +552,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * Increments processing filtered activity items count.
 	 */
 	protected void incrementFilteredActivitiesCount() {
-		for (StreamItemAccountingListener streamItemAccountingListener : streamItemAccountingListeners) {
-			streamItemAccountingListener.onItemFiltered();
+		synchronized (streamItemAccountingListeners) {
+			for (StreamItemAccountingListener streamItemAccountingListener : streamItemAccountingListeners) {
+				streamItemAccountingListener.onItemFiltered();
+			}
 		}
 	}
 
@@ -559,8 +563,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * Increments processing skipped lost activity items count.
 	 */
 	protected void incrementLostActivitiesCount() {
-		for (StreamItemAccountingListener streamItemAccountingListener : streamItemAccountingListeners) {
-			streamItemAccountingListener.onItemLost();
+		synchronized (streamItemAccountingListeners) {
+			for (StreamItemAccountingListener streamItemAccountingListener : streamItemAccountingListeners) {
+				streamItemAccountingListener.onItemLost();
+			}
 		}
 	}
 
@@ -580,9 +586,11 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *            number of bytes to add
 	 */
 	protected void addStreamedBytesCount(long bytesCount) {
-		for (StreamItemAccountingListener streamItemAccountingListener : streamItemAccountingListeners) {
-			streamItemAccountingListener.onBytesStreamed(bytesCount);
-			streamItemAccountingListener.updateTotal(getTotalBytes());
+		synchronized (streamItemAccountingListeners) {
+			for (StreamItemAccountingListener streamItemAccountingListener : streamItemAccountingListeners) {
+				streamItemAccountingListener.onBytesStreamed(bytesCount);
+				streamItemAccountingListener.updateTotal(getTotalBytes());
+			}
 		}
 	}
 
@@ -694,20 +702,28 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	}
 
 	private void removeListeners() {
-		if (CollectionUtils.isNotEmpty(streamListeners)) {
-			streamListeners.clear();
+		synchronized (streamListeners) {
+			if (CollectionUtils.isNotEmpty(streamListeners)) {
+				streamListeners.clear();
+			}
 		}
 
-		if (CollectionUtils.isNotEmpty(streamTasksListeners)) {
-			streamTasksListeners.clear();
+		synchronized (streamTasksListeners) {
+			if (CollectionUtils.isNotEmpty(streamTasksListeners)) {
+				streamTasksListeners.clear();
+			}
 		}
 
-		if (CollectionUtils.isNotEmpty(streamItemAccountingListeners)) {
-			streamItemAccountingListeners.clear();
+		synchronized (streamItemAccountingListeners) {
+			if (CollectionUtils.isNotEmpty(streamItemAccountingListeners)) {
+				streamItemAccountingListeners.clear();
+			}
 		}
 
-		if (MapUtils.isNotEmpty(streamItemProcessingListeners)) {
-			streamItemProcessingListeners.clear();
+		synchronized (streamItemProcessingListeners) {
+			if (MapUtils.isNotEmpty(streamItemProcessingListeners)) {
+				streamItemProcessingListeners.clear();
+			}
 		}
 	}
 
@@ -1015,12 +1031,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 			return;
 		}
 
-		if (streamListeners == null) {
-			streamListeners = new ArrayList<>();
-		}
-
-		if (!streamListeners.contains(l)) {
-			streamListeners.add(l);
+		synchronized (streamListeners) {
+			if (!streamListeners.contains(l)) {
+				streamListeners.add(l);
+			}
 		}
 	}
 
@@ -1031,8 +1045,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *            the {@code InputStreamListener} to be removed
 	 */
 	public void removeStreamListener(InputStreamListener l) {
-		if (l != null && streamListeners != null) {
-			streamListeners.remove(l);
+		synchronized (streamListeners) {
+			if (l != null) {
+				streamListeners.remove(l);
+			}
 		}
 	}
 
@@ -1047,12 +1063,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 			return;
 		}
 
-		if (streamItemAccountingListeners == null) {
-			streamItemAccountingListeners = new ArrayList<>();
-		}
-
-		if (!streamItemAccountingListeners.contains(l)) {
-			streamItemAccountingListeners.add(l);
+		synchronized (streamItemAccountingListeners) {
+			if (!streamItemAccountingListeners.contains(l)) {
+				streamItemAccountingListeners.add(l);
+			}
 		}
 	}
 
@@ -1063,8 +1077,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *            the {@code StreamItemAccountingListener} to be removed
 	 */
 	public void removeStreamItemAccountingListener(StreamItemAccountingListener l) {
-		if (l != null && streamItemAccountingListeners != null) {
-			streamItemAccountingListeners.remove(l);
+		synchronized (streamItemAccountingListeners) {
+			if (l != null) {
+				streamItemAccountingListeners.remove(l);
+			}
 		}
 	}
 
@@ -1094,7 +1110,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 */
 	public void removeItemProcessingListener(StreamItemProcessingListener<Timer.Context> l) {
 		synchronized (streamItemProcessingListeners) {
-			if (l != null && streamItemProcessingListeners != null) {
+			if (l != null) {
 				streamItemProcessingListeners.remove(l);
 			}
 		}
@@ -1157,7 +1173,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *            total number of activity items to stream
 	 */
 	protected void notifyProgressUpdate(int curr, int total) {
-		if (streamListeners != null) {
+		synchronized (streamListeners) {
 			for (InputStreamListener l : streamListeners) {
 				l.onProgressUpdate(this, curr, total);
 			}
@@ -1169,7 +1185,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 */
 	public void notifyStreamSuccess() {
 		notifyStatusChange(StreamStatus.SUCCESS);
-		if (streamListeners != null) {
+		synchronized (streamListeners) {
 			for (InputStreamListener l : streamListeners) {
 				l.onSuccess(this);
 			}
@@ -1188,7 +1204,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 */
 	protected void notifyFailed(String msg, Throwable exc, String code) {
 		notifyStatusChange(StreamStatus.FAILURE);
-		if (streamListeners != null) {
+		synchronized (streamListeners) {
 			for (InputStreamListener l : streamListeners) {
 				l.onFailure(this, msg, exc, code);
 			}
@@ -1202,7 +1218,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *            new stream status value
 	 */
 	protected void notifyStatusChange(StreamStatus newStatus) {
-		if (streamListeners != null) {
+		synchronized (streamListeners) {
 			for (InputStreamListener l : streamListeners) {
 				l.onStatusChange(this, newStatus);
 			}
@@ -1213,7 +1229,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * Notifies that activity items streaming process has finished independent of completion state.
 	 */
 	protected void notifyFinished() {
-		if (streamListeners != null) {
+		synchronized (streamListeners) {
 			TNTInputStreamStatistics stats = getStreamStatistics();
 			for (InputStreamListener l : streamListeners) {
 				l.onFinish(this, stats);
@@ -1232,7 +1248,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *            event source
 	 */
 	protected void notifyStreamEvent(OpLevel level, String message, Object source) {
-		if (streamListeners != null) {
+		synchronized (streamListeners) {
 			for (InputStreamListener l : streamListeners) {
 				l.onStreamEvent(this, level, message, source);
 			}
@@ -1250,11 +1266,11 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 			return;
 		}
 
-		if (streamTasksListeners == null) {
-			streamTasksListeners = new ArrayList<>();
+		synchronized (streamTasksListeners) {
+			if (!streamTasksListeners.contains(l)) {
+				streamTasksListeners.add(l);
+			}
 		}
-
-		streamTasksListeners.add(l);
 	}
 
 	/**
@@ -1264,8 +1280,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *            the {@code StreamTasksListener} to be removed
 	 */
 	public void removeStreamTasksListener(StreamTasksListener l) {
-		if (l != null && streamTasksListeners != null) {
-			streamTasksListeners.remove(l);
+		synchronized (streamTasksListeners) {
+			if (l != null) {
+				streamTasksListeners.remove(l);
+			}
 		}
 	}
 
@@ -1276,7 +1294,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *            executor rejected task
 	 */
 	protected void notifyStreamTaskRejected(Runnable task) {
-		if (streamTasksListeners != null) {
+		synchronized (streamTasksListeners) {
 			for (StreamTasksListener l : streamTasksListeners) {
 				l.onReject(this, task);
 			}
@@ -1291,7 +1309,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *            list of executor dropped of tasks
 	 */
 	protected void notifyStreamTasksDropOff(List<Runnable> tasks) {
-		if (streamTasksListeners != null) {
+		synchronized (streamTasksListeners) {
 			for (StreamTasksListener l : streamTasksListeners) {
 				l.onDropOff(this, tasks);
 			}
