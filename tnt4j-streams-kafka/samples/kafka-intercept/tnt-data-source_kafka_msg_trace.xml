@@ -19,11 +19,10 @@
         <field name="EventName" value="Kafka_Producer_Send"/>
 
         <field name="Topic" locator="topic" locator-type="Label"/>
-        <field name="Partition" locator="partition" datatype="Number" locator-type="Label"/>
+        <field name="Partition" locator="partition" locator-type="Label" datatype="Number"/>
 
         <field name="Key" locator="key" locator-type="Label"/>
-        <field name="Value" locator="value" locator-type="Label"/>
-
+        <field name="Value" locator="value" locator-type="Label" datatype="AsInput"/>
         <field name="Message" locator="value" locator-type="Label" datatype="String"/>
 
         <field name="StreamTime" locator="DateTime" locator-type="StreamProp" datatype="DateTime" units="Milliseconds" transparent="true"/>
@@ -51,16 +50,16 @@
 
         <field name="EventType" value="EVENT"/>
         <field name="EventName" value="Kafka_Producer_Acknowledge"/>
-        <field name="Checksum" locator="checksum" datatype="Number" locator-type="Label"/>
+        <field name="Checksum" locator="checksum" locator-type="Label" datatype="Number"/>
 
         <field name="Topic" locator="topic" locator-type="Label"/>
-        <field name="Partition" locator="partition" datatype="Number" locator-type="Label"/>
-        <field name="Offset" locator="offset" datatype="Number" locator-type="Label"/>
+        <field name="Partition" locator="partition" locator-type="Label" datatype="Number"/>
+        <field name="Offset" locator="offset" locator-type="Label" datatype="Number"/>
 
         <field name="StartTime" locator="timestamp" locator-type="Label" datatype="Timestamp" units="Milliseconds"/>
 
-        <field name="serializedKeySize" locator="serializedKeySize" datatype="Number" locator-type="Label"/>
-        <field name="serializedValueSize" locator="serializedValueSize" datatype="Number" locator-type="Label"/>
+        <field name="serializedKeySize" locator="serializedKeySize" locator-type="Label" datatype="Number"/>
+        <field name="serializedValueSize" locator="serializedValueSize" locator-type="Label" datatype="Number"/>
 
         <field name="MsgLength" value="" datatype="Number">
             <field-transform lang="groovy"><![CDATA[
@@ -83,16 +82,16 @@
         <field name="EventName" value="Kafka_Consumer_Consume_Record"/>
 
         <field name="Topic" locator="topic" locator-type="Label"/>
-        <field name="Partition" locator="partition" datatype="Number" locator-type="Label"/>
-        <field name="Offset" locator="offset" datatype="Number" locator-type="Label"/>
+        <field name="Partition" locator="partition" locator-type="Label" datatype="Number"/>
+        <field name="Offset" locator="offset" locator-type="Label" datatype="Number"/>
 
         <field name="StartTime" locator="timestamp" locator-type="Label" datatype="Timestamp" units="Milliseconds"/>
 
         <field name="TimestampType" locator="timestampType" locator-type="Label"/>
         <field name="Key" locator="key" locator-type="Label"/>
-        <field name="Value" locator="value" locator-type="Label"/>
+        <field name="Value" locator="value" locator-type="Label" datatype="AsInput"/>
         <field name="Message" locator="value" locator-type="Label" datatype="String"/>
-        <field name="Checksum" locator="checksum" datatype="Number" locator-type="Label"/>
+        <field name="Checksum" locator="checksum" locator-type="Label" datatype="Number"/>
 
         <field name="serializedKeySize" locator="serializedKeySize" locator-type="Label"/>
         <field name="serializedValueSize" locator="serializedValueSize" locator-type="Label"/>
@@ -126,7 +125,7 @@
 
         <field name="EventType" value="EVENT"/>
         <field name="EventName" value="Kafka_Consumer_Commit_Record"/>
-        <field name="Offset" locator="offset" datatype="Number" locator-type="Label"/>
+        <field name="Offset" locator="offset" locator-type="Label" datatype="Number"/>
         <field name="Metadata" locator="metadata" locator-type="Label"/>
         <field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="DateTime" units="Milliseconds"/>
     </parser>
@@ -135,7 +134,7 @@
         <property name="supportedClass" value="org.apache.kafka.common.TopicPartition"/>
 
         <field name="Topic" locator="topic" locator-type="Label"/>
-        <field name="Partition" locator="partition" datatype="Number" locator-type="Label"/>
+        <field name="Partition" locator="partition" locator-type="Label" datatype="Number"/>
     </parser>
     <!-- CONSUMER parsers end -->
 
