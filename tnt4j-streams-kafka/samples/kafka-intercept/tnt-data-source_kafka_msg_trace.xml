@@ -31,8 +31,8 @@
                 $fieldValue == null ? ${StreamTime} : $fieldValue;
             ]]></field-transform>
         </field>
-        <field name="Correlator" value="">
-            <field-transform lang="groovy" name="ValueCorrelatorTransform"><![CDATA[
+        <field name="MsgSignature" value="" transparent="true">
+            <field-transform lang="groovy" name="SendSignatureTransform"><![CDATA[
                 ${Value} == null
                     ? null
                     : com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.MsgTraceReporter.calcSignature(${Topic}, ${Value})
@@ -106,8 +106,8 @@
                    : 0)
            ]]></field-transform>
         </field>
-        <field name="Correlator" value="">
-            <field-transform lang="groovy" name="ValueCorrelatorTransform"><![CDATA[
+        <field name="MsgSignature" value="" transparent="true">
+            <field-transform lang="groovy" name="ConsumeSignatureTransform"><![CDATA[
                 ${Value} == null
                     ? null
                     : com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.MsgTraceReporter.calcSignature(${Topic}, ${Value})
@@ -174,7 +174,7 @@
         <!-- COMMON Fields -->
         <field name="KafkaType" locator="type" locator-type="Label"/>
         <field name="ApplName" locator="appInfo" locator-type="Label"/>
-        <field name="TrackingId" locator="signature" locator-type="Label">
+        <field name="TrackingId" locator="MsgSignature" locator-type="Activity">
             <field-transform lang="groovy" name="SignatureTransform"><![CDATA[
                 StringUtils.isNotEmpty($fieldValue)
                     ? $fieldValue
@@ -188,10 +188,10 @@
         <field name="ResourceName" formattingPattern="QUEUE={0}">
             <field-locator locator="Topic" locator-type="Activity"/>
         </field>
-        <field name="Correlator" separator="_">
+        <!--field name="Correlator" separator="_">
             <field-locator locator="Topic" locator-type="Activity" required="false"/>
             <field-locator locator="Offset" locator-type="Activity" required="false"/>
-        </field>
+        </field-->
         <field name="EndTime" locator="StartTime" locator-type="Activity"/>
     </parser>
 </tnt-data-source>
