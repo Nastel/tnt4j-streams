@@ -126,7 +126,7 @@ public class MsgTraceReporterTest {
 
 		ProducerRecord producerRecord = getProducerRecord();
 
-		reporter.send(mock(TNTKafkaPInterceptor.class), producerRecord);
+		reporter.send(mock(TNTKafkaPInterceptor.class), producerRecord, null);
 
 		test = new TestActivityInfoConsumer() {
 			@Override
@@ -230,7 +230,7 @@ public class MsgTraceReporterTest {
 		HashMap<TopicPartition, OffsetAndMetadata> map = new HashMap<>();
 		map.put(getTopicPartition(), new OffsetAndMetadata(OFFSET));
 		Map.Entry<TopicPartition, OffsetAndMetadata> me = map.entrySet().iterator().next();
-		reporter.commit(mock(TNTKafkaCInterceptor.class), map);
+		reporter.commit(mock(TNTKafkaCInterceptor.class), map, null);
 
 		ActivityInfo activityInfo = stream.getNextItem();
 
