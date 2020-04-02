@@ -104,7 +104,7 @@ public class MsgTraceReporterTest {
 		Properties props = null;
 		Properties kafkaProperties = new Properties();
 		kafkaProperties
-				.load(new FileInputStream("..\\tnt4j-streams-kafka\\config\\intercept\\interceptors.properties"));
+				.load(new FileInputStream("..\\tnt4j-streams-kafka\\config\\intercept\\interceptorsC.properties"));
 
 		props = MsgTraceReporter.extractKafkaProperties(kafkaProperties);
 

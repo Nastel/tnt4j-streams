@@ -67,7 +67,8 @@ reported to dedicated Kafka topic):
 
 #### Interceptors configuration
 
-To configure interceptors use sample file `./config/intercept/interceptors.properties`. Configuration properties are:
+To configure interceptors use sample files `./config/intercept/interceptorsC.properties` (for consumer) and 
+`./config/intercept/interceptorsP.properties` (for producer). Configuration properties are:
 * `metrics.report.period` - period (in seconds) of Kafka interceptors (and JMX) collected metrics reporting to dedicated Kafka topic. 
 Default value - `30`.
 * `metrics.report.delay` - delay (in seconds) before first metrics reporting is invoked. If not defined, it is equal to 

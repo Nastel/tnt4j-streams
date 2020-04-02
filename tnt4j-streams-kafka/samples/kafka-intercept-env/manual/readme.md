@@ -71,6 +71,7 @@ right after line defining environment variable `KAFKA_HEAP_OPTS`):
     ```
 1. Alter `<KAFKA_INSTALL_DIR>/config/procuder.properties` by adding:
     ```properties
+    # NOTE: when using with Kafka console-producer, value will be reset to 'console-producer' (turns out to be hardcoded)
     client.id=kafka-x-ray-intercept-test-producer
     interceptor.classes=com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.TNTKafkaPInterceptor
     ```
@@ -181,6 +182,7 @@ append it with this one:
     messages.tracer.stream.parser=tnt-data-source_kafka_msg_trace_custom.xml#KafkaTraceParser
     messages.tracer.stream.name=KafkaProducerXXXStream
     messages.tracer.kafka.bootstrap.servers=localhost:9092
+    # NOTE: when using with Kafka console-producer, value will be reset to 'console-producer' (turns out to be hardcoded)
     messages.tracer.kafka.client.id=kafka-x-ray-intercept-test-producer
     ```
     **NOTE:** see [Interceptors configuration section](../../kafka-intercept/readme.md#interceptors-configuration) for more details about 

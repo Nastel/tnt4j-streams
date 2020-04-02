@@ -36,7 +36,7 @@ public class InterceptionsManagerTest {
 		System.setProperty(TrackerConfigStore.TNT4J_PROPERTIES_KEY, "./config/intercept/tnt4j_kafka.properties");
 		System.setProperty("producer.config", "./config/intercept/producer.properties");
 		System.setProperty("consumer.config", "./config/intercept/consumer.properties");
-		System.setProperty("interceptors.config", "./config/intercept/interceptors.properties");
+		System.setProperty("interceptors.config", "./config/intercept/interceptorsC.properties");
 		System.setProperty("log4j.configuration", "file:../config/log4j.properties");
 	}
 
