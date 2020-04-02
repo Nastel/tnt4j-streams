@@ -25,6 +25,7 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
  * @version $Revision: 1 $
  *
  * @see TNTInputStream#addStreamListener(InputStreamListener)
+ * @see com.jkoolcloud.tnt4j.streams.inputs.InputStreamEventsAdapter
  */
 public interface InputStreamListener {
 	/**

@@ -39,10 +39,9 @@ import com.jkoolcloud.tnt4j.source.Source;
 import com.jkoolcloud.tnt4j.source.SourceType;
 import com.jkoolcloud.tnt4j.streams.configure.OutputProperties;
 import com.jkoolcloud.tnt4j.streams.configure.zookeeper.ZKConfigManager;
-import com.jkoolcloud.tnt4j.streams.inputs.InputStreamListener;
+import com.jkoolcloud.tnt4j.streams.inputs.InputStreamEventsAdapter;
 import com.jkoolcloud.tnt4j.streams.inputs.StreamStatus;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
-import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStreamStatistics;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsThread;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
@@ -613,19 +612,7 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 	 */
 	protected abstract O formatStreamStatusMessage(TrackingEvent statusMessage);
 
-	private class JKoolNotificationListener implements InputStreamListener {
-		@Override
-		public void onProgressUpdate(TNTInputStream<?, ?> stream, int current, int total) {
-		}
-
-		@Override
-		public void onSuccess(TNTInputStream<?, ?> stream) {
-		}
-
-		@Override
-		public void onFailure(TNTInputStream<?, ?> stream, String msg, Throwable exc, String code) {
-		}
-
+	private class JKoolNotificationListener extends InputStreamEventsAdapter {
 		@Override
 		public void onStatusChange(TNTInputStream<?, ?> stream, StreamStatus status) {
 			if (status == null) {
@@ -644,14 +631,6 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 			default:
 				break;
 			}
-		}
-
-		@Override
-		public void onFinish(TNTInputStream<?, ?> stream, TNTInputStreamStatistics stats) {
-		}
-
-		@Override
-		public void onStreamEvent(TNTInputStream<?, ?> stream, OpLevel level, String message, Object source) {
 		}
 	}
 }
