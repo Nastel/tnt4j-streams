@@ -453,13 +453,14 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	}
 
 	@Override
-	public void send(TNTKafkaPInterceptor interceptor, ProducerRecord<Object, Object> producerRecord) {
+	public void send(TNTKafkaPInterceptor interceptor, ProducerRecord<Object, Object> producerRecord,
+			ClusterResource clusterResource) {
 		if (producerRecord == null) {
 			return;
 		}
 		if (shouldSendTrace(producerRecord.topic(), true, SEND)) {
 			try {
-				KafkaTraceEventData kafkaTraceData = new KafkaTraceEventData(producerRecord,
+				KafkaTraceEventData kafkaTraceData = new KafkaTraceEventData(producerRecord, clusterResource,
 						MapUtils.getString(interceptor.getConfig(), ProducerConfig.CLIENT_ID_CONFIG));
 
 				stream.addInputToBuffer(mainParser.parse(stream, kafkaTraceData));
@@ -537,7 +538,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 			}
 			if (shouldSendTrace(cr.topic(), true, CONSUME)) {
 				try {
-					KafkaTraceEventData kafkaTraceData = new KafkaTraceEventData(cr,
+					KafkaTraceEventData kafkaTraceData = new KafkaTraceEventData(cr, clusterResource,
 							MapUtils.getString(interceptor.getConfig(), ConsumerConfig.CLIENT_ID_CONFIG));
 					kafkaTraceData.setParentId(tid);
 					stream.addInputToBuffer(mainParser.parse(stream, kafkaTraceData));
@@ -551,7 +552,8 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	}
 
 	@Override
-	public void commit(TNTKafkaCInterceptor interceptor, Map<TopicPartition, OffsetAndMetadata> map) {
+	public void commit(TNTKafkaCInterceptor interceptor, Map<TopicPartition, OffsetAndMetadata> map,
+			ClusterResource clusterResource) {
 		if (map == null || map.isEmpty()) {
 			return;
 		}
@@ -578,6 +580,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 			if (shouldSendTrace(me.getKey().topic(), false, COMMIT)) {
 				try {
 					KafkaTraceEventData kafkaTraceData = new KafkaTraceEventData(me.getKey(), me.getValue(),
+							clusterResource,
 							MapUtils.getString(interceptor.getConfig(), ConsumerConfig.CLIENT_ID_CONFIG));
 					kafkaTraceData.setParentId(tid);
 					stream.addInputToBuffer(mainParser.parse(stream, kafkaTraceData));

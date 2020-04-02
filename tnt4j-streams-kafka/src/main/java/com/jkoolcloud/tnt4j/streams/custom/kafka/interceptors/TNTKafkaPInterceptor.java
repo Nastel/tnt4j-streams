@@ -46,7 +46,7 @@ public class TNTKafkaPInterceptor implements ProducerInterceptor<Object, Object>
 
 	@Override
 	public ProducerRecord<Object, Object> onSend(ProducerRecord<Object, Object> producerRecord) {
-		return iManager.send(this, producerRecord);
+		return iManager.send(this, producerRecord, clusterResource);
 	}
 
 	@Override

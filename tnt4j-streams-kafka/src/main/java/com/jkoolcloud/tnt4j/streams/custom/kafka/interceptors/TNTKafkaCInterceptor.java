@@ -54,7 +54,7 @@ public class TNTKafkaCInterceptor implements ConsumerInterceptor<Object, Object>
 
 	@Override
 	public void onCommit(Map<TopicPartition, OffsetAndMetadata> map) {
-		iManager.commit(this, map);
+		iManager.commit(this, map, clusterResource);
 	}
 
 	@Override

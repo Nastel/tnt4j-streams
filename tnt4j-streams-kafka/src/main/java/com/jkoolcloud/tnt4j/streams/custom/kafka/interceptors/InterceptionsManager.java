@@ -237,16 +237,18 @@ public class InterceptionsManager {
 	 *            interceptor instance invoking send
 	 * @param producerRecord
 	 *            producer record to be sent
+	 * @param clusterResource
+	 *            cluster resource metadata records where sent to
 	 *
 	 * @return producer record to be sent
 	 */
 	public ProducerRecord<Object, Object> send(TNTKafkaPInterceptor interceptor,
-			ProducerRecord<Object, Object> producerRecord) {
+			ProducerRecord<Object, Object> producerRecord, ClusterResource clusterResource) {
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 				"InterceptionsManager.send", producerRecord);
 
 		for (InterceptionsReporter rep : reporters) {
-			rep.send(interceptor, producerRecord);
+			rep.send(interceptor, producerRecord, clusterResource);
 		}
 
 		return producerRecord;
@@ -305,13 +307,16 @@ public class InterceptionsManager {
 	 *            interceptor instance invoking commit
 	 * @param map
 	 *            committed records topics and messages map
+	 * @param clusterResource
+	 *            cluster resource metadata records where consumed from
 	 */
-	public void commit(TNTKafkaCInterceptor interceptor, Map<TopicPartition, OffsetAndMetadata> map) {
+	public void commit(TNTKafkaCInterceptor interceptor, Map<TopicPartition, OffsetAndMetadata> map,
+			ClusterResource clusterResource) {
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 				"InterceptionsManager.commit", map);
 
 		for (InterceptionsReporter rep : reporters) {
-			rep.commit(interceptor, map);
+			rep.commit(interceptor, map, clusterResource);
 		}
 	}
 

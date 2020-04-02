@@ -82,13 +82,16 @@ public class KafkaTraceEventData {
 	 *
 	 * @param producerRecord
 	 *            Kafka producer record instance
+	 * @param clusterResource
+	 *            cluster resource descriptor
 	 * @param clientID
 	 *            client identifier
 	 */
-	public KafkaTraceEventData(ProducerRecord<?, ?> producerRecord, String clientID) {
+	public KafkaTraceEventData(ProducerRecord<?, ?> producerRecord, ClusterResource clusterResource, String clientID) {
 		this.type = SEND;
 
 		this.producerRecord = producerRecord;
+		this.clusterResource = clusterResource;
 		this.appInfo = clientID;
 	}
 
@@ -119,13 +122,16 @@ public class KafkaTraceEventData {
 	 *
 	 * @param consumerRecords
 	 *            consumer records
+	 * @param clusterResource
+	 *            cluster resource descriptor
 	 * @param clientID
 	 *            client identifier
 	 */
-	public KafkaTraceEventData(ConsumerRecord<?, ?> consumerRecords, String clientID) {
+	public KafkaTraceEventData(ConsumerRecord<?, ?> consumerRecords, ClusterResource clusterResource, String clientID) {
 		this.type = CONSUME;
 
 		this.consumerRecord = consumerRecords;
+		this.clusterResource = clusterResource;
 		this.appInfo = clientID;
 	}
 
@@ -136,14 +142,18 @@ public class KafkaTraceEventData {
 	 *            topic partition descriptor
 	 * @param offsetAndMetadata
 	 *            offset and metadata
+	 * @param clusterResource
+	 *            cluster resource descriptor
 	 * @param clientID
 	 *            client identifier
 	 */
-	public KafkaTraceEventData(TopicPartition topicPartition, OffsetAndMetadata offsetAndMetadata, String clientID) {
+	public KafkaTraceEventData(TopicPartition topicPartition, OffsetAndMetadata offsetAndMetadata,
+			ClusterResource clusterResource, String clientID) {
 		this.type = COMMIT;
 
 		this.topicPartition = topicPartition;
 		this.offsetAndMetadata = offsetAndMetadata;
+		this.clusterResource = clusterResource;
 		this.appInfo = clientID;
 	}
 

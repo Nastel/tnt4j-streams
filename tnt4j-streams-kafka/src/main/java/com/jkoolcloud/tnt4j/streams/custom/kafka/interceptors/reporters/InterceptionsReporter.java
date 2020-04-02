@@ -43,8 +43,11 @@ public interface InterceptionsReporter {
 	 *            interceptor instance invoking send
 	 * @param producerRecord
 	 *            producer record to be sent
+	 * @param clusterResource
+	 *            cluster resource metadata records where sent to
 	 */
-	void send(TNTKafkaPInterceptor interceptor, ProducerRecord<Object, Object> producerRecord);
+	void send(TNTKafkaPInterceptor interceptor, ProducerRecord<Object, Object> producerRecord,
+			ClusterResource clusterResource);
 
 	/**
 	 * Notifies reporter when Kafka producer interceptor has invoked
@@ -86,8 +89,11 @@ public interface InterceptionsReporter {
 	 *            interceptor instance invoking commit
 	 * @param map
 	 *            committed records topics and messages map
+	 * @param clusterResource
+	 *            cluster resource metadata records where consumed from
 	 */
-	void commit(TNTKafkaCInterceptor interceptor, Map<TopicPartition, OffsetAndMetadata> map);
+	void commit(TNTKafkaCInterceptor interceptor, Map<TopicPartition, OffsetAndMetadata> map,
+			ClusterResource clusterResource);
 
 	/**
 	 * Notifies reporter that all interceptors has been closed and reporter should shutdown.

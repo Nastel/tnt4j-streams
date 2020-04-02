@@ -283,7 +283,8 @@ public class MetricsReporter implements InterceptionsReporter {
 	}
 
 	@Override
-	public void send(TNTKafkaPInterceptor interceptor, ProducerRecord<Object, Object> producerRecord) {
+	public void send(TNTKafkaPInterceptor interceptor, ProducerRecord<Object, Object> producerRecord,
+			ClusterResource clusterResource) {
 		String topic = producerRecord.topic();
 		String clientId = MapUtils.getString(interceptor.getConfig(), ProducerConfig.CLIENT_ID_CONFIG);
 		ProducerTopicMetrics topicMetrics = getProducerTopicMetrics(topic, producerRecord.partition(), clientId,
@@ -373,7 +374,8 @@ public class MetricsReporter implements InterceptionsReporter {
 	}
 
 	@Override
-	public void commit(TNTKafkaCInterceptor interceptor, Map<TopicPartition, OffsetAndMetadata> tpomMap) {
+	public void commit(TNTKafkaCInterceptor interceptor, Map<TopicPartition, OffsetAndMetadata> tpomMap,
+			ClusterResource clusterResource) {
 		String clientId = MapUtils.getString(interceptor.getConfig(), ConsumerConfig.CLIENT_ID_CONFIG);
 		for (Map.Entry<TopicPartition, OffsetAndMetadata> tpom : tpomMap.entrySet()) {
 			TopicPartition partition = tpom.getKey();
