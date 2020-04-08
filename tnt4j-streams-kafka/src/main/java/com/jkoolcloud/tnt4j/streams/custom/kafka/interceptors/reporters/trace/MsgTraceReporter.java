@@ -22,7 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
-import java.text.ParseException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -42,7 +41,6 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
-import com.jkoolcloud.tnt4j.core.OpType;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.StreamsAgent;
 import com.jkoolcloud.tnt4j.streams.configure.build.POJOStreamsBuilder;
@@ -51,9 +49,7 @@ import com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.InterceptionsManag
 import com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.TNTKafkaCInterceptor;
 import com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.TNTKafkaPInterceptor;
 import com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.InterceptionsReporter;
-import com.jkoolcloud.tnt4j.streams.fields.ActivityField;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
-import com.jkoolcloud.tnt4j.streams.fields.StreamFieldType;
 import com.jkoolcloud.tnt4j.streams.inputs.InputStreamEventsAdapter;
 import com.jkoolcloud.tnt4j.streams.inputs.StreamStatus;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
@@ -62,7 +58,6 @@ import com.jkoolcloud.tnt4j.streams.utils.KafkaStreamConstants;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
-import com.jkoolcloud.tnt4j.uuid.DefaultUUIDFactory;
 
 /**
  * Producer/Consumer interceptors intercepted messages reporter sending jKoolCloud events containing intercepted message
@@ -492,45 +487,11 @@ public class MsgTraceReporter implements InterceptionsReporter {
 		}
 	}
 
-	/**
-	 * Appends resource related fields to provided activity info instance {@code ai}.
-	 *
-	 * @param ai
-	 *            activity info instance
-	 * @param topic
-	 *            topic name
-	 * @param appName
-	 *            application name
-	 *
-	 * @throws ParseException
-	 *             if fails to set activity info value
-	 */
-	protected static void appendResourceFields(ActivityInfo ai, String topic, String appName) throws ParseException {
-		ai.setFieldValue(new ActivityField(StreamFieldType.ResourceName.name()), "QUEUE=" + topic); // NON-NLS
-		ai.setFieldValue(new ActivityField(StreamFieldType.ApplName.name()), appName);
-	}
-
 	@Override
 	public void consume(TNTKafkaCInterceptor interceptor, ConsumerRecords<Object, Object> consumerRecords,
 			ClusterResource clusterResource) {
 		if (consumerRecords == null) {
 			return;
-		}
-		String tid = null;
-		ActivityInfo ai = null;
-		try {
-			ai = new ActivityInfo(true);
-			ai.setFieldValue(new ActivityField(StreamFieldType.EventType.name()), OpType.ACTIVITY);
-			ai.setFieldValue(new ActivityField(StreamFieldType.EventName.name()), "Kafka_Consumer_Consume"); // NON-NLS
-			ai.setFieldValue(new ActivityField(StreamFieldType.TrackingId.name()),
-					DefaultUUIDFactory.getInstance().newUUID());
-			stream.addInputToBuffer(ai);
-
-			tid = ai.getTrackingId();
-		} catch (Exception exc) {
-			Utils.logThrowable(LOGGER, OpLevel.ERROR,
-					StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-					"MsgTraceReporter.consume.failed", exc);
 		}
 		for (ConsumerRecord<Object, Object> cr : consumerRecords) {
 			if (cr == null) {
@@ -540,7 +501,6 @@ public class MsgTraceReporter implements InterceptionsReporter {
 				try {
 					KafkaTraceEventData kafkaTraceData = new KafkaTraceEventData(cr, clusterResource,
 							MapUtils.getString(interceptor.getConfig(), ConsumerConfig.CLIENT_ID_CONFIG));
-					kafkaTraceData.setParentId(tid);
 					stream.addInputToBuffer(mainParser.parse(stream, kafkaTraceData));
 				} catch (Exception exc) {
 					Utils.logThrowable(LOGGER, OpLevel.ERROR,
@@ -557,22 +517,6 @@ public class MsgTraceReporter implements InterceptionsReporter {
 		if (map == null || map.isEmpty()) {
 			return;
 		}
-		String tid = null;
-		ActivityInfo ai;
-		try {
-			ai = new ActivityInfo(true);
-			ai.setFieldValue(new ActivityField(StreamFieldType.EventType.name()), OpType.ACTIVITY);
-			ai.setFieldValue(new ActivityField(StreamFieldType.EventName.name()), "Kafka_Consumer_Commit"); // NON-NLS
-			ai.setFieldValue(new ActivityField(StreamFieldType.TrackingId.name()),
-					DefaultUUIDFactory.getInstance().newUUID());
-			stream.addInputToBuffer(ai);
-
-			tid = ai.getTrackingId();
-		} catch (Exception exc) {
-			Utils.logThrowable(LOGGER, OpLevel.ERROR,
-					StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-					"MsgTraceReporter.commit.failed", exc);
-		}
 		for (Map.Entry<TopicPartition, OffsetAndMetadata> me : map.entrySet()) {
 			if (me == null) {
 				continue;
@@ -582,7 +526,6 @@ public class MsgTraceReporter implements InterceptionsReporter {
 					KafkaTraceEventData kafkaTraceData = new KafkaTraceEventData(me.getKey(), me.getValue(),
 							clusterResource,
 							MapUtils.getString(interceptor.getConfig(), ConsumerConfig.CLIENT_ID_CONFIG));
-					kafkaTraceData.setParentId(tid);
 					stream.addInputToBuffer(mainParser.parse(stream, kafkaTraceData));
 				} catch (Exception exc) {
 					Utils.logThrowable(LOGGER, OpLevel.ERROR,
