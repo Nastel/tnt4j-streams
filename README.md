@@ -1038,6 +1038,18 @@ Defining combined `field` parameters values:
 
 In this sample field name value is combined from dynamic `${FieldNameLoc}` and static `_attr` parts.
 
+More complex sample involving field name resolution from map and using collection/array element index:
+```xml
+    <field name="${ColumnNameLoc}.Column$index" locator="*.2" locator-type="Label" datatype="AsInput">
+        <field-locator id="ColumnNameLoc" locator="ColumnNames" locator-type="Activity" datatype="AsInput"/>
+    </field>
+```
+
+Locator `ColumnNames` resolved map of e.g. some table column names, where map entry key string `ColumnX` (`X` stands for column index) and 
+value is column name string. Consider locator `*.2` resolves list/array of cell values for that table over RegEx. Dynamic field name 
+definition `${ColumnNameLoc}.Column$index` pre-fills token `$index` with cell index (from list/array), refers locator `ColumnNameLoc` 
+resolved map, and finally picks map entry value having key `ColumnX` (`Column0`, `Column1` and so on..).
+
 Sample of using another `field` resolved value in locator definition:
 ```xml
     <.../>
