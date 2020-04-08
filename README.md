@@ -5487,6 +5487,8 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
  * `$DATA$` - allows to set complete activity data as field value and redirect it to stacked parser if such is defined for that field.
  * `$METADATA$` - allows to access activity bound meta-data map. Activity meta-data binding is stream specific: some streams may not provide 
  any meta-data. To get list of stream provided meta-data entries, see particular stream documentation (both JavaDoc and readme).
+ * field wildcard locators having `*` symbol within field name e.g. `FieldNameFragment*` are used to capture map of activity entity field 
+ values, where map entry key is field name and value is field value.
 
 #### Activity Name-Value parser
 

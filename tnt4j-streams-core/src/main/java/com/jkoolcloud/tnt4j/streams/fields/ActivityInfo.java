@@ -2159,7 +2159,7 @@ public class ActivityInfo {
 	}
 
 	/**
-	 * Returns activity field value.
+	 * Returns activity entity field value.
 	 * <p>
 	 * {@code fieldName} can also be as some expression variable having {@code "${FIELD_NAME}"} format.
 	 *
@@ -2178,7 +2178,7 @@ public class ActivityInfo {
 	/**
 	 * Returns activity field value.
 	 * <p>
-	 * {@code fieldName} can also be as some expression variable having {@code "${FIELD_NAME}"} format.
+	 * {@code fieldName} can also be as some expression variable having {@code "${FIELD_NAME}"} format or wildcard mask.
 	 *
 	 * @param fieldName
 	 *            field name value to get
@@ -2212,6 +2212,10 @@ public class ActivityInfo {
 
 		if (StreamsConstants.CHILD_ORDINAL_INDEX.equals(fieldName)) {
 			return ai.ordinalIdx;
+		}
+
+		if (Utils.isWildcardString(fieldName)) {
+			return getWildcardFieldValue(fieldName, ai);
 		}
 
 		if (fieldName.startsWith(Utils.VAR_EXP_START_TOKEN)) {
@@ -2460,5 +2464,124 @@ public class ActivityInfo {
 
 	private static <T> T last(T[] a) {
 		return a[a.length - 1];
+	}
+
+	/**
+	 * Returns activity entity field(s) value(s) map. Field names are matched against provided {@code fieldName}
+	 * wildcard mask.
+	 * 
+	 * @param fieldName
+	 *            field name wildcard mask
+	 * @param ai
+	 *            activity entity to collect fields values from
+	 * @return fields values map
+	 */
+	protected static Map<String, Object> getWildcardFieldValue(String fieldName, ActivityInfo ai) {
+		Map<String, Object> valuesMap = new HashMap<>();
+		Pattern mp = Pattern.compile(Utils.wildcardToRegex(fieldName));
+
+		if (mp.matcher(StreamFieldType.ApplName.name()).matches()) {
+			valuesMap.put(StreamFieldType.ApplName.name(), ai.applName);
+		}
+		if (mp.matcher(StreamFieldType.Category.name()).matches()) {
+			valuesMap.put(StreamFieldType.Category.name(), ai.category);
+		}
+		if (mp.matcher(StreamFieldType.CompCode.name()).matches()) {
+			valuesMap.put(StreamFieldType.CompCode.name(), ai.compCode);
+		}
+		if (mp.matcher(StreamFieldType.Correlator.name()).matches()) {
+			valuesMap.put(StreamFieldType.Correlator.name(), ai.correlator);
+		}
+		if (mp.matcher(StreamFieldType.ElapsedTime.name()).matches()) {
+			valuesMap.put(StreamFieldType.ElapsedTime.name(), ai.elapsedTime);
+		}
+		if (mp.matcher(StreamFieldType.EndTime.name()).matches()) {
+			valuesMap.put(StreamFieldType.EndTime.name(), ai.endTime);
+		}
+		if (mp.matcher(StreamFieldType.EventName.name()).matches()) {
+			valuesMap.put(StreamFieldType.EventName.name(), ai.eventName);
+		}
+		if (mp.matcher(StreamFieldType.EventStatus.name()).matches()) {
+			valuesMap.put(StreamFieldType.EventStatus.name(), ai.eventStatus);
+		}
+		if (mp.matcher(StreamFieldType.EventType.name()).matches()) {
+			valuesMap.put(StreamFieldType.EventType.name(), ai.eventType);
+		}
+		if (mp.matcher(StreamFieldType.Exception.name()).matches()) {
+			valuesMap.put(StreamFieldType.Exception.name(), ai.exception);
+		}
+		if (mp.matcher(StreamFieldType.Location.name()).matches()) {
+			valuesMap.put(StreamFieldType.Location.name(), ai.location);
+		}
+		if (mp.matcher(StreamFieldType.Message.name()).matches()) {
+			valuesMap.put(StreamFieldType.Message.name(), ai.message);
+		}
+		if (mp.matcher(StreamFieldType.MsgCharSet.name()).matches()) {
+			valuesMap.put(StreamFieldType.MsgCharSet.name(), ai.msgCharSet);
+		}
+		if (mp.matcher(StreamFieldType.MsgEncoding.name()).matches()) {
+			valuesMap.put(StreamFieldType.MsgEncoding.name(), ai.msgEncoding);
+		}
+		if (mp.matcher(StreamFieldType.MsgLength.name()).matches()) {
+			valuesMap.put(StreamFieldType.MsgLength.name(), ai.msgLength);
+		}
+		if (mp.matcher(StreamFieldType.MsgMimeType.name()).matches()) {
+			valuesMap.put(StreamFieldType.MsgMimeType.name(), ai.msgMimeType);
+		}
+		if (mp.matcher(StreamFieldType.MessageAge.name()).matches()) {
+			valuesMap.put(StreamFieldType.MessageAge.name(), ai.msgAge);
+		}
+		if (mp.matcher(StreamFieldType.TTL.name()).matches()) {
+			valuesMap.put(StreamFieldType.TTL.name(), ai.ttl);
+		}
+		if (mp.matcher(StreamFieldType.ParentId.name()).matches()) {
+			valuesMap.put(StreamFieldType.ParentId.name(), ai.parentId);
+		}
+		if (mp.matcher(StreamFieldType.ProcessId.name()).matches()) {
+			valuesMap.put(StreamFieldType.ProcessId.name(), ai.processId);
+		}
+		if (mp.matcher(StreamFieldType.ReasonCode.name()).matches()) {
+			valuesMap.put(StreamFieldType.ReasonCode.name(), ai.reasonCode);
+		}
+		if (mp.matcher(StreamFieldType.ResourceName.name()).matches()) {
+			valuesMap.put(StreamFieldType.ResourceName.name(), ai.resourceName);
+		}
+		if (mp.matcher(StreamFieldType.ServerIp.name()).matches()) {
+			valuesMap.put(StreamFieldType.ServerIp.name(), ai.serverIp);
+		}
+		if (mp.matcher(StreamFieldType.ServerName.name()).matches()) {
+			valuesMap.put(StreamFieldType.ServerName.name(), ai.serverName);
+		}
+		if (mp.matcher(StreamFieldType.Severity.name()).matches()) {
+			valuesMap.put(StreamFieldType.Severity.name(), ai.severity);
+		}
+		if (mp.matcher(StreamFieldType.StartTime.name()).matches()) {
+			valuesMap.put(StreamFieldType.StartTime.name(), ai.startTime);
+		}
+		if (mp.matcher(StreamFieldType.Tag.name()).matches()) {
+			valuesMap.put(StreamFieldType.Tag.name(), ai.tag);
+		}
+		if (mp.matcher(StreamFieldType.ThreadId.name()).matches()) {
+			valuesMap.put(StreamFieldType.ThreadId.name(), ai.threadId);
+		}
+		if (mp.matcher(StreamFieldType.TrackingId.name()).matches()) {
+			valuesMap.put(StreamFieldType.TrackingId.name(), ai.determineTrackingId());
+		}
+		if (mp.matcher(StreamFieldType.UserName.name()).matches()) {
+			valuesMap.put(StreamFieldType.UserName.name(), ai.userName);
+		}
+		if (mp.matcher(StreamFieldType.Guid.name()).matches()) {
+			valuesMap.put(StreamFieldType.Guid.name(), ai.guid);
+		}
+
+		if (ai.activityProperties != null) {
+			for (Map.Entry<String, Property> pe : ai.activityProperties.entrySet()) {
+				if (mp.matcher(pe.getKey()).matches()) {
+					valuesMap.put(pe.getKey(), pe.getValue().getValue());
+				}
+			}
+		}
+
+		return valuesMap;
 	}
 }
