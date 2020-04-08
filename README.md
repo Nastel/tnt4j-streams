@@ -513,7 +513,7 @@ See [Parser matching data or parsing context](#parser-matching-data-or-parsing-c
              </embedded-activity>
              <.../>
          </parser>
-         ...
+         <.../>
      </tnt-data-source>
      ```
     `AccessLogParserCommon` uses field `ValueFromParent` locator `^.StaticValue` to fill in value defined in `SampleJMSParser` parser field
@@ -4567,12 +4567,12 @@ under `java-object` tag referring output type class and referred from `stream` l
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
     <parser name="ProgressEventParser">
-        ...
+        <.../>
     </parser>
 
     <stream name="WmqStream" class="com.jkoolcloud.tnt4j.streams.inputs.WmqStream">
         <property name="SplitRelatives" value="true"/>
-        ...
+        <.../>
 
         <parser-ref name="ProgressEventParser"/>
     </stream>
@@ -4589,11 +4589,11 @@ or
     </java-object>
 
     <parser name="ProgressEventParser">
-        ...
+        <.../>
     </parser>
 
     <stream name="WmqStream" class="com.jkoolcloud.tnt4j.streams.inputs.WmqStream">
-        ...
+        <.../>
 
         <parser-ref name="ProgressEventParser"/>
 
@@ -4615,12 +4615,12 @@ or
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
     <parser name="ProgressEventParser">
-        ...
+        <.../>
     </parser>
 
     <stream name="WmqStream" class="com.jkoolcloud.tnt4j.streams.inputs.WmqStream">
         <property name="SplitRelatives" value="true"/>
-        ...
+        <.../>
 
         <parser-ref name="ProgressEventParser" tags="Kafka,Http"/>
     </stream>
@@ -4638,12 +4638,12 @@ or
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
     <parser name="ProgressEventParser">
-        ...
+        <.../>
     </parser>
 
     <stream name="WmqStream" class="com.jkoolcloud.tnt4j.streams.inputs.WmqStream">
         <property name="SplitRelatives" value="true"/>
-        ...
+        <.../>
 
         <parser-ref name="ProgressEventParser">
             <matchExp>regex:(([a-zA-Z]*):)?(.+)</matchExp>
@@ -5074,13 +5074,13 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
     <property name="OpenOptions" value="!MQSO_FAIL_IF_QUIESCING|MQSO_CREATE|MQSO_MANAGED|MQSO_WILDCARD_CHAR"/>
     <property name="CMQC.USE_MQCSP_AUTHENTICATION_PROPERTY" value="true"/>
     <property name="CMQC.THREAD_AFFINITY_PROPERTY" value="false"/>
-    ...
+    <.../>
     <!-- MULTIPLE INSTANCES (MI) host configurations -->
     <property name="Host" value="wmq.sample1.com(1420),wmq.sample2.com(1421)"/>
     <property name="Host" value="wmq.sample1.com:1420,wmq.sample2.com:1421"/>
     <property name="Host" value="wmq.sample1.com,wmq.sample2.com"/>
     <property name="Port" value="1420"/>
-    ...
+    <.../>
 ```
 
 Also see ['Generic streams parameters'](#generic-streams-parameters).
@@ -5297,7 +5297,7 @@ for details. (Optional)
     <!-- Quartz configuration -->
     <property name="org.quartz.scheduler.instanceName" value="MyStreamScheduler"/>
     <property name="org.quartz.threadPool.threadCount" value="5"/>
-    ...
+    <.../>
 ```
 
 ##### WsStream parameters
@@ -5312,7 +5312,7 @@ for details. (Optional)
     <property name="DisableSSL" value="true"/>
     <!-- Custom WS request properties -->
     <property name="WsEndpoint" value="https://192.168.3.3/ws"/>
-    ...
+    <.../>
 ```
 
 ###### CastIronWsStream
@@ -5455,7 +5455,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
     sample:
 ```xml
     <parser name="TestParser" class="com.my.company.ActivityTestParser" manualFieldsOrder="true" default-data-type="Generic" default-emptyAsNull="false">
-    ...
+    <.../>
     </parser>
 ```
 
@@ -5520,25 +5520,45 @@ Also see [Activity map parser](#activity-map-parser) regarding higher level pars
 
     sample:
 * index-capturing groups:
-```xml
-    <property name="Pattern" value="((\S+) (\S+) (\S+))"/>
-    <property name="MatchStrategy" value="FIND"/>
-```
+    ```xml
+        <property name="Pattern" value="((\S+) (\S+) (\S+))"/>
+        <property name="MatchStrategy" value="FIND"/>
+    ```
 * named-capturing groups:
-```xml
-    <property name="Pattern"><![CDATA[
-        (?<CoID>.*)\.(?<ProcessArea>.*)\.(?<InterfaceID>.*)\.(?<HopNr>.*)
-    ]]></property>
-    <property name="MatchStrategy" value="MATCH"/>
-```
-**NOTE:** When `MatchStrategy=FIND` is used and regex returns multiple matches, it is possible to access an individual match group by 
-defining the `Label` type locator match index (`1` can be omitted since it is the default) and a group descriptor (an index or name), 
-following the match index after a period delimiter `.` e.g.,
+    ```xml
+        <property name="Pattern"><![CDATA[
+            (?<CoID>.*)\.(?<ProcessArea>.*)\.(?<InterfaceID>.*)\.(?<HopNr>.*)
+        ]]></property>
+        <property name="MatchStrategy" value="MATCH"/>
+    ```
+    **NOTE:** When `MatchStrategy=FIND` is used and regex returns multiple matches, it is possible to access an individual match group by 
+    defining the `Label` type locator match index (`1` can be omitted since it is the default) and a group descriptor (an index or name), 
+    following the match index after a period delimiter `.` e.g.,
 
-* `locator="2.2" locator-type="Label"` will return the group indexed by `2` for match `2`
-* `locator="3.groupName" locator-type="Label"` will return the group named `groupName` for match `3`
+    * `locator="2.2" locator-type="Label"` will return the group indexed by `2` for match `2`
+    * `locator="3.groupName" locator-type="Label"` will return the group named `groupName` for match `3`
 
-Note that the match index starts from `1`, while the group index starts from `0` (group `0` usually means `Full match`).
+    Note that the match index starts from `1`, while the group index starts from `0` (group `0` usually means `Full match`).
+* `Expression` type locators:
+    ```xml
+        <field name="EventName">
+            <field-locator locator-type="Expression"><![CDATA[<table id="(.[^"]*)"]]></field-locator>
+        </field>
+    ```
+    resolves individual field value within whole activities data string. 
+* wildcard locators:
+    ```xml
+      <property name="Pattern"><![CDATA[<tbody[^>]*?[^>]*?>((?s).*?)</tbody>]]></property>
+      <.../>
+      <field name="TableBodyData" locator="*.0" locator-type="Label" transparent="true" split="true" datatype="AsInput">
+          <parser-ref name="TableContentParser" aggregation="Relate"/>
+      </field>
+    ```
+    this sample crops all `<tbody>` content from HTML document. Both match and group (index or name) tokens can be wildcard `*`, e.g.:
+    * `*.*` - returns all groups for all matches
+    * `*.1` - returns group indexed `1` for all matches 
+    * `1.*` - returns match indexed `1` all groups 
+    * `2.*Number` - returns match indexed `2` all groups name ending `Number`
 
 Also see [Generic parser parameters](#generic-parser-parameters).
 

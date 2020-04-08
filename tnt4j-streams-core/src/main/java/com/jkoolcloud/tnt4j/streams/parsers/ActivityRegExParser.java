@@ -82,6 +82,8 @@ public class ActivityRegExParser extends GenericActivityParser<Matcher> {
 
 	private static final String MATCHES_KEY = "MATCHES_DATA"; // NON-NLS
 
+	private static final String WILDCARD = "*"; // NON-NLS
+
 	/**
 	 * Contains the regular expression pattern that each data item is assumed to match (set by {@code Pattern}
 	 * property).
@@ -91,6 +93,8 @@ public class ActivityRegExParser extends GenericActivityParser<Matcher> {
 	 * Defines strategy used to verify if {@link #pattern} created {@link Matcher} matches input data string.
 	 */
 	protected Strategy matchStrategy = Strategy.MATCH;
+
+	private Map<String, Pattern> locatorPatternMap = new HashMap<>(5);
 
 	/**
 	 * Constructs a new ActivityRegExParser.
@@ -209,7 +213,7 @@ public class ActivityRegExParser extends GenericActivityParser<Matcher> {
 	protected Map<String, String> findMatches(Matcher matcher) throws ParseException {
 		try {
 			Map<String, Integer> namedGroupsMap = getNamedGroups(pattern);
-			Map<String, String> matches = new HashMap<>(10);
+			Map<String, String> matches = new LinkedHashMap<>(10);
 
 			matcher.reset();
 			int mi = 0;
@@ -272,6 +276,9 @@ public class ActivityRegExParser extends GenericActivityParser<Matcher> {
 	 * @param formattingNeeded
 	 *            flag to set if value formatting is not needed
 	 * @return raw value resolved by locator, or {@code null} if value is not resolved
+	 * 
+	 * @throws java.text.ParseException
+	 *             if exception occurs while finding RegEx matches
 	 *
 	 * @see java.util.regex.Matcher#group(int)
 	 * @see java.util.regex.Matcher#group(String)
@@ -279,12 +286,14 @@ public class ActivityRegExParser extends GenericActivityParser<Matcher> {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected Object resolveLocatorValue(ActivityFieldLocator locator, ActivityContext cData,
-			AtomicBoolean formattingNeeded) {
+			AtomicBoolean formattingNeeded) throws ParseException {
 		Object val = null;
 		String locStr = locator.getLocator();
 
 		if (StringUtils.isNotEmpty(locStr)) {
-			if (cData.containsKey(MATCHES_KEY)) {
+			if (locator.getBuiltInType() == ActivityFieldLocatorType.Expression) {
+				val = getRegExValue(locStr, cData);
+			} else if (cData.containsKey(MATCHES_KEY)) {
 				Map<String, String> matches = (Map<String, String>) cData.get(MATCHES_KEY);
 				val = getMatch(matches, locStr);
 			} else {
@@ -311,23 +320,36 @@ public class ActivityRegExParser extends GenericActivityParser<Matcher> {
 	/**
 	 * Finds match value in regex matches map using provided locator string.
 	 * <p>
-	 * If locator string does not contain match-group delimiter, default match index {@code 1} is used.
+	 * If locator string does not contain match-group delimiter {@value StreamsConstants#DEFAULT_PATH_DELIM}, default
+	 * match index {@code 1} is used.
 	 *
 	 * @param matches
 	 *            regex matches map
 	 * @param locStr
-	 *            locator string:
+	 *            match ang group locator string
 	 * @return matches map contained value
 	 */
-	private static Object getMatch(Map<String, String> matches, String locStr) {
-		if (!locStr.contains(StreamsConstants.DEFAULT_PATH_DELIM)) {
+	protected static Object getMatch(Map<String, String> matches, String locStr) {
+		if (locStr.contains(WILDCARD)) {
+			return getMatchesList(locStr, matches);
+		} else if (!locStr.contains(StreamsConstants.DEFAULT_PATH_DELIM)) {
 			return matches.get(makeMatchKey(1, locStr));
 		} else {
 			return matches.get(locStr);
 		}
 	}
 
-	private static String groupIndex(String locStr, Matcher matcher) {
+	/**
+	 * Captures matcher group by index.
+	 * 
+	 * @param locStr
+	 *            locator string defining group index
+	 * @param matcher
+	 *            matcher instance to capture group
+	 * @return group string captured by matcher, or {@code null} if group failed to match or {@code locStr} can't be
+	 *         cast to number
+	 */
+	protected static String groupIndex(String locStr, Matcher matcher) {
 		int loc = Integer.parseInt(locStr);
 		try {
 			return matcher.group(loc);
@@ -336,12 +358,63 @@ public class ActivityRegExParser extends GenericActivityParser<Matcher> {
 		}
 	}
 
-	private static String groupName(String locStr, Matcher matcher) {
+	/**
+	 * Captures matcher group by name.
+	 * 
+	 * @param locStr
+	 *            locator string defining group name
+	 * @param matcher
+	 *            matcher instance to capture group
+	 * @return group string captured by matcher, or {@code null} if group failed to match or {@code locStr} is illegal
+	 */
+	protected static String groupName(String locStr, Matcher matcher) {
 		try {
 			return matcher.group(locStr);
 		} catch (NullPointerException | IllegalArgumentException exc) {
 			return null;
 		}
+	}
+
+	/**
+	 * Captures list of groups matching match-group wildcard locator from regex matches map.
+	 * 
+	 * @param locStr
+	 *            match-group wildcard locator
+	 * @param matches
+	 *            regex matches map
+	 * @return list of wildcard matched groups
+	 */
+	protected static List<String> getMatchesList(String locStr, Map<String, String> matches) {
+		if (WILDCARD.equals(locStr)) {
+			locStr = WILDCARD + StreamsConstants.DEFAULT_PATH_DELIM + WILDCARD;
+		}
+
+		List<String> mList = new ArrayList<>(matches.size());
+		for (Map.Entry<String, String> me : matches.entrySet()) {
+			if (locatorMatchesKey(locStr, me.getKey())) {
+				mList.add(me.getValue());
+			}
+		}
+
+		return mList;
+	}
+
+	/**
+	 * Checks if regex matches map key matches match-group wildcard string.
+	 * 
+	 * @param locStr
+	 *            match-group wildcard
+	 * @param key
+	 *            regex matches map key value
+	 * @return {@code true} if map key matches match-group wildcard, {@code false} - otherwise
+	 */
+	protected static boolean locatorMatchesKey(String locStr, String key) {
+		int di = locStr.indexOf(StreamsConstants.DEFAULT_PATH_DELIM);
+		String[] lt = new String[] { locStr.substring(0, di), locStr.substring(di) };
+		di = key.indexOf(StreamsConstants.DEFAULT_PATH_DELIM);
+		String[] kt = new String[] { key.substring(0, di), key.substring(di) };
+
+		return StringUtils.equalsAny(lt[0], WILDCARD, kt[0]) && StringUtils.equalsAny(lt[1], WILDCARD, kt[1]);
 	}
 
 	/**
@@ -363,6 +436,34 @@ public class ActivityRegExParser extends GenericActivityParser<Matcher> {
 		Map<String, Integer> namedGroups = (Map<String, Integer>) namedGroupsMethod.invoke(regexPattern);
 
 		return namedGroups == null ? null : Collections.unmodifiableMap(namedGroups);
+	}
+
+	/**
+	 * Evaluates provided regular expression {@code regEx} against parser context data {@code cData}.
+	 * <p>
+	 * Evaluation is performed using {@code FIND} evaluation strategy.
+	 * 
+	 * @param regEx
+	 *            regular expression string
+	 * @param cData
+	 *            parser context data package
+	 * @return string matching regular expression
+	 * 
+	 * @throws ParseException
+	 *             if exception occurs while finding RegEx matches
+	 */
+	protected Object getRegExValue(String regEx, ActivityContext cData) throws ParseException {
+		Pattern pattern = locatorPatternMap.get(regEx);
+
+		if (pattern == null) {
+			pattern = Pattern.compile(regEx);
+			locatorPatternMap.put(regEx, pattern);
+		}
+
+		Matcher matcher = pattern.matcher(cData.getMessage());
+		Map<String, String> matches = findMatches(matcher);
+
+		return getMatch(matches, "1");
 	}
 
 	private static final EnumSet<ActivityFieldLocatorType> UNSUPPORTED_LOCATOR_TYPES = EnumSet
