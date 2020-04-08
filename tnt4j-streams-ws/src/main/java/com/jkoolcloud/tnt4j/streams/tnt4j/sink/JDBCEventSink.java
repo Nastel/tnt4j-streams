@@ -163,6 +163,7 @@ public class JDBCEventSink extends LoggedEventSink {
 			if (isOpen()) {
 				_close();
 			}
+			setErrorState(null);
 
 			LOGGER.log(OpLevel.DEBUG, "Open sink ''{0}'' DB data source url={1}, user={2}, pass={3}", getName(), url,
 					user, passwd == null ? null : "xxxxxx"); // NON-NLS
@@ -183,7 +184,12 @@ public class JDBCEventSink extends LoggedEventSink {
 			LOGGER.log(OpLevel.ERROR, "Failed to open sink name={0}, url={1}, user={2}, pass={3}", getName(), url, user,
 					passwd == null ? null : "xxxxxx", e);
 			_close();
-			throw new IOException(e.getMessage(), e);
+
+			if (e instanceof IOException) {
+				throw (IOException) e;
+			} else {
+				throw new IOException(e.getMessage(), e);
+			}
 		}
 	}
 
