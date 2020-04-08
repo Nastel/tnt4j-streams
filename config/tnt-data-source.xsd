@@ -488,6 +488,14 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
+
+            <xs:enumeration value="Expression">
+                <xs:annotation>
+                    <xs:documentation>
+                        Locator value is the expression applicable for parser context, e.g. regex.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
         </xs:restriction>
     </xs:simpleType>
 

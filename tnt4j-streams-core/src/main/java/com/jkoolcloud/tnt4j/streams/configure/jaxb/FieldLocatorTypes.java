@@ -111,7 +111,17 @@ public enum FieldLocatorTypes {
 	 * 
 	 */
 	@XmlEnumValue("Activity")
-	ACTIVITY("Activity");
+	ACTIVITY("Activity"),
+
+	/**
+	 * 
+	 * Locator value is the expression applicable for parser context, e.g. regex.
+	 * 
+	 * 
+	 */
+	@XmlEnumValue("Expression")
+	EXPRESSION("Expression");
+
 	private final String value;
 
 	FieldLocatorTypes(String v) {

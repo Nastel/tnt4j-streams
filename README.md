@@ -408,7 +408,12 @@ sample:
     /**
      * Indicates that data value is the value from currently processed activity data entity with specified entity field name.
      */
-    Activity(String.class);
+    Activity(String.class),
+
+    /**
+     * Indicates that data value shall be evaluated by using provided expression for parser context data.
+     */
+    Expression(String.class);
 ```
 
 **NOTE:** `Index` is default value and may be suppressed in field/locator definition:
