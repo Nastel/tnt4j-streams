@@ -720,6 +720,8 @@ To pass a resolved field/locator value to a transformation script/expression, us
 also use parser defined field names as script/expression variables having the format `${FIELD_NAME}` to access resolved activity entity 
 fields like `${EventType}` or `${Trace.HighResTime}`. The referenced fields must be <u>within the same parser definition</u>.
 
+To access transformation performing field/locator name/id - use predefined variable placeholder `$fieldName`.
+
 #### Transformation definition
 
 To define transformations stream configuration token `<field-transform>` shall be used. Attributes:
