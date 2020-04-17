@@ -168,9 +168,10 @@ append it with this one:
     messages.tracer.trace=all
     messages.tracer.stream.parser=tnt-data-source_kafka_msg_trace_custom.xml#KafkaTraceParser
     messages.tracer.stream.name=KafkaConsumerXXXStream
-    messages.tracer.kafka.group.id=kafka-x-ray-interceptors
+    # Trace configuration topic consumer properties
     messages.tracer.kafka.bootstrap.servers=localhost:9092
-    messages.tracer.kafka.client.id=kafka-x-ray-intercept-test-consumer
+    messages.tracer.kafka.group.id=kafka-x-ray-trace-config-consumers
+    messages.tracer.kafka.client.id=kafka-x-ray-trace-config-listener-c
     ```
     **NOTE:** see [Interceptors configuration section](../../kafka-intercept/readme.md#interceptors-configuration) for more details about 
     interceptors configuration. 
@@ -181,9 +182,10 @@ append it with this one:
     messages.tracer.trace=all
     messages.tracer.stream.parser=tnt-data-source_kafka_msg_trace_custom.xml#KafkaTraceParser
     messages.tracer.stream.name=KafkaProducerXXXStream
+    # Trace configuration topic consumer properties
     messages.tracer.kafka.bootstrap.servers=localhost:9092
-    # NOTE: when using with Kafka console-producer, value will be reset to 'console-producer' (turns out to be hardcoded)
-    messages.tracer.kafka.client.id=kafka-x-ray-intercept-test-producer
+    messages.tracer.kafka.group.id=kafka-x-ray-trace-config-consumers
+    messages.tracer.kafka.client.id=kafka-x-ray-trace-config-listener-p
     ```
     **NOTE:** see [Interceptors configuration section](../../kafka-intercept/readme.md#interceptors-configuration) for more details about 
     interceptors configuration.

@@ -102,9 +102,10 @@ properties in `interceptor.properties` file.
 
 Use standard Kafka consumer keys with prefix `messages.tracer.kafka.`, e.g:
 ```properties
-messages.tracer.kafka.group.id=kafka-x-ray-interceptors
+# Trace configuration topic consumer properties
 messages.tracer.kafka.bootstrap.servers=localhost:9092
-messages.tracer.kafka.client.id=kafka-x-ray-intercept-test-producer
+messages.tracer.kafka.group.id=kafka-x-ray-trace-config-consumers
+messages.tracer.kafka.client.id=kafka-x-ray-trace-config-listener
 ```
 
 Provided configuration should be OK to start with. In the distributed systems adjustments should be made.
