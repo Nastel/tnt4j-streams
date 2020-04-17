@@ -20,12 +20,10 @@ import java.io.FileReader;
 import java.net.URL;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -136,7 +134,16 @@ public class InterceptorsTest {
 	 */
 	public static void consume() throws Exception {
 		Consumer<String, String> consumer = initConsumer();
-		consume(consumer);
+		Thread ct = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				consume(consumer);
+			}
+		}, "InterceptConsumerThread");
+		ct.start();
+		TimeUnit.SECONDS.sleep(2);
+		consumer.wakeup();
+		ct.join();
 	}
 
 	private static Producer<String, String> initProducer() throws Exception {
@@ -179,6 +186,7 @@ public class InterceptorsTest {
 		Properties props = new Properties();
 		props.load(new FileReader(System.getProperty("consumer.config"))); // NON-NLS
 		topicName = props.getProperty("test.app.topic.name", topicName); // NON-NLS
+		props.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true"); // NON-NLS
 		props.remove("test.app.topic.name");
 
 		Consumer<String, String> consumer = new KafkaConsumer<>(props);

@@ -339,7 +339,6 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 					}
 				} catch (WakeupException exc) {
 				} finally {
-					consumer.unsubscribe();
 					consumer.close();
 				}
 			}

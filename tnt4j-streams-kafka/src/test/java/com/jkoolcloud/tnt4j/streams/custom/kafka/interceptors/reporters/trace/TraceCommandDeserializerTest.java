@@ -23,9 +23,11 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.errors.WakeupException;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -38,6 +40,8 @@ public class TraceCommandDeserializerTest {
 	// String[] testCases = { "trace on topic TNT4JStreams", "trace off topic TNT4JStreams",
 	// "trace until 2017-11-10 12:54 topic TNT4JStreams",
 	// "trace between 2017-11-10 12:54 2017-11-10 12:54 topic TNT4JStreams" };
+
+	private Consumer<String, String> consumer;
 
 	@Test
 	public void interpretTest() throws Exception {
@@ -94,13 +98,28 @@ public class TraceCommandDeserializerTest {
 		props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 		props.put("client.id", "kafka-x-ray-test-consumer");
 
-		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
-		consumer.subscribe(Collections.singletonList(MsgTraceReporter.TNT_TRACE_CONFIG_TOPIC));
-		while (true) {
-			ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-			for (ConsumerRecord<String, String> record : records) {
-				System.out.printf("offset = %d, key = %s, value = %s", record.offset(), record.key(), record.value());
+		consumer = new KafkaConsumer<>(props);
+		try {
+			consumer.subscribe(Collections.singletonList(MsgTraceReporter.TNT_TRACE_CONFIG_TOPIC));
+
+			while (true) {
+				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(500));
+				for (ConsumerRecord<String, String> record : records) {
+					System.out.printf("offset = %d, key = %s, value = %s", record.offset(), record.key(),
+							record.value());
+				}
 			}
+		} catch (WakeupException exc) {
+		} finally {
+			consumer.close();
+		}
+	}
+
+	@Test
+	@Ignore("Stop messages consumer")
+	public void stopConsuming() {
+		if (consumer != null) {
+			consumer.wakeup();
 		}
 	}
 

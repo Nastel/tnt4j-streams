@@ -17,6 +17,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.ClusterResource;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.record.TimestampType;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.Ignore;
@@ -46,30 +47,31 @@ public class MsgTraceReporterTest {
 	public static final long OFFSET = 123;
 	public static final long CHECKSUM = -1L;
 	public TestActivityInfoConsumer test;
+	private Consumer<String, String> consumer;
 
 	@Ignore
 	@Test
 	public void pollConfigQueue() throws Exception {
-		HashMap<String, String> config = new HashMap<String, String>() {
-			private static final long serialVersionUID = 964697684935570302L;
+		HashMap<String, String> config = new HashMap<>();
+		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
+		config.put(ConsumerConfig.GROUP_ID_CONFIG, "Test");
+		config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+		config.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
+		config.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");
 
-			{
-				put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-				put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
-				put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
-				put(ConsumerConfig.GROUP_ID_CONFIG, "Test");
-				put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
-				put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
-				put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");
-			}
-		};
-		while (true) {
+		KafkaObjTraceStream<ActivityInfo> stream = buildStream();
+		MsgTraceReporter reporter = getMsgTraceReporter(stream);
+
+		for (int i = 0; i < 10; i++) {
 			HashMap<String, TraceCommandDeserializer.TopicTraceCommand> traceConfig = new HashMap<>();
-			MsgTraceReporter.pollConfigQueue(config, new Properties(), traceConfig);
+			reporter.pollConfigQueue(config, new Properties(), traceConfig);
 			System.out.println("Control records for " + traceConfig.size());
 			TimeUnit.SECONDS.sleep(3);
 		}
 
+		reporter.shutdown();
 	}
 
 	@Ignore
@@ -83,19 +85,35 @@ public class MsgTraceReporterTest {
 		props.put("session.timeout.ms", "30000");
 		props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 		props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-		KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
-		TopicPartition topic = new TopicPartition(MsgTraceReporter.TNT_TRACE_CONFIG_TOPIC, 0);
-		consumer.assign(Arrays.asList(topic));
-		while (true) {
-			ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-			if (records.count() > 0) {
-				System.out.println("Polled " + records.count() + "messages");
-			}
 
-			for (ConsumerRecord<String, String> record : records) {
-				System.out.printf("offset = %d, key = %s, value = %s", record.offset(), record.key(), record.value())
-						.println();
+		consumer = new KafkaConsumer<>(props);
+		try {
+			TopicPartition topicPartition = new TopicPartition(MsgTraceReporter.TNT_TRACE_CONFIG_TOPIC, 0);
+			consumer.assign(Arrays.asList(topicPartition));
+
+			while (true) {
+				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(500));
+				if (records.count() > 0) {
+					System.out.println("Polled " + records.count() + "messages");
+				}
+
+				for (ConsumerRecord<String, String> record : records) {
+					System.out
+							.printf("offset = %d, key = %s, value = %s", record.offset(), record.key(), record.value())
+							.println();
+				}
 			}
+		} catch (WakeupException exc) {
+		} finally {
+			consumer.close();
+		}
+	}
+
+	@Test
+	@Ignore("Stop messages consumer")
+	public void stopConsuming() {
+		if (consumer != null) {
+			consumer.wakeup();
 		}
 	}
 
@@ -135,6 +153,7 @@ public class MsgTraceReporterTest {
 			}
 		};
 
+		reporter.shutdown();
 	}
 
 	@Test
@@ -163,6 +182,7 @@ public class MsgTraceReporterTest {
 			}
 		};
 
+		reporter.shutdown();
 	}
 
 	private void testSendFields(ProducerRecord producerRecord, ActivityInfo activityInfo) {
@@ -255,6 +275,7 @@ public class MsgTraceReporterTest {
 			}
 		};
 
+		reporter.shutdown();
 	}
 
 	@Test
@@ -285,6 +306,7 @@ public class MsgTraceReporterTest {
 			}
 		};
 
+		reporter.shutdown();
 	}
 
 	private void testConsumeFields(ConsumerRecords<Object, Object> consumerRecords, ActivityInfo activityInfo) {

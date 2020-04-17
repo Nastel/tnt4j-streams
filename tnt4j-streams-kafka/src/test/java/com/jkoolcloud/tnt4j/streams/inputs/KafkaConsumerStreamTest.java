@@ -132,7 +132,6 @@ public class KafkaConsumerStreamTest {
 
 		System.err.println();
 		consumer.wakeup();
-		consumer.unsubscribe();
 		consumer.close();
 	}
 }

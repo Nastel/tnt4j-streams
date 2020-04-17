@@ -25,7 +25,6 @@ import java.security.MessageDigest;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -38,6 +37,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.ClusterResource;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
@@ -94,10 +94,6 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 */
 	public static final String TNT_TRACE_CONFIG_TOPIC = "TNT_TRACE_CONFIG_TOPIC"; // NON-NLS
 	/**
-	 * Constant defining tracing configuration dedicated topic polling interval in seconds.
-	 */
-	public static final int POOL_TIME_SECONDS = 3;
-	/**
 	 * Constant defining interceptor message tracing configuration properties prefix.
 	 */
 	public static final String TRACER_PROPERTY_PREFIX = "messages.tracer.kafka."; // NON-NLS
@@ -115,10 +111,9 @@ public class MsgTraceReporter implements InterceptionsReporter {
 
 	private KafkaObjTraceStream<ActivityInfo> stream;
 	private final Map<String, TraceCommandDeserializer.TopicTraceCommand> traceConfig = new HashMap<>();
-	private Timer pollTimer;
 	private Set<String> traceOptions;
 
-	private static KafkaConsumer<String, TraceCommandDeserializer.TopicTraceCommand> consumer;
+	private KafkaConsumer<String, TraceCommandDeserializer.TopicTraceCommand> consumer;
 
 	/**
 	 * Constructs a new MsgTraceReporter.
@@ -202,22 +197,18 @@ public class MsgTraceReporter implements InterceptionsReporter {
 				"MsgTraceReporter.stream.started", stream.getName());
 
 		if (enableCfgPolling) {
-			TimerTask mrt = new TimerTask() {
+			traceConfig.put(TraceCommandDeserializer.MASTER_CONFIG, new TraceCommandDeserializer.TopicTraceCommand());
+			Map<String, Map<String, ?>> consumersCfg = InterceptionsManager.getInstance()
+					.getInterceptorsConfig(TNTKafkaCInterceptor.class);
+			Map<String, ?> cConfig = MapUtils.isEmpty(consumersCfg) ? null
+					: consumersCfg.entrySet().iterator().next().getValue();
+			Thread traceConfigPollThread = new Thread(new Runnable() {
 				@Override
 				public void run() {
-					Map<String, Map<String, ?>> consumersCfg = InterceptionsManager.getInstance()
-							.getInterceptorsConfig(TNTKafkaCInterceptor.class);
-					Map<String, ?> cConfig = MapUtils.isEmpty(consumersCfg) ? null
-							: consumersCfg.entrySet().iterator().next().getValue();
 					pollConfigQueue(cConfig, interceptorProperties, traceConfig);
 				}
-			};
-			traceConfig.put(TraceCommandDeserializer.MASTER_CONFIG, new TraceCommandDeserializer.TopicTraceCommand());
-			long period = TimeUnit.SECONDS.toMillis(POOL_TIME_SECONDS);
-			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-					"MsgTraceReporter.schedule.commands.polling", TNT_TRACE_CONFIG_TOPIC, period, period);
-			pollTimer = new Timer("KafkaInterceptorTracesPollTimer", true); // NON-NLS
-			pollTimer.scheduleAtFixedRate(mrt, period, period);
+			}, stream.getName() + "_TraceConfigPollThread");
+			traceConfigPollThread.start();
 		}
 	}
 
@@ -313,7 +304,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 * @param traceConfig
 	 *            complete message tracing configuration properties
 	 */
-	protected static void pollConfigQueue(Map<String, ?> config, Properties interceptorProperties,
+	protected void pollConfigQueue(Map<String, ?> config, Properties interceptorProperties,
 			Map<String, TraceCommandDeserializer.TopicTraceCommand> traceConfig) {
 		Properties props = new Properties();
 		if (config != null) {
@@ -323,36 +314,47 @@ public class MsgTraceReporter implements InterceptionsReporter {
 			props.putAll(extractKafkaProperties(interceptorProperties));
 		}
 		if (!props.isEmpty()) {
-			props.put(ConsumerConfig.CLIENT_ID_CONFIG, "kafka-x-ray-message-trace-reporter-config-listener"); // NON-NLS
+			if (!props.contains(ConsumerConfig.CLIENT_ID_CONFIG)) {
+				props.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, "kafka-x-ray-trace-config-listener"); // NON-NLS
+			}
+			if (!props.contains(ConsumerConfig.GROUP_ID_CONFIG)) {
+				props.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "kafka-x-ray-trace-config-consumers"); // NON-NLS
+			}
+			props.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true"); // NON-NLS
 			props.remove(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG);
-			KafkaConsumer<String, TraceCommandDeserializer.TopicTraceCommand> consumer = getKafkaConsumer(props);
-			while (true) {
-				ConsumerRecords<String, TraceCommandDeserializer.TopicTraceCommand> records = consumer
-						.poll(Duration.ofMillis(100));
-				if (records.count() > 0) {
-					LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-							"MsgTraceReporter.polled.commands", records.count(), records.iterator().next());
-					for (ConsumerRecord<String, TraceCommandDeserializer.TopicTraceCommand> record : records) {
-						if (record.value() != null) {
-							traceConfig.put(record.value().topic, record.value());
+			consumer = createKafkaConsumer(props);
+			boolean consume = true;
+			while (consume) {
+				try {
+					ConsumerRecords<String, TraceCommandDeserializer.TopicTraceCommand> records = consumer
+							.poll(Duration.ofMillis(500));
+					if (records.count() > 0) {
+						LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
+								"MsgTraceReporter.polled.commands", records.count(), records.iterator().next());
+						for (ConsumerRecord<String, TraceCommandDeserializer.TopicTraceCommand> record : records) {
+							if (record.value() != null) {
+								traceConfig.put(record.value().topic, record.value());
+							}
 						}
 					}
-					break;
+				} catch (WakeupException exc) {
+					consume = false;
 				}
 			}
+
+			consumer.close();
 		}
 	}
 
-	private static KafkaConsumer<String, TraceCommandDeserializer.TopicTraceCommand> getKafkaConsumer(
+	private static KafkaConsumer<String, TraceCommandDeserializer.TopicTraceCommand> createKafkaConsumer(
 			Properties props) {
-		if (consumer != null) {
-			return consumer;
-		}
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 				"MsgTraceReporter.creating.command.consumer", props);
-		consumer = new KafkaConsumer<>(props, new StringDeserializer(), new TraceCommandDeserializer());
-		TopicPartition topic = new TopicPartition(MsgTraceReporter.TNT_TRACE_CONFIG_TOPIC, 0);
-		consumer.assign(Collections.singletonList(topic));
+		KafkaConsumer<String, TraceCommandDeserializer.TopicTraceCommand> consumer = new KafkaConsumer<>(props,
+				new StringDeserializer(), new TraceCommandDeserializer());
+		TopicPartition topicPartition = new TopicPartition(MsgTraceReporter.TNT_TRACE_CONFIG_TOPIC, 0);
+		consumer.assign(Collections.singletonList(topicPartition));
+
 		return consumer;
 	}
 
@@ -538,12 +540,12 @@ public class MsgTraceReporter implements InterceptionsReporter {
 
 	@Override
 	public void shutdown() {
-		if (stream != null) {
-			stream.markEnded();
+		if (consumer != null) {
+			consumer.wakeup();
 		}
 
-		if (pollTimer != null) {
-			pollTimer.cancel();
+		if (stream != null) {
+			stream.markEnded();
 		}
 	}
 
