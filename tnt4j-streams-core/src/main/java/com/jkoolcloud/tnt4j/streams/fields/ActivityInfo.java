@@ -1023,6 +1023,10 @@ public class ActivityInfo {
 				continue;
 			}
 
+			if (chTrackables == null && !isEmbeddableChild(pTrackable, child)) {
+				continue;
+			}
+
 			Trackable cTrackable = buildChild(tracker, child, pTrackable);
 			boolean consumed = addTrackableChild(pTrackable, cTrackable);
 
@@ -1030,6 +1034,15 @@ public class ActivityInfo {
 				chTrackables.put(cTrackable, child);
 			}
 		}
+	}
+
+	private boolean isEmbeddableChild(Trackable pTrackable, ActivityInfo child) {
+		if (pTrackable != null && child != null) {
+			return child.eventType == OpType.SNAPSHOT
+					&& (pTrackable instanceof TrackingEvent || pTrackable instanceof Activity);
+		}
+
+		return false;
 	}
 
 	/**
