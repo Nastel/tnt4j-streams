@@ -43,7 +43,25 @@ public interface ValueTransformation<V, T> extends NamedObject {
 	 * @throws com.jkoolcloud.tnt4j.streams.transform.TransformationException
 	 *             if transformation operation fails
 	 */
-	T transform(V value, ActivityInfo ai) throws TransformationException;
+	default T transform(V value, ActivityInfo ai) throws TransformationException {
+		return transform(value, ai, null);
+	}
+
+	/**
+	 * Transforms provided data value applying some business rules.
+	 *
+	 * @param value
+	 *            data value to transform
+	 * @param ai
+	 *            activity entity instance
+	 * @param fieldName
+	 *            name of field performing transformation
+	 * @return transformed data value
+	 *
+	 * @throws com.jkoolcloud.tnt4j.streams.transform.TransformationException
+	 *             if transformation operation fails
+	 */
+	T transform(V value, ActivityInfo ai, String fieldName) throws TransformationException;
 
 	/**
 	 * Returns activity data value resolution phase when transformation has to be applied.

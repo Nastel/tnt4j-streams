@@ -42,9 +42,17 @@ public final class StreamsScriptingUtils {
 	 */
 	public static final String FIELD_VALUE_VARIABLE_NAME = "fieldValue"; // NON-NLS
 	/**
+	 * Constant for field name variable name used in script/expression code.
+	 */
+	public static final String FIELD_NAME_VARIABLE_NAME = "fieldName"; // NON-NLS
+	/**
 	 * Constant for field value variable expression used in script/expression code.
 	 */
 	public static final String FIELD_VALUE_VARIABLE_EXPR = '$' + FIELD_VALUE_VARIABLE_NAME;
+	/**
+	 * Constant for field name variable expression used in script/expression code.
+	 */
+	public static final String FIELD_NAME_VARIABLE_EXPR = '$' + FIELD_NAME_VARIABLE_NAME;
 
 	/**
 	 * Constant for name of scripting/expression language {@value}.
@@ -64,7 +72,7 @@ public final class StreamsScriptingUtils {
 	private static final String IMPORT_CLASSES_PROP_KEY_SUFFIX = ".scripting.import.classes"; // NON-NLS
 
 	private static final Pattern FIELD_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("\\$(\\w+\\b)"); // NON-NLS
-	private static final Pattern FIELD_PLACEHOLDER_PATTERN = Pattern.compile("\\{\\w+\\}"); // NON-NLS
+	private static final Pattern FIELD_PLACEHOLDER_PATTERN = Pattern.compile("\\{[\\w.^$]+\\}"); // NON-NLS
 
 	private static CompilerConfiguration DEFAULT_GROOVY_CONFIGURATION;
 	private static String DEFAULT_JS_CODE_IMPORTS;
@@ -263,6 +271,10 @@ public final class StreamsScriptingUtils {
 		if (fValue != null) {
 			appendVariable(varStr, FIELD_VALUE_VARIABLE_EXPR, fValue);
 		}
+		Object fName = vars.get(FIELD_NAME_VARIABLE_EXPR);
+		if (fValue != null) {
+			appendVariable(varStr, FIELD_NAME_VARIABLE_EXPR, fName);
+		}
 
 		if (varStr.length() > 0) {
 			expDescStr.append(" (").append(varStr).append(")"); // NON-NLS
@@ -427,7 +439,7 @@ public final class StreamsScriptingUtils {
 
 		m = FIELD_VALUE_PLACEHOLDER_PATTERN.matcher(expString);
 		while (m.find()) {
-			if (!FIELD_VALUE_VARIABLE_EXPR.equals(m.group())) {
+			if (!StringUtils.equalsAny(m.group(), FIELD_VALUE_VARIABLE_EXPR, FIELD_NAME_VARIABLE_EXPR)) {
 				return false;
 			}
 		}

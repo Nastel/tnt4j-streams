@@ -175,6 +175,11 @@ public class ActivityField extends AbstractFieldEntity {
 		return this;
 	}
 
+	@Override
+	String getName() {
+		return fieldTypeName;
+	}
+
 	/**
 	 * Gets activity field locators list.
 	 *
@@ -677,6 +682,7 @@ public class ActivityField extends AbstractFieldEntity {
 		tField.valueType = fillDynamicAttr(valueType, dValues, valueIndex);
 		tField.transparent = transparent;
 		tField.parser = parser;
+		tField.transformations = transformations;
 
 		return tField;
 	}
@@ -685,11 +691,17 @@ public class ActivityField extends AbstractFieldEntity {
 		String tAttr = dAttr;
 
 		if (isDynamicAttr(dAttr) && MapUtils.isNotEmpty(dValMap)) {
+			tAttr = dAttr = dAttr.replace("$index", String.valueOf(valueIndex));
 			List<String> vars = new ArrayList<>();
 			Utils.resolveCfgVariables(vars, dAttr);
 
 			for (String var : vars) {
-				tAttr = tAttr.replace(var, String.valueOf(Utils.getItem(dValMap.get(var), valueIndex)));
+				Object dVal = dValMap.get(var);
+				if (dVal instanceof Map) {
+					tAttr = String.valueOf(Utils.getMapValueByPath(dAttr, dValMap));
+				} else {
+					tAttr = tAttr.replace(var, String.valueOf(Utils.getItem(dVal, valueIndex)));
+				}
 			}
 		}
 

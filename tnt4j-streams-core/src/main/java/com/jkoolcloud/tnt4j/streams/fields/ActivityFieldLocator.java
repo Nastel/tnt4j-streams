@@ -484,6 +484,11 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 		this.id = id;
 	}
 
+	@Override
+	String getName() {
+		return id;
+	}
+
 	/**
 	 * Adds a mapping to translate a raw data value to the corresponding converted data value.
 	 *

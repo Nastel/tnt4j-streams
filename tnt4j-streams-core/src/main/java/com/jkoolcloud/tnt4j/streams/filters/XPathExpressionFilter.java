@@ -49,6 +49,7 @@ public class XPathExpressionFilter extends AbstractExpressionFilter<Object> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(XPathExpressionFilter.class);
 
 	private static final String OWN_FIELD_VALUE_KEY = "<!TNT4J_XPATH_FLTR_FLD_VALUE!>"; // NON-NLS;
+	private static final String OWN_FIELD_NAME_KEY = "<!TNT4J_XPATH_FLTR_FLD_NAME!>"; // NON-NLS;
 
 	/**
 	 * Constructs a new XPathExpressionFilter. Handle type is set to
@@ -91,6 +92,7 @@ public class XPathExpressionFilter extends AbstractExpressionFilter<Object> {
 	public boolean doFilter(Object value, ActivityInfo ai) throws FilterException {
 		Map<String, Object> valuesMap = new HashMap<>();
 		valuesMap.put(OWN_FIELD_VALUE_KEY, value);
+		valuesMap.put(OWN_FIELD_NAME_KEY, null);
 
 		if (ai != null && CollectionUtils.isNotEmpty(exprVars)) {
 			for (String eVar : exprVars) {
@@ -146,6 +148,8 @@ public class XPathExpressionFilter extends AbstractExpressionFilter<Object> {
 			Object varValue;
 			if (variableName.equals(new QName(StreamsScriptingUtils.FIELD_VALUE_VARIABLE_NAME))) {
 				varValue = valuesMap.get(OWN_FIELD_VALUE_KEY);
+			} else if (variableName.equals(new QName(StreamsScriptingUtils.FIELD_NAME_VARIABLE_NAME))) {
+				varValue = valuesMap.get(OWN_FIELD_NAME_KEY);
 			} else {
 				String varNameStr = "$" + variableName.toString(); // NON-NLS
 

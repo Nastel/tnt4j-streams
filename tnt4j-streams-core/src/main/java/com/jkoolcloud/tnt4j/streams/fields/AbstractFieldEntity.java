@@ -176,7 +176,7 @@ public abstract class AbstractFieldEntity {
 		Object tValue = fieldValue;
 		for (ValueTransformation<Object, Object> vt : transformations) {
 			if (vt.getPhase().equals(phase)) {
-				tValue = vt.transform(tValue, ai);
+				tValue = vt.transform(tValue, ai, getName());
 				logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"AbstractFieldEntity.value.after.transformation", this, vt.getName(), Utils.toString(tValue));
 			}
@@ -245,4 +245,11 @@ public abstract class AbstractFieldEntity {
 
 		return false;
 	}
+
+	/**
+	 * Returns activity field/locator name.
+	 * 
+	 * @return entity name
+	 */
+	abstract String getName();
 }

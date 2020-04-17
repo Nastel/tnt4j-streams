@@ -49,6 +49,7 @@ public class XPathTransformation extends AbstractScriptTransformation<Object> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(XPathTransformation.class);
 
 	private static final String OWN_FIELD_VALUE_KEY = "<!TNT4J_XPATH_TRSF_FLD_VALUE!>"; // NON-NLS;
+	private static final String OWN_FIELD_NAME_KEY = "<!TNT4J_XPATH_TRSF_FLD_NAME!>"; // NON-NLS;
 
 	/**
 	 * Constructs a new XPathTransformation.
@@ -91,9 +92,10 @@ public class XPathTransformation extends AbstractScriptTransformation<Object> {
 	}
 
 	@Override
-	public Object transform(Object value, ActivityInfo ai) throws TransformationException {
+	public Object transform(Object value, ActivityInfo ai, String fieldName) throws TransformationException {
 		Map<String, Object> valuesMap = new HashMap<>();
 		valuesMap.put(OWN_FIELD_VALUE_KEY, value);
+		valuesMap.put(OWN_FIELD_NAME_KEY, fieldName);
 
 		if (ai != null && CollectionUtils.isNotEmpty(exprVars)) {
 			for (String eVar : exprVars) {
@@ -130,6 +132,8 @@ public class XPathTransformation extends AbstractScriptTransformation<Object> {
 			Object varValue;
 			if (variableName.equals(new QName(StreamsScriptingUtils.FIELD_VALUE_VARIABLE_NAME))) {
 				varValue = valuesMap.get(OWN_FIELD_VALUE_KEY);
+			} else if (variableName.equals(new QName(StreamsScriptingUtils.FIELD_NAME_VARIABLE_NAME))) {
+				varValue = valuesMap.get(OWN_FIELD_NAME_KEY);
 			} else {
 				String varNameStr = "$" + variableName.toString(); // NON-NLS
 

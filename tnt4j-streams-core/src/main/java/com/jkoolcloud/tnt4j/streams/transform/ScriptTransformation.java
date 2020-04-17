@@ -111,9 +111,10 @@ public class ScriptTransformation extends AbstractScriptTransformation<Object> {
 	}
 
 	@Override
-	public Object transform(Object value, ActivityInfo ai) throws TransformationException {
+	public Object transform(Object value, ActivityInfo ai, String fName) throws TransformationException {
 		Bindings bindings = new SimpleBindings();
 		bindings.put(StreamsScriptingUtils.FIELD_VALUE_VARIABLE_EXPR, value);
+		bindings.put(StreamsScriptingUtils.FIELD_NAME_VARIABLE_EXPR, fName);
 
 		if (ai != null && CollectionUtils.isNotEmpty(exprVars)) {
 			for (String eVar : exprVars) {

@@ -40,13 +40,15 @@ public abstract class AbstractFunction<V> extends AbstractValueTransformation<V,
 	 *            data value to transform
 	 * @param ai
 	 *            activity entity instance
+	 * @param fieldName
+	 *            name of field performing transformation
 	 * @return transformed value
 	 *
 	 * @throws com.jkoolcloud.tnt4j.streams.transform.TransformationException
 	 *             if function evaluation fails
 	 */
 	@Override
-	public Object transform(V value, ActivityInfo ai) throws TransformationException {
+	public Object transform(V value, ActivityInfo ai, String fieldName) throws TransformationException {
 		try {
 			return evaluate(Collections.singletonList(value));
 		} catch (Exception exc) {
