@@ -50,6 +50,28 @@ public class Strings {
 	}
 
 	/**
+	 * Replaces provided {@code strings} elements content matching the given {@code regex} with the given
+	 * {@code replacement}.
+	 * 
+	 * @param strings
+	 *            strings array to replace content
+	 * @param regex
+	 *            the regular expression to which this string is to be matched
+	 * @param replacement
+	 *            the replacement sequence of char values
+	 * @return strings array with replaced content
+	 */
+	public static String[] replaceAll(String[] strings, String regex, String replacement) {
+		if (strings != null) {
+			for (int i = 0; i < strings.length; i++) {
+				strings[i] = strings[i].replaceAll(regex, replacement);
+			}
+		}
+
+		return strings;
+	}
+
+	/**
 	 * Replaces provided {@code strings} elements content matching {@code target} sequence with {@code replacement}
 	 * sequence.
 	 * 
@@ -72,6 +94,28 @@ public class Strings {
 	}
 
 	/**
+	 * Replaces provided {@code strings} elements content matching the given {@code regex} with the given
+	 * {@code replacement}.
+	 * 
+	 * @param strings
+	 *            strings list to replace content
+	 * @param regex
+	 *            the regular expression to which this string is to be matched
+	 * @param replacement
+	 *            the replacement sequence of char values
+	 * @return strings list with replaced content
+	 */
+	public static List<String> replaceAll(List<String> strings, String regex, String replacement) {
+		if (strings != null) {
+			for (int i = 0; i < strings.size(); i++) {
+				strings.set(i, replaceAll(strings.get(i), regex, replacement));
+			}
+		}
+
+		return strings;
+	}
+
+	/**
 	 * Replaces provided {@code string} content matching {@code target} sequence with {@code replacement} sequence.
 	 *
 	 * @param string
@@ -84,6 +128,21 @@ public class Strings {
 	 */
 	public static String replace(String string, String target, String replacement) {
 		return string == null ? string : string.replace(target, replacement);
+	}
+
+	/**
+	 * Replaces provided {@code string} content matching the given {@code regex} with the given {@code replacement}.
+	 *
+	 * @param string
+	 *            string to replace content
+	 * @param regex
+	 *            the regular expression to which this string is to be matched
+	 * @param replacement
+	 *            the replacement sequence of char values
+	 * @return string with replaced content
+	 */
+	public static String replaceAll(String string, String regex, String replacement) {
+		return string == null ? string : string.replaceAll(regex, replacement);
 	}
 
 	/**
