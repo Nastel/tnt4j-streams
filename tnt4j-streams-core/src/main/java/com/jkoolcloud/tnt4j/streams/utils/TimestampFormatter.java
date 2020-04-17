@@ -16,9 +16,12 @@
 
 package com.jkoolcloud.tnt4j.streams.utils;
 
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.Temporal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -182,8 +185,9 @@ public class TimestampFormatter {
 	/**
 	 * Converts provided {@code value} to a {@link UsecTimestamp} without parsing.
 	 * <p>
-	 * If {@code value} is {@link UsecTimestamp}, {@link Date} or {@link Calendar}, then casted or new instance of
-	 * {@link UsecTimestamp} is returned. Otherwise {@code null} is returned.
+	 * If {@code value} is {@link UsecTimestamp}, {@link java.sql.Timestamp}, {@link Date}, {@link Calendar} or
+	 * {@link java.time.temporal.Temporal} then casted or new instance of {@link UsecTimestamp} is returned. Otherwise
+	 * {@code null} is returned.
 	 *
 	 * @param value
 	 *            object value to convert
@@ -194,6 +198,9 @@ public class TimestampFormatter {
 		if (value instanceof UsecTimestamp) {
 			return (UsecTimestamp) value;
 		}
+		if (value instanceof Timestamp) {
+			return new UsecTimestamp((Timestamp) value, 0);
+		}
 		if (value instanceof Date) {
 			return new UsecTimestamp((Date) value);
 		}
@@ -201,7 +208,31 @@ public class TimestampFormatter {
 			return new UsecTimestamp(((Calendar) value).getTimeInMillis(), 0);
 		}
 
+		if (value instanceof Temporal) {
+			return getTimestamp((Temporal) value);
+		}
+
 		return null;
+	}
+
+	private static UsecTimestamp getTimestamp(Temporal value) {
+		// if (value instanceof OffsetTime) {
+		// return getTimestamp(((OffsetTime) value).toLocalTime());
+		// }
+		// if (value instanceof LocalTime) {
+		// return getTimestamp(((LocalTime) value).atDate(LocalDate.now()));
+		// }
+		// if (value instanceof LocalDate) {
+		// return getTimestamp(((LocalDate) value).atStartOfDay());
+		// }
+		// if (value instanceof LocalDateTime) {
+		// return getTimestamp(((LocalDateTime) value).atZone(ZoneId.systemDefault()).toInstant());
+		// }
+		// if (value instanceof Instant) {
+		// return new UsecTimestamp(((Instant) value), 0);
+		// }
+
+		return new UsecTimestamp(Instant.from(value), 0);
 	}
 
 	/**
@@ -292,6 +323,9 @@ public class TimestampFormatter {
 				units = TimeUnit.MILLISECONDS;
 			} else if (value instanceof Calendar) {
 				time = ((Calendar) value).getTimeInMillis();
+				units = TimeUnit.MILLISECONDS;
+			} else if (value instanceof Temporal) {
+				time = Instant.from((Temporal) value).toEpochMilli();
 				units = TimeUnit.MILLISECONDS;
 			} else {
 				if (units == null) {
