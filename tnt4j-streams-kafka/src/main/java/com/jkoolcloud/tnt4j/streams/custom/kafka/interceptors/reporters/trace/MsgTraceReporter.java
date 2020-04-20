@@ -43,6 +43,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.StreamsAgent;
+import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.configure.build.POJOStreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.configure.sax.ConfigParserHandler;
 import com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.InterceptionsManager;
@@ -54,10 +55,7 @@ import com.jkoolcloud.tnt4j.streams.inputs.InputStreamEventsAdapter;
 import com.jkoolcloud.tnt4j.streams.inputs.StreamStatus;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
-import com.jkoolcloud.tnt4j.streams.utils.KafkaStreamConstants;
-import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
-import com.jkoolcloud.tnt4j.streams.utils.Utils;
+import com.jkoolcloud.tnt4j.streams.utils.*;
 
 /**
  * Producer/Consumer interceptors intercepted messages reporter sending jKoolCloud events containing intercepted message
@@ -71,7 +69,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * <li>commit - n {@link com.jkoolcloud.tnt4j.core.OpType#EVENT} type events.</li>
  * </ul>
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  */
 public class MsgTraceReporter implements InterceptionsReporter {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(MsgTraceReporter.class);
@@ -89,14 +87,20 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 */
 	public static final String NONE = "none"; // NON-NLS
 
+	private static final String TRACER_PROPERTY_PREFIX = "messages.tracer."; // NON-NLS
+
 	/**
 	 * Constant defining tracing configuration dedicated topic name.
 	 */
 	public static final String TNT_TRACE_CONFIG_TOPIC = "TNT_TRACE_CONFIG_TOPIC"; // NON-NLS
 	/**
-	 * Constant defining interceptor message tracing configuration properties prefix.
+	 * Constant defining message trace reporter stream configuration properties prefix.
 	 */
-	public static final String TRACER_PROPERTY_PREFIX = "messages.tracer.kafka."; // NON-NLS
+	public static final String STREAM_PROPERTY_PREFIX = TRACER_PROPERTY_PREFIX + "stream."; // NON-NLS
+	/**
+	 * Constant defining message tracing reporter configuration topic consumer configuration properties prefix.
+	 */
+	public static final String CFG_CONSUMER_PROPERTY_PREFIX = TRACER_PROPERTY_PREFIX + "kafka."; // NON-NLS
 	/**
 	 * Constant defining interceptor event parsers configuration file name.
 	 */
@@ -111,6 +115,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 
 	private KafkaMsgTraceStream<ActivityInfo> stream;
 	private final Map<String, TraceCommandDeserializer.TopicTraceCommand> traceConfig = new HashMap<>();
+	private String cfgTopic = TNT_TRACE_CONFIG_TOPIC;
 	private Set<String> traceOptions;
 
 	private KafkaConsumer<String, TraceCommandDeserializer.TopicTraceCommand> consumer;
@@ -161,15 +166,16 @@ public class MsgTraceReporter implements InterceptionsReporter {
 		this.stream = stream;
 		this.traceOptions = traceOpts;
 
-		String streamName = interceptorProperties.getProperty("messages.tracer.stream.name");
-		if (StringUtils.isEmpty(streamName)) {
-			streamName = interceptorProperties.getProperty("messages.tracer.kafka.client.id");
+		String streamName = interceptorProperties.getProperty(STREAM_PROPERTY_PREFIX + "name"); // NON-NLS
+		stream.setName((StringUtils.isEmpty(streamName) ? stream.getName() : streamName) + "_" + Utils.getVMPID()); // NON-NLS
+		Properties streamProps = extractScopeProperties(interceptorProperties, STREAM_PROPERTY_PREFIX);
+		for (String propName : streamProps.stringPropertyNames()) {
+			if (StreamsConstants.isStreamCfgProperty(propName, StreamProperties.class)) {
+				stream.setProperty(propName, streamProps.getProperty(propName));
+			}
 		}
 
-		stream.setName(StringUtils.isEmpty(streamName) ? "kafka-x-ray-trace-stream_" + System.currentTimeMillis() // NON-NLS
-				: streamName); // NON-NLS
-
-		String parserCfg = Utils.getString("messages.tracer.stream.parser", interceptorProperties,
+		String parserCfg = Utils.getString(STREAM_PROPERTY_PREFIX + "parser", interceptorProperties, // NON-NLS
 				DEFAULT_PARSER_CONFIG_FILE + PARSER_DELIM + DEFAULT_PARSER_NAME);
 		mainParser = getParser(parserCfg);
 		stream.addParser(mainParser);
@@ -197,15 +203,17 @@ public class MsgTraceReporter implements InterceptionsReporter {
 				"MsgTraceReporter.stream.started", stream.getName());
 
 		if (enableCfgPolling) {
+			String cfgTopicName = interceptorProperties.getProperty(TRACER_PROPERTY_PREFIX + "cfg.topic"); // NON-NLS
+			if (StringUtils.isNotEmpty(cfgTopicName)) {
+				cfgTopic = cfgTopicName;
+			}
 			traceConfig.put(TraceCommandDeserializer.MASTER_CONFIG, new TraceCommandDeserializer.TopicTraceCommand());
-			Map<String, Map<String, ?>> consumersCfg = InterceptionsManager.getInstance()
-					.getInterceptorsConfig(TNTKafkaCInterceptor.class);
-			Map<String, ?> cConfig = MapUtils.isEmpty(consumersCfg) ? null
-					: consumersCfg.entrySet().iterator().next().getValue();
+
+			Properties consumerConfig = extractKafkaProperties(interceptorProperties);
 			Thread traceConfigPollThread = new Thread(new Runnable() {
 				@Override
 				public void run() {
-					pollConfigQueue(cConfig, interceptorProperties, traceConfig);
+					pollConfigQueue(consumerConfig, cfgTopic, traceConfig);
 				}
 			}, stream.getName() + "_TraceConfigPollThread");
 			traceConfigPollThread.start();
@@ -297,62 +305,60 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 * Merges Kafka consumer, messages interceptor file and topic provided properties and puts them all into complete
 	 * tracing configuration map {@code traceConfig}.
 	 *
-	 * @param config
-	 *            Kafka consumer interceptor configuration properties map
-	 * @param interceptorProperties
-	 *            Kafka interceptor configuration properties
+	 * @param consumerConfig
+	 *            trace configuration topic consumer configuration properties
+	 * @param cfgTopicName
+	 *            trace configuration topic name
 	 * @param traceConfig
 	 *            complete message tracing configuration properties
 	 */
-	protected void pollConfigQueue(Map<String, ?> config, Properties interceptorProperties,
+	protected void pollConfigQueue(Properties consumerConfig, String cfgTopicName,
 			Map<String, TraceCommandDeserializer.TopicTraceCommand> traceConfig) {
-		Properties props = new Properties();
-		if (config != null) {
-			props.putAll(config);
+		if (consumerConfig.isEmpty() || StringUtils.isEmpty(cfgTopicName)) {
+			return;
 		}
-		if (interceptorProperties != null) {
-			props.putAll(extractKafkaProperties(interceptorProperties));
+
+		String clintId = consumerConfig.getProperty(ConsumerConfig.CLIENT_ID_CONFIG);
+		if (StringUtils.isEmpty(clintId)) {
+			clintId = "kafka-x-ray-trace-config-listener"; // NON-NLS
 		}
-		if (!props.isEmpty()) {
-			if (!props.contains(ConsumerConfig.CLIENT_ID_CONFIG)) {
-				props.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, "kafka-x-ray-trace-config-listener"); // NON-NLS
-			}
-			if (!props.contains(ConsumerConfig.GROUP_ID_CONFIG)) {
-				props.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "kafka-x-ray-trace-config-consumers"); // NON-NLS
-			}
-			props.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true"); // NON-NLS
-			props.remove(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG);
-			consumer = createKafkaConsumer(props);
-			boolean consume = true;
-			while (consume) {
-				try {
-					ConsumerRecords<String, TraceCommandDeserializer.TopicTraceCommand> records = consumer
-							.poll(Duration.ofMillis(500));
-					if (records.count() > 0) {
-						LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-								"MsgTraceReporter.polled.commands", records.count(), records.iterator().next());
-						for (ConsumerRecord<String, TraceCommandDeserializer.TopicTraceCommand> record : records) {
-							if (record.value() != null) {
-								traceConfig.put(record.value().topic, record.value());
-							}
+		consumerConfig.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, clintId + "_" + Utils.getVMPID()); // NON-NLS
+		if (!consumerConfig.contains(ConsumerConfig.GROUP_ID_CONFIG)) {
+			consumerConfig.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "kafka-x-ray-trace-config-consumers"); // NON-NLS
+		}
+		consumerConfig.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true"); // NON-NLS
+		consumerConfig.remove(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG);
+
+		consumer = createKafkaConsumer(consumerConfig, cfgTopicName);
+		boolean consume = true;
+		while (consume) {
+			try {
+				ConsumerRecords<String, TraceCommandDeserializer.TopicTraceCommand> records = consumer
+						.poll(Duration.ofMillis(500));
+				if (records.count() > 0) {
+					LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
+							"MsgTraceReporter.polled.commands", records.count(), records.iterator().next());
+					for (ConsumerRecord<String, TraceCommandDeserializer.TopicTraceCommand> record : records) {
+						if (record.value() != null) {
+							traceConfig.put(record.value().topic, record.value());
 						}
 					}
-				} catch (WakeupException exc) {
-					consume = false;
 				}
+			} catch (WakeupException exc) {
+				consume = false;
 			}
-
-			consumer.close();
 		}
+
+		consumer.close();
 	}
 
 	private static KafkaConsumer<String, TraceCommandDeserializer.TopicTraceCommand> createKafkaConsumer(
-			Properties props) {
+			Properties props, String cfgTopic) {
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-				"MsgTraceReporter.creating.command.consumer", props);
+				"MsgTraceReporter.creating.command.consumer", cfgTopic, props);
 		KafkaConsumer<String, TraceCommandDeserializer.TopicTraceCommand> consumer = new KafkaConsumer<>(props,
 				new StringDeserializer(), new TraceCommandDeserializer());
-		TopicPartition topicPartition = new TopicPartition(MsgTraceReporter.TNT_TRACE_CONFIG_TOPIC, 0);
+		TopicPartition topicPartition = new TopicPartition(cfgTopic, 0);
 		consumer.assign(Collections.singletonList(topicPartition));
 
 		return consumer;
@@ -405,10 +411,14 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 * @return interceptor message tracing configuration properties
 	 */
 	protected static Properties extractKafkaProperties(Properties interceptorProperties) {
+		return extractScopeProperties(interceptorProperties, CFG_CONSUMER_PROPERTY_PREFIX);
+	}
+
+	protected static Properties extractScopeProperties(Properties interceptorProperties, String scopePrefix) {
 		Properties props = new Properties();
 		for (String key : interceptorProperties.stringPropertyNames()) {
-			if (key.startsWith(TRACER_PROPERTY_PREFIX)) {
-				props.put(key.substring(TRACER_PROPERTY_PREFIX.length()), interceptorProperties.getProperty(key));
+			if (key.startsWith(scopePrefix)) {
+				props.put(key.substring(scopePrefix.length()), interceptorProperties.getProperty(key));
 			}
 		}
 		return props;
@@ -427,7 +437,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 * @return {@code true} if message should be traced, {@code false} - otherwise
 	 */
 	protected boolean shouldSendTrace(String topic, boolean count, String opName) {
-		if (!isOpTraceEnabled(opName) || TNT_TRACE_CONFIG_TOPIC.equals(topic)) {
+		if (!isOpTraceEnabled(opName) || cfgTopic.equals(topic)) {
 			return false;
 		}
 

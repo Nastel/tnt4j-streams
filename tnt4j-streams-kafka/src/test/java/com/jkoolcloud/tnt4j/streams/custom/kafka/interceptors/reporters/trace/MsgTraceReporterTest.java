@@ -52,7 +52,7 @@ public class MsgTraceReporterTest {
 	@Ignore
 	@Test
 	public void pollConfigQueue() throws Exception {
-		HashMap<String, String> config = new HashMap<>();
+		Properties config = new Properties();
 		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
 		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getCanonicalName());
@@ -66,7 +66,7 @@ public class MsgTraceReporterTest {
 
 		for (int i = 0; i < 10; i++) {
 			HashMap<String, TraceCommandDeserializer.TopicTraceCommand> traceConfig = new HashMap<>();
-			reporter.pollConfigQueue(config, new Properties(), traceConfig);
+			reporter.pollConfigQueue(config, MsgTraceReporter.TNT_TRACE_CONFIG_TOPIC, traceConfig);
 			System.out.println("Control records for " + traceConfig.size());
 			TimeUnit.SECONDS.sleep(3);
 		}
