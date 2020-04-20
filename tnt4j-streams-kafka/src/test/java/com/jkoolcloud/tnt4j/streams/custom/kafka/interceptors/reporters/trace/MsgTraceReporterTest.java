@@ -61,7 +61,7 @@ public class MsgTraceReporterTest {
 		config.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
 		config.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");
 
-		KafkaObjTraceStream<ActivityInfo> stream = buildStream();
+		KafkaMsgTraceStream<ActivityInfo> stream = buildStream();
 		MsgTraceReporter reporter = getMsgTraceReporter(stream);
 
 		for (int i = 0; i < 10; i++) {
@@ -139,7 +139,7 @@ public class MsgTraceReporterTest {
 
 	@Test
 	public void testSend() throws Exception {
-		KafkaObjTraceStream<ActivityInfo> stream = buildStream();
+		KafkaMsgTraceStream<ActivityInfo> stream = buildStream();
 		MsgTraceReporter reporter = getMsgTraceReporter(stream);
 
 		ProducerRecord producerRecord = getProducerRecord();
@@ -158,7 +158,7 @@ public class MsgTraceReporterTest {
 
 	@Test
 	public void testAck() throws Exception {
-		KafkaObjTraceStream<ActivityInfo> stream = buildStream();
+		KafkaMsgTraceStream<ActivityInfo> stream = buildStream();
 		MsgTraceReporter reporter = getMsgTraceReporter(stream);
 
 		RecordMetadata recordMetadata = new RecordMetadata(getTopicPartition(), OFFSET, OFFSET, TIMESTAMP, 123L,
@@ -203,8 +203,8 @@ public class MsgTraceReporterTest {
 		return new ProducerRecord<String, String>(TOPIC, 0, null, "VALUE"); // NON-NLS
 	}
 
-	private KafkaObjTraceStream<ActivityInfo> buildStream() throws Exception {
-		KafkaObjTraceStream<ActivityInfo> stream = new KafkaObjTraceStream<ActivityInfo>() {
+	private KafkaMsgTraceStream<ActivityInfo> buildStream() throws Exception {
+		KafkaMsgTraceStream<ActivityInfo> stream = new KafkaMsgTraceStream<ActivityInfo>() {
 			{
 				setOutput(new JKCloudActivityOutput() {
 					@Override
@@ -218,7 +218,7 @@ public class MsgTraceReporterTest {
 		return stream;
 	}
 
-	private MsgTraceReporter getMsgTraceReporter(KafkaObjTraceStream<ActivityInfo> stream) throws Exception {
+	private MsgTraceReporter getMsgTraceReporter(KafkaMsgTraceStream<ActivityInfo> stream) throws Exception {
 		// System.setProperty("tnt4j.config", "../config/tnt4j.properties");
 
 		MsgTraceReporter reporter = new MsgTraceReporter(stream, new Properties(), false, "all"); // NON-NLS
@@ -244,7 +244,7 @@ public class MsgTraceReporterTest {
 
 	@Test
 	public void testCommit() throws Exception {
-		KafkaObjTraceStream<ActivityInfo> stream = buildStream();
+		KafkaMsgTraceStream<ActivityInfo> stream = buildStream();
 		MsgTraceReporter reporter = getMsgTraceReporter(stream);
 
 		HashMap<TopicPartition, OffsetAndMetadata> map = new HashMap<>();
@@ -280,7 +280,7 @@ public class MsgTraceReporterTest {
 
 	@Test
 	public void testConsume() throws Exception {
-		KafkaObjTraceStream<ActivityInfo> stream = buildStream();
+		KafkaMsgTraceStream<ActivityInfo> stream = buildStream();
 		MsgTraceReporter reporter = getMsgTraceReporter(stream);
 
 		ConsumerRecords<Object, Object> consumerRecords = getConsumerRecords();

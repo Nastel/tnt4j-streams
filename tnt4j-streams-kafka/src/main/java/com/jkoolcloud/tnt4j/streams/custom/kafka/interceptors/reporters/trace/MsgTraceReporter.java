@@ -109,7 +109,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 
 	private ActivityParser mainParser;
 
-	private KafkaObjTraceStream<ActivityInfo> stream;
+	private KafkaMsgTraceStream<ActivityInfo> stream;
 	private final Map<String, TraceCommandDeserializer.TopicTraceCommand> traceConfig = new HashMap<>();
 	private Set<String> traceOptions;
 
@@ -124,7 +124,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 *            messages tracing options set
 	 */
 	public MsgTraceReporter(Properties interceptorProperties, Set<String> traceOpts) {
-		this(new KafkaObjTraceStream<>(), interceptorProperties, true, traceOpts);
+		this(new KafkaMsgTraceStream<>(), interceptorProperties, true, traceOpts);
 	}
 
 	/**
@@ -139,7 +139,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 * @param traceOpts
 	 *            messages tracing options string
 	 */
-	MsgTraceReporter(KafkaObjTraceStream<ActivityInfo> stream, Properties interceptorProperties,
+	MsgTraceReporter(KafkaMsgTraceStream<ActivityInfo> stream, Properties interceptorProperties,
 			boolean enableCfgPolling, String traceOpts) {
 		this(stream, interceptorProperties, enableCfgPolling, getTraceOptsSet(traceOpts));
 	}
@@ -156,7 +156,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 * @param traceOpts
 	 *            messages tracing options set
 	 */
-	MsgTraceReporter(KafkaObjTraceStream<ActivityInfo> stream, Properties interceptorProperties,
+	MsgTraceReporter(KafkaMsgTraceStream<ActivityInfo> stream, Properties interceptorProperties,
 			boolean enableCfgPolling, Set<String> traceOpts) {
 		this.stream = stream;
 		this.traceOptions = traceOpts;
