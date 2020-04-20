@@ -1,6 +1,6 @@
 ### How to manually integrate Kafka-X-Ray into your Kafka environment
 
-1. Install Kafka (if not yet), but **NOTE** this guide is written to perform actions on clean instance of Kafka installation - if you 
+1. Install Kafka (if not yet), but **NOTE** this guide written to perform actions on a clean instance of Kafka installation - if you 
 already made any changes to your Kafka environment, it **may require some improvisation**. 
 1. Add `tnt4j-streams-kafka-[VERSION]-all.jar` to Kafka class-path:
     1. If you can put files into `<KAFKA_INSTALL_DIR>/libs` dir, then just copy it there. 
@@ -111,7 +111,7 @@ right after line defining environment variable `KAFKA_HEAP_OPTS`):
     log4j.logger.com.jkoolcloud.tnt4j.streams.activities_log=INFO, activities_log
     log4j.additivity.com.jkoolcloud.tnt4j.streams.activities_log=false
     ```
-1. Copy your `tnt4j.properties` file (one having your JKool token defined) into `<KAFKA_INSTALL_DIR>/config` directory. Also check if your 
+1. Copy your `tnt4j.properties` file (one having your JKool token defined) into `<KAFKA_INSTALL_DIR>/config` directory. Also, check if your 
 `tnt4j.properties` file contains stanza for source `com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics`. If not - 
 append it with this one:
     ```properties
@@ -163,12 +163,23 @@ append it with this one:
     ```
 1. Create file `<KAFKA_INSTALL_DIR>/config/interceptorsC.properties` and fill it with these properties:
     ```properties
+    ### Kafka metrics reporting configuration
+    # Use value 0 to disable metrics reporting
     metrics.report.period=30
     metrics.report.delay=10
+
+    ### Kafka messages tracing configuration
+    # Possible values: all, none, consume, commit
     messages.tracer.trace=all
+    # Default parser reference is from -all.jar resource
     messages.tracer.stream.parser=tnt-data-source_kafka_msg_trace_custom.xml#KafkaTraceParser
     messages.tracer.stream.name=KafkaConsumerXXXStream
-    # Trace configuration topic consumer properties
+    ## Additional stream configuration properties
+    # Add any stream property prefixed by 'messages.tracer.stream.'
+    messages.tracer.stream.RetryStateCheck=3
+    messages.tracer.stream.RetryInterval=5
+    ## Trace configuration topic consumer properties
+    messages.tracer.cfg.topic=TNT_TRACE_CONFIG_TOPIC
     messages.tracer.kafka.bootstrap.servers=localhost:9092
     messages.tracer.kafka.group.id=kafka-x-ray-trace-config-consumers
     messages.tracer.kafka.client.id=kafka-x-ray-trace-config-listener-c
@@ -177,12 +188,23 @@ append it with this one:
     interceptors configuration. 
 1. Create file `<KAFKA_INSTALL_DIR>/config/interceptorsP.properties` and fill it with these properties:
     ```properties
+    ### Kafka metrics reporting configuration
+    # Use value 0 to disable metrics reporting
     metrics.report.period=30
     metrics.report.delay=10
+
+    ### Kafka messages tracing configuration
+    # Possible values: all, none, send, ack
     messages.tracer.trace=all
+    # Default parser reference is from -all.jar resource
     messages.tracer.stream.parser=tnt-data-source_kafka_msg_trace_custom.xml#KafkaTraceParser
     messages.tracer.stream.name=KafkaProducerXXXStream
-    # Trace configuration topic consumer properties
+    ## Additional stream configuration properties
+    # Add any stream property prefixed by 'messages.tracer.stream.'
+    messages.tracer.stream.RetryStateCheck=3
+    messages.tracer.stream.RetryInterval=5
+    ## Trace configuration topic consumer properties
+    messages.tracer.cfg.topic=TNT_TRACE_CONFIG_TOPIC
     messages.tracer.kafka.bootstrap.servers=localhost:9092
     messages.tracer.kafka.group.id=kafka-x-ray-trace-config-consumers
     messages.tracer.kafka.client.id=kafka-x-ray-trace-config-listener-p

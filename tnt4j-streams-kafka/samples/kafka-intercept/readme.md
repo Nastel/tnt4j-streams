@@ -13,7 +13,7 @@ All the rest configuration is for advanced use cases: different kafka server hos
 ```properties
 source: com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics
 ```
-if there is no such, it must be you have an old build of TNT4J-Streams or you have not built `tnt4j-streams-kafka` module.
+if there is no such, it must be you have an old build of TNT4J-Streams, or you have not built `tnt4j-streams-kafka` module.
 
 ### Advanced
 
@@ -36,7 +36,7 @@ To configure interceptors collected metrics streaming to dedicated Kafka topic u
 (e.g. `./config/tnt4j.properties`), used by TNT4J-Streams over system property `tnt4j.config`. When building TNT4J-Streams deliverable 
 package with `tnt4j-streams-kafka` module included - this merge is performed automatically.
 
-* Define stanza for source `com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics` (without this metrics will not be 
+* Define a stanza for source `com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics` (without this metrics will not be 
 reported to dedicated Kafka topic):
     ```properties
       source: com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics
@@ -68,13 +68,13 @@ reported to dedicated Kafka topic):
 #### Interceptors configuration
 
 To configure interceptors use sample files `./config/intercept/interceptorsC.properties` (for consumer) and 
-`./config/intercept/interceptorsP.properties` (for producer). Configuration properties are:
+`./config/intercept/interceptorsP.properties` (for a producer). Configuration properties are:
 * `metrics.report.period` - period (in seconds) of Kafka interceptors (and JMX) collected metrics reporting to dedicated Kafka topic. 
 Default value - `30`.
-* `metrics.report.delay` - delay (in seconds) before first metrics reporting is invoked. If not defined, it is equal to 
+* `metrics.report.delay` - delay (in seconds) before first metrics reporting will invoke. If not defined, it is equal to 
 `metrics.report.period`.
-* `messages.tracer.trace` - messages tracing options, allowing to enable/disable tracing of all, none or desired set of message 
-producer/consumer intercepted operations:
+* `messages.tracer.trace` - messages tracing options, allows enabling/disabling trace of all, none or set of message producer/consumer 
+intercepted operations:
     * `send` - producer send operation
     * `ack` - producer acknowledge operation
     * `consume` - consumer consume operation
@@ -84,25 +84,32 @@ producer/consumer intercepted operations:
 
   Default value - `none`.
 * `messages.tracer.stream.parser` - parser reference, used to parse Kafka interceptors trace events (of class 
-`com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.KafkaTraceEventData`). Reference is defined using pattern 
+`com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.KafkaTraceEventData`). Reference mey be defined using pattern 
 `parsers_cfg_file_name_path#parserName`, where:
     * `parsers_cfg_file_path` - is parsers configuration file path (absolute or relative to interceptors configuration file). (Optional). 
     Default value - `tnt-data-source_kafka_msg_trace.xml`. 
     * `parserName` - primary parser name from referenced parsers configuration file. Default value - `KafkaTraceParser`.
 
-  To define only parser name from file under default parsers configuration file path - use `#parserName` pattern. Default value - 
+  To define only parser name from a file under default parsers configuration file path - use `#parserName` pattern. Default value - 
   `tnt-data-source_kafka_msg_trace.xml#KafkaTraceParser`.
 * `messages.tracer.stream.name` - Kafka interceptors trace events stream name.
+* set of stream configuration properties prefixed by `messages.tracer.stream.`, e.g.:
+```properties
+messages.tracer.stream.RetryStateCheck=3
+messages.tracer.stream.RetryInterval=5
+```
+* `messages.tracer.cfg.topic` - tracer configuration topic name. Default value - `TNT_TRACE_CONFIG_TOPIC`. (Optional)
 
 ##### Kafka messages trace configuration over file
 
-When messaging tracing is enabled, it generates quite noticeable overhead and you're able to control tracing process using topic: 
+When message tracing enabled, it generates quite noticeable overhead, and you're able to control tracing process using topic: 
 `TNT_TRACE_CONFIG_TOPIC`. To read (poll) messages tracing handling commands from topic `TNT_TRACE_CONFIG_TOPIC`, set consumer configuration 
 properties in `interceptor.properties` file.
 
 Use standard Kafka consumer keys with prefix `messages.tracer.kafka.`, e.g:
 ```properties
-# Trace configuration topic consumer properties
+## Trace configuration topic consumer properties
+messages.tracer.cfg.topic=TNT_TRACE_CONFIG_TOPIC
 messages.tracer.kafka.bootstrap.servers=localhost:9092
 messages.tracer.kafka.group.id=kafka-x-ray-trace-config-consumers
 messages.tracer.kafka.client.id=kafka-x-ray-trace-config-listener
@@ -150,7 +157,7 @@ kafka-console-producer --broker-list localhost:9092,localhost:9093 --topic TNT_T
 
 #### Kafka broker configuration
 
-Default Kafka broker is configured to be on local machine (default host/port is `localhost:9092`). If this does not meet your environment, 
+Default Kafka broker configured to run on a local machine (default host/port is `localhost:9092`). If this does not meet your environment, 
 set it to match yours in those files:
 * `consumer.properties` file property `bootstrap.servers` 
 * `producer.properties` file property `bootstrap.servers`
