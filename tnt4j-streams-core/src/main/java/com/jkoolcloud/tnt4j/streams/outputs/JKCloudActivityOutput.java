@@ -145,7 +145,7 @@ public class JKCloudActivityOutput extends AbstractJKCloudOutput<ActivityInfo, T
 
 	private void recordActivity(Tracker tracker, Trackable t, ActivityInfo ai, String aiFQN) throws Exception {
 		alterTrackableSource(tracker, t, ai, aiFQN);
-		recordActivity(tracker, CONN_RETRY_INTERVAL, t);
+		recordActivity(tracker, retryPeriod, t);
 		notifyEntityRecorded(ai, t);
 	}
 

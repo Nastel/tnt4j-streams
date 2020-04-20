@@ -70,7 +70,7 @@ public class JKCloudJsonOutput extends AbstractJKCloudOutput<String, String> {
 	public void logItem(String ai) throws Exception {
 		super.logItem(ai);
 		try {
-			recordActivity(getTracker(), CONN_RETRY_INTERVAL, ai);
+			recordActivity(getTracker(), retryPeriod, ai);
 		} finally {
 			notifyLoggingFinish(ai);
 		}

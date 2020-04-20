@@ -59,9 +59,12 @@ import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
  * <li>TNT4JProperty - defines specific TNT4J configuration properties to be used by stream output. (Optional)</li>
  * <li>TNT4JConfigZKNode - defines ZooKeeper path where stream configuration is located. Default value - ''.
  * (Optional)</li>
- * <li>RetryStateCheck - flag indicating whether tracker state check should be perform repeatedly. If {@code false},
- * then streaming process exits with {@link java.lang.IllegalStateException}. Default value - {@code false}.
- * (Optional)</li>
+ * <li>RetryStateCheck - flag indicating whether tracker state check shall be performed repeatedly, or number of retries
+ * to perform. If {@code false}, then streaming process exits with {@link java.lang.IllegalStateException} on first
+ * failure. If {@code true}, then state check retry procedure repeats until success (may repeat infinite number of
+ * times). Default value - {@code false} or {@code 1}. (Optional)</li>
+ * <li>RetryPeriod - period in seconds to wait before next issue of state check or activity recording operation after
+ * failure. Default value - '10sec.'. (Optional)</li>
  * <li>SendStreamStates - flag indicating whether to send stream status change messages (`startup`/`shutdown`) to output
  * endpoint e.g. 'jKoolCloud'. Default value - {@code true}. (Optional)</li>
  * </ul>
@@ -71,14 +74,14 @@ import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
  * @param <O>
  *            the type of outgoing activity data package to be sent to jKoolCloud
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  */
 public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutput<T> implements SinkErrorListener {
 
 	/**
 	 * Delay between retries to submit data package to jKoolCloud if some transmission failure occurs, in milliseconds.
 	 */
-	protected static final long CONN_RETRY_INTERVAL = TimeUnit.SECONDS.toMillis(10);
+	private static final long CONN_RETRY_PERIOD = TimeUnit.SECONDS.toMillis(10);
 
 	private static final String FILE_PREFIX = "file://"; // NON-NLS
 	private static final String ZK_PREFIX = "zk://"; // NON-NLS
@@ -93,7 +96,8 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 	private String tnt4jCfgPath;
 	private Map<String, String> tnt4jProperties;
 
-	private boolean retryStateCheck = false;
+	private int stateCheckRetries = 1;
+	protected long retryPeriod = CONN_RETRY_PERIOD;
 	private boolean sendStreamStates = true;
 	private JKoolNotificationListener jKoolNotificationListener = new JKoolNotificationListener();
 
@@ -190,8 +194,8 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 	}
 
 	private void checkTracker(Tracker tracker) throws IllegalArgumentException {
-		if (retryStateCheck) {
-			checkTrackerWithRetry(tracker, CONN_RETRY_INTERVAL);
+		if (stateCheckRetries > 1) {
+			checkTrackerWithRetry(tracker, retryPeriod);
 		} else {
 			checkTrackerState(tracker);
 		}
@@ -210,21 +214,25 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 
 				if (retryAttemptsCount > 0) {
 					logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"TNTStreamOutput.check.retry.successful", getTrackerId(tracker), retryAttemptsCount);
+							"TNTStreamOutput.check.retry.successful", getTrackerId(tracker), retryAttemptsCount,
+							stateCheckRetries == Integer.MAX_VALUE ? "\u221E" : stateCheckRetries); // NON-NLS
 				}
 
 				return;
 			} catch (IllegalStateException ise) {
 				Utils.logThrowable(logger(), OpLevel.ERROR,
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"TNTStreamOutput.check.failed", getTrackerId(tracker), ise);
-				if (thread == null) {
+						"TNTStreamOutput.check.failed", getTrackerId(tracker), ise.getMessage());
+
+				retryAttemptsCount++;
+				if (thread == null || retryAttemptsCount >= stateCheckRetries) {
 					throw ise;
 				}
-				retryAttemptsCount++;
+
 				if (!thread.isStopRunning()) {
 					logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"TNTStreamOutput.check.will.retry", getTrackerId(tracker),
+							"TNTStreamOutput.check.will.retry", getTrackerId(tracker), retryAttemptsCount,
+							stateCheckRetries == Integer.MAX_VALUE ? "\u221E" : stateCheckRetries, // NON-NLS
 							TimeUnit.MILLISECONDS.toSeconds(retryPeriod));
 					StreamsThread.sleep(retryPeriod);
 				}
@@ -252,7 +260,15 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 			}
 			setTnt4jCfgPath(path);
 		} else if (OutputProperties.PROP_RETRY_STATE_CHECK.equalsIgnoreCase(name)) {
-			retryStateCheck = Utils.toBoolean((String) value);
+			try {
+				stateCheckRetries = Integer.parseInt((String) value);
+			} catch (NumberFormatException exc) {
+				boolean retryStateCheck = Utils.toBoolean((String) value);
+
+				if (retryStateCheck) {
+					stateCheckRetries = Integer.MAX_VALUE;
+				}
+			}
 		} else if (OutputProperties.PROP_SEND_STREAM_STATES.equalsIgnoreCase(name)) {
 			sendStreamStates = Utils.toBoolean((String) value);
 
@@ -263,6 +279,9 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 					getStream().removeStreamListener(jKoolNotificationListener);
 				}
 			}
+		} else if (OutputProperties.PROP_RETRY_PERIOD.equalsIgnoreCase(name)) {
+			int retryPeriodSec = Integer.parseInt((String) value);
+			retryPeriod = TimeUnit.SECONDS.toMillis(retryPeriodSec);
 		}
 	}
 
@@ -579,13 +598,13 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 		TrackingEvent sMsgEvent;
 		if (status == StreamStatus.STARTED) {
 			sMsgEvent = tracker.newEvent(OpLevel.INFO, OpType.START, "Streaming-session-start-event", // NON-NLS
-					(String) null, "STREAM_START", // NON-NLS
+					null, "STREAM_START", // NON-NLS
 					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "TNTStreamOutput.status.msg"),
 					getStream().getName(), status);
 		} else {
 			sMsgEvent = tracker.newEvent(status == StreamStatus.FAILURE ? OpLevel.ERROR : OpLevel.INFO, OpType.STOP,
 					"Streaming-session-shutdown-event", // NON-NLS
-					(String) null, "STREAM_SHUTDOWN", // NON-NLS
+					null, "STREAM_SHUTDOWN", // NON-NLS
 					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "TNTStreamOutput.status.msg"),
 					getStream().getName(), status);
 		}
@@ -594,7 +613,7 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 		O wMsg = formatStreamStatusMessage(sMsgEvent);
 
 		try {
-			recordActivity(tracker, CONN_RETRY_INTERVAL, wMsg);
+			recordActivity(tracker, retryPeriod, wMsg);
 			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"TNTStreamOutput.status.msg.sent", status);
 		} catch (Exception exc) {

@@ -4544,12 +4544,15 @@ Stream output can be configured using these configuration properties:
 Default value - `null`. (Optional)
  * `TNT4JProperty` - defines specific TNT4J configuration properties to be used by stream output. (Optional)
  * `TNT4JConfigZKNode` - defines ZooKeeper path where stream configuration is located. Default value - ``. (Optional)
- * `RetryStateCheck` - flag indicating whether tracker state check should be perform repeatedly. If `false`, then streaming process exits with 
- `java.lang.IllegalStateException`. Default value - `false`. (Optional)
+ * `RetryStateCheck` - flag indicating whether tracker state check shall be performed repeatedly, or number of retries to perform. If 
+ `false`, then streaming process exits with `java.lang.IllegalStateException` on first failure. If `true`, then state check retry procedure 
+ repeats until success (may repeat infinite number of times). Default value - `false` or `1`. (Optional)
+ * `RetryPeriod` - period in seconds to wait before next issue of state check or activity recording operation after failure. Default 
+ value - `10sec.`. (Optional)
  * `ResolveServerFromDNS` - flag indicating whether to resolve activity entity host name/IP from DNS server. Default value - `false`. (Optional)
  * `SplitRelatives` - flag indicating whether to send activity entity child entities independently merging data from both parent and child 
  entity fields into produced entity. Default value - `false`. (Optional). **NOTE**: This value has alias `TurnOutActivityChildren` left for 
- backward compatibility, but it is not recommended to use it anymore and it should be changed right away for existing configurations.
+ backward compatibility, but it is not recommended to use it anymore - change it right away for existing configurations.
  * `BuildSourceFQNFromStreamedData` - flag indicating whether to set streamed activity entity `Source` FQN build from activity fields data 
  instead of default on configured in `tnt4j.properties`. Default value - `true`. (Optional)
  * `SourceFQN` - `Source` FQN pattern to be used when building it from streamed activity entity fields values. 
@@ -4559,19 +4562,21 @@ Default value - `null`. (Optional)
  [jKoolCloud](https://www.jkoolcloud.com/). Default value - `true`. (Optional)
 
      sample:
- ```xml
-     <property name="TNT4JConfigFile" value="../../configuration/tnt4j.properties"/>
-     <tnt4j-properties>
-         <property name="event.formatter" value="com.jkoolcloud.tnt4j.streams.utils.RedirectTNT4JStreamFormatter"/>
-     </tnt4j-properties>
-     <property name="TNT4JConfigZKNode" value="/samples/core/logstash"/>
-     <property name="RetryStateCheck" value="true"/>
-     <property name="ResolveServerFromDNS" value="true"/>
-     <property name="SplitRelatives" value="true"/>
-     <property name="BuildSourceFQNFromStreamedData" value="false"/>
-     <property name="SourceFQN" value="APPL=${ApplName}#USER=${UserName}#SERVER=${ServerName}"/>
-     <property name="SendStreamStates" value="false"/> 
- ```
+```xml
+    <property name="TNT4JConfigFile" value="../../configuration/tnt4j.properties"/>
+    <tnt4j-properties>
+        <property name="event.formatter" value="com.jkoolcloud.tnt4j.streams.utils.RedirectTNT4JStreamFormatter"/>
+    </tnt4j-properties>
+    <property name="TNT4JConfigZKNode" value="/samples/core/logstash"/>
+    <property name="RetryStateCheck" value="true"/>
+    <property name="RetryStateCheck" value="5"/>
+    <property name="RetryPeriod" value="3"/>
+    <property name="ResolveServerFromDNS" value="true"/>
+    <property name="SplitRelatives" value="true"/>
+    <property name="BuildSourceFQNFromStreamedData" value="false"/>
+    <property name="SourceFQN" value="APPL=${ApplName}#USER=${UserName}#SERVER=${ServerName}"/>
+    <property name="SendStreamStates" value="false"/> 
+```
 
 **NOTE:** stream output configuration parameters can be defined under `stream` tag (will drill down to default stream output instance), or 
 under `java-object` tag referring output type class and referred from `stream` like this:
