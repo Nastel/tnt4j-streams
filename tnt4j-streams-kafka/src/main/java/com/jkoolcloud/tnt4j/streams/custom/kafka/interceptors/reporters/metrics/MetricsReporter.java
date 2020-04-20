@@ -22,10 +22,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanInfo;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
+import javax.management.*;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 
@@ -82,7 +79,7 @@ import com.jkoolcloud.tnt4j.tracker.TrackingActivity;
  * <p>
  * Metrics data is reported in scheduled intervals and on interceptions shutdown.
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  */
 public class MetricsReporter implements InterceptionsReporter {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(MetricsReporter.class);
@@ -96,7 +93,7 @@ public class MetricsReporter implements InterceptionsReporter {
 
 	private java.util.Timer metricsReportingTimer;
 
-	private Tracker tracker;
+	private final Tracker tracker;
 
 	private Map<String, TopicMetrics> topicsMetrics = new HashMap<>();
 
@@ -392,7 +389,9 @@ public class MetricsReporter implements InterceptionsReporter {
 		metricsReportingTimer.cancel();
 		reportMetrics(topicsMetrics);
 
-		Utils.close(tracker);
+		synchronized (tracker) {
+			Utils.close(tracker);
+		}
 	}
 
 	/**
@@ -402,44 +401,46 @@ public class MetricsReporter implements InterceptionsReporter {
 	 *            metrics registry map
 	 */
 	protected void reportMetrics(Map<String, TopicMetrics> mRegistry) {
-		String metricsCorrelator = tracker.newUUID();
+		synchronized (tracker) {
+			String metricsCorrelator = tracker.newUUID();
 
-		try {
-			if (InterceptionsManager.getInstance().isProducerIntercepted()) {
-				TrackingActivity metricsJMX = collectKafkaProducerMetricsJMX(tracker);
+			try {
+				TrackingActivity metricsJMX = collectJVMMetricsJMX(tracker);
 				metricsJMX.setCorrelator(metricsCorrelator);
 				prepareAndSend(metricsJMX);
-			}
-			if (InterceptionsManager.getInstance().isConsumerIntercepted()) {
-				TrackingActivity metricsJMX = collectKafkaConsumerMetricsJMX(tracker);
-				metricsJMX.setCorrelator(metricsCorrelator);
-				prepareAndSend(metricsJMX);
+
+				if (InterceptionsManager.getInstance().isProducerIntercepted()) {
+					metricsJMX = collectKafkaProducerMetricsJMX(tracker);
+					metricsJMX.setCorrelator(metricsCorrelator);
+					prepareAndSend(metricsJMX);
+				}
+				if (InterceptionsManager.getInstance().isConsumerIntercepted()) {
+					metricsJMX = collectKafkaConsumerMetricsJMX(tracker);
+					metricsJMX.setCorrelator(metricsCorrelator);
+					prepareAndSend(metricsJMX);
+				}
+			} catch (Exception exc) {
+				Utils.logThrowable(LOGGER, OpLevel.WARNING,
+						StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
+						"MetricsReporter.clients.jmx.fail", exc);
 			}
 
-			TrackingActivity metricsJMX = collectJVMMetricsJMX(tracker);
-			metricsJMX.setCorrelator(metricsCorrelator);
-			prepareAndSend(metricsJMX);
-		} catch (Exception exc) {
-			Utils.logThrowable(LOGGER, OpLevel.WARNING,
-					StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-					"MetricsReporter.clients.jmx.fail", exc);
-		}
-
-		try {
-			ObjectMapper mapper = new ObjectMapper();
-			mapper.registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, false));
-			mapper.registerModule(new MetricsRegistryModule());
-			for (Map.Entry<String, TopicMetrics> metrics : mRegistry.entrySet()) {
-				TopicMetrics topicMetrics = metrics.getValue();
-				topicMetrics.correlator = metricsCorrelator;
-				String msg = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(topicMetrics);
-				topicMetrics.reset();
-				tracker.log(OpLevel.INFO, msg);
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+				mapper.registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, false));
+				mapper.registerModule(new MetricsRegistryModule());
+				for (Map.Entry<String, TopicMetrics> metrics : mRegistry.entrySet()) {
+					TopicMetrics topicMetrics = metrics.getValue();
+					topicMetrics.correlator = metricsCorrelator;
+					String msg = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(topicMetrics);
+					topicMetrics.reset();
+					tracker.log(OpLevel.INFO, msg);
+				}
+			} catch (JsonProcessingException exc) {
+				Utils.logThrowable(LOGGER, OpLevel.ERROR,
+						StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
+						"MetricsReporter.report.metrics.fail", exc);
 			}
-		} catch (JsonProcessingException exc) {
-			Utils.logThrowable(LOGGER, OpLevel.ERROR,
-					StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-					"MetricsReporter.report.metrics.fail", exc);
 		}
 	}
 
@@ -590,9 +591,14 @@ public class MetricsReporter implements InterceptionsReporter {
 				}
 				activity.addSnapshot(snapshot);
 			} catch (Exception exc) {
-				Utils.logThrowable(LOGGER, OpLevel.WARNING,
-						StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-						"MetricsReporter.bean.info.fail", mBeanName, exc);
+				if (exc.getCause() instanceof InstanceNotFoundException) {
+					LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
+							"MetricsReporter.bean.not.found", mBeanName);
+				} else {
+					Utils.logThrowable(LOGGER, OpLevel.WARNING,
+							StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
+							"MetricsReporter.bean.info.fail", mBeanName, exc);
+				}
 			}
 		}
 	}
