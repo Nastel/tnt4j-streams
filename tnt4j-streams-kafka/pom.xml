@@ -14,7 +14,7 @@
     <artifactId>tnt4j-streams-kafka</artifactId>
 
     <properties>
-        <kafka.clients.version>2.4.1</kafka.clients.version>
+        <kafka.clients.version>2.5.0</kafka.clients.version>
     </properties>
 
     <build>
