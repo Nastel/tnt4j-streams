@@ -72,7 +72,7 @@ public class InterceptionsManager {
 	private static final String DEFAULT_INTERCEPTORS_PROP_FILE = "interceptors.properties"; // NON-NLS
 	private static final String DEFAULT_TRACKER_CFG_FILE = "tnt4j_kafka_metrics_default.properties"; // NON-NLS
 
-	private final Set<TNTKafkaInterceptor> references = new HashSet<>(5);
+	private final Set<TNTKafkaInterceptor> references = new LinkedHashSet<>(5);
 	private final Collection<InterceptionsReporter> reporters = new ArrayList<>(2);
 
 	private static InterceptionsManager instance;
@@ -291,7 +291,7 @@ public class InterceptionsManager {
 	public ConsumerRecords<Object, Object> consume(TNTKafkaCInterceptor interceptor,
 			ConsumerRecords<Object, Object> consumerRecords, ClusterResource clusterResource) {
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-				"InterceptionsManager.consume", consumerRecords);
+				"InterceptionsManager.consume", consumerRecords.count(), consumerRecords.partitions());
 
 		for (InterceptionsReporter rep : reporters) {
 			rep.consume(interceptor, consumerRecords, clusterResource);
@@ -351,10 +351,10 @@ public class InterceptionsManager {
 	 *            interceptor type class to match, or {@code null} to iterate over all referenced interceptors
 	 * @return map of class matching referenced interceptors configurations
 	 *
-	 * @see TNTKafkaCInterceptor#getConfig()
+	 * @see TNTKafkaInterceptor#getConfig()
 	 */
 	public Map<String, Map<String, ?>> getInterceptorsConfig(Class<? extends TNTKafkaInterceptor> iClass) {
-		Map<String, Map<String, ?>> interceptorsCfg = new HashMap<>();
+		Map<String, Map<String, ?>> interceptorsCfg = new LinkedHashMap<>();
 		for (TNTKafkaInterceptor ref : references) {
 			if (iClass == null || ref.getClass().isAssignableFrom(iClass)) {
 				Map<String, ?> refCfg = ref.getConfig();
