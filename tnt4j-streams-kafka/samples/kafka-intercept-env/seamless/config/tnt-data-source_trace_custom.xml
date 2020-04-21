@@ -4,7 +4,7 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
     <parser name="HeadersParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
-        <property name="supportedClass" value="org.apache.kafka.common.header.Header"/>
+        <property name="SupportedClass" value="org.apache.kafka.common.header.Header"/>
 
         <field name="H_${HFieldNameLoc}" locator="value" locator-type="Label" datatype="String">
             <field-locator id="HFieldNameLoc" locator="key" locator-type="Label" datatype="String"/>
@@ -13,17 +13,16 @@
 
     <!-- PRODUCER parsers start -->
     <parser name="ProducerRecordParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
-        <property name="supportedClass" value="org.apache.kafka.clients.producer.ProducerRecord"/>
+        <property name="SupportedClass" value="org.apache.kafka.clients.producer.ProducerRecord"/>
 
         <field name="EventType" value="SEND"/>
         <field name="EventName" value="Kafka_Producer_Send"/>
 
         <field name="Topic" locator="topic" locator-type="Label"/>
-        <field name="Partition" locator="partition" datatype="Number" locator-type="Label"/>
+        <field name="Partition" locator="partition" locator-type="Label" datatype="Number"/>
 
         <field name="Key" locator="key" locator-type="Label"/>
-        <field name="Value" locator="value" locator-type="Label"/>
-
+        <field name="Value" locator="value" locator-type="Label" datatype="AsInput"/>
         <field name="Message" locator="value" locator-type="Label" datatype="String"/>
 
         <field name="StreamTime" locator="DateTime" locator-type="StreamProp" datatype="DateTime" units="Milliseconds" transparent="true"/>
@@ -32,34 +31,43 @@
                 $fieldValue == null ? ${StreamTime} : $fieldValue;
             ]]></field-transform>
         </field>
-        <field name="Correlator" value="">
-            <field-transform lang="groovy" name="ValueCorrelatorTransform"><![CDATA[
+        <field name="EndTime" locator="StartTime" locator-type="Activity"/>
+
+        <field name="MsgSignature" value="" transparent="true">
+            <field-transform lang="groovy" name="SendSignatureTransform"><![CDATA[
                 ${Value} == null
                     ? null
                     : com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.MsgTraceReporter.calcSignature(${Topic}, ${Value})
             ]]></field-transform>
         </field>
 
-        <embedded-activity name="Headers" locator="headers.headers" locator-type="Label">
+        <!-- un-comment if your Kafka version >= 0.11-->
+        <!--embedded-activity name="Headers" locator="headers.headers" locator-type="Label">
             <parser-ref name="HeadersParser"/>
-        </embedded-activity>
+        </embedded-activity-->
     </parser>
 
     <parser name="RecordMetadataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
-        <property name="supportedClass" value="org.apache.kafka.clients.producer.RecordMetadata"/>
+        <property name="SupportedClass" value="org.apache.kafka.clients.producer.RecordMetadata"/>
 
         <field name="EventType" value="EVENT"/>
         <field name="EventName" value="Kafka_Producer_Acknowledge"/>
-        <field name="Checksum" locator="checksum" datatype="Number" locator-type="Label"/>
+        <field name="Checksum" locator="checksum" locator-type="Label" datatype="Number"/>
 
         <field name="Topic" locator="topic" locator-type="Label"/>
-        <field name="Partition" locator="partition" datatype="Number" locator-type="Label"/>
-        <field name="Offset" locator="offset" datatype="Number" locator-type="Label"/>
+        <field name="Partition" locator="partition" locator-type="Label" datatype="Number"/>
+        <field name="Offset" locator="offset" locator-type="Label" datatype="Number"/>
 
-        <field name="StartTime" locator="timestamp" locator-type="Label" datatype="Timestamp" units="Milliseconds"/>
+        <field name="StreamTime" locator="DateTime" locator-type="StreamProp" datatype="DateTime" units="Milliseconds" transparent="true"/>
+        <field name="StartTime" locator="timestamp" locator-type="Label" datatype="Timestamp" units="Milliseconds">
+            <field-transform lang="groovy" name="ProducerStartTimeTransform"><![CDATA[
+                $fieldValue == null ? ${StreamTime} : $fieldValue;
+            ]]></field-transform>
+        </field>
+        <field name="EndTime" locator="StartTime" locator-type="Activity"/>
 
-        <field name="serializedKeySize" locator="serializedKeySize" datatype="Number" locator-type="Label"/>
-        <field name="serializedValueSize" locator="serializedValueSize" datatype="Number" locator-type="Label"/>
+        <field name="serializedKeySize" locator="serializedKeySize" locator-type="Label" datatype="Number"/>
+        <field name="serializedValueSize" locator="serializedValueSize" locator-type="Label" datatype="Number"/>
 
         <field name="MsgLength" value="" datatype="Number">
             <field-transform lang="groovy"><![CDATA[
@@ -76,22 +84,23 @@
 
     <!-- CONSUMER parsers start -->
     <parser name="ConsumerRecordParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
-        <property name="supportedClass" value="org.apache.kafka.clients.consumer.ConsumerRecord"/>
+        <property name="SupportedClass" value="org.apache.kafka.clients.consumer.ConsumerRecord"/>
 
         <field name="EventType" value="RECEIVE"/>
         <field name="EventName" value="Kafka_Consumer_Consume_Record"/>
 
         <field name="Topic" locator="topic" locator-type="Label"/>
-        <field name="Partition" locator="partition" datatype="Number" locator-type="Label"/>
-        <field name="Offset" locator="offset" datatype="Number" locator-type="Label"/>
+        <field name="Partition" locator="partition" locator-type="Label" datatype="Number"/>
+        <field name="Offset" locator="offset" locator-type="Label" datatype="Number"/>
 
         <field name="StartTime" locator="timestamp" locator-type="Label" datatype="Timestamp" units="Milliseconds"/>
+        <field name="EndTime" locator="DateTime" locator-type="StreamProp" datatype="DateTime" units="Milliseconds"/>
 
         <field name="TimestampType" locator="timestampType" locator-type="Label"/>
         <field name="Key" locator="key" locator-type="Label"/>
-        <field name="Value" locator="value" locator-type="Label"/>
+        <field name="Value" locator="value" locator-type="Label" datatype="AsInput"/>
         <field name="Message" locator="value" locator-type="Label" datatype="String"/>
-        <field name="Checksum" locator="checksum" datatype="Number" locator-type="Label"/>
+        <field name="Checksum" locator="checksum" locator-type="Label" datatype="Number"/>
 
         <field name="serializedKeySize" locator="serializedKeySize" locator-type="Label"/>
         <field name="serializedValueSize" locator="serializedValueSize" locator-type="Label"/>
@@ -106,39 +115,41 @@
                    : 0)
            ]]></field-transform>
         </field>
-        <field name="Correlator" value="">
-            <field-transform lang="groovy" name="ValueCorrelatorTransform"><![CDATA[
+        <field name="MsgSignature" value="" transparent="true">
+            <field-transform lang="groovy" name="ConsumeSignatureTransform"><![CDATA[
                 ${Value} == null
                     ? null
                     : com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.MsgTraceReporter.calcSignature(${Topic}, ${Value})
             ]]></field-transform>
         </field>
 
-        <embedded-activity name="Headers" locator="headers.headers" locator-type="Label">
+        <!-- un-comment if your Kafka version >= 0.11-->
+        <!--embedded-activity name="Headers" locator="headers.headers" locator-type="Label">
             <parser-ref name="HeadersParser"/>
-        </embedded-activity>
+        </embedded-activity-->
     </parser>
 
     <parser name="OffsetAndMetadataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
-        <property name="supportedClass" value="org.apache.kafka.clients.consumer.OffsetAndMetadata"/>
+        <property name="SupportedClass" value="org.apache.kafka.clients.consumer.OffsetAndMetadata"/>
 
         <field name="EventType" value="EVENT"/>
         <field name="EventName" value="Kafka_Consumer_Commit_Record"/>
-        <field name="Offset" locator="offset" datatype="Number" locator-type="Label"/>
+        <field name="Offset" locator="offset" locator-type="Label" datatype="Number"/>
         <field name="Metadata" locator="metadata" locator-type="Label"/>
         <field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="DateTime" units="Milliseconds"/>
+        <field name="EndTime" locator="StartTime" locator-type="Activity"/>
     </parser>
 
     <parser name="TopicPartitionParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
         <property name="supportedClass" value="org.apache.kafka.common.TopicPartition"/>
 
         <field name="Topic" locator="topic" locator-type="Label"/>
-        <field name="Partition" locator="partition" datatype="Number" locator-type="Label"/>
+        <field name="Partition" locator="partition" locator-type="Label" datatype="Number"/>
     </parser>
     <!-- CONSUMER parsers end -->
 
     <parser name="KafkaTraceParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
-        <property name="supportedClass" value="com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.KafkaTraceEventData"/>
+        <property name="SupportedClass" value="com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.KafkaTraceEventData"/>
 
         <!-- SEND fields -->
         <field name="producerRecord" locator="producerRecord" locator-type="Label" transparent="true">
@@ -173,13 +184,11 @@
         <!-- COMMON Fields -->
         <field name="KafkaType" locator="type" locator-type="Label"/>
         <field name="ApplName" locator="appInfo" locator-type="Label"/>
-        <field name="TrackingId" locator="signature" locator-type="Label">
+        <field name="TrackingId" locator="MsgSignature" locator-type="Activity">
             <field-transform lang="groovy" name="SignatureTransform"><![CDATA[
                 StringUtils.isNotEmpty($fieldValue)
                     ? $fieldValue
-                    : ${Offset} == null
-                        ? null
-                        : com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.MsgTraceReporter.calcSignature(${Topic}, ${Partition}, ${Offset})
+                    : null
             ]]></field-transform>
         </field>
         <field name="ParentID" locator="parentId" locator-type="Label"/>
@@ -187,10 +196,12 @@
         <field name="ResourceName" formattingPattern="QUEUE={0}">
             <field-locator locator="Topic" locator-type="Activity"/>
         </field>
-        <field name="Correlator" separator="_">
-            <field-locator locator="Topic" locator-type="Activity" required="false"/>
-            <field-locator locator="Offset" locator-type="Activity" required="false"/>
+        <field name="Correlator" value="">
+            <field-transform lang="groovy" name="CorrelatorTransform"><![CDATA[
+                ${Offset} == null
+                    ? null
+                    : ${Topic} + "_" + ${Partition} + "_" + ${Offset}
+            ]]></field-transform>
         </field>
-        <field name="EndTime" locator="StartTime" locator-type="Activity"/>
     </parser>
 </tnt-data-source>
