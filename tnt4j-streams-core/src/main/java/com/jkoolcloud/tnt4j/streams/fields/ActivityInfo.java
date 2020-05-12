@@ -1123,7 +1123,7 @@ public class ActivityInfo {
 			}
 
 			if (StringUtils.equals(chTrackable.getParentId(), pTrackable.getTrackingId())) {
-				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+				LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"ActivityInfo.invalid.child", resolveTrackableType(chTrackable),
 						resolveTrackableType(pTrackable), resolveChildTypesFor(pTrackable), chTrackable.getTrackingId(),
 						pTrackable.getTrackingId());
@@ -1219,7 +1219,7 @@ public class ActivityInfo {
 			} else {
 				trackName = trackId;
 			}
-			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityInfo.activity.has.no.name", eClass.getSimpleName(), trackId, trackName);
 		}
 
