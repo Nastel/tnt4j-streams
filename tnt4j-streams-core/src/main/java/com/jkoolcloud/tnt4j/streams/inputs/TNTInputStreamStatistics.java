@@ -38,7 +38,9 @@ import com.jkoolcloud.tnt4j.core.Trackable;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.outputs.OutputStreamListener;
+import com.jkoolcloud.tnt4j.streams.utils.Duration;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsCache;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
 
@@ -100,19 +102,31 @@ public class TNTInputStreamStatistics
 
 		if (stream == null) {
 			try {
-				metrics.register(streamName + START_TIME_KEY,
+				Gauge<?> startTime = metrics.register(streamName + START_TIME_KEY,
 						new JmxAttributeGauge(new ObjectName("java.lang:type=Runtime"), "StartTime"));
+				Gauge<String> elapsedTimeGauge = metrics.register(streamName + ":elapsed time", new Gauge<String>() {
+					@Override
+					public String getValue() {
+						return Duration.durationHMS((Long) startTime.getValue());
+					}
+				});
 			} catch (Exception e) {
 			}
 		} else {
-			Counter streamTimer = metrics.counter(streamName + START_TIME_KEY);
-			streamTimer.inc(System.currentTimeMillis());
+			Counter startTime = metrics.counter(streamName + START_TIME_KEY);
+			startTime.inc(System.currentTimeMillis());
+			Gauge<String> elapsedTimeGauge = metrics.register(streamName + ":elapsed time", new Gauge<String>() {
+				@Override
+				public String getValue() {
+					return Duration.durationHMS(startTime.getCount());
+				}
+			});
 		}
 
 		jmxReporter.start();
 		streamsItemsTimer = metrics.timer(streamName + ":input timer"); // NON-NLS
 		processingTimer = metrics.timer(streamName + ":processing timer"); // NON-NLS
-		outputTimer = metrics.timer(streamName + ":output timer"); // NON-NLS
+		outputTimer = metrics.timer(streamName + ":output:timer"); // NON-NLS
 
 		skippedActivitiesCount = metrics.counter(streamName + ":skipped entities"); // NON-NLS
 		filteredActivitiesCount = metrics.counter(streamName + ":filtered entities"); // NON-NLS
@@ -120,10 +134,10 @@ public class TNTInputStreamStatistics
 		totalActivities = metrics.meter(streamName + ":total entities"); // NON-NLS
 		processedActivitiesCount = metrics.counter(streamName + ":processed entities"); // NON-NLS
 
-		outputEvents = metrics.counter(streamName + ":output events"); // NON-NLS
-		outputActivities = metrics.counter(streamName + ":output activities"); // NON-NLS
-		outputSnapshots = metrics.counter(streamName + ":output snapshots"); // NON-NLS
-		outputOther = metrics.counter(streamName + ":output others"); // NON-NLS
+		outputEvents = metrics.counter(streamName + ":output:events"); // NON-NLS
+		outputActivities = metrics.counter(streamName + ":output:activities"); // NON-NLS
+		outputSnapshots = metrics.counter(streamName + ":output:snapshots"); // NON-NLS
+		outputOther = metrics.counter(streamName + ":output:others"); // NON-NLS
 
 		bytesTotal = metrics.register(streamName + ":total bytes", new Gauge<Long>() { // NON-NLS
 			@Override
@@ -204,6 +218,8 @@ public class TNTInputStreamStatistics
 		if (context != null) {
 			context.getItem().stop();
 		}
+
+		onItemProcessed();
 	}
 
 	@Override
@@ -276,8 +292,8 @@ public class TNTInputStreamStatistics
 	 * @return new value of current activity index
 	 */
 	protected int incrementCurrentActivitiesCount() {
-		totalActivities.mark();
 		getMainStatisticsModule().totalActivities.mark();
+		totalActivities.mark();
 		return getCurrentActivity();
 	}
 
@@ -459,7 +475,11 @@ public class TNTInputStreamStatistics
 			try {
 				Hashtable<String, String> properties = new Hashtable<>();
 				String[] nameTokens = name.split(":"); // NON-NLS
-				if (nameTokens.length > 1) {
+				if (nameTokens.length == 3) {
+					properties.put("type", nameTokens[0]); // NON-NLS
+					properties.put("scope", nameTokens[1]); // NON-NLS
+					properties.put("value", nameTokens[2]); // NON-NLS
+				} else if (nameTokens.length == 2) {
 					properties.put("type", nameTokens[0]); // NON-NLS
 					properties.put("name", nameTokens[1]); // NON-NLS
 				} else {
