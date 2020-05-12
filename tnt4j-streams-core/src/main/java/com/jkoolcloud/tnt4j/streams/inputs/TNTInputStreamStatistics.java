@@ -110,6 +110,12 @@ public class TNTInputStreamStatistics
 						return Duration.durationHMS((Long) startTime.getValue());
 					}
 				});
+				Gauge<String> cacheGauge = metrics.register(streamName + ":cache load", new Gauge<String>() {
+					@Override
+					public String getValue() {
+						return StreamsCache.cacheSize() + "/" + StreamsCache.cacheMaxSize();
+					}
+				});
 			} catch (Exception e) {
 			}
 		} else {

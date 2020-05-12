@@ -433,6 +433,24 @@ public final class StreamsCache {
 		return cacheEntries.put(entryId, new CacheEntry(entryId, key, value, typedValue, transientEntry));
 	}
 
+	/**
+	 * Returns values cache size.
+	 * 
+	 * @return values cache size
+	 */
+	public static long cacheSize() {
+		return valuesCache == null ? 0 : valuesCache.size();
+	}
+
+	/**
+	 * Returns configured max. values cache size.
+	 * 
+	 * @return configured max. values cache size
+	 */
+	public static long cacheMaxSize() {
+		return maxSize;
+	}
+
 	private static void loadPersisted() {
 		try {
 			JAXBContext jc = JAXBContext.newInstance(CacheRoot.class);
