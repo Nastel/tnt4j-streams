@@ -22,6 +22,10 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
@@ -61,6 +65,17 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 	 */
 	protected BlockingQueue<Object> inputBuffer;
 	private ThreadLocal<T> currentItem = new ThreadLocal<>();
+
+	private Gauge<String> loadGauge;
+	private Gauge<Long> lastReadTimeGauge;
+	private Gauge<Long> lastWriteTimeGauge;
+	private Meter readMeter;
+	private Meter writeMeter;
+	private Timer readWaitTimer;
+	private Timer writeWaitTimer;
+
+	private Long lastReadTime;
+	private Long lastWriteTime;
 
 	/**
 	 * Constructs a new AbstractBufferedStream.
@@ -110,6 +125,17 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 	@Override
 	protected void initialize() throws Exception {
 		inputBuffer = new ArrayBlockingQueue<>(bufferSize, true);
+
+		MetricRegistry streamMetrics = TNTInputStreamStatistics.getMetrics(this);
+
+		readMeter = streamMetrics.meter(getName() + ":buffer:read meter");
+		writeMeter = streamMetrics.meter(getName() + ":buffer:write meter");
+		readWaitTimer = streamMetrics.timer(getName() + ":buffer:read wait timer");
+		writeWaitTimer = streamMetrics.timer(getName() + ":buffer:write wait timer");
+
+		loadGauge = streamMetrics.register(getName() + ":buffer:load", () -> inputBuffer.size() + "/" + bufferSize);
+		lastReadTimeGauge = streamMetrics.register(getName() + ":buffer:read last time", () -> lastReadTime);
+		lastWriteTimeGauge = streamMetrics.register(getName() + ":buffer:write last time", () -> lastWriteTime);
 
 		super.initialize();
 	}
@@ -185,6 +211,8 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 			T item = getCurrentItem();
 			if (item == null || isItemConsumed(item)) {
 				Object qe = getItemFromBuffer();
+				readMeter.mark();
+				lastReadTime = System.currentTimeMillis();
 
 				// Producer input was slower than consumer, but was able to put "DIE" marker object
 				// to queue. No more items going to be available.
@@ -245,7 +273,9 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 	 *             if interrupted while waiting for activity item data to get available in the buffer
 	 */
 	protected Object getItemFromBuffer() throws InterruptedException {
-		return inputBuffer.poll(20, TimeUnit.SECONDS);
+		try (Timer.Context ctx = readWaitTimer.time()) {
+			return inputBuffer.poll(20, TimeUnit.SECONDS);
+		}
 	}
 
 	/**
@@ -339,7 +369,10 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 			switch (fullBufferAddPolicy) {
 			case DROP:
 				boolean added = inputBuffer.offer(inputData);
-				if (!added) {
+				if (added) {
+					writeMeter.mark();
+					lastWriteTime = System.currentTimeMillis();
+				} else {
 					logger().log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 							"AbstractBufferedStream.changes.buffer.limit", inputData);
 					incrementLostActivitiesCount();
@@ -347,8 +380,10 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 				return added;
 			case WAIT:
 			default:
-				try {
+				try (Timer.Context ctx = writeWaitTimer.time()) {
 					inputBuffer.put(inputData);
+					writeMeter.mark();
+					lastWriteTime = System.currentTimeMillis();
 					return true;
 				} catch (InterruptedException exc) {
 					logger().log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),

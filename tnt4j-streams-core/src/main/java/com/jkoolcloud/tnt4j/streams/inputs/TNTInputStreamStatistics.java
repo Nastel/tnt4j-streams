@@ -190,7 +190,7 @@ public class TNTInputStreamStatistics
 	@Override
 	public void afterNextItem(Context<Timer.Context> context) {
 		if (context != null) {
-			long time = context.getItem().stop();
+			context.getItem().stop();
 		}
 	}
 
@@ -202,7 +202,7 @@ public class TNTInputStreamStatistics
 	@Override
 	public void afterProcessItem(Context<Timer.Context> context) {
 		if (context != null) {
-			long time = context.getItem().stop();
+			context.getItem().stop();
 		}
 	}
 
