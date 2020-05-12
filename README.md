@@ -2525,7 +2525,7 @@ names as labels.
 
 **NOTE:** Stream stops only when critical runtime error/exception occurs or application gets terminated.
 
-#### Kafka client stream
+#### Kafka consumer stream
 
 This sample shows how to stream activity events received over Apache Kafka transport as messages. Sample also shows how to use stacked 
 parsers technique to extract message payload data.
@@ -2577,6 +2577,8 @@ Sample stream configuration:
 
     <stream name="SampleKafkaClientStream" class="com.jkoolcloud.tnt4j.streams.inputs.KafkaConsumerStream">
         <property name="HaltIfNoParser" value="false"/>
+        <property name="RetryStateCheck" value="3"/>
+        <property name="RetryInterval" value="5"/>
         <property name="Topic" value="TNT4JStreams"/>
 
         <!-- Kafka consumer properties -->
@@ -2587,7 +2589,7 @@ Sample stream configuration:
         <property name="enable.auto.commit" value="true"/>
         <property name="auto.commit.interval.ms" value="1000"/>
         <property name="session.timeout.ms" value="30000"/>
-        <property name="client.id" value="tnt4j-streams-kafka-consumer"/>
+        <property name="client.id" value="tnt4j-streams-kafka-consumer-stream"/>
 
         <parser-ref name="KafkaMessageParser"/>
     </stream>
@@ -5004,21 +5006,42 @@ or
 
 Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffered streams parameters'](#buffered-streams-parameters).
 
-#### Kafka stream parameters
+#### Kafka consumer stream parameters
 
- * `Topic` - topic name to listen. (Required)
- * `StartServer` - flag indicating if stream has to start Kafka server on startup. Default value - `false`. (Optional)
- * `StartZooKeeper` - flag indicating if stream has to start ZooKeeper server on startup. Default value - `false`. (Optional)
- * List of properties used by Kafka API, e.g., `zookeeper.connect`, `group.id`. See `kafka.consumer.ConsumerConfig` class for more
- details on Kafka consumer properties.
+ * `Topic` - defines set of topic names (delimited using `|` character) to listen. (Required)
+ * `Offset` - defines list of topic offsets (delimited using `|` character) to start consuming messages. Value `-1` or `||` (for tokenized 
+ definitions) means `use latest topic offset`. Number of offset tokens must match number of defined topics. Single value applies to all 
+ topics. Default value - `-1`. (Optional)
+ * `FileName` - Kafka Consumer configuration file (`consumer.properties`) path. (Optional)
+ * List of Kafka Consumer configuration properties. See [Kafka Consumer configuration reference](https://kafka.apache.org/documentation/#consumerconfigs).
 
     sample:
 ```xml
     <property name="Topic" value="TNT4JKafkaTestTopic"/>
-    <property name="StartServer" value="true"/>
-    <property name="StartZooKeeper" value="true"/>
-    <property name="zookeeper.connect" value="127.0.0.1:2181/tnt4j_kafka"/>
-    <property name="group.id" value="0"/>
+    <property name="Offset" value="2"/>
+    
+    <property name="Topic" value="TNT4JKafkaTestTopic|TNT4JKafkaProductionTopic"/>
+    <property name="Offset" value="2|0"/>
+    
+    <property name="Topic" value="TNT4JKafkaTestTopic|TNT4JKafkaProductionTopic"/>
+    <property name="Offset" value="2|-1"/>
+    
+    <property name="Topic" value="TNT4JKafkaTestTopic|TNT4JKafkaProductionTopic|TNT4JKafkaRnDTopic"/>
+    <property name="Offset" value="2||12"/> 
+    
+    <property name="Topic" value="TNT4JKafkaTestTopic|TNT4JKafkaProductionTopic|TNT4JKafkaRnDTopic"/>
+    <property name="Offset" value="5"/>
+    
+    <property name="FileName" value="./config/consumer.properties"/>    
+    
+    <property name="bootstrap.servers" value="localhost:6667"/>
+    <property name="group.id" value="tnt4j-streams-kafka"/>
+    <property name="key.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer"/>
+    <property name="value.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer"/>
+    <property name="enable.auto.commit" value="true"/>
+    <property name="auto.commit.interval.ms" value="1000"/>
+    <property name="session.timeout.ms" value="30000"/>
+    <property name="client.id" value="tnt4j-streams-kafka-consumer-stream"/>
 ```
 
 Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Parseable streams parameters'](#parseable-streams-parameters).

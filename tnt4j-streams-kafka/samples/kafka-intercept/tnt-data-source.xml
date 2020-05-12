@@ -244,6 +244,8 @@
 
     <stream name="KafkaMetricsStream" class="com.jkoolcloud.tnt4j.streams.inputs.KafkaConsumerStream">
         <property name="HaltIfNoParser" value="false"/>
+        <property name="RetryStateCheck" value="3"/>
+        <property name="RetryInterval" value="5"/>
         <property name="Topic" value="tnt4j_kafka_interceptor_metrics"/>
         <!--<property name="FileName" value="./tnt4j-streams-kafka/config/intercept/consumer.properties"/>-->
 
