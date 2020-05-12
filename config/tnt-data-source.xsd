@@ -777,6 +777,14 @@
                 </xs:annotation>
             </xs:enumeration>
 
+            <xs:enumeration value="FullBufferAddPolicy">
+                <xs:annotation>
+                    <xs:documentation>
+                        Defines policy how to perform adding new RAW activity data entry, when buffer queue is full: WAIT or DROP.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
             <xs:enumeration value="FilePolling">
                 <xs:annotation>
                     <xs:documentation>

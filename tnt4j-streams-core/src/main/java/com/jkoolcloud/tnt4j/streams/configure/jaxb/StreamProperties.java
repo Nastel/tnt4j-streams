@@ -369,7 +369,17 @@ public enum StreamProperties {
 	 *
 	 */
 	@XmlEnumValue("BufferDropWhenFull")
+	@Deprecated
 	BUFFER_DROP_WHEN_FULL("BufferDropWhenFull"),
+
+	/**
+	 * 
+	 * Defines policy how to perform adding new RAW activity data entry, when buffer queue is full: WAIT or DROP.
+	 *
+	 *
+	 */
+	@XmlEnumValue("FullBufferAddPolicy")
+	FULL_FUFFER_ADD_POLICY("FullBufferAddPolicy"),
 
 	/**
 	 *
@@ -426,6 +436,7 @@ public enum StreamProperties {
 	 */
 	@XmlEnumValue("StreamReconnectDelay")
 	STREAM_RECONNECT_DELAY("StreamReconnectDelay");
+
 	private final String value;
 
 	StreamProperties(String v) {

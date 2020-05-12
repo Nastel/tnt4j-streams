@@ -161,7 +161,13 @@ public interface StreamProperties extends OutputProperties {
 	/**
 	 * Constant for name of built-in {@value} property.
 	 */
+	@Deprecated
 	String PROP_BUFFER_DROP_WHEN_FULL = "BufferDropWhenFull"; // NON-NLS
+
+	/**
+	 * Constant for name of built-in {@value} property.
+	 */
+	String PROP_FULL_BUFFER_ADD_POLICY = "FullBufferAddPolicy"; // NON-NLS
 
 	/**
 	 * Constant for name of built-in {@value} property.

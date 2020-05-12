@@ -37,13 +37,15 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * <ul>
  * <li>BufferSize - maximal buffer queue capacity. Default value - {@code 1024}. (Optional)</li>
  * <li>BufferDropWhenFull - flag indicating to drop buffer queue offered RAW activity data entries when queue gets full.
- * Default value - {@code false}. (Optional)</li>
+ * Default value - {@code false}. (Optional, deprecated - use {@code FullBufferAddPolicy} instead)</li>
+ * <li>FullBufferAddPolicy - defines policy how to perform adding new RAW activity data entry, when buffer queue is
+ * full: {@code WAIT} or {@code DROP}. Default value - {@code WAIT}. (Optional)</li>
  * </ul>
  *
  * @param <T>
  *            the type of handled RAW activity data
  *
- * @version $Revision: 2 $
+ * @version $Revision: 3 $
  *
  * @see ArrayBlockingQueue
  */
@@ -52,7 +54,7 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 	private static final Object DIE_MARKER = new Object();
 
 	private int bufferSize;
-	private boolean dropDataWhenBufferFull = false;
+	private FullBufferAddPolicy fullBufferAddPolicy = FullBufferAddPolicy.WAIT;
 
 	/**
 	 * RAW activity data items buffer queue. Items in this queue are processed asynchronously by consumer thread(s).
@@ -84,7 +86,10 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 		if (StreamProperties.PROP_BUFFER_SIZE.equalsIgnoreCase(name)) {
 			bufferSize = Integer.parseInt(value);
 		} else if (StreamProperties.PROP_BUFFER_DROP_WHEN_FULL.equalsIgnoreCase(name)) {
-			dropDataWhenBufferFull = Utils.toBoolean(value);
+			boolean dropDataWhenBufferFull = Utils.toBoolean(value);
+			fullBufferAddPolicy = dropDataWhenBufferFull ? FullBufferAddPolicy.DROP : FullBufferAddPolicy.WAIT;
+		} else if (StreamProperties.PROP_FULL_BUFFER_ADD_POLICY.equalsIgnoreCase(name)) {
+			fullBufferAddPolicy = FullBufferAddPolicy.valueOf(value.toUpperCase());
 		}
 	}
 
@@ -94,7 +99,10 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 			return bufferSize;
 		}
 		if (StreamProperties.PROP_BUFFER_DROP_WHEN_FULL.equalsIgnoreCase(name)) {
-			return dropDataWhenBufferFull;
+			return fullBufferAddPolicy == FullBufferAddPolicy.DROP;
+		}
+		if (StreamProperties.PROP_FULL_BUFFER_ADD_POLICY.equalsIgnoreCase(name)) {
+			return fullBufferAddPolicy;
 		}
 		return super.getProperty(name);
 	}
@@ -328,7 +336,8 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 					"AbstractBufferedStream.changes.buffer.uninitialized"));
 		}
 		if (inputData != null && !isHalted()) {
-			if (dropDataWhenBufferFull) {
+			switch (fullBufferAddPolicy) {
+			case DROP:
 				boolean added = inputBuffer.offer(inputData);
 				if (!added) {
 					logger().log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
@@ -336,7 +345,8 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 					incrementLostActivitiesCount();
 				}
 				return added;
-			} else {
+			case WAIT:
+			default:
 				try {
 					inputBuffer.put(inputData);
 					return true;
@@ -476,5 +486,9 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 		protected boolean isInputEnded() {
 			return inputEnd;
 		}
+	}
+
+	private enum FullBufferAddPolicy {
+		WAIT, DROP
 	}
 }
