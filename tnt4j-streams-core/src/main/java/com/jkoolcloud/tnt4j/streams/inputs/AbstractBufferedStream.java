@@ -146,6 +146,8 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 	@Override
 	protected void stopInternals() {
 		offerDieMarker(true);
+
+		super.stopInternals();
 	}
 
 	/**

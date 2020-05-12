@@ -285,6 +285,8 @@ public class RedirectTNT4JStream extends TNTInputStream<String, String> {
 	@Override
 	protected void stopInternals() {
 		offerDieMarker();
+
+		super.stopInternals();
 	}
 
 	/**

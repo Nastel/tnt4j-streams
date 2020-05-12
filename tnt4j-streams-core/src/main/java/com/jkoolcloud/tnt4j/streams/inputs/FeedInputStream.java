@@ -262,6 +262,8 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 	@Override
 	protected void stopInternals() {
 		Utils.close(dataFeed);
+
+		super.stopInternals();
 	}
 
 	/**

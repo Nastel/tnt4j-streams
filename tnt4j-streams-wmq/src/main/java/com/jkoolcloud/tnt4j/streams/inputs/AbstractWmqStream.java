@@ -464,6 +464,8 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 
 		// Restore WMQ tracing.
 		traceOff(false);
+
+		super.stopInternals();
 	}
 
 	private void traceOff(boolean off) {
