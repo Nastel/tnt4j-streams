@@ -483,10 +483,6 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 			throws SQLException {
 		if (params != null) {
 			for (Map.Entry<String, WsRequest.Parameter> param : params.entrySet()) {
-				if (param.getValue().isTransient()) {
-					continue;
-				}
-
 				try {
 					int pIdx = Integer.parseInt(param.getValue().getId());
 					String type = param.getValue().getType();
@@ -500,118 +496,152 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 					switch (type.toUpperCase()) {
 					case "INTEGER": // NON-NLS
 						value = fillInRequestData(value, format);
-						if (isNullValue(value)) {
-							setNullParameter(statement, pIdx, Types.INTEGER, type.toUpperCase());
-						} else {
-							int iValue = Integer.parseInt(value);
-							statement.setInt(pIdx, iValue);
-							LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-									"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+						if (!param.getValue().isTransient()) {
+							if (isNullValue(value)) {
+								setNullParameter(statement, pIdx, Types.INTEGER, type.toUpperCase());
+							} else {
+								int iValue = Integer.parseInt(value);
+								statement.setInt(pIdx, iValue);
+								LOGGER.log(OpLevel.DEBUG,
+										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+							}
 						}
 						break;
 					case "BIGINT": // NON-NLS
 						value = fillInRequestData(value, format);
-						if (isNullValue(value)) {
-							setNullParameter(statement, pIdx, Types.BIGINT, type.toUpperCase());
-						} else {
-							long lValue = Long.parseLong(value);
-							statement.setLong(pIdx, lValue);
-							LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-									"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+						if (!param.getValue().isTransient()) {
+							if (isNullValue(value)) {
+								setNullParameter(statement, pIdx, Types.BIGINT, type.toUpperCase());
+							} else {
+								long lValue = Long.parseLong(value);
+								statement.setLong(pIdx, lValue);
+								LOGGER.log(OpLevel.DEBUG,
+										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+							}
 						}
 						break;
 					case "FLOAT": // NON-NLS
 						value = fillInRequestData(value, format);
-						if (isNullValue(value)) {
-							setNullParameter(statement, pIdx, Types.FLOAT, type.toUpperCase());
-						} else {
-							float fValue = Float.parseFloat(value);
-							statement.setFloat(pIdx, fValue);
-							LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-									"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+						if (!param.getValue().isTransient()) {
+							if (isNullValue(value)) {
+								setNullParameter(statement, pIdx, Types.FLOAT, type.toUpperCase());
+							} else {
+								float fValue = Float.parseFloat(value);
+								statement.setFloat(pIdx, fValue);
+								LOGGER.log(OpLevel.DEBUG,
+										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+							}
 						}
 						break;
 					case "DOUBLE": // NON-NLS
 					case "REAL": // NON-NLS
 					case "DECIMAL": // NON-NLS
 						value = fillInRequestData(value, format);
-						if (isNullValue(value)) {
-							setNullParameter(statement, pIdx, Types.DOUBLE, "DOUBLE"); // NON-NLS
-						} else {
-							double dValue = Double.parseDouble(value);
-							statement.setDouble(pIdx, dValue);
-							LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-									"JDBCStream.set.query.parameter", pIdx, value, "DOUBLE"); // NON-NLS
+						if (!param.getValue().isTransient()) {
+							if (isNullValue(value)) {
+								setNullParameter(statement, pIdx, Types.DOUBLE, "DOUBLE"); // NON-NLS
+							} else {
+								double dValue = Double.parseDouble(value);
+								statement.setDouble(pIdx, dValue);
+								LOGGER.log(OpLevel.DEBUG,
+										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+										"JDBCStream.set.query.parameter", pIdx, value, "DOUBLE"); // NON-NLS
+							}
 						}
 						break;
 					case "DATE": // NON-NLS
 						value = fillInRequestData(value, StringUtils.isEmpty(format) ? DEFAULT_DATE_PATTERN : format);
-						if (isNullValue(value)) {
-							setNullParameter(statement, pIdx, Types.DATE, type.toUpperCase());
-						} else {
-							Date dtValue = Date.valueOf(value);
-							statement.setDate(pIdx, dtValue);
-							LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-									"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+						if (!param.getValue().isTransient()) {
+							if (isNullValue(value)) {
+								setNullParameter(statement, pIdx, Types.DATE, type.toUpperCase());
+							} else {
+								Date dtValue = Date.valueOf(value);
+								statement.setDate(pIdx, dtValue);
+								LOGGER.log(OpLevel.DEBUG,
+										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+							}
 						}
 						break;
 					case "TIME": // NON-NLS
 						value = fillInRequestData(value, StringUtils.isEmpty(format) ? DEFAULT_TIME_PATTERN : format);
-						if (isNullValue(value)) {
-							setNullParameter(statement, pIdx, Types.TIME, type.toUpperCase());
-						} else {
-							Time tValue = Time.valueOf(value);
-							statement.setTime(pIdx, tValue);
-							LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-									"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+						if (!param.getValue().isTransient()) {
+							if (isNullValue(value)) {
+								setNullParameter(statement, pIdx, Types.TIME, type.toUpperCase());
+							} else {
+								Time tValue = Time.valueOf(value);
+								statement.setTime(pIdx, tValue);
+								LOGGER.log(OpLevel.DEBUG,
+										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+							}
 						}
 						break;
 					case "TIMESTAMP": // NON-NLS
 					case "DATETIME": // NON-NLS
 						value = fillInRequestData(value,
 								StringUtils.isEmpty(format) ? DEFAULT_TIMESTAMP_PATTERN : format);
-						if (isNullValue(value)) {
-							setNullParameter(statement, pIdx, Types.TIMESTAMP, type.toUpperCase());
-						} else {
-							Timestamp tsValue = Timestamp.valueOf(value);
-							statement.setTimestamp(pIdx, tsValue);
-							LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-									"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+						if (!param.getValue().isTransient()) {
+							if (isNullValue(value)) {
+								setNullParameter(statement, pIdx, Types.TIMESTAMP, type.toUpperCase());
+							} else {
+								Timestamp tsValue = Timestamp.valueOf(value);
+								statement.setTimestamp(pIdx, tsValue);
+								LOGGER.log(OpLevel.DEBUG,
+										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+							}
 						}
 						break;
 					case "BOOLEAN": // NON-NLS
 						value = fillInRequestData(value, format);
-						if (isNullValue(value)) {
-							setNullParameter(statement, pIdx, Types.BOOLEAN, type.toUpperCase());
-						} else {
-							boolean bValue = Boolean.parseBoolean(value);
-							statement.setBoolean(pIdx, bValue);
-							LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-									"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+						if (!param.getValue().isTransient()) {
+							if (isNullValue(value)) {
+								setNullParameter(statement, pIdx, Types.BOOLEAN, type.toUpperCase());
+							} else {
+								boolean bValue = Boolean.parseBoolean(value);
+								statement.setBoolean(pIdx, bValue);
+								LOGGER.log(OpLevel.DEBUG,
+										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+							}
 						}
 						break;
 					case "BINARY": // NON-NLS
 						value = fillInRequestData(value, format);
-						if (isNullValue(value)) {
-							setNullParameter(statement, pIdx, Types.BINARY, type.toUpperCase());
-						} else {
-							byte[] baValue = Utils.decodeHex(value);
-							statement.setBytes(pIdx, baValue);
-							LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-									"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+						if (!param.getValue().isTransient()) {
+							if (isNullValue(value)) {
+								setNullParameter(statement, pIdx, Types.BINARY, type.toUpperCase());
+							} else {
+								byte[] baValue = Utils.decodeHex(value);
+								statement.setBytes(pIdx, baValue);
+								LOGGER.log(OpLevel.DEBUG,
+										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+							}
 						}
 						break;
 					case "VARCHAR": // NON-NLS
 					default:
 						value = fillInRequestData(value, format);
-						if (isNullValue(value)) {
-							setNullParameter(statement, pIdx, Types.VARCHAR, "VARCHAR"); // NON-NLS
-						} else {
-							statement.setString(pIdx, value);
-							LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-									"JDBCStream.set.query.parameter", pIdx, value, "VARCHAR"); // NON-NLS
+						if (!param.getValue().isTransient()) {
+							if (isNullValue(value)) {
+								setNullParameter(statement, pIdx, Types.VARCHAR, "VARCHAR"); // NON-NLS
+							} else {
+								statement.setString(pIdx, value);
+								LOGGER.log(OpLevel.DEBUG,
+										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+										"JDBCStream.set.query.parameter", pIdx, value, "VARCHAR"); // NON-NLS
+							}
 						}
 						break;
+					}
+
+					if (param.getValue().isTransient()) {
+						param.getValue().setValue(value);
 					}
 				} catch (SQLException exc) {
 					throw exc;

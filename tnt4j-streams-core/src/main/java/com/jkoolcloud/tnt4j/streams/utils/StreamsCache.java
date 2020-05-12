@@ -17,6 +17,7 @@
 package com.jkoolcloud.tnt4j.streams.utils;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -40,7 +41,7 @@ import org.apache.commons.collections4.MapUtils;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.jkoolcloud.tnt4j.core.OpLevel;
-import com.jkoolcloud.tnt4j.sink.DefaultEventSinkFactory;
+import com.jkoolcloud.tnt4j.core.UsecTimestamp;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.CacheProperties;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
@@ -49,7 +50,8 @@ import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
  * Utility class to support TNT4J-Streams streamed data values caching.
  * <p>
  * Cache entries are defined using static or dynamic (e.g., patterns having field name variable to fill in data from
- * activity entity) values.
+ * activity entity) values. If defined, default entry value can be static value, or dynamic functional expression
+ * {@code "now()"} evaluating current timestamp.
  * <p>
  * Streams cache supports the following configuration properties:
  * <ul>
@@ -239,12 +241,27 @@ public final class StreamsCache {
 			String cacheKey = fillInKeyPattern(cacheEntry.getKey(), ai, parserName);
 			if (cacheKey != null) {
 				CacheValue value = valuesCache == null ? null : valuesCache.getIfPresent(cacheKey);
-				return value == null ? cacheEntry.getDefaultValue() : value.value();
+				return value == null ? evaluateValue(cacheEntry.getDefaultValue()) : value.value();
 			} else {
-				return cacheEntry.getDefaultValue();
+				return evaluateValue(cacheEntry.getDefaultValue());
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Evaluates functional expression provided through {@code cValue}.
+	 * 
+	 * @param cValue
+	 *            value to evaluate if it is functional expression
+	 * @return evaluated functional expression value, or {@code cValue} if it is not functional expression
+	 */
+	protected static Object evaluateValue(Object cValue) {
+		if ("now()".equalsIgnoreCase(Utils.toString(cValue))) { // NON-NLS
+			return UsecTimestamp.now();
+		}
+
+		return cValue;
 	}
 
 	/**
@@ -261,7 +278,7 @@ public final class StreamsCache {
 			CacheEntry cacheEntry = cacheEntries.get(cacheKey);
 			if (cacheEntry != null) {
 				String cValue = cacheEntry.getValue();
-				return isInvalidCacheEntryValue(cValue) ? cacheEntry.getDefaultValue() : cValue;
+				return isInvalidCacheEntryValue(cValue) ? evaluateValue(cacheEntry.getDefaultValue()) : cValue;
 			}
 
 			return null;
@@ -377,13 +394,43 @@ public final class StreamsCache {
 	 *            entry value pattern
 	 * @param defaultValue
 	 *            default entry value
+	 * @param dataType
+	 *            data type of default value
 	 * @param transientEntry
 	 *            indicating whether cache entry is transient and should not be persisted
 	 * @return previous cache entry instance stored
 	 */
-	public static CacheEntry addEntry(String entryId, String key, String value, String defaultValue,
+	public static CacheEntry addEntry(String entryId, String key, String value, String defaultValue, String dataType,
 			boolean transientEntry) {
-		return cacheEntries.put(entryId, new CacheEntry(entryId, key, value, defaultValue, transientEntry));
+		CacheValueType cacheValueType;
+		try {
+			cacheValueType = CacheValueType.valueOf(dataType.toUpperCase());
+		} catch (IllegalArgumentException | NullPointerException e) {
+			cacheValueType = CacheValueType.STRING;
+		}
+
+		Object typedValue = defaultValue;
+		try {
+			switch (cacheValueType) {
+			case DATE:
+				typedValue = DateFormat.getDateTimeInstance().parse(defaultValue);
+				break;
+			case NUMBER:
+				typedValue = NumericFormatter.strToNumber(defaultValue);
+				break;
+			case TIMESTAMP:
+				typedValue = TimestampFormatter.parse(null, defaultValue);
+				break;
+			case STRING:
+			default:
+				break;
+			}
+		} catch (Throwable e) {
+			Utils.logThrowable(LOGGER, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+					"StreamsCache.default.value.conversion.failed", defaultValue, dataType, e);
+		}
+
+		return cacheEntries.put(entryId, new CacheEntry(entryId, key, value, typedValue, transientEntry));
 	}
 
 	private static void loadPersisted() {
@@ -476,7 +523,7 @@ public final class StreamsCache {
 		private String id;
 		private String key;
 		private String value;
-		private String defaultValue;
+		private Object defaultValue;
 		private boolean transientEntry = false;
 
 		/**
@@ -509,7 +556,7 @@ public final class StreamsCache {
 		 * @param transientEntry
 		 *            indicating whether cache entry is transient and should not be persisted
 		 */
-		private CacheEntry(String id, String key, String value, String defaultValue, boolean transientEntry) {
+		private CacheEntry(String id, String key, String value, Object defaultValue, boolean transientEntry) {
 			this.id = id;
 			this.key = key;
 			this.value = value;
@@ -549,7 +596,7 @@ public final class StreamsCache {
 		 *
 		 * @return default cache entry value
 		 */
-		public String getDefaultValue() {
+		public Object getDefaultValue() {
 			return defaultValue;
 		}
 
@@ -607,6 +654,10 @@ public final class StreamsCache {
 		}
 	}
 
+	private enum CacheValueType {
+		TIMESTAMP, DATE, NUMBER, STRING
+	}
+
 	/**
 	 * Cache entries map JAXB marshaling adapter.
 	 */
@@ -658,6 +709,8 @@ public final class StreamsCache {
 		public void setValue(Object value) {
 			if (value instanceof XMLGregorianCalendar) {
 				this.value = ((XMLGregorianCalendar) value).toGregorianCalendar().getTime();
+			} else if (value instanceof UsecTimestamp) {
+				this.value = ((UsecTimestamp) value).getTimeUsec();
 			} else {
 				this.value = value;
 			}
