@@ -17,7 +17,6 @@
 package com.jkoolcloud.tnt4j.streams.utils;
 
 import java.io.File;
-import java.text.DateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -394,43 +393,13 @@ public final class StreamsCache {
 	 *            entry value pattern
 	 * @param defaultValue
 	 *            default entry value
-	 * @param dataType
-	 *            data type of default value
 	 * @param transientEntry
 	 *            indicating whether cache entry is transient and should not be persisted
 	 * @return previous cache entry instance stored
 	 */
-	public static CacheEntry addEntry(String entryId, String key, String value, String defaultValue, String dataType,
+	public static CacheEntry addEntry(String entryId, String key, String value, String defaultValue,
 			boolean transientEntry) {
-		CacheValueType cacheValueType;
-		try {
-			cacheValueType = CacheValueType.valueOf(dataType.toUpperCase());
-		} catch (IllegalArgumentException | NullPointerException e) {
-			cacheValueType = CacheValueType.STRING;
-		}
-
-		Object typedValue = defaultValue;
-		try {
-			switch (cacheValueType) {
-			case DATE:
-				typedValue = DateFormat.getDateTimeInstance().parse(defaultValue);
-				break;
-			case NUMBER:
-				typedValue = NumericFormatter.strToNumber(defaultValue);
-				break;
-			case TIMESTAMP:
-				typedValue = TimestampFormatter.parse(null, defaultValue);
-				break;
-			case STRING:
-			default:
-				break;
-			}
-		} catch (Throwable e) {
-			Utils.logThrowable(LOGGER, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"StreamsCache.default.value.conversion.failed", defaultValue, dataType, e);
-		}
-
-		return cacheEntries.put(entryId, new CacheEntry(entryId, key, value, typedValue, transientEntry));
+		return cacheEntries.put(entryId, new CacheEntry(entryId, key, value, defaultValue, transientEntry));
 	}
 
 	/**
@@ -670,10 +639,6 @@ public final class StreamsCache {
 		public boolean isTransient() {
 			return transientValue;
 		}
-	}
-
-	private enum CacheValueType {
-		TIMESTAMP, DATE, NUMBER, STRING
 	}
 
 	/**
