@@ -175,7 +175,9 @@ append it with this one:
     messages.tracer.stream.parser=tnt-data-source_kafka_msg_trace_custom.xml#KafkaTraceParser
     messages.tracer.stream.name=KafkaConsumerXXXStream
     ## Additional stream configuration properties
-    # Add any stream property prefixed by 'messages.tracer.stream.'
+    # Add any stream property prefixed by 'messages.tracer.stream.'  
+    #messages.tracer.stream.BuildSourceFQNFromStreamedData=true
+    messages.tracer.stream.SourceFQN=APPL=${ApplName}#SERVER=${ServerName}#GEOADDR=${Location}
     messages.tracer.stream.RetryStateCheck=3
     messages.tracer.stream.RetryInterval=5
     ## Trace configuration topic consumer properties
@@ -200,7 +202,9 @@ append it with this one:
     messages.tracer.stream.parser=tnt-data-source_kafka_msg_trace_custom.xml#KafkaTraceParser
     messages.tracer.stream.name=KafkaProducerXXXStream
     ## Additional stream configuration properties
-    # Add any stream property prefixed by 'messages.tracer.stream.'
+    # Add any stream property prefixed by 'messages.tracer.stream.'   
+    #messages.tracer.stream.BuildSourceFQNFromStreamedData=true
+    messages.tracer.stream.SourceFQN=APPL=${ApplName}#SERVER=${ServerName}#GEOADDR=${Location}
     messages.tracer.stream.RetryStateCheck=3
     messages.tracer.stream.RetryInterval=5
     ## Trace configuration topic consumer properties
