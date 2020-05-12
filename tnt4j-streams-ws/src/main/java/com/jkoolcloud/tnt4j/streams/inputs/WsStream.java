@@ -75,6 +75,11 @@ public class WsStream extends AbstractHttpStream {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(WsStream.class);
 
 	/**
+	 * Constant for name of built-in request parameter {@value}.
+	 */
+	protected static final String REQ_URL_PARAM = "WS_REQ_URL"; // NON-NLS
+
+	/**
 	 * Contains custom WS Stream requests configuration properties.
 	 */
 	protected Map<String, String> wsProperties = new HashMap<>();
@@ -304,6 +309,16 @@ public class WsStream extends AbstractHttpStream {
 	 */
 	protected void handleFault(SOAPFault fault, WsScenario scenario) {
 		throw new RuntimeException(fault.getFaultString());
+	}
+
+	@Override
+	protected WsRequest<String> fillInRequest(WsRequest<String> req, String url) throws VoidRequestException {
+		WsRequest.Parameter urlParam = req.getParameter(REQ_URL_PARAM);
+		if (urlParam == null) {
+			req.addParameter(REQ_URL_PARAM, url, true);
+		}
+
+		return fillInRequest(req);
 	}
 
 	/**

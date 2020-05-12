@@ -49,11 +49,6 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  */
 public abstract class AbstractHttpStream extends AbstractWsStream<String, String> {
 
-	/**
-	 * Constant for name of built-in request parameter {@value}.
-	 */
-	protected static final String REQ_URL_PARAM = "WS_REQ_URL"; // NON-NLS
-
 	private boolean disableSSL = false;
 
 	@Override
@@ -145,12 +140,5 @@ public abstract class AbstractHttpStream extends AbstractWsStream<String, String
 	 * 
 	 * @see #fillInRequest(com.jkoolcloud.tnt4j.streams.scenario.WsRequest)
 	 */
-	protected WsRequest<String> fillInRequest(WsRequest<String> req, String url) throws VoidRequestException {
-		WsRequest.Parameter urlParam = req.getParameter(REQ_URL_PARAM);
-		if (urlParam == null) {
-			req.addParameter(REQ_URL_PARAM, url, true);
-		}
-
-		return fillInRequest(req);
-	}
+	protected abstract WsRequest<String> fillInRequest(WsRequest<String> req, String url) throws VoidRequestException;
 }
