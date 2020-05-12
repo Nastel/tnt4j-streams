@@ -109,7 +109,6 @@ public class WmqTraceStream extends WmqStreamPCF {
 
 			if (StringUtils.isNotEmpty(value)) {
 				String[] erca = Utils.splitValue(rcExclude);
-
 				excludedRCs = new HashSet<>(erca.length);
 
 				Integer eRC;

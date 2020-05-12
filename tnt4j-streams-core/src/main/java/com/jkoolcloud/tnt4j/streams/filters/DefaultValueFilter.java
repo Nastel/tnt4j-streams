@@ -95,7 +95,6 @@ public class DefaultValueFilter extends AbstractEntityFilter<Object> {
 			matchPattern = Pattern.compile(value);
 		} else {
 			String[] va = Utils.splitValue(value);
-
 			valuesSet = new HashSet<>(va.length);
 
 			Collections.addAll(valuesSet, va);
