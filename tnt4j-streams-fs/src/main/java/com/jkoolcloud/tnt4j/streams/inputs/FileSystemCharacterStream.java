@@ -33,7 +33,7 @@ import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
  * List of supported file systems can be found in {@link com.jkoolcloud.tnt4j.streams.inputs.FileSystemAdapter}
  * documentation.
  * <p>
- * This activity stream supports configuration properties from {@link FeedInputStream} (and higher hierarchy streams) in
+ * This activity stream supports configuration properties from {@link CharacterStream} (and higher hierarchy streams) in
  * combination with properties from {@link com.jkoolcloud.tnt4j.streams.inputs.FileSystemAdapter}. It allows use of
  * {@code "FileName"} property in common with with {@code "Port"} property when accessing remote files.
  * 

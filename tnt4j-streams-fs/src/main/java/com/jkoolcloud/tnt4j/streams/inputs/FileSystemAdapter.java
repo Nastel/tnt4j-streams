@@ -86,7 +86,7 @@ import com.pastdev.jsch.nio.file.UnixSshFileSystemProvider;
  *
  * @see java.nio.file.FileSystem
  * @see java.nio.file.FileSystems
- * @see com.jkoolcloud.tnt4j.streams.inputs.FileSystemByteInputStream
+ * @see com.jkoolcloud.tnt4j.streams.inputs.FileSystemBytesInputStream
  * @see com.jkoolcloud.tnt4j.streams.inputs.FileSystemCharacterStream
  * @see com.jkoolcloud.tnt4j.streams.inputs.FileSystemLineStream
  */

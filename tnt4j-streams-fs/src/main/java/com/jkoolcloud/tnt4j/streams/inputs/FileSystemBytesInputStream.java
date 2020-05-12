@@ -41,15 +41,15 @@ import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
  * @see FileSystemAdapter
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  */
-public class FileSystemByteInputStream extends BytesInputStream {
-	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(FileSystemByteInputStream.class);
+public class FileSystemBytesInputStream extends BytesInputStream {
+	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(FileSystemBytesInputStream.class);
 
 	private FileSystemAdapter fsAdapter;
 
 	/**
-	 * Constructs an empty FileSystemByteInputStream. Requires configuration settings to set input stream source.
+	 * Constructs an empty FileSystemBytesInputStream. Requires configuration settings to set input stream source.
 	 */
-	public FileSystemByteInputStream() {
+	public FileSystemBytesInputStream() {
 		super();
 
 		fsAdapter = new FileSystemAdapter();

@@ -4908,7 +4908,7 @@ General stream configuration parameters:
 
 JSR-203 File Characters feed stream class name is `com.jkoolcloud.tnt4j.streams.inputs.FileSystemCharacterStream`.
 
-JSR-203 File Bytes feed stream class name is `com.jkoolcloud.tnt4j.streams.inputs.FileSystemByteInputStream`.
+JSR-203 File Bytes feed stream class name is `com.jkoolcloud.tnt4j.streams.inputs.FileSystemBytesInputStream`.
 
  * `FileName` - the system-dependent file name: path or URI. (Required)
  * `RestartOnInputClose` - flag indicating to restart stream if input socked gets closed. Default value - `false`. (Optional)
