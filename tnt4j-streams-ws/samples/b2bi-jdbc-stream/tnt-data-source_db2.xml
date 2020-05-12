@@ -55,8 +55,10 @@
                           , FAF.DELIVERY_STATE AS AFILE_DELIVERY_STATE
                           , FAF.DIST_MSG_ID AS AFILE_DIST_MSG_ID
                         FROM FG_ARRIVEDFILE FAF
-                        WHERE FAF.MODIFYTS > ?
+                        WHERE FAF.MODIFYTS >= ?
+                          AND FAF.MODIFYTS < (CURRENT TIMESTAMP - 5 MINUTES)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY FAF.CREATETS, FAF.DATA_FLOW_ID ASC
+                        LIMIT 10000 -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastAFileRecordMDate}" type="TIMESTAMP"/>
@@ -108,8 +110,10 @@
                             ) AS EVT_ATTRS
                         FROM FG_EVENT FE
                             LEFT OUTER JOIN FG_ARRIVEDFILE FAF ON (FAF.ARRIVEDFILE_KEY = FE.ARRIVEDFILE_KEY)
-                        WHERE FE.MODIFYTS > ?
+                        WHERE FE.MODIFYTS >= ?
+                          AND FE.MODIFYTS < (CURRENT TIMESTAMP - 5 MINUTES)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY FE.CREATETS, FE.COUNTER ASC
+                        LIMIT 10000 -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastEventRecordMDate}" type="TIMESTAMP"/>
@@ -162,8 +166,10 @@
                             LEFT OUTER JOIN FG_EVENTATTR FEA on (FER.EVENT_KEY = FEA.EVENT_KEY AND FEA.NAME = 'RoutingChannelTemplateName')
                             LEFT OUTER JOIN FG_ARRIVEDFILE FAF ON (FAF.ARRIVEDFILE_KEY = FE.ARRIVEDFILE_KEY)
                         WHERE FE.EVENT_CODE = 'FG_0425'
-                          AND FER.MODIFYTS > ?
+                          AND FER.MODIFYTS >= ?
+                          AND FER.MODIFYTS < (CURRENT TIMESTAMP - 5 MINUTES)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY FE.CREATETS, FE.COUNTER ASC
+                        LIMIT 10000 -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastEventApplRecordMDate}" type="TIMESTAMP"/>
@@ -195,9 +201,11 @@
                           , FR.CREATEPROGID AS ROUTE_CREATEPROGID
                           , FR.MODIFYPROGID AS ROUTE_MODIFYPROGID
                         FROM FG_ROUTE FR
-                        WHERE FR.MODIFYTS > ?
+                        WHERE FR.MODIFYTS >= ?
                           AND FR.ROUTCHAN_KEY IS NOT NULL  -- exclude all routes having no channel key defined
+                          AND FR.MODIFYTS < (CURRENT TIMESTAMP - 5 MINUTES)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY FR.CREATETS, FR.DATA_FLOW_ID ASC
+                        LIMIT 10000 -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastRouteRecordMDate}" type="TIMESTAMP"/>
@@ -228,9 +236,11 @@
                           , FD.MODIFYPROGID AS DELIVERY_MODIFYPROGID
                           , FD.DIST_CONSUMER_MSGID AS DELIVERY_DIST_CONSUMER_MSGID
                         FROM FG_DELIVERY FD
-                        WHERE FD.MODIFYTS > ?
+                        WHERE FD.MODIFYTS >= ?
                           AND FD.FILENAME IS NOT NULL  -- exclude all deliveries not bound to particular file transfer
+                          AND FD.MODIFYTS < (CURRENT TIMESTAMP - 5 MINUTES)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY FD.CREATETS, FD.DATA_FLOW_ID ASC
+                        LIMIT 10000 -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastDeliveryRecordMDate}" type="TIMESTAMP"/>
@@ -259,8 +269,10 @@
                           , CK.LABEL CORR_KEY_LABEL
                         FROM CORRELATION_SET CS
                             INNER JOIN CORREL_KEY CK ON (CS.KEY_ID = CK.ID)
-                        WHERE CS.REC_TIME > ?
+                        WHERE CS.REC_TIME >= ?
+                          AND CS.REC_TIME < (CURRENT TIMESTAMP - 5 MINUTES) -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY CS.REC_TIME, CS.OBJECT_ID ASC
+                        LIMIT 10000 -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastCorrelationSetRecordMDate}" type="TIMESTAMP"/>
@@ -306,16 +318,19 @@
                           , WC.NODEEXECUTED AS WORKFLOW_NODEEXECUTED
                           , WC.EVENT_LEVEL AS WORKFLOW_EVENT_LEVEL
                         FROM WORKFLOW_CONTEXT WC
-                        WHERE WC.START_TIME > ?
+                        WHERE WC.START_TIME >= ? OR WC.END_TIME >= ?
                           AND EXISTS (SELECT DL.WORKFLOW_ID
                                         FROM WORKFLOW_LINKAGE WL
                                             INNER JOIN DOCUMENT_LIFESPAN DL ON (WL.C_WF_ID = DL.WORKFLOW_ID)
                                         WHERE WL.ROOT_WF_ID = WC.WORKFLOW_ID
                                            OR DL.WORKFLOW_ID = WC.WORKFLOW_ID
                                      )  -- pick only document related workflow events
+                          AND WC.START_TIME < (CURRENT TIMESTAMP - 5 MINUTES)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY WC.START_TIME, WC.WORKFLOW_ID ASC
+                        LIMIT 10000 -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
+                    <req-param value="${LastWorkflowContextRecordMDate}" type="TIMESTAMP"/>
                     <req-param value="${LastWorkflowContextRecordMDate}" type="TIMESTAMP"/>
 
                     <parser-ref name="B2BiWorkflowContextResultSetParser"/>
@@ -352,32 +367,138 @@
                            , DF.DOC_TRAK_ID AS DATA_FLOW_DOC_TRAK_ID
                            , DF.ROOT_DOC_NAME AS DATA_FLOW_ROOT_DOC_NAME
                            , DF.ROOT_DOC_SIZE AS DATA_FLOW_ROOT_DOC_SIZE
-                           , (SELECT xmlserialize(
-                                       content xmlelement(
-                                         name "xfers",
-                                         xmlagg(
-                                           xmlelement(
-                                             name "xfer",
-                                             xmlforest(
-                                               XFR.XFER_ID as "XFER_ID"
-                                             )
-                                           )
-                                         )
-                                       ) AS CLOB VERSION '1.0' INCLUDING XMLDECLARATION
-                                     )
-                              FROM ACT_XFER XFR
-                              WHERE D.DOC_ID = XFR.DOC_ID
-                                AND XFR.XFER_ID like 'WMQFTE:%'
-                             ) AS XFER_XFER_IDS
+                           -- , (SELECT xmlserialize(
+                           --             content xmlelement(
+                           --               name "xfers",
+                           --               xmlagg(
+                           --                 xmlelement(
+                           --                   name "xfer",
+                           --                   xmlforest(
+                           --                     XFR.XFER_ID as "XFER_ID"
+                           --                   )
+                           --                 )
+                           --               )
+                           --             ) AS CLOB VERSION '1.0' INCLUDING XMLDECLARATION
+                           --           )
+                           --    FROM ACT_XFER XFR
+                           --    WHERE D.DOC_ID = XFR.DOC_ID
+                           --      AND XFR.XFER_ID like 'WMQFTE:%'
+                           --   ) AS XFER_XFER_IDS
                       FROM DOCUMENT D
                        INNER JOIN DATA_FLOW DF ON (D.DOC_ID = DF.ROOT_DOCUMENT)
-                      WHERE D.MODIFYTS > ?
+                      WHERE D.MODIFYTS >= ?
+                        AND D.MODIFYTS < (CURRENT TIMESTAMP - 5 MINUTES)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                       ORDER BY D.CREATE_TIME, D.DOC_ID ASC
+                      LIMIT 10000 -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastDocumentsRecordMDate}" type="TIMESTAMP"/>
 
                     <parser-ref name="B2BiDocumentsResultSetParser"/>
+                </request>
+                <request id="Sessions_Req">
+                    <![CDATA[
+                      SELECT S.SESSION_ID AS SESSION_ID
+                           , S.SESSION_ARCHIVE_ID AS SESSION_ARCHIVE_ID
+                           , S.CHILD_SESSIONID AS SESSION_CHILD_SESSIONID
+                           , S.CON_START_TIME AS SESSION_CON_START_TIME
+                           , S.CON_END_TIME AS SESSION_CON_END_TIME
+                           , S.DIS_START_TIME AS SESSION_DIS_START_TIME
+                           , S.DIS_END_TIME AS SESSION_DIS_END_TIME
+                           , S.IS_LOCAL_INIT AS SESSION_IS_LOCAL_INIT
+                           , S.ADAPTER_NAME AS SESSION_ADAPTER_NAME
+                           , S.ADAPTER_TYPE AS SESSION_ADAPTER_TYPE
+                           , S.PS_INSTANCE AS SESSION_PS_INSTANCE
+                           , S.CON_IS_SUCCESS AS SESSION_CON_IS_SUCCESS
+                           , S.PROTOCOL AS SESSION_PROTOCOL
+                           , S.SECURE_MODE AS SESSION_SECURE_MODE
+                           , S.ENDPOINT1 AS SESSION_ENDPOINT1
+                           , S.ENDPORT1 AS SESSION_ENDPORT1
+                           , S.ENDPOINT2 AS SESSION_ENDPOINT2
+                           , S.ENDPORT2 AS SESSION_ENDPORT2
+                           , S.DIS_IS_SUCCESS AS SESSION_DIS_IS_SUCCESS
+                           , S.STATUS_CODE AS SESSION_STATUS_CODE
+                           , S.ERROR_MSG AS SESSION_ERROR_MSG
+                           , S.START_WFID AS SESSION_START_WFID
+                           , S.START_WFSTEP AS SESSION_START_WFSTEP
+                           , S.END_WFID AS SESSION_END_WFID
+                           , S.END_WFSTEP AS SESSION_END_WFSTEP
+                           , S.PRINCIPAL AS SESSION_PRINCIPAL
+                           , S.STATE AS SESSION_STATE
+                      FROM ACT_SESSION S
+                      WHERE S.CON_START_TIME >= ? OR S.DIS_END_TIME >= ?
+                        AND S.CON_START_TIME < (CURRENT TIMESTAMP - 5 MINUTES)  -- Don't pick entries younger than 5min. - update for them may be still in progress
+                      ORDER BY S.CON_START_TIME, S.SESSION_ID ASC
+                      LIMIT 10000 -- limit rows number per query iteration
+                    ]]>
+
+                    <!-- parameter index is incremented automatically -->
+                    <req-param value="${LastSessionsRecordMDate}" type="TIMESTAMP"/>
+                    <req-param value="${LastSessionsRecordMDate}" type="TIMESTAMP"/>
+
+                    <parser-ref name="B2BiSessionsResultSetParser"/>
+                </request>
+                <request id="Xfers_Req">
+                    <![CDATA[
+                      SELECT XF.XFER_ID AS XFER_ID
+                           , XF.SESSION_ID AS XFER_SESSION_ID
+                           , XF.SESSION_ARCHIVE_ID AS XFER_SESSION_ARCHIVE_ID
+                           , XF.IS_PUT AS XFER_IS_PUT
+                           , XF.DOC_ID AS XFER_DOC_ID
+                           , XF.IS_SUCCESS AS XFER_IS_SUCCESS
+                           , XF.FILE_SIZE AS XFER_FILE_SIZE
+                           , XF.START_TIME AS XFER_START_TIME
+                           , XF.END_TIME AS XFER_END_TIME
+                           , XF.MBOX_PATH AS XFER_MBOX_PATH
+                           , XF.MESSAGE_ID AS XFER_MESSAGE_ID
+                           , XF.MESSAGE_NAME AS XFER_MESSAGE_NAME
+                           , XF.REMOTE_FILENAME AS XFER_REMOTE_FILENAME
+                           , XF.DOC_NAME AS XFER_DOC_NAME
+                           , XF.STATUS_CODE AS XFER_STATUS_CODE
+                           , XF.ERROR_MSG AS XFER_ERROR_MSG
+                           , XF.IS_BIN_XFER AS XFER_IS_BIN_XFER
+                           , XF.KBYTES_XFER AS XFER_KBYTES_XFER
+                           , XF.WFID AS XFER_WFID
+                           , XF.WFSTEP AS XFER_WFSTEP
+                           , XF.IS_SECURE AS XFER_IS_SECURE
+                      FROM ACT_XFER XF
+                      WHERE XF.START_TIME >= ? OR XF.END_TIME >= ?
+                        AND XF.START_TIME < (CURRENT TIMESTAMP - 5 MINUTES)  -- Don't pick entries younger than 5min. - update for them may be still in progress
+                      ORDER BY XF.START_TIME, XF.XFER_ID ASC
+                      LIMIT 10000 -- limit rows number per query iteration
+                    ]]>
+
+                    <!-- parameter index is incremented automatically -->
+                    <req-param value="${LastXfersRecordMDate}" type="TIMESTAMP"/>
+                    <req-param value="${LastXfersRecordMDate}" type="TIMESTAMP"/>
+
+                    <parser-ref name="B2BiXfersResultSetParser"/>
+                </request>
+                <request id="NonXfers_Req">
+                    <![CDATA[
+                      SELECT NXF.NON_XFER_ID AS NON_XFER_ID
+                           , NXF.SESSION_ID AS NON_XFER_SESSION_ID
+                           , NXF.SESSION_ARCHIVE_ID AS NON_XFER_SESSION_ARCHIVE_ID
+                           , NXF.TYPE AS NON_XFER_TYPE
+                           , NXF.START_TIME AS NON_XFER_START_TIME
+                           , NXF.END_TIME AS NON_XFER_END_TIME
+                           , NXF.VALUE AS NON_XFER_VALUE
+                           , NXF.WFID AS NON_XFER_WFID
+                           , NXF.WFSTEP AS NON_XFER_WFSTEP
+                           , NXF.IS_SUCCESS AS NON_XFER_IS_SUCCESS
+                           , NXF.ERROR_MSG AS NON_XFER_ERROR_MSG
+                      FROM ACT_NON_XFER NXF
+                      WHERE NXF.START_TIME >= ? OR NXF.END_TIME >= ?
+                        AND NXF.START_TIME < (CURRENT TIMESTAMP - 5 MINUTES)  -- Don't pick entries younger than 5min. - update for them may be still in progress
+                      ORDER BY NXF.START_TIME, NXF.NON_XFER_ID ASC
+                      LIMIT 10000 -- limit rows number per query iteration
+                    ]]>
+
+                    <!-- parameter index is incremented automatically -->
+                    <req-param value="${LastNonXfersRecordMDate}" type="TIMESTAMP"/>
+                    <req-param value="${LastNonXfersRecordMDate}" type="TIMESTAMP"/>
+
+                    <parser-ref name="B2BiNonXfersResultSetParser"/>
                 </request>
             </step>
         </scenario>
