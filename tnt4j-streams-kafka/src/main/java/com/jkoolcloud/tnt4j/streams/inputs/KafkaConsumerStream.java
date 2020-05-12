@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.TopicPartition;
@@ -42,7 +43,9 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * This activity stream supports the following configuration properties (in addition to those supported by
  * {@link AbstractBufferedStream}):
  * <ul>
- * <li>Topic - topic name to listen. (Required)</li>
+ * <li>Topic - defines set of topic names (delimited using '|' character) to listen. (Required)</li>
+ * <li>Offset - defines list of topic offsets (delimited using '|' character) to start consuming messages. Single value
+ * applies to all topics. Default value - {@code -1 (from latest)}. (Optional)</li>
  * <li>FileName - Kafka Consumer configuration file ({@code "consumer.properties"}) path. (Optional)</li>
  * <li>List of Kafka Consumer configuration properties. See
  * <a href="https://kafka.apache.org/documentation/#consumerconfigs">Kafka Consumer configuration reference</a>.</li>
@@ -70,6 +73,9 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 	protected static final String PROP_SCOPE_CONSUMER = "consumer"; // NON-NLS
 
 	private String topicName;
+	private Set<String> topicNames;
+	private String offset;
+	private List<Integer> offsets;
 	private String cfgFileName;
 
 	private Map<String, Properties> userKafkaProps = new HashMap<>(3);
@@ -94,8 +100,32 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 
 		if (StreamProperties.PROP_TOPIC_NAME.equalsIgnoreCase(name)) {
 			topicName = value;
+
+			if (StringUtils.isNotEmpty(value)) {
+				String[] topics = Utils.splitValue(topicName);
+				topicNames = new LinkedHashSet<>(topics.length);
+
+				for (String topic : topicNames) {
+					String tTopic = topic.trim();
+					if (!tTopic.isEmpty()) {
+						topicNames.add(tTopic);
+					}
+				}
+			}
 		} else if (StreamProperties.PROP_FILENAME.equalsIgnoreCase(name)) {
 			cfgFileName = value;
+		} else if (KafkaStreamProperties.PROP_OFFSET.equalsIgnoreCase(name)) {
+			offset = value;
+
+			if (StringUtils.isNotEmpty(value)) {
+				String[] offsetArray = Utils.splitValue(offset);
+				offsets = new ArrayList<>(offsetArray.length);
+
+				for (String offst : offsetArray) {
+					String tOffst = offst.trim();
+					offsets.add(tOffst.isEmpty() ? -1 : Integer.parseInt(tOffst));
+				}
+			}
 		} else if (!StreamsConstants.isStreamCfgProperty(name, KafkaStreamProperties.class)) {
 			addUserKafkaProperty(name, decPassword(value));
 		}
@@ -106,7 +136,9 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 		if (StreamProperties.PROP_TOPIC_NAME.equalsIgnoreCase(name)) {
 			return topicName;
 		}
-
+		if (KafkaStreamProperties.PROP_OFFSET.equalsIgnoreCase(name)) {
+			return offset;
+		}
 		if (StreamProperties.PROP_FILENAME.equalsIgnoreCase(name)) {
 			return cfgFileName;
 		}
@@ -221,9 +253,14 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 	protected void applyProperties() throws Exception {
 		super.applyProperties();
 
-		if (StringUtils.isEmpty(topicName)) {
+		if (CollectionUtils.isEmpty(topicNames)) {
 			throw new IllegalStateException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
 					"TNTInputStream.property.undefined", StreamProperties.PROP_TOPIC_NAME));
+		}
+
+		if (CollectionUtils.isNotEmpty(offsets) && offsets.size() > 1 && offsets.size() != topicNames.size()) {
+			throw new IllegalStateException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+					"KafkaConsumerStream.offsets.mismatch", offsets.size(), topicNames.size()));
 		}
 
 		if (StringUtils.isNotEmpty(cfgFileName)) {
@@ -248,7 +285,7 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 				"KafkaConsumerStream.consumer.starting");
 
 		kafkaDataReceiver = new KafkaDataReceiver();
-		kafkaDataReceiver.initialize(getScopeProps(PROP_SCOPE_CONSUMER), Collections.singleton(topicName));
+		kafkaDataReceiver.initialize(getScopeProps(PROP_SCOPE_CONSUMER), topicNames, offsets);
 	}
 
 	@Override
@@ -285,7 +322,8 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 	private class KafkaDataReceiver extends InputProcessor {
 
 		private Consumer<?, ?> consumer;
-		private Collection<String> topics;
+		private Set<String> topics;
+		private List<Integer> offsets;
 		private boolean autoCommit = true;
 
 		private KafkaDataReceiver() {
@@ -305,7 +343,8 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 		@SuppressWarnings("unchecked")
 		protected void initialize(Object... params) throws Exception {
 			Properties cProperties = (Properties) params[0];
-			topics = (Collection<String>) params[1];
+			topics = (Set<String>) params[1];
+			offsets = (List<Integer>) params[2];
 
 			autoCommit = Utils.getBoolean(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, cProperties, true);
 			consumer = new KafkaConsumer<>(cProperties);
@@ -319,6 +358,23 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 			if (consumer != null) {
 				try {
 					consumer.subscribe(topics);
+					if (CollectionUtils.isNotEmpty(offsets)) {
+						if (offsets.size() == 1) {
+							if (offsets.get(0) >= 0) {
+								for (String topic : topics) {
+									consumer.seek(new TopicPartition(topic, 0), offsets.get(0));
+								}
+							}
+						} else {
+							int idx = 0;
+							for (String topic : topics) {
+								int offset = offsets.get(idx++);
+								if (offset >= 0) {
+									consumer.seek(new TopicPartition(topic, 0), offset);
+								}
+							}
+						}
+					}
 
 					while (!isHalted()) {
 						ConsumerRecords<?, ?> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));

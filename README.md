@@ -4528,12 +4528,15 @@ These parameters are applicable to streams which uses parsers to parse incoming 
 
  * `BufferSize` - maximal buffer queue capacity. Default value - `1024`. (Optional)
  * `BufferDropWhenFull` - flag indicating to drop buffer queue offered Raw activity data entries when queue gets full. 
- Default value - `false`. (Optional)
+ Default value - `false`. (Optional, deprecated - use `FullBufferAddPolicy` instead)
+ * `FullBufferAddPolicy` - defines policy how to perform adding new RAW activity data entry, when buffer queue is full: `WAIT` or `DROP`. 
+ Default value - `WAIT. (Optional)
 
      sample:
  ```xml
      <property name="BufferSize" value="2048"/>
      <property name="BufferDropWhenFull" value="true"/>
+     <property name="FullBufferAddPolicy" value="DROP"/>
  ```
 
 ##### Stream output configuration parameters
@@ -4568,8 +4571,10 @@ Default value - `null`. (Optional)
         <property name="event.formatter" value="com.jkoolcloud.tnt4j.streams.utils.RedirectTNT4JStreamFormatter"/>
     </tnt4j-properties>
     <property name="TNT4JConfigZKNode" value="/samples/core/logstash"/>
+
     <property name="RetryStateCheck" value="true"/>
     <property name="RetryStateCheck" value="5"/>
+
     <property name="RetryPeriod" value="3"/>
     <property name="ResolveServerFromDNS" value="true"/>
     <property name="SplitRelatives" value="true"/>

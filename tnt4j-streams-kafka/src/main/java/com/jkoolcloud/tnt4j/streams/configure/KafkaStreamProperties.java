@@ -26,5 +26,5 @@ public interface KafkaStreamProperties extends StreamProperties {
 	/**
 	 * Constant for name of built-in {@value} property.
 	 */
-	String PROP_START_ZOOKEEPER = "StartZooKeeper"; // NON-NLS
+	String PROP_OFFSET = "Offset"; // NON-NLS
 }
