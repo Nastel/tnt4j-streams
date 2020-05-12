@@ -385,7 +385,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 			return null;
 		}
 
-		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"JDBCStream.invoking.query", url, query);
 
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -398,7 +398,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 		try {
 			Duration cod = Duration.arm();
 			dbConn = getDbConnection(url, user, pass);
-			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"JDBCStream.db.connection.obtained", url, cod.durationHMS());
 
 			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),

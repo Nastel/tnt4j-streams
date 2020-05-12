@@ -192,13 +192,13 @@ public class RestStream extends AbstractHttpStream {
 			return null;
 		}
 
-		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"RestStream.invoking.get.request", uriStr);
 
 		HttpGet get = new HttpGet(uriStr);
 		String respStr = executeRequest(client, get, username, password);
 
-		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"RestStream.received.response", uriStr, respStr);
 
 		return respStr;
@@ -254,7 +254,7 @@ public class RestStream extends AbstractHttpStream {
 			return executeGET(client, uriStr, username, password);
 		}
 
-		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"RestStream.invoking.post.request", uriStr, reqData);
 
 		HttpPost post = new HttpPost(uriStr);
@@ -266,7 +266,7 @@ public class RestStream extends AbstractHttpStream {
 
 		String respStr = executeRequest(client, post, username, password);
 
-		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"RestStream.received.response", uriStr, respStr);
 
 		return respStr;
