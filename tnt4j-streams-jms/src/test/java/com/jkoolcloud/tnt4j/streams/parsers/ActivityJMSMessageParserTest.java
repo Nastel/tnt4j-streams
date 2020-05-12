@@ -39,7 +39,7 @@ import com.solacesystems.jms.message.SolTextMessage;
  * @author akausinis
  * @version 1.0
  */
-public class ActivityJMSMessageParserTest extends ActivityMapParserTest {
+public class ActivityJMSMessageParserTest extends ActivityParserTestBase<ActivityJMSMessageParser> {
 
 	@Override
 	@Before
@@ -54,30 +54,35 @@ public class ActivityJMSMessageParserTest extends ActivityMapParserTest {
 		assertFalse("ActivityJMSMessageParser does not support Strings", parser.isDataClassSupported(String.class));
 	}
 
-	@Test
 	@Override
+	public void setPropertiesTest() throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Test
 	public void getDataMapTest() throws JMSException {
 		TextMessage message = mock(TextMessage.class);
 		String string = "TEST"; // NON-NLS
 		when(message.getText()).thenReturn(string);
-		((ActivityJMSMessageParser) parser).getDataMap(message);
+		parser.getDataMap(message);
 
 		BytesMessage messageB = mock(BytesMessage.class);
-		((ActivityJMSMessageParser) parser).getDataMap(messageB);
+		parser.getDataMap(messageB);
 		verify(messageB).readBytes(any(byte[].class));
 
 		MapMessage messageM = mock(MapMessage.class);
 		StringTokenizer tokenizer = new StringTokenizer("TEST,TEST,TEST", ","); // NON-NLS
 		when(messageM.getMapNames()).thenReturn(tokenizer);
-		((ActivityJMSMessageParser) parser).getDataMap(messageM);
+		parser.getDataMap(messageM);
 		verify(messageM, times(3)).getObject(anyString());
 
 		StreamMessage messageS = mock(StreamMessage.class);
-		((ActivityJMSMessageParser) parser).getDataMap(messageS);
+		parser.getDataMap(messageS);
 		verify(messageS).readBytes(any(byte[].class));
 
 		ObjectMessage messageO = mock(ObjectMessage.class);
-		((ActivityJMSMessageParser) parser).getDataMap(messageO);
+		parser.getDataMap(messageO);
 		verify(messageO).getObject();
 
 	}

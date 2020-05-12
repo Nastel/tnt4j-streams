@@ -32,7 +32,8 @@ import com.jkoolcloud.tnt4j.streams.utils.UtilsTest;
  * @author akausinis
  * @version 1.0
  */
-public abstract class GenericActivityParserTestBase extends ActivityParserTestBase {
+public abstract class GenericActivityParserTestBase<P extends GenericActivityParser<T>, T>
+		extends ActivityParserTestBase<P> {
 
 	@Override
 	@Test
@@ -50,11 +51,10 @@ public abstract class GenericActivityParserTestBase extends ActivityParserTestBa
 
 	@Test
 	public void getNextString() throws Exception {
-		GenericActivityParser<?> gParser = (GenericActivityParser<?>) parser;
 		final String testString = "Test\n"; // NON-NLS
 		final String expectedString = "Test"; // NON-NLS
-		final StringReader reader = UtilsTest.toReader(testString);
-		final ByteArrayInputStream inputStream = UtilsTest.toInputStream(testString);
+		StringReader reader = UtilsTest.toReader(testString);
+		ByteArrayInputStream inputStream = UtilsTest.toInputStream(testString);
 		List<Object> testCases = new ArrayList<Object>() {
 			private static final long serialVersionUID = 1L;
 			{
@@ -66,22 +66,24 @@ public abstract class GenericActivityParserTestBase extends ActivityParserTestBa
 		};
 		for (Object data : testCases) {
 			System.out.println(data.getClass());
-			assertEquals(expectedString, gParser.getNextActivityString(data));
+			assertEquals(expectedString, parser.getNextActivityString(data));
 		}
-		assertNull(gParser.getNextActivityString(null));
+		assertNull(parser.getNextActivityString(null));
 	}
 
 	@Test
 	public void getNextStringWhenBufferedReaderInstanceTest() {
-		GenericActivityParser<?> gParser = (GenericActivityParser<?>) parser;
 		InputStream textStream = new ByteArrayInputStream("test".getBytes()); // NON-NLS
 		BufferedReader br = new BufferedReader(new InputStreamReader(textStream));
-		assertEquals("test", gParser.getNextActivityString(br));
+		assertEquals("test", parser.getNextActivityString(br));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void getNextStringWhenOtherInstanceTest() {
-		GenericActivityParser<?> gParser = (GenericActivityParser<?>) parser;
-		gParser.getNextActivityString(555);
+		parser.getNextActivityString(555);
+	}
+
+	protected P.ActivityContext makeContext(TNTInputStream<?, ?> stream, T data) {
+		return parser.new ActivityContext(stream, null, data);
 	}
 }

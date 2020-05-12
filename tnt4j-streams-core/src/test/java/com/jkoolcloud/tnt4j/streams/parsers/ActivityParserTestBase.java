@@ -28,8 +28,8 @@ import org.junit.Test;
  * @author akausinis
  * @version 1.0
  */
-public abstract class ActivityParserTestBase {
-	ActivityParser parser;
+public abstract class ActivityParserTestBase<P extends ActivityParser> {
+	P parser;
 
 	public abstract void prepare();
 

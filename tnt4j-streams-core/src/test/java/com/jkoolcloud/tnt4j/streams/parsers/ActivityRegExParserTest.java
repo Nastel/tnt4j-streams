@@ -39,7 +39,7 @@ import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
  * @author akausinis
  * @version 1.0
  */
-public class ActivityRegExParserTest extends ActivityParserTestBase {
+public class ActivityRegExParserTest extends ActivityParserTestBase<ActivityRegExParser> {
 
 	private static final String TEST_STRING = "TEST_STRING"; // NON-NLS
 	private static final String TEST_PATTERN = "(\\S+)"; // NON-NLS

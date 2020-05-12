@@ -32,6 +32,7 @@ import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocator;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType;
 import com.jkoolcloud.tnt4j.streams.inputs.AbstractBufferedStream;
+import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 
 /**
  * @author akausinis
@@ -70,30 +71,30 @@ public class ActivityJavaObjectParserTest {
 		assertNull(testParser.parse(stream, null));
 	}
 
-	@SuppressWarnings("deprecation")
+	private ActivityJavaObjectParser.ActivityContext makeContext(TNTInputStream<?, ?> stream, Object data) {
+		return testParser.new ActivityContext(stream, null, data);
+	}
+
 	@Test
 	public void getLocatorValueExceptionTest() throws Exception {
 		ActivityJavaObjectParser testParser = new ActivityJavaObjectParser();
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "555"); // NON-NLS
-		assertNull(testParser.getLocatorValue(stream, fieldLocator, ""));
+		assertNull(testParser.getLocatorValue(fieldLocator, makeContext(stream, "")));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValueWhenLocatorIsNullTest() throws Exception {
 		ActivityJavaObjectParser testParser = new ActivityJavaObjectParser();
-		assertNull(testParser.getLocatorValue(stream, null, ""));
+		assertNull(testParser.getLocatorValue(null, makeContext(stream, "")));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test(expected = NumberFormatException.class)
 	public void getLocatorValueWhenLocatorIsEmptyTest() throws Exception {
 		ActivityJavaObjectParser testParser = new ActivityJavaObjectParser();
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "");
-		assertNull(testParser.getLocatorValue(stream, fieldLocator, ""));
+		assertNull(testParser.getLocatorValue(fieldLocator, makeContext(stream, "")));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValueWhenTypeisStreamPropTest() throws Exception {
 		ActivityJavaObjectParser testParser = new ActivityJavaObjectParser();
@@ -103,61 +104,56 @@ public class ActivityJavaObjectParserTest {
 		props.put(StreamProperties.PROP_HALT_ON_PARSER, String.valueOf(true));
 		props.put(StreamProperties.PROP_EXECUTOR_THREADS_QTY, "5");
 		stream.setProperties(props.entrySet());
-		assertEquals(5, testParser.getLocatorValue(stream, fieldLocator, ""));
+		assertEquals(5, testParser.getLocatorValue(fieldLocator, makeContext(stream, "")));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test(expected = NumberFormatException.class)
 	public void getFieldValueWhenDataIsNullTest() throws Exception {
 		ActivityJavaObjectParser testParser = new ActivityJavaObjectParser();
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "test"); // NON-NLS
-		assertNull(testParser.getLocatorValue(stream, fieldLocator, null));
+		assertNull(testParser.getLocatorValue(fieldLocator, makeContext(stream, null)));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test(expected = NumberFormatException.class)
 	public void getFieldValueWhenPathIsNullTest() throws Exception {
 		ActivityJavaObjectParser testParser = new ActivityJavaObjectParser();
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "."); // NON-NLS
-		assertNull(testParser.getLocatorValue(stream, fieldLocator, ""));
+		assertNull(testParser.getLocatorValue(fieldLocator, makeContext(stream, "")));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test(expected = NumberFormatException.class)
 	@Ignore("Not finished")
 	public void getFieldValueTest() throws Exception {
 		ActivityJavaObjectParser testParser = new ActivityJavaObjectParser();
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label,
 				"testName.testNumber"); // NON-NLS
-		MyClasTest prop = new MyClasTest();
-		testParser.getLocatorValue(stream, fieldLocator, prop);
+		MyClassTest prop = new MyClassTest();
+		testParser.getLocatorValue(fieldLocator, makeContext(stream, prop));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test(expected = NumberFormatException.class)
 	@Ignore("Not finished")
 	public void getFieldValueWhenTwoSameFieldsTest() throws Exception {
 		ActivityJavaObjectParser testParser = new ActivityJavaObjectParser();
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label,
 				"testNumber.isActive"); // NON-NLS
-		MyClasTest prop = new MyClasTest();
-		Object locValue = testParser.getLocatorValue(stream, fieldLocator, prop);
+		MyClassTest prop = new MyClassTest();
+		Object locValue = testParser.getLocatorValue(fieldLocator, makeContext(stream, prop));
 		assertNotNull(locValue);
-		assertEquals("Excpected value does not match", prop.isActive, locValue);
+		assertEquals("Expected value does not match", prop.isActive, locValue);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test(expected = NumberFormatException.class)
 	public void getFieldValueWhenOneFieldTest() throws Exception {
 		ActivityJavaObjectParser testParser = new ActivityJavaObjectParser();
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "testNumber"); // NON-NLS
-		MyClasTest prop = new MyClasTest();
-		Object locValue = testParser.getLocatorValue(stream, fieldLocator, prop);
+		MyClassTest prop = new MyClassTest();
+		Object locValue = testParser.getLocatorValue(fieldLocator, makeContext(stream, prop));
 		assertNotNull(locValue);
-		assertEquals("Excpected value does not match", prop.testNumber, locValue);
+		assertEquals("Expected value does not match", prop.testNumber, locValue);
 	}
 
-	public class MyClasTest {
+	public class MyClassTest {
 		public String testName = "Test Name"; // NON-NLS
 		public int testNumber = 123456789;
 		public boolean isActive = false;

@@ -33,7 +33,7 @@ import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
  * @author akausinis
  * @version 1.0
  */
-public class ActivityTokenParserTest extends GenericActivityParserTestBase {
+public class ActivityTokenParserTest extends GenericActivityParserTestBase<ActivityTokenParser, String[]> {
 
 	@Override
 	@Test
@@ -52,7 +52,7 @@ public class ActivityTokenParserTest extends GenericActivityParserTestBase {
 
 	@Test
 	public void testParse() throws Exception {
-		final TNTInputStream<?, ?> stream = mock(TNTInputStream.class);
+		TNTInputStream<?, ?> stream = mock(TNTInputStream.class);
 		final Object data = "TEST"; // NON-NLS
 		setPropertiesTest();
 		assertNotNull(parser.parse(stream, data));
@@ -60,28 +60,26 @@ public class ActivityTokenParserTest extends GenericActivityParserTestBase {
 
 	@Test
 	public void testParseDoensMatch() throws Exception {
-		final TNTInputStream<?, ?> stream = mock(TNTInputStream.class);
+		TNTInputStream<?, ?> stream = mock(TNTInputStream.class);
 		final Object data = "TEST TTT"; // NON-NLS
 		setPropertiesTest();
 		assertNull(parser.parse(stream, data));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetLocatorValueAsProperty() throws ParseException {
-		final TNTInputStream<?, ?> stream = mock(TNTInputStream.class);
-		final ActivityFieldLocator locator = new ActivityFieldLocator(ActivityFieldLocatorType.StreamProp, "TEST"); // NON-NLS
-		((ActivityTokenParser) parser).getLocatorValue(stream, locator, null);
+		TNTInputStream<?, ?> stream = mock(TNTInputStream.class);
+		ActivityFieldLocator locator = new ActivityFieldLocator(ActivityFieldLocatorType.StreamProp, "TEST"); // NON-NLS
+		parser.getLocatorValue(locator, makeContext(stream, null));
 		verify(stream).getProperty(any(String.class));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetLocatorAsIndex() throws ParseException {
-		final TNTInputStream<?, ?> stream = mock(TNTInputStream.class);
-		final ActivityFieldLocator locator = new ActivityFieldLocator(ActivityFieldLocatorType.Index, "2");
+		TNTInputStream<?, ?> stream = mock(TNTInputStream.class);
+		ActivityFieldLocator locator = new ActivityFieldLocator(ActivityFieldLocatorType.Index, "2");
 		String[] fields = { "FAIL", "GOOD" }; // NON-NLS
-		Object result = ((ActivityTokenParser) parser).getLocatorValue(stream, locator, fields);
+		Object result = parser.getLocatorValue(locator, makeContext(stream, fields));
 		assertEquals("GOOD", result);
 	}
 }

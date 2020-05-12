@@ -31,7 +31,7 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
  * @author akausinis
  * @version 1.0
  */
-public class ActivityMapParserTest extends ActivityParserTestBase {
+public class ActivityMapParserTest extends ActivityParserTestBase<ActivityMapParser> {
 	@Override
 	@Before
 	public void prepare() {
@@ -49,7 +49,7 @@ public class ActivityMapParserTest extends ActivityParserTestBase {
 	public void getDataMapTest() throws Exception {
 		Map<String, byte[]> data = new HashMap<>();
 		data.put(StreamsConstants.ACTIVITY_DATA_KEY, "TEST".getBytes()); // NON-NLS
-		assertNotNull(((ActivityMapParser) parser).getDataMap(data));
+		assertNotNull(parser.getDataMap(data));
 	}
 
 	@Override

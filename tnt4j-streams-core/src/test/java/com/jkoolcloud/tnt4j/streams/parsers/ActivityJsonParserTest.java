@@ -32,6 +32,7 @@ import com.jkoolcloud.tnt4j.streams.TestUtils;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.fields.*;
 import com.jkoolcloud.tnt4j.streams.inputs.AbstractBufferedStream;
+import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
@@ -88,34 +89,34 @@ public class ActivityJsonParserTest {
 		assertNull(parser.parse(stream, jsonString));
 	}
 
-	@SuppressWarnings("deprecation")
+	private ActivityJsonParser.ActivityContext makeContext(TNTInputStream<?, ?> stream, DocumentContext data) {
+		return parser.new ActivityContext(stream, null, data);
+	}
+
 	@Test(expected = ParseException.class)
 	public void getLocatorValueTest() throws Exception {
 		ActivityFieldLocator aLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "test", // NON-NLS
 				ActivityFieldDataType.Number);
 		String jsonString = "{\"test\":\"OK\",\"status\":\"finished\"}"; // NON-NLS
 		DocumentContext jsonContext = JsonPath.parse(jsonString);
-		parser.getLocatorValue(stream, aLocator, jsonContext);
+		parser.getLocatorValue(aLocator, makeContext(stream, jsonContext));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValueWhenLocatorIsNullTest() throws Exception {
 		String jsonString = "{\"test\":\"OK\",\"status\":\"finished\"}"; // NON-NLS
 		DocumentContext jsonContext = JsonPath.parse(jsonString);
-		assertNull(parser.getLocatorValue(stream, null, jsonContext));
+		assertNull(parser.getLocatorValue(null, makeContext(stream, jsonContext)));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValueWhenLocatorEmptyTest() throws Exception {
 		ActivityFieldLocator aLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "");
 		String jsonString = "{\"test\":\"OK\",\"status\":\"finished\"}"; // NON-NLS
 		DocumentContext jsonContext = JsonPath.parse(jsonString);
-		assertNull(parser.getLocatorValue(stream, aLocator, jsonContext));
+		assertNull(parser.getLocatorValue(aLocator, makeContext(stream, jsonContext)));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValueWhenTypeExpectedTest() throws Exception {
 		Map<String, String> props = new HashMap<>(2);
@@ -126,36 +127,33 @@ public class ActivityJsonParserTest {
 				"ExecutorThreadsQuantity", ActivityFieldDataType.Number); // NON-NLS
 		String jsonString = "{\"test\":\"OK\",\"status\":\"finished\"}"; // NON-NLS
 		DocumentContext jsonContext = JsonPath.parse(jsonString);
-		assertEquals(5, parser.getLocatorValue(stream, aLocator, jsonContext));
+		assertEquals(5, parser.getLocatorValue(aLocator, makeContext(stream, jsonContext)));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValueStartsWithJsonPathTest() throws Exception {
 		ActivityFieldLocator aLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "$.test"); // NON-NLS
 		String jsonString = "{\"test\":\"OK\",\"status\":\"finished\"}"; // NON-NLS
 		DocumentContext jsonContext = JsonPath.parse(jsonString);
-		assertEquals("OK", parser.getLocatorValue(stream, aLocator, jsonContext));
+		assertEquals("OK", parser.getLocatorValue(aLocator, makeContext(stream, jsonContext)));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValueJsonPathIsListTest() throws Exception {
 		ActivityFieldLocator aLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "$.values"); // NON-NLS
 		String jsonString = "{\"test\":\"OK\",\"status\":\"finished\",\"values\":[4, 5, 6]}"; // NON-NLS
 		DocumentContext jsonContext = JsonPath.parse(jsonString);
 		List<Object> testData = new ArrayList<>(Arrays.asList(4, 5, 6));
-		testData.equals(parser.getLocatorValue(stream, aLocator, jsonContext));
+		testData.equals(parser.getLocatorValue(aLocator, makeContext(stream, jsonContext)));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValueJsonPathIsEmptyListTest() throws Exception {
 		ActivityFieldLocator aLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "$.values"); // NON-NLS
 		String jsonString = "{\"test\":\"OK\",\"status\":\"finished\",\"values\":[]}"; // NON-NLS
 		DocumentContext jsonContext = JsonPath.parse(jsonString);
 		List<Object> testData = new ArrayList<>();
-		assertNull(parser.getLocatorValue(stream, aLocator, jsonContext));
+		assertNull(parser.getLocatorValue(aLocator, makeContext(stream, jsonContext)));
 	}
 
 	@Test

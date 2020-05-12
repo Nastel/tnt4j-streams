@@ -1068,30 +1068,6 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	/**
 	 * Gets field value from raw data location and formats it according locator definition.
 	 *
-	 * @param stream
-	 *            stream providing activity data
-	 * @param locator
-	 *            activity field locator
-	 * @param data
-	 *            activity object data
-	 * @return value formatted based on locator definition or {@code null} if locator is not defined
-	 * @throws ParseException
-	 *             if exception occurs applying locator format properties to specified value
-	 * @see #getLocatorValue(com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocator,
-	 *      com.jkoolcloud.tnt4j.streams.parsers.GenericActivityParser.ActivityContext)
-	 * @deprecated used by tests only. Use
-	 *             {@link #getLocatorValue(com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocator, com.jkoolcloud.tnt4j.streams.parsers.GenericActivityParser.ActivityContext)}
-	 *             instead.
-	 */
-	@Deprecated
-	protected Object getLocatorValue(TNTInputStream<?, ?> stream, ActivityFieldLocator locator, T data)
-			throws ParseException {
-		return getLocatorValue(locator, new ActivityContext(stream, null, data));
-	}
-
-	/**
-	 * Gets field value from raw data location and formats it according locator definition.
-	 *
 	 * @param locator
 	 *            activity field locator
 	 * @param cData

@@ -19,7 +19,10 @@ package com.jkoolcloud.tnt4j.streams.parsers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -71,63 +74,60 @@ public class AbstractActivityMapParserTest {
 		assertNull(testParser.parse(stream, myMap));
 	}
 
-	@SuppressWarnings("deprecation")
+	private ActivityMapParser.ActivityContext makeContext(TNTInputStream<?, ?> stream, Map<String, ?> data) {
+		return testParser.new ActivityContext(stream, null, data);
+	}
+
 	@Test
 	public void getLocatorValueTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "555"); // NON-NLS
 		Map<String, String> myMap = new HashMap<>();
 		myMap.put("test", "OK"); // NON-NLS
 		myMap.put("555", "hello"); // NON-NLS
-		assertEquals("hello", testParser.getLocatorValue(stream, fieldLocator, myMap));
+		assertEquals("hello", testParser.getLocatorValue(fieldLocator, makeContext(stream, myMap)));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValueWhenFieldLocatorNullTest() throws Exception {
 		Map<String, String> myMap = new HashMap<>();
 		myMap.put("test", "OK"); // NON-NLS
 		myMap.put("status", "finished"); // NON-NLS
-		assertNull(testParser.getLocatorValue(stream, null, myMap));
+		assertNull(testParser.getLocatorValue(null, makeContext(stream, myMap)));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValueWhenLocatorEmptyTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "");
 		Map<String, String> myMap = new HashMap<>();
 		myMap.put("test", "OK"); // NON-NLS
 		myMap.put("status", "finished"); // NON-NLS
-		assertNull(testParser.getLocatorValue(stream, fieldLocator, myMap));
+		assertNull(testParser.getLocatorValue(fieldLocator, makeContext(stream, myMap)));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValueTypeTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.StreamProp, "333"); // NON-NLS
 		Map<String, String> myMap = new HashMap<>();
 		myMap.put("test", "OK"); // NON-NLS
 		myMap.put("status", "finished"); // NON-NLS
-		assertNull(testParser.getLocatorValue(stream, fieldLocator, myMap));
+		assertNull(testParser.getLocatorValue(fieldLocator, makeContext(stream, myMap)));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValueWhenDataIsNullTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "333"); // NON-NLS
-		assertNull(testParser.getLocatorValue(stream, fieldLocator, null));
+		assertNull(testParser.getLocatorValue(fieldLocator, makeContext(stream, null)));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValuePathTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "333.555"); // NON-NLS
 		Map<String, Object> myMap = new HashMap<>();
 		myMap.put("333", new HashMap<String, String>()); // NON-NLS
 		myMap.put("555", Arrays.asList("test1")); // NON-NLS
-		assertNull(testParser.getLocatorValue(stream, fieldLocator, myMap));
+		assertNull(testParser.getLocatorValue(fieldLocator, makeContext(stream, myMap)));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValuePathListTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "333.0.222"); // NON-NLS
@@ -136,37 +136,41 @@ public class AbstractActivityMapParserTest {
 		Map<String, Object> myMap = new HashMap<>();
 		myMap.put("333", Arrays.asList(testMap, "test2", "test3")); // NON-NLS
 		myMap.put("status", "TEST"); // NON-NLS
-		assertNull(testParser.getLocatorValue(stream, fieldLocator, myMap));
+		assertNull(testParser.getLocatorValue(fieldLocator, makeContext(stream, myMap)));
 	}
 
 	@Test
-	@SuppressWarnings({ "unchecked", "deprecation" })
 	public void getLocatorValueNumberExceptionTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "333.test.222", // NON-NLS
 				ActivityFieldDataType.AsInput);
 		Map<String, Object> myMap = new HashMap<>();
 		myMap.put("333", Arrays.asList("test1", "test2", "test3")); // NON-NLS
 		myMap.put("status", "TEST"); // NON-NLS
-		List<String> output = (List<String>) testParser.getLocatorValue(stream, fieldLocator, myMap);
+		ActivityMapParser.ActivityContext ctx = makeContext(stream, myMap);
+		Object output = testParser.getLocatorValue(fieldLocator, ctx);
+		assertNull(output);
+		fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "333", ActivityFieldDataType.AsInput); // NON-NLS
+		output = testParser.getLocatorValue(fieldLocator, ctx);
 		assertEquals(myMap.get("333"), output); // NON-NLS
+		fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "333.1", ActivityFieldDataType.AsInput); // NON-NLS
+		output = testParser.getLocatorValue(fieldLocator, ctx);
+		assertEquals("test2", output); // NON-NLS
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValueInstanceTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "333"); // NON-NLS
 		Map<String, Object> myMap = new HashMap<>();
 		myMap.put("333", "TEST1"); // NON-NLS
-		assertEquals("TEST1", testParser.getLocatorValue(stream, fieldLocator, myMap));
+		assertEquals("TEST1", testParser.getLocatorValue(fieldLocator, makeContext(stream, myMap)));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValueEmptyLocatorTest() throws Exception {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "1"); // NON-NLS
 		Map<String, Object> myMap = new HashMap<>();
 		myMap.put("333", "TEST1"); // NON-NLS
-		assertNull(testParser.getLocatorValue(stream, fieldLocator, myMap));
+		assertNull(testParser.getLocatorValue(fieldLocator, makeContext(stream, myMap)));
 	}
 
 	@Test
@@ -174,7 +178,7 @@ public class AbstractActivityMapParserTest {
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.Index, "1"); // NON-NLS
 		Map<String, Object> myMap = new HashMap<>();
 		myMap.put("333", "TEST1"); // NON-NLS
-		testParser.getLocatorValue(stream, fieldLocator, myMap);
+		testParser.getLocatorValue(fieldLocator, makeContext(stream, myMap));
 	}
 
 }

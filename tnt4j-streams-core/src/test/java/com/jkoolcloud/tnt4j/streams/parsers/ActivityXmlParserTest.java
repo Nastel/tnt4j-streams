@@ -58,7 +58,7 @@ import com.jkoolcloud.tnt4j.streams.utils.UtilsTest;
  * @author akausinis
  * @version 1.0
  */
-public class ActivityXmlParserTest extends GenericActivityParserTestBase {
+public class ActivityXmlParserTest extends GenericActivityParserTestBase<ActivityXmlParser, Node> {
 
 	private final static Object simpleString = "<MsgData format=\"string\" value=\"Message Body\"/>"; // NON-NLS
 	private TNTInputStream<String, ActivityInfo> is;
@@ -78,7 +78,6 @@ public class ActivityXmlParserTest extends GenericActivityParserTestBase {
 
 	@Test
 	public void simpleStringParseTest() throws Exception {
-
 		ActivityInfo ai = parser.parse(is, simpleString);
 		assertNotNull(ai);
 	}
@@ -91,7 +90,6 @@ public class ActivityXmlParserTest extends GenericActivityParserTestBase {
 
 	@Test
 	public void simpleBufferedReaderParseTest() throws Exception {
-
 		BufferedReader reader = new BufferedReader(new StringReader(simpleString.toString()));
 		ActivityInfo ai = parser.parse(is, reader);
 		assertNotNull(ai);
@@ -99,7 +97,6 @@ public class ActivityXmlParserTest extends GenericActivityParserTestBase {
 
 	@Test
 	public void simpleReaderParseTest() throws Exception {
-
 		Reader reader = new StringReader(simpleString.toString());
 		ActivityInfo ai = parser.parse(is, reader);
 		assertNotNull(ai);
@@ -107,7 +104,6 @@ public class ActivityXmlParserTest extends GenericActivityParserTestBase {
 
 	@Test
 	public void simpleInputStreamParseTest() throws Exception {
-
 		InputStream bis = new ByteArrayInputStream(simpleString.toString().getBytes());
 		ActivityInfo ai = parser.parse(is, bis);
 		assertNotNull(ai);
@@ -121,7 +117,6 @@ public class ActivityXmlParserTest extends GenericActivityParserTestBase {
 	}
 
 	@Ignore("Not completed")
-	@SuppressWarnings("deprecation")
 	@Test
 	public void getLocatorValue() throws Exception {
 		TNTInputStream<?, ?> stream = mock(TNTInputStream.class);
@@ -132,7 +127,7 @@ public class ActivityXmlParserTest extends GenericActivityParserTestBase {
 		// when(locator.getLocator()).thenReturn("MsgData");
 		// when(locator.formatValue(any(Object.class))).thenCallRealMethod();
 		//
-		Object locatorValue = ((ActivityXmlParser) parser).getLocatorValue(stream, locator, document);
+		Object locatorValue = parser.getLocatorValue(locator, makeContext(stream, document));
 		assertNotNull(locatorValue);
 		// TODO
 	}
@@ -280,6 +275,8 @@ public class ActivityXmlParserTest extends GenericActivityParserTestBase {
 
 		public NamespaceTestSuite invoke() throws ParserConfigurationException {
 			namespaces = new HashMap<String, String>() {
+				private static final long serialVersionUID = 7566251836422017139L;
+
 				{
 					put("soapenv", "http://schemas.xmlsoap.org/soap/envelope/");
 					put("ts", "http://github.com/Nastel/tnt4j-streams");
@@ -331,8 +328,8 @@ public class ActivityXmlParserTest extends GenericActivityParserTestBase {
 				return node;
 			}
 		};
-		parser.intXmlParser(new HashMap<String, String>());
-		stackedParser.intXmlParser(new HashMap<String, String>());
+		parser.intXmlParser(new HashMap<>());
+		stackedParser.intXmlParser(new HashMap<>());
 		String data = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 				+ "<root xmlns:foo=\"http://www.foo.org/\" xmlns:bar=\"http://www.bar.org\">\n" + "\t<employees>\n"
 				+ "\t\t<employee id=\"1\">Johnny Dapp</employee>\n" + "\t\t<employee id=\"2\">Al Pacino</employee>\n"
