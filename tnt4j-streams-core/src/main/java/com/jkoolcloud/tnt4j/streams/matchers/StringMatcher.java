@@ -34,6 +34,8 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
  */
 public class StringMatcher implements Matcher {
 
+	private static final Method[] SU_METHODS = StringUtils.class.getDeclaredMethods();
+
 	private static StringMatcher instance;
 
 	private StringMatcher() {
@@ -99,8 +101,7 @@ public class StringMatcher implements Matcher {
 		if (hasNoArguments) {
 			method = StringUtils.class.getDeclaredMethod(methodName, CharSequence.class);
 		} else {
-			method = findMatchingMethodAndConvertArgs(methodName, arguments, convertedArguments,
-					StringUtils.class.getDeclaredMethods());
+			method = findMatchingMethodAndConvertArgs(methodName, arguments, convertedArguments, SU_METHODS);
 		}
 		if (method != null) {
 			if (hasNoArguments) {
