@@ -337,6 +337,7 @@
                 </request>
             </step>
             <step name="B2Bi documents query">
+                <property name="SynchronizeRequests" value="true"/>
                 <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="35" startDelayUnits="Seconds"/>
                 <request id="Documents_Req">
                     <![CDATA[
