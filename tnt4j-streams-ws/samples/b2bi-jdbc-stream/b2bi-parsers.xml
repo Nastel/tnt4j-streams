@@ -88,7 +88,7 @@
     </parser>
 
     <parser name="B2BiFGEventAttributesXMLParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
-        <field name="FG_E_Attr_${FieldNameLoc}" locator="/attributes/attr[*]/EVENTATTR_VALUE" locator-type="Label">
+        <field name="FG_E_Attr_${FieldNameLoc}" locator="/attributes/attr[*]/EVENTATTR_VALUE" locator-type="Label" datatype="String">
             <field-locator id="FieldNameLoc" locator="/attributes/attr[*]/EVENTATTR_NAME" locator-type="Label">
                 <field-transform lang="groovy" name="AttrNameTransform"><![CDATA[
                     Strings.replace($fieldValue, "@", "_");
@@ -105,7 +105,7 @@
         <field name="StartTime" locator="AF_CREATE_TS" locator-type="Label"/>
         <field name="EndTime" locator="EVENT_TIME" locator-type="Label" datatype="Number" units="Milliseconds" timezone="GMT-04:00"/>
 
-        <field name="EntityKey" locator="EVENT_ENTITY_KEY" locator-type="Label"/>
+        <field name="EntityKey" locator="EVENT_ENTITY_KEY" locator-type="Label" datatype="String"/>
         <field name="DataFlowId" locator="EVENT_DATA_FLOW_ID" locator-type="Label" datatype="Number" format="long"/>
         <field name="Counter" locator="EVENT_COUNTER" locator-type="Label" datatype="Number" format="long"/>
         <field name="EventCode" locator="EVENT_EVENT_CODE" locator-type="Label"/>
@@ -219,7 +219,7 @@
         <field name="StartTime" locator="AF_CREATE_TS" locator-type="Label"/>
         <field name="EndTime" locator="EVENT_TIME" locator-type="Label" datatype="Number" units="Milliseconds" timezone="GMT-04:00"/>
 
-        <field name="EntityKey" locator="EVENT_ENTITY_KEY" locator-type="Label"/>
+        <field name="EntityKey" locator="EVENT_ENTITY_KEY" locator-type="Label" datatype="String"/>
         <field name="DataFlowId" locator="EVENT_DATA_FLOW_ID" locator-type="Label" datatype="Number" format="long"/>
         <field name="Counter" locator="EVENT_COUNTER" locator-type="Label" datatype="Number" format="long"/>
         <field name="EventCode" locator="EVENT_EVENT_CODE" locator-type="Label"/>
@@ -345,7 +345,7 @@
         </field>
 
         <field name="DataFlowId" locator="ROUTE_DATA_FLOW_ID" locator-type="Label" datatype="Number" format="long"/>
-        <field name="RoutchanKey" locator="ROUTE_ROUTCHAN_KEY" locator-type="Label"/>
+        <field name="RoutChanKey" locator="ROUTE_ROUTCHAN_KEY" locator-type="Label" datatype="String"/>
         <field name="ConsOrgKey" locator="ROUTE_CONS_ORG_KEY" locator-type="Label"/>
         <field name="ConsOrgName" locator="ROUTE_CONS_ORG_NAME" locator-type="Label"/>
         <field name="PFstructKey" locator="ROUTE_P_FSTRUCT_KEY" locator-type="Label"/>
@@ -373,7 +373,7 @@
         <!-- Filter out routes having no channel key defined -->
         <!--filter name="R_RCKeyFilter">
             <expression handle="exclude" lang="groovy"><![CDATA[
-               ${RoutchanKey} == null
+               ${RoutChanKey} == null
             ]]></expression>
         </filter-->
     </parser>
@@ -393,7 +393,7 @@
 
         <field name="DataFlowId" locator="DELIVERY_DATA_FLOW_ID" locator-type="Label" datatype="Number" format="long"/>
         <field name="State" locator="DELIVERY_STATE" locator-type="Label"/>
-        <field name="DelivChanKey" locator="DELIVERY_DELIVCHAN_KEY" locator-type="Label"/>
+        <field name="DelivChanKey" locator="DELIVERY_DELIVCHAN_KEY" locator-type="Label" datatype="String"/>
         <field name="ConsumerDocId" locator="DELIVERY_CONSUMER_DOCID" locator-type="Label"/>
         <field name="ContentType" locator="DELIVERY_CONTENT_TYPE" locator-type="Label"/>
         <field name="FileName" locator="DELIVERY_FILENAME" locator-type="Label"/>
@@ -813,57 +813,57 @@
         <entry id="LastAFileRecordMDate">
             <key>LastAFileRecordMDate</key>
             <value>${AF_ModifyTs}</value>
-            <default>2019-06-10 00:00:00.000</default>
+            <default>2020-05-10 00:00:00.000</default>
         </entry>
         <entry id="LastEventRecordMDate">
             <key>LastEventRecordMDate</key>
             <value>${E_ModifyTs}</value>
-            <default>2019-06-10 00:00:00.000</default>
+            <default>2020-05-10 00:00:00.000</default>
         </entry>
         <entry id="LastEventApplRecordMDate">
             <key>LastEventApplRecordMDate</key>
             <value>${E_App_ModifyTs}</value>
-            <default>2019-06-10 00:00:00.000</default>
+            <default>2020-05-10 00:00:00.000</default>
         </entry>
         <entry id="LastRouteRecordMDate">
             <key>LastRouteRecordMDate</key>
             <value>${R_ModifyTs}</value>
-            <default>2019-06-10 00:00:00.000</default>
+            <default>2020-05-10 00:00:00.000</default>
         </entry>
         <entry id="LastDeliveryRecordMDate">
             <key>LastDeliveryRecordMDate</key>
             <value>${D_ModifyTs}</value>
-            <default>2019-06-10 00:00:00.000</default>
+            <default>2020-05-10 00:00:00.000</default>
         </entry>
         <entry id="LastCorrelationSetRecordMDate">
             <key>LastCorrelationSetRecordMDate</key>
             <value>${CS_RecTime}</value>
-            <default>2019-06-10 00:00:00.000</default>
+            <default>2020-05-10 00:00:00.000</default>
         </entry>
         <entry id="LastWorkflowContextRecordMDate">
             <key>LastWorkflowContextRecordMDate</key>
             <value>${WC_StartTime}</value>
-            <default>2019-06-10 00:00:00.000</default>
+            <default>2020-05-10 00:00:00.000</default>
         </entry>
         <entry id="LastDocumentsRecordMDate">
             <key>LastDocumentsRecordMDate</key>
             <value>${Doc_ModifyTs}</value>
-            <default>2019-06-10 00:00:00.000</default>
+            <default>2020-05-10 00:00:00.000</default>
         </entry>
         <entry id="LastSessionsRecordMDate">
             <key>LastSessionsRecordMDate</key>
             <value>${S_StartTime}</value>
-            <default>2019-06-10 00:00:00.000</default>
+            <default>2020-05-10 00:00:00.000</default>
         </entry>
         <entry id="LastXfersRecordMDate">
             <key>LastXfersRecordMDate</key>
             <value>${XF_StartTime}}</value>
-            <default>2019-06-10 00:00:00.000</default>
+            <default>2020-05-10 00:00:00.000</default>
         </entry>
         <entry id="LastNonXfersRecordMDate">
             <key>LastNonXfersRecordMDate</key>
             <value>${NXF_StartTime}</value>
-            <default>2019-06-10 00:00:00.000</default>
+            <default>2020-05-10 00:00:00.000</default>
         </entry>
         <entry id="CachedApplName">
             <key>${DataFlowId}</key>
