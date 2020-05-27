@@ -233,15 +233,11 @@
     <field name="ChannelName" locator="MQCACH_CHANNEL_NAME" locator-type="Label"/>
 
     <field name="ApplName" value="">
-        <!-- show APPLNAME in case of SENDER/RECIEVER as channel type along with channel name-->
+        <!-- show APPLNAME as channel name in case of Queue Manager channels as type along with channel name-->
         <field-transform lang="groovy" name="ApplTransform"><![CDATA[
-            ${ChannelType} == null ? ${ProgramName} : "CHL:"+${ChannelType}+":"+${ChannelName}
+            ${ChannelType} == null || ${ChannelType} ==  "SVRCONN" ? ${ProgramName} : "CHL:"+${ChannelType}+":"+${ChannelName}
         ]]></field-transform>
-        <!-- show APPLNAME in case of SENDER/RECIEVER as channel name only -->
-        <!--<field-transform lang="groovy" name="ApplTransform"><![CDATA[
-            ${ChannelType} == null ? ${ProgramName} : ${ChannelName}
-        ]]></field-transform>  -->
-    </field>
+            </field>
 
     <!-- record actual elapsed time as a number only, not time stamp -->
     <field name="QMgrOpDuration" locator="MQGACF_ACTIVITY_TRACE.MQIAMO64_QMGR_OP_DURATION" locator-type="Label" datatype="Number"
