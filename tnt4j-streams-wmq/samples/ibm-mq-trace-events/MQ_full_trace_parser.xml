@@ -143,7 +143,7 @@
         <field-transform lang="groovy" name="TrackTransform"><![CDATA[
             ${TrackingIdXQH} != null
                 ? ${TrackingIdXQH}
-                : (${TrackingIdNorm} != null ? ${TrackingIdNorm} : null )
+                : (${TrackingIdNorm} != null ? ${TrackingIdNorm} : null)
         ]]></field-transform>
     </field>
 
@@ -233,11 +233,13 @@
     <field name="ChannelName" locator="MQCACH_CHANNEL_NAME" locator-type="Label"/>
 
     <field name="ApplName" value="">
-        <!-- show APPLNAME as channel name in case of Queue Manager channels as type along with channel name-->
+        <!-- show APPLNAME as channel name in case of Queue Manager channels as type along with channel name -->
         <field-transform lang="groovy" name="ApplTransform"><![CDATA[
-            ${ChannelType} == null || ${ChannelType} ==  "SVRCONN" ? ${ProgramName} : "CHL:"+${ChannelType}+":"+${ChannelName}
+            (${ChannelType} == null || ${ChannelType} == "SVRCONN")
+                ? ${ProgramName}
+                : "CHL:" + ${ChannelType} + ":" + ${ChannelName}
         ]]></field-transform>
-            </field>
+    </field>
 
     <!-- record actual elapsed time as a number only, not time stamp -->
     <field name="QMgrOpDuration" locator="MQGACF_ACTIVITY_TRACE.MQIAMO64_QMGR_OP_DURATION" locator-type="Label" datatype="Number"
@@ -264,9 +266,9 @@
     <!-- compute age of message based on time from put to time when delivered adjusting for difference in precision -->
     <field name="MessageAge" value="" datatype="Number">
         <field-transform name="MATransform" lang="groovy"><![CDATA[
-           (${PutTime} != null && ${EventType}.name().equals("RECEIVE"))
-            ? ${HighresTime} - ${PutTime} - 10000
-            : 0
+            (${PutTime} != null && ${EventType}.name().equals("RECEIVE"))
+                ? ${HighresTime} - ${PutTime} - 10000
+                : 0
         ]]></field-transform>
     </field>
 
