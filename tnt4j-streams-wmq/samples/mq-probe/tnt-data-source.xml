@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-wmq/config/tnt-data-source-wmq_pcf.xsd">
+
+    <!-- Include the MQ Probe parser, which includes most MQ Probe and zOS interceptor data elements  -->
+    <resource-ref id="MQProbeCommon" type="Parser" uri="MQ_probe_parser.xml"/>
+
+    <stream name="WmqProbeStream" class="com.jkoolcloud.tnt4j.streams.inputs.WmqStream">
+        <property name="StripHeaders" value="false"/>
+        <property name="RetryStateCheck" value="true"/>
+
+        <!-- Queue Manager name to which to connect -->
+        <property name="QueueManager" value="[QMGR]"/>
+        <property name="Queue" value="NASTEL.APTM.MESSAGE"/>
+
+        <!-- these are required if connecting remote or removed for local connection -->
+        <property name="Channel" value="[CHANNEL]"/>
+        <property name="Host" value="[HOST]"/>
+        <property name="Port" value="1414"/>
+
+        <property name="UserName" value="[USER]"/>
+
+        <parser-ref name="MQProbeEventsParser"/>
+    </stream>
+</tnt-data-source>

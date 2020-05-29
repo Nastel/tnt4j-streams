@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-wmq/config/tnt-data-source-wmq_pcf.xsd">
+
+    <java-object name="MQMsgToMQProbeMapPreParser" class="com.jkoolcloud.tnt4j.streams.custom.preparsers.MQMessageToMQProbeStructMap"/>
+
+    <parser name="ZOSProbeMapParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="EVENT"/>
+
+        <!-- Message fields -->
+        <field name="MsgEncoding" locator="Encoding" locator-type="Label" datatype="Number"/>
+        <field name="MsgCharSet" locator="CharSet" locator-type="Label" datatype="Number"/>
+        <field name="Message" locator="Message" locator-type="Label">
+            <field-transform lang="groovy"><![CDATA[
+                WmqUtils.getString($fieldValue, ${MsgCharSet});
+            ]]></field-transform>
+        </field>
+
+        <!-- Batch info fields -->
+        <field name="Batch_StrucId" locator="BatchInfo.StrucId" locator-type="Label"/>
+        <field name="Batch_StructSize" locator="BatchInfo.StructSize" locator-type="Label" datatype="Number"/>
+        <field name="Batch_Type" locator="BatchInfo.Type" locator-type="Label"/>
+        <field name="Batch_TranName" locator="BatchInfo.TranName" locator-type="Label"/>
+        <field name="Batch_TranNumber" locator="BatchInfo.TranNumber" locator-type="Label"/>
+        <field name="Batch_McdOffset" locator="BatchInfo.McdOffset" locator-type="Label" datatype="Number"/>
+        <field name="Batch_McdLength" locator="BatchInfo.McdLength" locator-type="Label" datatype="Number"/>
+        <field name="Batch_MsgOffset" locator="BatchInfo.MsgOffset" locator-type="Label" datatype="Number"/>
+        <field name="Batch_MsgLength" locator="BatchInfo.MsgLength" locator-type="Label" datatype="Number"/>
+        <field name="Batch_TimeSticker" locator="BatchInfo.TimeSticker" locator-type="Label" datatype="Timestamp"/>
+        <field name="Batch_CpuCount" locator="BatchInfo.CpuCount" locator-type="Label" datatype="Number"/>
+        <field name="Batch_MipsCount" locator="BatchInfo.MipsCount" locator-type="Label" datatype="Number"/>
+
+        <!-- MQ call context fields -->
+        <field name="MqCallCtx_StrucId" locator="MqCallCtx.StrucId" locator-type="Label"/>
+        <field name="MqCallCtx_ApiType" locator="MqCallCtx.ApiType" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_ApiCall" locator="MqCallCtx.ApiCall" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_CompCode" locator="MqCallCtx.CompCode" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_Reason" locator="MqCallCtx.Reason" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_HandleConn" locator="MqCallCtx.HandleConn" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_HandleObj" locator="MqCallCtx.HandleObj" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_Options" locator="MqCallCtx.Options" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_DataSize" locator="MqCallCtx.DataSize" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_QMgrName" locator="MqCallCtx.QMgrName" locator-type="Label"/>
+        <field name="MqCallCtx_ObjectName" locator="MqCallCtx.ObjectName" locator-type="Label"/>
+        <field name="MqCallCtx_ObjectType" locator="MqCallCtx.ObjectType" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_UserId" locator="MqCallCtx.UserId" locator-type="Label"/>
+        <field name="MqCallCtx_ProcessId" locator="MqCallCtx.ProcessId" locator-type="Label"/>
+        <field name="MqCallCtx_ThreadId" locator="MqCallCtx.ThreadId" locator-type="Label"/>
+        <field name="MqCallCtx_ProgramName" locator="MqCallCtx.ProgramName" locator-type="Label"/>
+        <field name="MqCallCtx_Offset" locator="MqCallCtx.Offset" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_JobName" locator="MqCallCtx.JobName" locator-type="Label"/>
+        <field name="MqCallCtx_JobType" locator="MqCallCtx.JobType" locator-type="Label"/>
+        <field name="MqCallCtx_ExitTime" locator="MqCallCtx.ExitTime" locator-type="Label" datatype="Timestamp"/>
+        <field name="MqCallCtx_ExitDelta" locator="MqCallCtx.ExitDelta" locator-type="Label"/>
+        <field name="MqCallCtx_MsgAge" locator="MqCallCtx.MsgAge" locator-type="Label"/>
+        <field name="MqCallCtx_SessionTime" locator="MqCallCtx.SessionTime" locator-type="Label" datatype="Timestamp"/>
+        <field name="MqCallCtx_LuwTime" locator="MqCallCtx.LuwTime" locator-type="Label" datatype="Timestamp"/>
+        <field name="MqCallCtx_MsgSig" locator="MqCallCtx.MsgSig" locator-type="Label"/>
+        <field name="MqCallCtx_CpuTime" locator="MqCallCtx.CpuTime" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_NetUowId" locator="MqCallCtx.NetUowId" locator-type="Label"/>
+        <field name="MqCallCtx_MqiCpuTime" locator="MqCallCtx.MqiCpuTime" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_ClientIp" locator="MqCallCtx.ClientIp" locator-type="Label"/>
+        <field name="MqCallCtx_FirstTransId" locator="MqCallCtx.FirstTransId" locator-type="Label"/>
+        <field name="MqCallCtx_TransGrpId" locator="MqCallCtx.TransGrpId" locator-type="Label"/>
+        <field name="MqCallCtx_ClientIpAddr" locator="MqCallCtx.ClientIpAddr" locator-type="Label"/>
+        <field name="MqCallCtx_ClientPort" locator="MqCallCtx.ClientPort" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_UserCorrelator" locator="MqCallCtx.UserCorrelator" locator-type="Label"/>
+        <field name="MqCallCtx_MDOffset" locator="MqCallCtx.MDOffset" locator-type="Label" datatype="Number"/>
+
+        <!-- MQ MD fields-->
+        <field name="MqCallCtx_MD_StrucId" locator="MqCallCtx.MsgDesc.StrucId" locator-type="Label"/>
+        <field name="MqCallCtx_MD_Report" locator="MqCallCtx.MsgDesc.Report" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_MD_MsgType" locator="MqCallCtx.MsgDesc.MsgType" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_MD_Expiry" locator="MqCallCtx.MsgDesc.Expiry" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_MD_Feedback" locator="MqCallCtx.MsgDesc.Feedback" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_MD_Encoding" locator="MqCallCtx.MsgDesc.Encoding2" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_MD_CodedCharSetId" locator="MqCallCtx.MsgDesc.CodedCharSetId" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_MD_Format" locator="MqCallCtx.MsgDesc.Format" locator-type="Label"/>
+        <field name="MqCallCtx_MD_Priority" locator="MqCallCtx.MsgDesc.Priority" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_MD_Persistence" locator="MqCallCtx.MsgDesc.Persistence" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_MD_MsgId" locator="MqCallCtx.MsgDesc.MsgId" locator-type="Label">
+            <field-transform lang="groovy" phase="raw"><![CDATA[
+                WmqUtils.getString($fieldValue, ${MsgCharSet});
+            ]]></field-transform>
+        </field>
+        <field name="MqCallCtx_MD_CorrelId" locator="MqCallCtx.MsgDesc.CorrelId" locator-type="Label">
+            <field-transform lang="groovy" phase="raw"><![CDATA[
+                WmqUtils.getString($fieldValue, ${MsgCharSet});
+            ]]></field-transform>
+        </field>
+        <field name="MqCallCtx_MD_BackoutCount" locator="MqCallCtx.MsgDesc.BackoutCount" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_MD_ReplyToQ" locator="MqCallCtx.MsgDesc.ReplyToQ" locator-type="Label"/>
+        <field name="MqCallCtx_MD_ReplyToQMgr" locator="MqCallCtx.MsgDesc.ReplyToQMgr" locator-type="Label"/>
+        <field name="MqCallCtx_MD_UserIdentifier" locator="MqCallCtx.MsgDesc.UserIdentifier" locator-type="Label"/>
+        <field name="MqCallCtx_MD_AccountingToken" locator="MqCallCtx.MsgDesc.AccountingToken" locator-type="Label">
+            <field-transform lang="groovy" phase="raw"><![CDATA[
+                WmqUtils.getString($fieldValue, ${MsgCharSet});
+            ]]></field-transform>
+        </field>
+        <field name="MqCallCtx_MD_ApplIdentityData" locator="MqCallCtx.MsgDesc.ApplIdentityData" locator-type="Label"/>
+        <field name="MqCallCtx_MD_PutApplType" locator="MqCallCtx.MsgDesc.PutApplType" locator-type="Label" datatype="Number"/>
+        <field name="MqCallCtx_MD_PutApplName" locator="MqCallCtx.MsgDesc.PutApplName" locator-type="Label"/>
+        <field name="MqCallCtx_MD_PutTime" formattingPattern="{0} {1}" format="yyyyMMdd HHmmssSS" datatype="DateTime" timezone="GMT">
+            <field-locator locator="MqCallCtx.MsgDesc.PutDate" locator-type="Label"/>
+            <field-locator locator="MqCallCtx.MsgDesc.PutTime" locator-type="Label"/>
+        </field>
+        <field name="MqCallCtx_MD_ApplOriginData" locator="MqCallCtx.MsgDesc.ApplOriginData" locator-type="Label"/>
+    </parser>
+
+    <parser name="MQProbeMapParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="EVENT"/>
+    </parser>
+
+    <parser name="MQProbeEventsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <reference name="MQMsgToMQProbeMapPreParser"/>
+
+        <field name="EventType" value="EVENT"/>
+        <field name="StrucId" locator="StrucId" locator-type="Label" transparent="true"/>
+
+        <embedded-activity name="ZOSProbe" locator="$DATA$" locator-type="Label">
+            <parser-ref name="ZOSProbeMapParser" aggregation="Merge">
+                <matchExp>groovy:"TAZOS".equals(${StrucId}.trim())</matchExp>
+            </parser-ref>
+            <parser-ref name="MQProbeMapParser" aggregation="Merge">
+                <matchExp>groovy:"APIEXIT".equals(${StrucId}.trim())</matchExp>
+            </parser-ref>
+        </embedded-activity>
+    </parser>
+</tnt-data-source>
