@@ -306,14 +306,6 @@
             </exclusions>
         </dependency>
 
-        <!-- JAXB dependencies for Java9+ -->
-        <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-            <version>${jaxb.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-
         <!-- logging dependencies -->
         <!-- slf4j-log4j12 logger shall be used by default -->
         <dependency>
