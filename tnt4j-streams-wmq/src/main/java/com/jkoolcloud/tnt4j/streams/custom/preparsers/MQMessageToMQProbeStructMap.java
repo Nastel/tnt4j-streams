@@ -16,6 +16,7 @@
 
 package com.jkoolcloud.tnt4j.streams.custom.preparsers;
 
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
@@ -60,10 +61,16 @@ public class MQMessageToMQProbeStructMap extends AbstractMQMessagePreParser<Map<
 
 		MQProbeStructs.MQProbeRootStruct mqStruct = null;
 
-		if ("APIE".equals(strId)) { // NON-NLS
-			mqStruct = MQProbeStructs.TAMQAPINT.read(bb, enc, charSet);
-		} else if ("mqh ".equals(strId)) { // NON-NLS
-			mqStruct = MQProbeStructs.TAZOS.read(bb, enc, charSet);
+		try {
+			if ("APIE".equals(strId)) { // NON-NLS
+				mqStruct = MQProbeStructs.TAMQAPINT.read(bb, enc, charSet);
+			} else if ("mqh ".equals(strId)) { // NON-NLS
+				mqStruct = MQProbeStructs.TAZOS.read(bb, enc, charSet);
+			}
+		} catch (BufferUnderflowException exc) {
+			Utils.logThrowable(LOGGER, OpLevel.ERROR, WmqStreamConstants.RESOURCE_BUNDLE_NAME,
+					"MQMessageToMQProbeStructMap.buffer.underflow", bb.position(), bb.remaining(), bb.limit(),
+					bb.capacity(), exc);
 		}
 
 		return mqStruct == null ? null : mqStruct.asMap();

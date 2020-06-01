@@ -1028,7 +1028,7 @@ public class MQProbeStructs {
 		public TAMQBATCH batchInfo;
 		public TAMQCD mqCallCtx;
 		public byte[] msg;
-		byte[] align; // 4
+		// byte[] align; // 4
 
 		/**
 		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAZOS} data structure.
@@ -1053,7 +1053,7 @@ public class MQProbeStructs {
 			tazos.batchInfo = TAMQBATCH.read(bb, encoding, charSet);
 			tazos.mqCallCtx = TAMQCD.read(bb, encoding, charSet);
 			tazos.msg = getBytes(bb, tazos.batchInfo.msgLength);
-			tazos.align = getBytes(bb, 4);
+			// tazos.align = getBytes(bb, 4);
 
 			return tazos;
 		}
