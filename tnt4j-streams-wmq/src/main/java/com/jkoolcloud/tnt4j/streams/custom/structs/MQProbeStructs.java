@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.custom.structs;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -58,6 +59,18 @@ import com.jkoolcloud.tnt4j.streams.utils.WmqUtils;
  */
 public class MQProbeStructs {
 
+	/**
+	 * API exit interface on UNIX, Windows and AS/400.
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>StrucId (String)</li>
+	 * <li>MqInfo ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAMQINFO})</li>
+	 * <li>ApiIntInfo ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAAPINTINFO})</li>
+	 * <li>MsgId (String)</li>
+	 * <li>Message (byte[])</li>
+	 * </ul>
+	 */
 	public static class TAMQAPINT extends MQStruct implements MQProbeRootStruct {
 		public String strucId; // 8
 		public TAMQINFO mqInfo;
@@ -65,10 +78,27 @@ public class MQProbeStructs {
 		public String msgId; // 8
 		public byte[] msg;
 
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAMQAPINT} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code TAMQAPINT} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
 		public static TAMQAPINT read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			TAMQAPINT tamqapint = new TAMQAPINT();
 			tamqapint.encoding = encoding;
 			tamqapint.charSet = charSet;
+
+			bb.order(ByteOrder.LITTLE_ENDIAN);
 
 			tamqapint.strucId = getString(bb, 8, encoding, charSet);
 			tamqapint.mqInfo = TAMQINFO.read(bb, encoding, charSet);
@@ -93,6 +123,30 @@ public class MQProbeStructs {
 		}
 	}
 
+	/**
+	 * API exit interface context information.
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>StrucId (String)</li>
+	 * <li>HostName (String)</li>
+	 * <li>ApplName (String)</li>
+	 * <li>GTID (String)</li>
+	 * <li>ObjName (String)</li>
+	 * <li>RslvObjName (String)</li>
+	 * <li>RslvQMgr (String)</li>
+	 * <li>RslvObjName (String)</li>
+	 * <li>IpAddress (String)</li>
+	 * <li>OsType (String)</li>
+	 * <li>ObjType (int)</li>
+	 * <li>CpuCount (int)</li>
+	 * <li>ExitTime ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TIME_INFO})</li>
+	 * <li>ExitDelta ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.APXDELTA})</li>
+	 * <li>ExitSigntr ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.APXSIGNTR})</li>
+	 * <li>ExitParms ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAAXP})</li>
+	 * <li>ExitContext ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAAXC})</li>
+	 * </ul>
+	 */
 	public static class TAAPINTINFO extends MQStruct {
 		public String strucId; // 8
 		public String hostName; // 64
@@ -103,6 +157,7 @@ public class MQProbeStructs {
 		public String rslvQMgr; // 48+1
 		public String ipAddress; // 64
 		public String osType; // 256
+		byte[] unused0; // 3
 		public int objType; /* for szObjName */
 		public int cpuCount;
 		byte[] unused; // 4
@@ -112,6 +167,21 @@ public class MQProbeStructs {
 		public TAAXP exitParms;
 		public TAAXC exitContext;
 
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAAPINTINFO} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code TAAPINTINFO} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
 		public static TAAPINTINFO read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			TAAPINTINFO taapintinfo = new TAAPINTINFO();
 			taapintinfo.encoding = encoding;
@@ -126,6 +196,7 @@ public class MQProbeStructs {
 			taapintinfo.rslvQMgr = getString(bb, 49, encoding, charSet);
 			taapintinfo.ipAddress = getString(bb, 64, encoding, charSet);
 			taapintinfo.osType = getString(bb, 256, encoding, charSet);
+			taapintinfo.unused0 = getBytes(bb, 3);
 			taapintinfo.objType = bb.getInt();
 			taapintinfo.cpuCount = bb.getInt();
 			taapintinfo.unused = getBytes(bb, 4);
@@ -137,8 +208,50 @@ public class MQProbeStructs {
 
 			return taapintinfo;
 		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("StrucId", strucId); // NON-NLS
+			sMap.put("HostName", hostName); // NON-NLS
+			sMap.put("ApplName", applName); // NON-NLS
+			sMap.put("GTID", GTID); // NON-NLS
+			sMap.put("ObjName", objName); // NON-NLS
+			sMap.put("RslvObjName", rslvObjName); // NON-NLS
+			sMap.put("RslvQMgr", rslvQMgr); // NON-NLS
+			sMap.put("IpAddress", ipAddress); // NON-NLS
+			sMap.put("OsType", osType); // NON-NLS
+			sMap.put("ObjType", objType); // NON-NLS
+			sMap.put("CpuCount", cpuCount); // NON-NLS
+			sMap.put("ExitTime", exitTime.asMap()); // NON-NLS
+			sMap.put("ExitDelta", exitDelta.asMap()); // NON-NLS
+			sMap.put("ExitSigntr", exitSigntr.asMap()); // NON-NLS
+			sMap.put("ExitParms", exitParms.asMap()); // NON-NLS
+			sMap.put("ExitContext", exitContext.asMap()); // NON-NLS
+
+			return sMap;
+		}
 	}
 
+	/**
+	 * MQ call (CICS) contextual information.
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>StrucId (String)</li>
+	 * <li>ApiType (int)</li>
+	 * <li>ApiCall (int)</li>
+	 * <li>CompCode (int)</li>
+	 * <li>Reason (int)</li>
+	 * <li>DataSize (int)</li>
+	 * <li>OriginalDataSize (int)</li>
+	 * <li>ObjDesc ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAOD})</li>
+	 * <li>MsgOpt ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAMSGOPT})</li>
+	 * <li>MsgAge ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.MSGAGE})</li>
+	 * <li>MsgDesc ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAMD})</li>
+	 * </ul>
+	 */
 	public static class TAMQINFO extends MQStruct {
 		public String strucId; // 4
 		public int apiType;
@@ -153,11 +266,25 @@ public class MQProbeStructs {
 		public MSGAGE msgAge;
 		public TAMD msgDesc;
 
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAMQINFO} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code TAMQINFO} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
 		public static TAMQINFO read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			TAMQINFO tamqinfo = new TAMQINFO();
 			tamqinfo.encoding = encoding;
 			tamqinfo.charSet = charSet;
-			// bb.order(ByteOrder.LITTLE_ENDIAN);
 
 			tamqinfo.strucId = getString(bb, 4, encoding, charSet);
 			tamqinfo.apiType = bb.getInt();
@@ -174,8 +301,42 @@ public class MQProbeStructs {
 
 			return tamqinfo;
 		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("StrucId", strucId); // NON-NLS
+			sMap.put("ApiType", apiType); // NON-NLS
+			sMap.put("ApiCall", apiCall); // NON-NLS
+			sMap.put("CompCode", compCode); // NON-NLS
+			sMap.put("Reason", reason); // NON-NLS
+			sMap.put("DataSize", dataSize); // NON-NLS
+			sMap.put("OriginalDataSize", originalDataSize); // NON-NLS
+			sMap.put("ObjDesc", objDesc.asMap()); // NON-NLS
+			sMap.put("MsgOpt", msgOpt.asMap()); // NON-NLS
+			sMap.put("MsgAge", msgAge.asMap()); // NON-NLS
+			sMap.put("MsgDesc", msgDesc.asMap()); // NON-NLS
+
+			return sMap;
+		}
 	}
 
+	/**
+	 * OBJ DESC structure (similar to MQOD).
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>StrucId (String)</li>
+	 * <li>ObjectType (int)</li>
+	 * <li>ObjectName (String)</li>
+	 * <li>ObjectQMgrName (String)</li>
+	 * <li>DynamicQName (String)</li>
+	 * <li>AlternateUserId (String)</li>
+	 * <li>ResolvedQName (String)</li>
+	 * <li>ResolvedQMgrName (String)</li>
+	 * </ul>
+	 */
 	public static class TAOD extends MQStruct {
 		public String strucId; // 4
 		public int objectType;
@@ -187,6 +348,21 @@ public class MQProbeStructs {
 		public String resolvedQMgrName; // 48
 		byte[] unused; // 28
 
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAOD} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code TAOD} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
 		public static TAOD read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			TAOD taod = new TAOD();
 			taod.encoding = encoding;
@@ -204,8 +380,37 @@ public class MQProbeStructs {
 
 			return taod;
 		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("StrucId", strucId); // NON-NLS
+			sMap.put("ObjectType", objectType); // NON-NLS
+			sMap.put("ObjectName", objectName); // NON-NLS
+			sMap.put("ObjectQMgrName", objectQMgrName); // NON-NLS
+			sMap.put("DynamicQName", dynamicQName); // NON-NLS
+			sMap.put("AlternateUserId", alternateUserId); // NON-NLS
+			sMap.put("ResolvedQName", resolvedQName); // NON-NLS
+			sMap.put("ResolvedQMgrName", resolvedQName); // NON-NLS
+
+			return sMap;
+		}
 	}
 
+	/**
+	 * Message put /get options (PMO/GMO).
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>StrucId (String)</li>
+	 * <li>Version (int)</li>
+	 * <li>Options (int)</li>
+	 * <li>WaitInterval (int)</li>
+	 * <li>ResolvedQName (String)</li>
+	 * <li>ResolvedQMgrName (String)</li>
+	 * </ul>
+	 */
 	public static class TAMSGOPT extends MQStruct {
 		public String strucId; // 4
 		public int version;
@@ -214,6 +419,21 @@ public class MQProbeStructs {
 		public String resolvedQName; // 48
 		public String resolvedQMgrName; // 48
 
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAMSGOPT} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code TAMSGOPT} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
 		public static TAMSGOPT read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			TAMSGOPT tamsgopt = new TAMSGOPT();
 			tamsgopt.encoding = encoding;
@@ -227,6 +447,20 @@ public class MQProbeStructs {
 			tamsgopt.resolvedQMgrName = getString(bb, 48, encoding, charSet);
 
 			return tamsgopt;
+		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("StrucId", strucId); // NON-NLS
+			sMap.put("Version", version); // NON-NLS
+			sMap.put("Options", options); // NON-NLS
+			sMap.put("WaitInterval", waitInterval); // NON-NLS
+			sMap.put("ResolvedQName", resolvedQName); // NON-NLS
+			sMap.put("ResolvedQMgrName", resolvedQName); // NON-NLS
+
+			return sMap;
 		}
 	}
 
@@ -364,6 +598,20 @@ public class MQProbeStructs {
 		}
 	}
 
+	/**
+	 * Exit time structure.
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>Time_sec (int)</li>
+	 * <li>Time_mls (int)</li>
+	 * <li>Time_usec (int)</li>
+	 * <li>Time_tz (int)</li>
+	 * <li>Offset_secs (int)</li>
+	 * <li>Offset_msecs (int)</li>
+	 * <li>Timer (double)</li>
+	 * </ul>
+	 */
 	public static class TIME_INFO extends MQStruct {
 		public int time_sec;
 		public int time_mls;
@@ -373,6 +621,21 @@ public class MQProbeStructs {
 		public int offset_msecs;
 		public double timer;
 
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code TIME_INFO} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code TIME_INFO} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
 		public static TIME_INFO read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			TIME_INFO time = new TIME_INFO();
 			time.encoding = encoding;
@@ -388,12 +651,51 @@ public class MQProbeStructs {
 
 			return time;
 		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("Time_sec", time_sec); // NON-NLS
+			sMap.put("Time_mls", time_mls); // NON-NLS
+			sMap.put("Time_usec", time_usec); // NON-NLS
+			sMap.put("Time_tz", time_tz); // NON-NLS
+			sMap.put("Offset_secs", offset_secs); // NON-NLS
+			sMap.put("Offset_msecs", offset_msecs); // NON-NLS
+			sMap.put("Timer", timer); // NON-NLS
+
+			return sMap;
+		}
 	}
 
+	/**
+	 * API EXIT time delta is difference in time between before/after exit.
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>Delta_sec (int)</li>
+	 * <li>Delta_usec (int)</li>
+	 * </ul>
+	 */
 	public static class APXDELTA extends MQStruct {
 		public int delta_sec;
 		public int delta_usec;
 
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code APXDELTA} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code APXDELTA} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
 		public static APXDELTA read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			APXDELTA apxdelta = new APXDELTA();
 			apxdelta.encoding = encoding;
@@ -404,22 +706,64 @@ public class MQProbeStructs {
 
 			return apxdelta;
 		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("Delta_sec", delta_sec); // NON-NLS
+			sMap.put("Delta_usec", delta_usec); // NON-NLS
+
+			return sMap;
+		}
 	}
 
+	/**
+	 * API EXIT signature (session and LUW).
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>ReadCount (int)</li>
+	 * <li>WriteCount (int)</li>
+	 * <li>OtherCount (int)</li>
+	 * <li>LuwType (int)</li>
+	 * <li>SesSig (byte[])</li>
+	 * <li>LuwSig (byte[])</li>
+	 * <li>MsgSig (byte[])</li>
+	 * <li>SesSigLen (int)</li>
+	 * <li>LuwSigLen (int)</li>
+	 * <li>MsgSigLen (int)</li>
+	 * </ul>
+	 */
 	public static class APXSIGNTR extends MQStruct {
 		public int readCount;
 		public int writeCount;
 		public int otherCount;
 		public int luwType;
-		public String sesSig; // 16
-		public String luwSig; // 16
-		public String msgSig; // 36+1
+		public byte[] sesSig; // 16
+		public byte[] luwSig; // 16
+		public byte[] msgSig; // 36+1
 		byte[] unused; // 3 /* pad variable to next multiple of 8 bytes */
 		public int sesSigLen;
 		public int luwSigLen;
 		public int msgSigLen;
 		byte[] unused2; // 4 /* pad struct to next multiple of 8 bytes */
 
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code APXSIGNTR} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code APXSIGNTR} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
 		public static APXSIGNTR read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			APXSIGNTR apxsigntr = new APXSIGNTR();
 			apxsigntr.encoding = encoding;
@@ -429,9 +773,9 @@ public class MQProbeStructs {
 			apxsigntr.writeCount = bb.getInt();
 			apxsigntr.otherCount = bb.getInt();
 			apxsigntr.luwType = bb.getInt();
-			apxsigntr.sesSig = getStringRaw(bb, 16, encoding, charSet);
-			apxsigntr.luwSig = getStringRaw(bb, 16, encoding, charSet);
-			apxsigntr.msgSig = getStringRaw(bb, 37, encoding, charSet);
+			apxsigntr.sesSig = getBytes(bb, 16);
+			apxsigntr.luwSig = getBytes(bb, 16);
+			apxsigntr.msgSig = getBytes(bb, 37);
 			apxsigntr.unused = getBytes(bb, 3);
 			apxsigntr.sesSigLen = bb.getInt();
 			apxsigntr.luwSigLen = bb.getInt();
@@ -440,12 +784,54 @@ public class MQProbeStructs {
 
 			return apxsigntr;
 		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("ReadCount", readCount); // NON-NLS
+			sMap.put("WriteCount", writeCount); // NON-NLS
+			sMap.put("OtherCount", otherCount); // NON-NLS
+			sMap.put("LuwType", luwType); // NON-NLS
+			sMap.put("SesSig", sesSig); // NON-NLS
+			sMap.put("LuwSig", luwSig); // NON-NLS
+			sMap.put("MsgSig", msgSig); // NON-NLS
+			sMap.put("SesSigLen", sesSigLen); // NON-NLS
+			sMap.put("LuwSigLen", luwSigLen); // NON-NLS
+			sMap.put("MsgSigLen", msgSigLen); // NON-NLS
+
+			return sMap;
+		}
 	}
 
+	/**
+	 * API EXIT time delta between PUTDATE/TIME of message put and current time after message get.
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>MsgAge_sec (int)</li>
+	 * <li>MsgAge_usec (int)</li>
+	 * </ul>
+	 */
 	public static class MSGAGE extends MQStruct {
 		public int msgage_sec;
 		public int msgage_usec;
 
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code MSGAGE} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code MSGAGE} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
 		static MSGAGE read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			MSGAGE msgage = new MSGAGE();
 			msgage.encoding = encoding;
@@ -456,8 +842,34 @@ public class MQProbeStructs {
 
 			return msgage;
 		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("MsgAge_sec", msgage_sec); // NON-NLS
+			sMap.put("MsgAge_usec", msgage_usec); // NON-NLS
+
+			return sMap;
+		}
 	}
 
+	/**
+	 * API EXIT AXP structure (similar to MQAXP).
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>StrucId (String)</li>
+	 * <li>ExitId (int)</li>
+	 * <li>ExitReason (int)</li>
+	 * <li>ExitResponse (int)</li>
+	 * <li>ExitResponse2 (int)</li>
+	 * <li>Feedback (int)</li>
+	 * <li>ApiCallerType (int)</li>
+	 * <li>Function (int)</li>
+	 * <li>QMgrName (String)</li>
+	 * </ul>
+	 */
 	public static class TAAXP extends MQStruct {
 		public String strucId; // 4
 		public int exitId;
@@ -469,6 +881,21 @@ public class MQProbeStructs {
 		public int function;
 		public String qMgrName; // 48
 
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAAXP} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code TAAXP} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
 		public static TAAXP read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			TAAXP taaxp = new TAAXP();
 			taaxp.encoding = encoding;
@@ -486,11 +913,44 @@ public class MQProbeStructs {
 
 			return taaxp;
 		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("StrucId", strucId); // NON-NLS
+			sMap.put("ExitId", exitId); // NON-NLS
+			sMap.put("ExitReason", exitReason); // NON-NLS
+			sMap.put("ExitResponse", exitResponse); // NON-NLS
+			sMap.put("ExitResponse2", exitResponse2); // NON-NLS
+			sMap.put("Feedback", feedback); // NON-NLS
+			sMap.put("ApiCallerType", apiCallerType); // NON-NLS
+			sMap.put("Function", function); // NON-NLS
+			sMap.put("QMgrName", qMgrName); // NON-NLS
+
+			return sMap;
+		}
 	}
 
+	/**
+	 * API EXIT AXC structure (similar to MQAXC).
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>StrucId (String)</li>
+	 * <li>Environment (int)</li>
+	 * <li>UserId (String)</li>
+	 * <li>SecurityId (byte[])</li>
+	 * <li>ConnectionName (String)</li>
+	 * <li>ApplName (String)</li>
+	 * <li>ApplType (int)</li>
+	 * <li>ProcessId (int)</li>
+	 * <li>ThreadId (int)</li>
+	 * </ul>
+	 */
 	public static class TAAXC extends MQStruct {
 		public String strucId; // 4
-		public int snvironment;
+		public int environment;
 		public String userId; // 12
 		public byte[] securityId; // 40
 		public String connectionName; // 264
@@ -500,13 +960,28 @@ public class MQProbeStructs {
 		public int threadId; // int?
 		byte[] unused; // 28 byte[]?
 
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAAXC} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code TAAXC} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
 		public static TAAXC read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			TAAXC taaxc = new TAAXC();
 			taaxc.encoding = encoding;
 			taaxc.charSet = charSet;
 
 			taaxc.strucId = getString(bb, 4, encoding, charSet);
-			taaxc.snvironment = bb.getInt();
+			taaxc.environment = bb.getInt();
 			taaxc.userId = getString(bb, 12, encoding, charSet);
 			taaxc.securityId = getBytes(bb, 40);
 			taaxc.connectionName = getString(bb, 264, encoding, charSet);
@@ -517,6 +992,23 @@ public class MQProbeStructs {
 			taaxc.unused = getBytes(bb, 28);
 
 			return taaxc;
+		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("StrucId", strucId); // NON-NLS
+			sMap.put("Environment", environment); // NON-NLS
+			sMap.put("UserId", userId); // NON-NLS
+			sMap.put("SecurityId", securityId); // NON-NLS
+			sMap.put("ConnectionName", connectionName); // NON-NLS
+			sMap.put("ApplName", applName); // NON-NLS
+			sMap.put("ApplType", applType); // NON-NLS
+			sMap.put("ProcessId", processId); // NON-NLS
+			sMap.put("ThreadId", threadId); // NON-NLS
+
+			return sMap;
 		}
 	}
 
@@ -746,7 +1238,7 @@ public class MQProbeStructs {
 		public long luwTime; // 8
 		public String luwType; // UICHAR
 		byte[] align2; // 3
-		public String msgSig; // 36
+		public byte[] msgSig; // 36
 		byte[] align3; // 4
 		public long cpuTime; // 8
 		public String netUowId; // 27
@@ -811,7 +1303,7 @@ public class MQProbeStructs {
 			tamqcd.luwTime = timestamp8(bb);
 			tamqcd.luwType = getString(bb, 1, encoding, charSet);
 			tamqcd.align2 = getBytes(bb, 3);
-			tamqcd.msgSig = getStringRaw(bb, 36, encoding, charSet);
+			tamqcd.msgSig = getBytes(bb, 36);
 			tamqcd.align3 = getBytes(bb, 4);
 			tamqcd.cpuTime = timestamp8(bb);
 			tamqcd.netUowId = getStringRaw(bb, 27, encoding, charSet);

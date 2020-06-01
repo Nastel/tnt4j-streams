@@ -24,7 +24,6 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs;
 import com.jkoolcloud.tnt4j.streams.preparsers.AbstractMQMessagePreParser;
-import com.jkoolcloud.tnt4j.streams.preparsers.MQMessageToBinPreParser;
 import com.jkoolcloud.tnt4j.streams.utils.*;
 
 /**
@@ -41,7 +40,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * @see com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAZOS
  */
 public class MQMessageToMQProbeStructMap extends AbstractMQMessagePreParser<Map<String, ?>> {
-	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(MQMessageToBinPreParser.class);
+	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(MQMessageToMQProbeStructMap.class);
 
 	@Override
 	public Map<String, ?> preParse(MQMessage mqMsg) throws Exception {

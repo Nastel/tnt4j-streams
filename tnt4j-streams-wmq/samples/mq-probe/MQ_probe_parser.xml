@@ -56,7 +56,11 @@
         <field name="MqCallCtx_MsgAge" locator="MqCallCtx.MsgAge" locator-type="Label"/>
         <field name="MqCallCtx_SessionTime" locator="MqCallCtx.SessionTime" locator-type="Label" datatype="Timestamp"/>
         <field name="MqCallCtx_LuwTime" locator="MqCallCtx.LuwTime" locator-type="Label" datatype="Timestamp"/>
-        <field name="MqCallCtx_MsgSig" locator="MqCallCtx.MsgSig" locator-type="Label"/>
+        <field name="MqCallCtx_MsgSig" locator="MqCallCtx.MsgSig" locator-type="Label">
+            <field-transform lang="groovy" phase="raw"><![CDATA[
+                WmqUtils.getString($fieldValue, ${MsgCharSet});
+            ]]></field-transform>
+        </field>
         <field name="MqCallCtx_CpuTime" locator="MqCallCtx.CpuTime" locator-type="Label" datatype="Number"/>
         <field name="MqCallCtx_NetUowId" locator="MqCallCtx.NetUowId" locator-type="Label"/>
         <field name="MqCallCtx_MqiCpuTime" locator="MqCallCtx.MqiCpuTime" locator-type="Label" datatype="Number"/>
@@ -68,7 +72,7 @@
         <field name="MqCallCtx_UserCorrelator" locator="MqCallCtx.UserCorrelator" locator-type="Label"/>
         <field name="MqCallCtx_MDOffset" locator="MqCallCtx.MDOffset" locator-type="Label" datatype="Number"/>
 
-        <!-- MQ MD fields-->
+        <!-- MQ MD fields -->
         <field name="MqCallCtx_MD_StrucId" locator="MqCallCtx.MsgDesc.StrucId" locator-type="Label"/>
         <field name="MqCallCtx_MD_Report" locator="MqCallCtx.MsgDesc.Report" locator-type="Label" datatype="Number"/>
         <field name="MqCallCtx_MD_MsgType" locator="MqCallCtx.MsgDesc.MsgType" locator-type="Label" datatype="Number"/>
@@ -110,6 +114,166 @@
 
     <parser name="MQProbeMapParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="EVENT"/>
+
+        <!-- Message fields -->
+        <field name="MsgEncoding" locator="Encoding" locator-type="Label" datatype="Number"/>
+        <field name="MsgCharSet" locator="CharSet" locator-type="Label" datatype="Number"/>
+        <field name="MessageId" locator="MsgId" locator-type="Label"/>
+        <field name="Message" locator="Message" locator-type="Label">
+            <field-transform lang="groovy"><![CDATA[
+                WmqUtils.getString($fieldValue, ${MsgCharSet});
+            ]]></field-transform>
+        </field>
+        <field name="StrucId" locator="StrucId" locator-type="Label"/>
+
+        <!-- MQ call (CICS) contextual information -->
+        <field name="MqInfo_StrucId" locator="MqInfo.StrucId" locator-type="Label"/>
+        <field name="MqInfo_ApiType" locator="MqInfo.ApiType" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_ApiCall" locator="MqInfo.ApiCall" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_CompCode" locator="MqInfo.CompCode" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_Reason" locator="MqInfo.Reason" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_DataSize" locator="MqInfo.DataSize" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_OriginalDataSize" locator="MqInfo.OriginalDataSize" locator-type="Label" datatype="Number"/>
+
+        <!-- Object descriptor fields -->
+        <field name="MqInfo_ObjDesc_StrucId" locator="MqInfo.ObjDesc.StrucId" locator-type="Label"/>
+        <field name="MqInfo_ObjDesc_ObjectType" locator="MqInfo.ObjDesc.ObjectType" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_ObjDesc_ObjectName" locator="MqInfo.ObjDesc.ObjectName" locator-type="Label"/>
+        <field name="MqInfo_ObjDesc_ObjectQMgrName" locator="MqInfo.ObjDesc.ObjectQMgrName" locator-type="Label"/>
+        <field name="MqInfo_ObjDesc_DynamicQName" locator="MqInfo.ObjDesc.DynamicQName" locator-type="Label"/>
+        <field name="MqInfo_ObjDesc_AlternateUserId" locator="MqInfo.ObjDesc.AlternateUserId" locator-type="Label"/>
+        <field name="MqInfo_ObjDesc_ResolvedQName" locator="MqInfo.ObjDesc.ResolvedQName" locator-type="Label"/>
+        <field name="MqInfo_ObjDesc_ResolvedQMgrName" locator="MqInfo.ObjDesc.ResolvedQMgrName" locator-type="Label"/>
+
+        <!-- Message options fields -->
+        <field name="MqInfo_MsgOpt_StrucId" locator="MqInfo.MsgOpt.StrucId" locator-type="Label"/>
+        <field name="MqInfo_MsgOpt_Version" locator="MqInfo.MsgOpt.Version" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_MsgOpt_Options" locator="MqInfo.MsgOpt.Options" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_MsgOpt_WaitInterval" locator="MqInfo.MsgOpt.WaitInterval" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_MsgOpt_ResolvedQName" locator="MqInfo.MsgOpt.ResolvedQName" locator-type="Label"/>
+        <field name="MqInfo_MsgOpt_ResolvedQMgrName" locator="MqInfo.MsgOpt.ResolvedQMgrName" locator-type="Label"/>
+
+        <!-- Message fields -->
+        <field name="MqInfo_MsgAge_MsgAge_sec" locator="MqInfo.MsgAge.MsgAge_sec" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_MsgAge_MsgAge_usec" locator="MqInfo.MsgAge.MsgAge_usec" locator-type="Label" datatype="Number"/>
+
+        <!-- MQ MD fields -->
+        <field name="MqInfo_MsgDesc_StrucId" locator="MqInfo.MsgDesc.StrucId" locator-type="Label"/>
+        <field name="MqInfo_MsgDesc_Report" locator="MqInfo.MsgDesc.Report" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_MsgDesc_MsgType" locator="MqInfo.MsgDesc.MsgType" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_MsgDesc_Expiry" locator="MqInfo.MsgDesc.Expiry" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_MsgDesc_Feedback" locator="MqInfo.MsgDesc.Feedback" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_MsgDesc_Encoding" locator="MqInfo.MsgDesc.Encoding2" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_MsgDesc_CodedCharSetId" locator="MqInfo.MsgDesc.CodedCharSetId" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_MsgDesc_Format" locator="MqInfo.MsgDesc.Format" locator-type="Label"/>
+        <field name="MqInfo_MsgDesc_Priority" locator="MqInfo.MsgDesc.Priority" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_MsgDesc_Persistence" locator="MqInfo.MsgDesc.Persistence" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_MsgDesc_MsgId" locator="MqInfo.MsgDesc.MsgId" locator-type="Label">
+            <field-transform lang="groovy" phase="raw"><![CDATA[
+                WmqUtils.getString($fieldValue, ${MsgCharSet});
+            ]]></field-transform>
+        </field>
+        <field name="MqInfo_MsgDesc_CorrelId" locator="MqInfo.MsgDesc.CorrelId" locator-type="Label">
+            <field-transform lang="groovy" phase="raw"><![CDATA[
+                WmqUtils.getString($fieldValue, ${MsgCharSet});
+            ]]></field-transform>
+        </field>
+        <field name="MqInfo_MsgDesc_BackoutCount" locator="MqInfo.MsgDesc.BackoutCount" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_MsgDesc_ReplyToQ" locator="MqInfo.MsgDesc.ReplyToQ" locator-type="Label"/>
+        <field name="MqInfo_MsgDesc_ReplyToQMgr" locator="MqInfo.MsgDesc.ReplyToQMgr" locator-type="Label"/>
+        <field name="MqInfo_MsgDesc_UserIdentifier" locator="MqInfo.MsgDesc.UserIdentifier" locator-type="Label"/>
+        <field name="MqInfo_MsgDesc_AccountingToken" locator="MqInfo.MsgDesc.AccountingToken" locator-type="Label">
+            <field-transform lang="groovy" phase="raw"><![CDATA[
+                WmqUtils.getString($fieldValue, ${MsgCharSet});
+            ]]></field-transform>
+        </field>
+        <field name="MqInfo_MsgDesc_ApplIdentityData" locator="MqInfo.MsgDesc.ApplIdentityData" locator-type="Label"/>
+        <field name="MqInfo_MsgDesc_PutApplType" locator="MqInfo.MsgDesc.PutApplType" locator-type="Label" datatype="Number"/>
+        <field name="MqInfo_MsgDesc_PutApplName" locator="MqInfo.MsgDesc.PutApplName" locator-type="Label"/>
+        <field name="MqInfo_MsgDesc_PutTime" formattingPattern="{0} {1}" format="yyyyMMdd HHmmssSS" datatype="DateTime" timezone="GMT">
+            <field-locator locator="MqInfo.MsgDesc.PutDate" locator-type="Label"/>
+            <field-locator locator="MqInfo.MsgDesc.PutTime" locator-type="Label"/>
+        </field>
+        <field name="MqInfo_MsgDesc_ApplOriginData" locator="MqInfo.MsgDesc.ApplOriginData" locator-type="Label"/>
+
+        <!-- API exit interface context fields -->
+        <field name="ApiIntInfo_StrucId" locator="ApiIntInfo.StrucId" locator-type="Label"/>
+        <field name="ApiIntInfo_HostName" locator="ApiIntInfo.HostName" locator-type="Label"/>
+        <field name="ApiIntInfo_ApplName" locator="ApiIntInfo.ApplName" locator-type="Label"/>
+        <field name="ApiIntInfo_GTID" locator="ApiIntInfo.GTID" locator-type="Label"/>
+        <field name="ApiIntInfo_ObjName" locator="ApiIntInfo.ObjName" locator-type="Label"/>
+        <field name="ApiIntInfo_ResolvedObjName" locator="ApiIntInfo.RslvObjName" locator-type="Label"/>
+        <field name="ApiIntInfo_ResolvedQMgr" locator="ApiIntInfo.RslvQMgr" locator-type="Label"/>
+        <field name="ApiIntInfo_IpAddress" locator="ApiIntInfo.IpAddress" locator-type="Label"/>
+        <field name="ApiIntInfo_OsType" locator="ApiIntInfo.OsType" locator-type="Label"/>
+        <field name="ApiIntInfo_ObjType" locator="ApiIntInfo.ObjType" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_CpuCount" locator="ApiIntInfo.CpuCount" locator-type="Label" datatype="Number"/>
+
+        <!-- Exit time fields TODO make proper time values mapping -->
+        <field name="ApiIntInfo_ExitTime_Time_sec" locator="ApiIntInfo.ExitTime.Time_sec" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitTime_Time_mls" locator="ApiIntInfo.ExitTime.Time_mls" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitTime_Time_usec" locator="ApiIntInfo.ExitTime.Time_usec" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitTime_Time_tz" locator="ApiIntInfo.ExitTime.Time_tz" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitTime_Offset_secs" locator="ApiIntInfo.ExitTime.Offset_secs" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitTime_Offset_msecs" locator="ApiIntInfo.ExitTime.Offset_msecs" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitTime_Timer" locator="ApiIntInfo.ExitTime.Timer" locator-type="Label" datatype="Number"/>
+
+        <!-- Exit time delta fields TODO make proper time values mapping -->
+        <field name="ApiIntInfo_ExitDelta_Delta_sec" locator="ApiIntInfo.ExitDelta.Delta_sec" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitDelta_Delta_usec" locator="ApiIntInfo.ExitDelta.Delta_usec" locator-type="Label" datatype="Number"/>
+
+        <!-- Exit signature fields -->
+        <field name="ApiIntInfo_ExitSigntr_ReadCount" locator="ApiIntInfo.ExitSigntr.ReadCount" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitSigntr_WriteCount" locator="ApiIntInfo.ExitSigntr.WriteCount" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitSigntr_OtherCount" locator="ApiIntInfo.ExitSigntr.OtherCount" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitSigntr_LuwType" locator="ApiIntInfo.ExitSigntr.LuwType" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitSigntr_SesSig" locator="ApiIntInfo.ExitSigntr.SesSig" locator-type="Label">
+            <field-transform lang="groovy" phase="raw"><![CDATA[
+                WmqUtils.getString($fieldValue, ${MsgCharSet});
+            ]]></field-transform>
+        </field>
+        <field name="ApiIntInfo_ExitSigntr_LuwSig" locator="ApiIntInfo.ExitSigntr.LuwSig" locator-type="Label">
+            <field-transform lang="groovy" phase="raw"><![CDATA[
+                WmqUtils.getString($fieldValue, ${MsgCharSet});
+            ]]></field-transform>
+        </field>
+        <field name="ApiIntInfo_ExitSigntr_MsgSig" locator="ApiIntInfo.ExitSigntr.MsgSig" locator-type="Label">
+            <field-transform lang="groovy" phase="raw"><![CDATA[
+                WmqUtils.getString($fieldValue, ${MsgCharSet});
+            ]]></field-transform>
+        </field>
+        <field name="ApiIntInfo_ExitSigntr_SesSigLen" locator="ApiIntInfo.ExitSigntr.SesSigLen" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitSigntr_LuwSigLen" locator="ApiIntInfo.ExitSigntr.LuwSigLen" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitSigntr_MsgSigLen" locator="ApiIntInfo.ExitSigntr.MsgSigLen" locator-type="Label" datatype="Number"/>
+
+        <!-- Exit parameters fields -->
+        <field name="ApiIntInfo_ExitParms_StrucId" locator="ApiIntInfo.ExitParms.StrucId" locator-type="Label"/>
+        <field name="ApiIntInfo_ExitParms_ExitId" locator="ApiIntInfo.ExitParms.ExitId" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitParms_ExitReason" locator="ApiIntInfo.ExitParms.ExitReason" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitParms_ExitResponse" locator="ApiIntInfo.ExitParms.ExitResponse" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitParms_ExitResponse2" locator="ApiIntInfo.ExitParms.ExitResponse2" locator-type="Label"
+               datatype="Number"/>
+        <field name="ApiIntInfo_ExitParms_Feedback" locator="ApiIntInfo.ExitParms.Feedback" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitParms_ApiCallerType" locator="ApiIntInfo.ExitParms.ApiCallerType" locator-type="Label"
+               datatype="Number"/>
+        <field name="ApiIntInfo_ExitParms_Function" locator="ApiIntInfo.ExitParms.Function" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitParms_QMgrName" locator="ApiIntInfo.ExitParms.QMgrName" locator-type="Label"/>
+
+        <!--Exit context fields -->
+        <field name="ApiIntInfo_ExitContext_StrucId" locator="ApiIntInfo.ExitContext.StrucId" locator-type="Label"/>
+        <field name="ApiIntInfo_ExitContext_Environment" locator="ApiIntInfo.ExitContext.Environment" locator-type="Label"
+               datatype="Number"/>
+        <field name="ApiIntInfo_ExitContext_UserId" locator="ApiIntInfo.ExitContext.UserId" locator-type="Label"/>
+        <field name="ApiIntInfo_ExitContext_SecurityId" locator="ApiIntInfo.ExitContext.SecurityId" locator-type="Label">
+            <field-transform lang="groovy" phase="raw"><![CDATA[
+               WmqUtils.getString($fieldValue, ${MsgCharSet});
+           ]]></field-transform>
+        </field>
+        <field name="ApiIntInfo_ExitContext_ConnectionName" locator="ApiIntInfo.ExitContext.ConnectionName" locator-type="Label"/>
+        <field name="ApiIntInfo_ExitContext_ApplName" locator="ApiIntInfo.ExitContext.ApplName" locator-type="Label"/>
+        <field name="ApiIntInfo_ExitContext_ApplType" locator="ApiIntInfo.ExitContext.ApplType" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitContext_ProcessId" locator="ApiIntInfo.ExitContext.ProcessId" locator-type="Label" datatype="Number"/>
+        <field name="ApiIntInfo_ExitContext_ThreadId" locator="ApiIntInfo.ExitContext.ThreadId" locator-type="Label" datatype="Number"/>
     </parser>
 
     <parser name="MQProbeEventsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
@@ -118,7 +282,7 @@
         <field name="EventType" value="EVENT"/>
         <field name="StrucId" locator="StrucId" locator-type="Label" transparent="true"/>
 
-        <embedded-activity name="ZOSProbe" locator="$DATA$" locator-type="Label">
+        <embedded-activity name="MQProbeData" locator="$DATA$" locator-type="Label">
             <parser-ref name="ZOSProbeMapParser" aggregation="Merge">
                 <matchExp>groovy:"TAZOS".equals(${StrucId}.trim())</matchExp>
             </parser-ref>
