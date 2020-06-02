@@ -1021,10 +1021,15 @@ public class MQProbeStructs {
 	 * <ul>
 	 * <li>StrucId (String)</li>
 	 * <li>BatchInfo ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAMQBATCH})</li>
+	 * <li>Message (byte[])</li>
+	 * </ul>
+	 * and one of:
+	 * <ul>
 	 * <li>MqCallCtx ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAMQCD})</li>
 	 * <li>HostData ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAHID})</li>
 	 * <li>DB2Data ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TADB2})</li>
-	 * <li>Message (byte[])</li>
+	 * <li>ExecCICSData ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TACCD})</li>
+	 * <li>CICSMqData ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAMQCICS})</li>
 	 * </ul>
 	 */
 	public static class TAZOS extends MQZOSStruct implements MQProbeRootStruct {
@@ -1077,21 +1082,25 @@ public class MQProbeStructs {
 				// tazos.interceptData = XXX.read(bb, encoding, charSet);
 				break;
 			case TACON_MQH_TYPE_CICS:
-				// tazos.interceptData = XXX.read(bb, encoding, charSet);
+				tazos.interceptData = TAMQCICS.read(bb, encoding, charSet);
+				tazos.msg = getBytes(bb, ((TAMQCICS) tazos.interceptData).mqInfo.dataSize); // tazos.batchInfo.msgLength
+																							// contains same value??
 				break;
 			case TACON_MQH_TYPE_IMS:
 				// tazos.interceptData = XXX.read(bb, encoding, charSet);
 				break;
 			case TACON_MQH_TYPE_EXECCICS:
-				// tazos.interceptData = XXX.read(bb, encoding, charSet);
+				tazos.interceptData = TACCD.read(bb, encoding, charSet);
+				tazos.msg = getBytes(bb, ((TACCD) tazos.interceptData).origMsgLength); // tazos.batchInfo.msgLength
+																						// contains same value??
 				break;
 			case TACON_MQH_TYPE_CHEXIT:
 				// tazos.interceptData = XXX.read(bb, encoding, charSet);
 				break;
 			case TACON_MQH_TYPE_CICSSQL:
-				TADB2 tadb2 = TADB2.read(bb, encoding, charSet);
-				tazos.interceptData = tadb2;
-				tazos.msg = getBytes(bb, tadb2.sqlLen); // tazos.batchInfo.msgLength contains same value??
+				tazos.interceptData = TADB2.read(bb, encoding, charSet);
+				tazos.msg = getBytes(bb, ((TADB2) tazos.interceptData).sqlLen); // tazos.batchInfo.msgLength contains
+																				// same value??
 				break;
 			case TACON_MQH_TYPE_BATCHSQL:
 				// tazos.interceptData = XXX.read(bb, encoding, charSet);
@@ -1120,6 +1129,14 @@ public class MQProbeStructs {
 				break;
 			case TACON_MQH_TYPE_CICSSQL:
 				sMap.put("DB2Data", interceptData.asMap()); // NON-NLS
+				sMap.put("Message", msg); // NON-NLS
+				break;
+			case TACON_MQH_TYPE_EXECCICS:
+				sMap.put("ExecCICSData", interceptData.asMap()); // NON-NLS
+				sMap.put("Message", msg); // NON-NLS
+				break;
+			case TACON_MQH_TYPE_CICS:
+				sMap.put("CICSMqData", interceptData.asMap()); // NON-NLS
 				sMap.put("Message", msg); // NON-NLS
 				break;
 			default:
@@ -1294,7 +1311,7 @@ public class MQProbeStructs {
 		public String msgAge; // 8
 		public long sessTime; // 8
 		public long luwTime; // 8
-		public String luwType; // UICHAR
+		public String luwType;
 		byte[] align2; // 3
 		public byte[] msgSig; // 36
 		byte[] align3; // 4
@@ -1674,6 +1691,322 @@ public class MQProbeStructs {
 			sMap.put("ClientPort", clientPort); // NON-NLS
 			sMap.put("UserCorrelator", userCorrelator); // NON-NLS
 			sMap.put("SqlLen", sqlLen); // NON-NLS
+
+			return sMap;
+		}
+	}
+
+	/**
+	 * EXEC CICS operational information.
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>StrucId (String)</li>
+	 * <li>FuncCode (String)</li>
+	 * <li>SubCmds (String)</li>
+	 * <li>CompCode (int)</li>
+	 * <li>Reason (int)</li>
+	 * <li>QmgrName (String)</li>
+	 * <li>UserId (String)</li>
+	 * <li>ProcessId (String)</li>
+	 * <li>ThreadId (String)</li>
+	 * <li>ProgramName (String)</li>
+	 * <li>CallOffset (int)</li>
+	 * <li>JobName (String)</li>
+	 * <li>JobType (String)</li>
+	 * <li>ExitTime (long)</li>
+	 * <li>ExitDelta (String)</li>
+	 * <li>LuwTime (long)</li>
+	 * <li>SessTime (long)</li>
+	 * <li>ResourceName (String)</li>
+	 * <li>ResourceType (byte)</li>
+	 * <li>CpuTime (long)</li>
+	 * <li>NetUowId (String)</li>
+	 * <li>ApiCpuTime (long)</li>
+	 * <li>FirstTransId (String)</li>
+	 * <li>TransGrpId (String)</li>
+	 * <li>ClientIpAddr (String)</li>
+	 * <li>ClientPort (int)</li>
+	 * <li>UserCorrelator (String)</li>
+	 * <li>OrigMsgLength (short)</li>
+	 * <li>MsgOffset (short)</li>
+	 * </ul>
+	 */
+	public static class TACCD extends MQZOSStruct {
+		public String strucId; // 4
+		public String funcCode; // 2
+		public String subCmds; // 4
+		byte[] align1; // 2
+		public int compCode;
+		public int reason;
+		public String qmgrName; // 4
+		public String userId; // 8
+		public String processId; // 8
+		public String threadId; // 16
+		public String programName; // 8
+		public int callOffset;
+		public String jobName; // 8
+		public String jobType; // 3
+		byte[] align2; // 1
+		public long exitTime; // 8
+		public String exitDelta; // 8
+		public long luwTime; // 8
+		public long sessTime; // 8
+		public String resourceName; // 8
+		public byte resourceType;
+		byte[] align3; // 3
+		byte[] align4; // 4
+		public long cpuTime; // 8
+		public String netUowId; // 27
+		byte[] align5; // 1
+		public long apiCpuTime; // 8
+		public String firstTransId; // 4
+		public String transGrpId; // 28
+		public String clientIpAddr; // 40
+		public int clientPort;
+		public String userCorrelator; // 64
+		public short origMsgLength;
+		public short msgOffset;
+
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code TACCD} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code TACCD} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
+		public static TACCD read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
+			TACCD taccd = new TACCD();
+			taccd.encoding = encoding;
+			taccd.charSet = charSet;
+
+			taccd.strucId = getString(bb, 4, encoding, charSet);
+			taccd.funcCode = getString(bb, 2, encoding, charSet);
+			taccd.subCmds = getString(bb, 4, encoding, charSet);
+			taccd.align1 = getBytes(bb, 2);
+			taccd.compCode = bb.getInt();
+			taccd.reason = bb.getInt();
+			taccd.qmgrName = getString(bb, 4, encoding, charSet);
+			taccd.userId = getString(bb, 8, encoding, charSet);
+			taccd.processId = getStringRaw(bb, 8, encoding, charSet);
+			taccd.threadId = getStringRaw(bb, 16, encoding, charSet);
+			taccd.programName = getString(bb, 8, encoding, charSet);
+			taccd.callOffset = bb.getInt();
+			taccd.jobName = getString(bb, 8, encoding, charSet);
+			taccd.jobType = getString(bb, 3, encoding, charSet);
+			taccd.align2 = getBytes(bb, 1);
+			taccd.exitTime = timestamp8(bb);
+			taccd.exitDelta = getStringRaw(bb, 8, encoding, charSet);
+			taccd.luwTime = timestamp8(bb);
+			taccd.sessTime = timestamp8(bb);
+			taccd.resourceName = getString(bb, 8, encoding, charSet);
+			taccd.resourceType = bb.get();
+			taccd.align3 = getBytes(bb, 3);
+			taccd.align4 = getBytes(bb, 4);
+			taccd.cpuTime = timestamp8(bb);
+			taccd.netUowId = getStringRaw(bb, 27, encoding, charSet);
+			taccd.align5 = getBytes(bb, 1);
+			taccd.apiCpuTime = timestamp8(bb);
+			taccd.firstTransId = getString(bb, 4, encoding, charSet);
+			taccd.transGrpId = getString(bb, 28, encoding, charSet);
+			taccd.clientIpAddr = getString(bb, 40, encoding, charSet);
+			taccd.clientPort = bb.getInt();
+			taccd.userCorrelator = getString(bb, 64, encoding, charSet);
+			taccd.origMsgLength = bb.getShort();
+			taccd.msgOffset = bb.getShort();
+
+			return taccd;
+		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("StrucId", strucId); // NON-NLS
+			sMap.put("FuncCode", funcCode); // NON-NLS
+			sMap.put("SubCmds", subCmds); // NON-NLS
+			sMap.put("CompCode", compCode); // NON-NLS
+			sMap.put("Reason", reason); // NON-NLS
+			sMap.put("QmgrName", qmgrName); // NON-NLS
+			sMap.put("UserId", userId); // NON-NLS
+			sMap.put("ProcessId", processId); // NON-NLS
+			sMap.put("ThreadId", threadId); // NON-NLS
+			sMap.put("ProgramName", programName); // NON-NLS
+			sMap.put("CallOffset", callOffset); // NON-NLS
+			sMap.put("JobName", jobName); // NON-NLS
+			sMap.put("JobType", jobType); // NON-NLS
+			sMap.put("ExitTime", exitTime); // NON-NLS
+			sMap.put("ExitDelta", exitDelta); // NON-NLS
+			sMap.put("LuwTime", luwTime); // NON-NLS
+			sMap.put("SessTime", sessTime); // NON-NLS
+			sMap.put("ResourceName", resourceName); // NON-NLS
+			sMap.put("ResourceType", resourceType); // NON-NLS
+			sMap.put("CpuTime", cpuTime); // NON-NLS
+			sMap.put("NetUowId", netUowId); // NON-NLS
+			sMap.put("ApiCpuTime", apiCpuTime); // NON-NLS
+			sMap.put("FirstTransId", firstTransId); // NON-NLS
+			sMap.put("TransGrpId", transGrpId); // NON-NLS
+			sMap.put("ClientIpAddr", clientIpAddr); // NON-NLS
+			sMap.put("ClientPort", clientPort); // NON-NLS
+			sMap.put("UserCorrelator", userCorrelator); // NON-NLS
+			sMap.put("OrigMsgLength", origMsgLength); // NON-NLS
+			sMap.put("MsgOffset", msgOffset); // NON-NLS
+
+			return sMap;
+		}
+	}
+
+	/**
+	 * CICS crossing exit on MVS.
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>StrucId (String)</li>
+	 * <li>MqInfo ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAMQINFO})</li>
+	 * <li>CicsInfo ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TACICSINFO})</li>
+	 * <li>MsgId (String)</li>
+	 * </ul>
+	 */
+	public static class TAMQCICS extends MQZOSStruct {
+		public String strucId; // 8
+		public TAMQINFO mqInfo;
+		public TACICSINFO cicsInfo;
+		public String msgId; // 8
+
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAMQCICS} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code TAMQCICS} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
+		public static TAMQCICS read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
+			TAMQCICS tamqcics = new TAMQCICS();
+			tamqcics.encoding = encoding;
+			tamqcics.charSet = charSet;
+
+			bb.order(ByteOrder.LITTLE_ENDIAN);
+
+			tamqcics.strucId = getString(bb, 8, encoding, charSet);
+			tamqcics.mqInfo = TAMQINFO.read(bb, encoding, charSet);
+			tamqcics.cicsInfo = TACICSINFO.read(bb, encoding, charSet);
+			tamqcics.msgId = getStringRaw(bb, 8, encoding, charSet);
+
+			return tamqcics;
+		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("StrucId", strucId); // NON-NLS
+			sMap.put("MqInfo", mqInfo.asMap()); // NON-NLS
+			sMap.put("CicsInfo", cicsInfo.asMap()); // NON-NLS
+			sMap.put("MsgId", msgId); // NON-NLS
+
+			return sMap;
+		}
+	}
+
+	/**
+	 * CICS contextual information
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>StrucId (String)</li>
+	 * <li>SysplxNum (String)</li>
+	 * <li>SysplxId (String)</li>
+	 * <li>CicsVer (String)</li>
+	 * <li>CicsName (String)</li>
+	 * <li>CicsTask (String)</li>
+	 * <li>TranName (String)</li>
+	 * <li>TaskNum (int)</li>
+	 * <li>TermId (String)</li>
+	 * <li>UserId (String)</li>
+	 * <li>Timer (long)</li>
+	 * </ul>
+	 */
+	public static class TACICSINFO extends MQZOSStruct {
+		public String strucId; // 4
+		public String sysplxNum; // 8
+		public String sysplxId; // 2
+		public String cicsVer; // 2
+		public String cicsName; // 8
+		public String cicsTask; // 8
+		public String tranName; // 4
+		public int taskNum;
+		public String termId; // 4
+		public String userId; // 8
+		public long timer; // 8
+
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code TACICSINFO} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code TACICSINFO} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
+		public static TACICSINFO read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
+			TACICSINFO tacicsinfo = new TACICSINFO();
+			tacicsinfo.encoding = encoding;
+			tacicsinfo.charSet = charSet;
+
+			bb.order(ByteOrder.LITTLE_ENDIAN);
+
+			tacicsinfo.strucId = getString(bb, 4, encoding, charSet);
+			tacicsinfo.sysplxNum = getString(bb, 8, encoding, charSet);
+			tacicsinfo.sysplxId = getString(bb, 2, encoding, charSet);
+			tacicsinfo.cicsVer = getStringRaw(bb, 2, encoding, charSet);
+			tacicsinfo.cicsName = getStringRaw(bb, 8, encoding, charSet);
+			tacicsinfo.cicsTask = getStringRaw(bb, 8, encoding, charSet);
+			tacicsinfo.tranName = getStringRaw(bb, 4, encoding, charSet);
+			tacicsinfo.taskNum = bb.getInt();
+			tacicsinfo.termId = getStringRaw(bb, 4, encoding, charSet);
+			tacicsinfo.userId = getStringRaw(bb, 8, encoding, charSet);
+			tacicsinfo.timer = timestamp8(bb);
+
+			return tacicsinfo;
+		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("StrucId", strucId); // NON-NLS
+			sMap.put("SysplxNum", sysplxNum); // NON-NLS
+			sMap.put("SysplxId", sysplxId); // NON-NLS
+			sMap.put("CicsVer", cicsVer); // NON-NLS
+			sMap.put("CicsName", cicsName); // NON-NLS
+			sMap.put("CicsTask", cicsTask); // NON-NLS
+			sMap.put("TranName", tranName); // NON-NLS
+			sMap.put("TaskNum", taskNum); // NON-NLS
+			sMap.put("TermId", termId); // NON-NLS
+			sMap.put("UserId", userId); // NON-NLS
+			sMap.put("Timer", timer); // NON-NLS
 
 			return sMap;
 		}
