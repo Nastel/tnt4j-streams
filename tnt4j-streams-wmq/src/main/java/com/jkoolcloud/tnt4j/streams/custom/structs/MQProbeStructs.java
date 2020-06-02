@@ -77,6 +77,7 @@ public class MQProbeStructs {
 		public TAAPINTINFO apiIntInfo;
 		public String msgId; // 8
 		public byte[] msg;
+		byte[] pad;
 
 		/**
 		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAMQAPINT} data structure.
@@ -105,6 +106,7 @@ public class MQProbeStructs {
 			tamqapint.apiIntInfo = TAAPINTINFO.read(bb, encoding, charSet);
 			tamqapint.msgId = getStringRaw(bb, 8, encoding, charSet);
 			tamqapint.msg = getBytes(bb, tamqapint.mqInfo.dataSize);
+			tamqapint.pad = getBytes(bb, bb.remaining());
 
 			return tamqapint;
 		}
@@ -1020,15 +1022,27 @@ public class MQProbeStructs {
 	 * <li>StrucId (String)</li>
 	 * <li>BatchInfo ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAMQBATCH})</li>
 	 * <li>MqCallCtx ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAMQCD})</li>
+	 * <li>HostData ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TAHID})</li>
+	 * <li>DB2Data ({@link com.jkoolcloud.tnt4j.streams.custom.structs.MQProbeStructs.TADB2})</li>
 	 * <li>Message (byte[])</li>
 	 * </ul>
 	 */
 	public static class TAZOS extends MQZOSStruct implements MQProbeRootStruct {
+		private static final String TACON_MQH_TYPE_ZOS = "z"; // NON-NLS
+		private static final String TACON_MQH_TYPE_BATCH = "b"; // NON-NLS
+		private static final String TACON_MQH_TYPE_CICS = "c"; // NON-NLS
+		private static final String TACON_MQH_TYPE_IMS = "i"; // NON-NLS
+		private static final String TACON_MQH_TYPE_EXECCICS = "e"; // NON-NLS
+		private static final String TACON_MQH_TYPE_CICSSQL = "s"; // NON-NLS
+		private static final String TACON_MQH_TYPE_BATCHSQL = "t"; // NON-NLS
+		private static final String TACON_MQH_TYPE_HID = "h"; // NON-NLS
+		private static final String TACON_MQH_TYPE_CHEXIT = "x"; // NON-NLS
+
 		public String strucId = "TAZOS"; // NON-NLS
 		public TAMQBATCH batchInfo;
-		public TAMQCD mqCallCtx;
+		public MQZOSStruct interceptData;
 		public byte[] msg;
-		// byte[] align; // 4
+		byte[] pad; // remaining buffer size
 
 		/**
 		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAZOS} data structure.
@@ -1051,9 +1065,41 @@ public class MQProbeStructs {
 			tazos.charSet = charSet;
 
 			tazos.batchInfo = TAMQBATCH.read(bb, encoding, charSet);
-			tazos.mqCallCtx = TAMQCD.read(bb, encoding, charSet);
-			tazos.msg = getBytes(bb, tazos.batchInfo.msgLength);
-			// tazos.align = getBytes(bb, 4);
+			switch (tazos.batchInfo.type) {
+			case TACON_MQH_TYPE_BATCH:
+				tazos.interceptData = TAMQCD.read(bb, encoding, charSet);
+				tazos.msg = getBytes(bb, tazos.batchInfo.msgLength);
+				break;
+			case TACON_MQH_TYPE_HID:
+				tazos.interceptData = TAHID.read(bb, encoding, charSet);
+				break;
+			case TACON_MQH_TYPE_ZOS:
+				// tazos.interceptData = XXX.read(bb, encoding, charSet);
+				break;
+			case TACON_MQH_TYPE_CICS:
+				// tazos.interceptData = XXX.read(bb, encoding, charSet);
+				break;
+			case TACON_MQH_TYPE_IMS:
+				// tazos.interceptData = XXX.read(bb, encoding, charSet);
+				break;
+			case TACON_MQH_TYPE_EXECCICS:
+				// tazos.interceptData = XXX.read(bb, encoding, charSet);
+				break;
+			case TACON_MQH_TYPE_CHEXIT:
+				// tazos.interceptData = XXX.read(bb, encoding, charSet);
+				break;
+			case TACON_MQH_TYPE_CICSSQL:
+				TADB2 tadb2 = TADB2.read(bb, encoding, charSet);
+				tazos.interceptData = tadb2;
+				tazos.msg = getBytes(bb, tadb2.sqlLen); // tazos.batchInfo.msgLength contains same value??
+				break;
+			case TACON_MQH_TYPE_BATCHSQL:
+				// tazos.interceptData = XXX.read(bb, encoding, charSet);
+				break;
+			default:
+			}
+
+			tazos.pad = getBytes(bb, bb.remaining());
 
 			return tazos;
 		}
@@ -1064,8 +1110,20 @@ public class MQProbeStructs {
 
 			sMap.put("StrucId", strucId); // NON-NLS
 			sMap.put("BatchInfo", batchInfo.asMap()); // NON-NLS
-			sMap.put("MqCallCtx", mqCallCtx.asMap()); // NON-NLS
-			sMap.put("Message", msg); // NON-NLS
+			switch (batchInfo.type) {
+			case TACON_MQH_TYPE_BATCH:
+				sMap.put("MqCallCtx", interceptData.asMap()); // NON-NLS
+				sMap.put("Message", msg); // NON-NLS
+				break;
+			case TACON_MQH_TYPE_HID:
+				sMap.put("HostData", interceptData.asMap()); // NON-NLS
+				break;
+			case TACON_MQH_TYPE_CICSSQL:
+				sMap.put("DB2Data", interceptData.asMap()); // NON-NLS
+				sMap.put("Message", msg); // NON-NLS
+				break;
+			default:
+			}
 
 			return sMap;
 		}
@@ -1194,7 +1252,7 @@ public class MQProbeStructs {
 	 * <li>MsgAge (String)</li>
 	 * <li>SessionTime (long)</li>
 	 * <li>LuwTime (long)</li>
-	 * <li>MsgSig (String)</li>
+	 * <li>MsgSig (byte[])</li>
 	 * <li>CpuTime (long)</li>
 	 * <li>NetUowId (String)</li>
 	 * <li>MqiCpuTime (long)</li>
@@ -1362,6 +1420,260 @@ public class MQProbeStructs {
 			sMap.put("UserCorrelator", userCorrelator); // NON-NLS
 			sMap.put("MDOffset", mdOffset); // NON-NLS
 			sMap.put("MsgDesc", msgDesc.asMap()); // NON-NLS
+
+			return sMap;
+		}
+	}
+
+	/**
+	 * z/OS Host Information Data.
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>StrucId (String)</li>
+	 * <li>OsName (String)</li>
+	 * <li>OsRelease (String)</li>
+	 * <li>HostIpLen (short)</li>
+	 * <li>HostIp (String)</li>
+	 * <li>HostNameLen (short)</li>
+	 * <li>HostName (String)</li>
+	 * </ul>
+	 */
+	public static class TAHID extends MQZOSStruct {
+		public String strucId; // 4
+		public String osName; // 16
+		public String osRelease; // 6
+		public short hostIpLen;
+		public String hostIp; // 48
+		public short hostNameLen;
+		public String hostName; // 256;
+
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAHID} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code TAHID} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
+		public static TAHID read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
+			TAHID tahid = new TAHID();
+			tahid.encoding = encoding;
+			tahid.charSet = charSet;
+
+			tahid.strucId = getString(bb, 4, encoding, charSet);
+			tahid.osName = getString(bb, 16, encoding, charSet);
+			tahid.osRelease = getString(bb, 6, encoding, charSet);
+			tahid.hostIpLen = bb.getShort();
+			tahid.hostIp = getString(bb, 48, encoding, charSet);
+			tahid.hostNameLen = bb.getShort();
+			tahid.hostName = getString(bb, 256, encoding, charSet);
+
+			return tahid;
+		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("StrucId", strucId); // NON-NLS
+			sMap.put("OsName", osName); // NON-NLS
+			sMap.put("OsRelease", osRelease); // NON-NLS
+			sMap.put("HostIpLen", hostIpLen); // NON-NLS
+			sMap.put("HostIp", hostIp); // NON-NLS
+			sMap.put("HostNameLen", hostNameLen); // NON-NLS
+			sMap.put("HostName", hostName); // NON-NLS
+
+			return sMap;
+		}
+	}
+
+	/**
+	 * z/OS DB2 SQL command.
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>StrucId (String)</li>
+	 * <li>StmtType (short)</li>
+	 * <li>StmtFunc (String)</li>
+	 * <li>CompCode (int)</li>
+	 * <li>Reason (int)</li>
+	 * <li>SubSysId (String)</li>
+	 * <li>DatabaseName (String)</li>
+	 * <li>UserId (String)</li>
+	 * <li>ProcessId (String)</li>
+	 * <li>ThreadId (String)</li>
+	 * <li>ProgramName (String)</li>
+	 * <li>CallOffset (int)</li>
+	 * <li>JobName (String)</li>
+	 * <li>JobType (String)</li>
+	 * <li>ExitTime (long)</li>
+	 * <li>ExitDelta (String)</li>
+	 * <li>LuwTime (long)</li>
+	 * <li>SessTime (long)</li>
+	 * <li>NetUowId (String)</li>
+	 * <li>DbrmName (String)</li>
+	 * <li>PlanName (String)</li>
+	 * <li>PrimAuth (String)</li>
+	 * <li>ConnId (String)</li>
+	 * <li>CorrId (byte[])</li>
+	 * <li>StmtNo (short)</li>
+	 * <li>SectNo (short)</li>
+	 * <li>CpuTime (long)</li>
+	 * <li>SqlCpuTime (long)</li>
+	 * <li>FirstTransId (String)</li>
+	 * <li>TransGrpId (String)</li>
+	 * <li>ClientIpAddr (String)</li>
+	 * <li>ClientPort (int)</li>
+	 * <li>UserCorrelator (String)</li>
+	 * <li>SqlLen (int)</li>
+	 * </ul>
+	 */
+	public static class TADB2 extends MQZOSStruct {
+		public String strucId; // 4
+		public short stmtType;
+		byte[] align1; // 2
+		public String stmtFunc; // 24
+		public int compCode;
+		public int reason;
+		public String subSysId; // 8
+		public String databaseName; // 8
+		public String userId; // 8
+		public String processId; // 8
+		public String threadId; // 16
+		public String programName; // 8
+		public int callOffset;
+		public String jobName; // 8
+		public String jobType; // 3
+		byte[] align2; // 1
+		public long exitTime; // 8
+		public String exitDelta; // 8
+		public long luwTime; // 8
+		public long sessTime; // 8
+		public String netUowId; // 27
+		byte[] align3; // 1
+		public String dbrmName; // 8
+		public String planName; // 8
+		public String primAuth; // 8
+		public String connId; // 8
+		public byte[] corrId; // 12
+		public short stmtNo;
+		public short sectNo;
+		public long cpuTime; // 8
+		public long sqlCpuTime; // 8
+		public String firstTransId; // 4
+		public String transGrpId; // 28
+		public String clientIpAddr; // 40
+		public int clientPort;
+		public String userCorrelator; // 64
+		public int sqlLen;
+
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code TADB2} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code TADB2} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
+		public static TADB2 read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
+			TADB2 tadb2 = new TADB2();
+			tadb2.encoding = encoding;
+			tadb2.charSet = charSet;
+
+			tadb2.strucId = getString(bb, 4, encoding, charSet);
+			tadb2.stmtType = bb.getShort();
+			tadb2.align1 = getBytes(bb, 2);
+			tadb2.stmtFunc = getString(bb, 24, encoding, charSet);
+			tadb2.compCode = bb.getInt();
+			tadb2.reason = bb.getInt();
+			tadb2.subSysId = getString(bb, 8, encoding, charSet);
+			tadb2.databaseName = getString(bb, 8, encoding, charSet);
+			tadb2.userId = getString(bb, 8, encoding, charSet);
+			tadb2.processId = getStringRaw(bb, 8, encoding, charSet);
+			tadb2.threadId = getStringRaw(bb, 16, encoding, charSet);
+			tadb2.programName = getString(bb, 8, encoding, charSet);
+			tadb2.callOffset = bb.getInt();
+			tadb2.jobName = getString(bb, 8, encoding, charSet);
+			tadb2.jobType = getString(bb, 3, encoding, charSet);
+			tadb2.align2 = getBytes(bb, 1);
+			tadb2.exitTime = timestamp8(bb);
+			tadb2.exitDelta = getStringRaw(bb, 8, encoding, charSet);
+			tadb2.luwTime = timestamp8(bb);
+			tadb2.sessTime = timestamp8(bb);
+			tadb2.netUowId = getStringRaw(bb, 27, encoding, charSet);
+			tadb2.align3 = getBytes(bb, 1);
+			tadb2.dbrmName = getString(bb, 8, encoding, charSet);
+			tadb2.planName = getString(bb, 8, encoding, charSet);
+			tadb2.primAuth = getString(bb, 8, encoding, charSet);
+			tadb2.connId = getString(bb, 8, encoding, charSet);
+			tadb2.corrId = getBytes(bb, 12);
+			tadb2.stmtNo = bb.getShort();
+			tadb2.sectNo = bb.getShort();
+			tadb2.cpuTime = timestamp8(bb);
+			tadb2.sqlCpuTime = timestamp8(bb);
+			tadb2.firstTransId = getStringRaw(bb, 4, encoding, charSet);
+			tadb2.transGrpId = getStringRaw(bb, 28, encoding, charSet);
+			tadb2.clientIpAddr = getString(bb, 40, encoding, charSet);
+			tadb2.clientPort = bb.getInt();
+			tadb2.userCorrelator = getString(bb, 64, encoding, charSet);
+			tadb2.sqlLen = bb.getInt();
+
+			return tadb2;
+		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("StrucId", strucId); // NON-NLS
+			sMap.put("StmtType", stmtType); // NON-NLS
+			sMap.put("StmtFunc", stmtFunc); // NON-NLS
+			sMap.put("CompCode", compCode); // NON-NLS
+			sMap.put("Reason", reason); // NON-NLS
+			sMap.put("SubSysId", subSysId); // NON-NLS
+			sMap.put("DatabaseName", databaseName); // NON-NLS
+			sMap.put("UserId", userId); // NON-NLS
+			sMap.put("ProcessId", processId); // NON-NLS
+			sMap.put("ThreadId", threadId); // NON-NLS
+			sMap.put("ProgramName", programName); // NON-NLS
+			sMap.put("CallOffset", callOffset); // NON-NLS
+			sMap.put("JobName", jobName); // NON-NLS
+			sMap.put("JobType", jobType); // NON-NLS
+			sMap.put("ExitTime", exitTime); // NON-NLS
+			sMap.put("ExitDelta", exitDelta); // NON-NLS
+			sMap.put("LuwTime", luwTime); // NON-NLS
+			sMap.put("SessTime", sessTime); // NON-NLS
+			sMap.put("NetUowId", netUowId); // NON-NLS
+			sMap.put("DbrmName", dbrmName); // NON-NLS
+			sMap.put("PlanName", planName); // NON-NLS
+			sMap.put("PrimAuth", primAuth); // NON-NLS
+			sMap.put("ConnId", connId); // NON-NLS
+			sMap.put("CorrId", corrId); // NON-NLS
+			sMap.put("StmtNo", stmtNo); // NON-NLS
+			sMap.put("SectNo", sectNo); // NON-NLS
+			sMap.put("CpuTime", cpuTime); // NON-NLS
+			sMap.put("SqlCpuTime", sqlCpuTime); // NON-NLS
+			sMap.put("FirstTransId", firstTransId); // NON-NLS
+			sMap.put("TransGrpId", transGrpId); // NON-NLS
+			sMap.put("ClientIpAddr", clientIpAddr); // NON-NLS
+			sMap.put("ClientPort", clientPort); // NON-NLS
+			sMap.put("UserCorrelator", userCorrelator); // NON-NLS
+			sMap.put("SqlLen", sqlLen); // NON-NLS
 
 			return sMap;
 		}

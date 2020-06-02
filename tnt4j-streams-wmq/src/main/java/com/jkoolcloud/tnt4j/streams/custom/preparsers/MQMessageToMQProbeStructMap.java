@@ -68,7 +68,8 @@ public class MQMessageToMQProbeStructMap extends AbstractMQMessagePreParser<Map<
 				mqStruct = MQProbeStructs.TAZOS.read(bb, enc, charSet);
 			}
 		} catch (BufferUnderflowException exc) {
-			Utils.logThrowable(LOGGER, OpLevel.ERROR, WmqStreamConstants.RESOURCE_BUNDLE_NAME,
+			Utils.logThrowable(LOGGER, OpLevel.ERROR,
+					StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
 					"MQMessageToMQProbeStructMap.buffer.underflow", bb.position(), bb.remaining(), bb.limit(),
 					bb.capacity(), exc);
 		}
