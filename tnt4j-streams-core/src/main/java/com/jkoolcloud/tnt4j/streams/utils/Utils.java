@@ -86,6 +86,9 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	private static final String VAR_EXP_END_TOKEN = "}"; // NON-NLS
 	private static final Pattern CFG_VAR_PATTERN = Pattern.compile("\\$\\{[\\w\\^\\[\\]\\=\\:.]+\\}"); // NON-NLS
 	private static final Pattern EXPR_VAR_PATTERN = CFG_VAR_PATTERN;
+	private static final int STACK_TRACE_ENTRIES_TO_LOG = Utils.getInt(
+			"com.jkoolcloud.tnt4j.streams.log.stack.trace.depth", // NON-NLS
+			System.getProperties(), -1);
 
 	/**
 	 * Default floating point numbers equality comparison difference tolerance {@value}.
@@ -2788,8 +2791,11 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	private static Object decorateThrowable(Throwable t, EventSink logger) {
+		if (STACK_TRACE_ENTRIES_TO_LOG >= 0) {
+			return getTruncatedException(t, STACK_TRACE_ENTRIES_TO_LOG);
+		}
 		if (logger.isSet(OpLevel.DEBUG)) {
-			return getTruncatedException(t, 5);
+			return getTruncatedException(t, 16);
 		}
 		if (logger.isSet(OpLevel.TRACE)) {
 			return t;
@@ -2798,7 +2804,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			return getTruncatedException(t, 0);
 		}
 
-		return getTruncatedException(t, 1);
+		return getTruncatedException(t, 4);
 	}
 
 	private static Object getTruncatedException(Throwable t, int depth) {
