@@ -62,10 +62,14 @@ public class MQMessageToMQProbeStructMap extends AbstractMQMessagePreParser<Map<
 		MQProbeStructs.MQProbeRootStruct mqStruct = null;
 
 		try {
-			if ("APIE".equals(strId)) { // NON-NLS
+			switch (strId) {
+			case "APIE": // NON-NLS
 				mqStruct = MQProbeStructs.TAMQAPINT.read(bb, enc, charSet);
-			} else if ("mqh ".equals(strId)) { // NON-NLS
+				break;
+			case MQProbeStructs.TAMQBATCH.STRUC_ID:
 				mqStruct = MQProbeStructs.TAZOS.read(bb, enc, charSet);
+				break;
+			default:
 			}
 		} catch (BufferUnderflowException exc) {
 			Utils.logThrowable(LOGGER, OpLevel.ERROR,

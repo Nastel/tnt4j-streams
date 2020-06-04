@@ -62,6 +62,8 @@ public class MQProbeStructs {
 	/**
 	 * API exit interface on UNIX, Windows and AS/400.
 	 * <p>
+	 * StrucId: {@value TAMQAPINT#STRUC_ID}
+	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
@@ -72,6 +74,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAMQAPINT extends MQStruct implements MQProbeRootStruct {
+		public static final String STRUC_ID = "APIEXIT "; // NON-NLS
+
 		public String strucId; // 8
 		public TAMQINFO mqInfo;
 		public TAAPINTINFO apiIntInfo;
@@ -128,6 +132,8 @@ public class MQProbeStructs {
 	/**
 	 * API exit interface context information.
 	 * <p>
+	 * StrucId: {@value TAAPINTINFO#STRUC_ID}
+	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
@@ -150,6 +156,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAAPINTINFO extends MQStruct {
+		public static final String STRUC_ID = "APIPARMS"; // NON-NLS
+
 		public String strucId; // 8
 		public String hostName; // 64
 		public String applName; // 64
@@ -239,6 +247,8 @@ public class MQProbeStructs {
 	/**
 	 * MQ call (CICS) contextual information.
 	 * <p>
+	 * StrucId: {@value TAMQINFO#STRUC_ID}
+	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
@@ -255,6 +265,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAMQINFO extends MQStruct {
+		public static final String STRUC_ID = "mq  "; // NON-NLS
+
 		public String strucId; // 4
 		public int apiType;
 		public int apiCall;
@@ -297,6 +309,7 @@ public class MQProbeStructs {
 			tamqinfo.originalDataSize = bb.getInt();
 			tamqinfo.pad = getBytes(bb, 4);
 			tamqinfo.objDesc = TAOD.read(bb, encoding, charSet);
+			// bb.order(ByteOrder.LITTLE_ENDIAN);
 			tamqinfo.msgOpt = TAMSGOPT.read(bb, encoding, charSet);
 			tamqinfo.msgAge = MSGAGE.read(bb, encoding, charSet);
 			tamqinfo.msgDesc = TAMD.read(bb, encoding, charSet);
@@ -327,6 +340,8 @@ public class MQProbeStructs {
 	/**
 	 * OBJ DESC structure (similar to MQOD).
 	 * <p>
+	 * StrucId: {@value TAOD#STRUC_ID}
+	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
@@ -340,6 +355,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAOD extends MQStruct {
+		public static final String STRUC_ID = ""; // NON-NLS
+
 		public String strucId; // 4
 		public int objectType;
 		public String objectName; // 48
@@ -403,6 +420,8 @@ public class MQProbeStructs {
 	/**
 	 * Message put /get options (PMO/GMO).
 	 * <p>
+	 * StrucId: {@value TAMSGOPT#STRUC_ID} or {@value TAMSGOPT#STRUC_ID2}
+	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
@@ -414,6 +433,9 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAMSGOPT extends MQStruct {
+		public static final String STRUC_ID = "GMO "; // NON-NLS
+		public static final String STRUC_ID2 = "PMO "; // NON-NLS
+
 		public String strucId; // 4
 		public int version;
 		public int options;
@@ -469,6 +491,8 @@ public class MQProbeStructs {
 	/**
 	 * MQ Probe Message Descriptor.
 	 * <p>
+	 * StrucId: {@value TAMD#STRUC_ID}
+	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
@@ -497,6 +521,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAMD extends MQStruct {
+		public static final String STRUC_ID = "MD "; // NON-NLS
+
 		public String strucId; // 4
 		public int report;
 		public int msgType;
@@ -859,6 +885,8 @@ public class MQProbeStructs {
 	/**
 	 * API EXIT AXP structure (similar to MQAXP).
 	 * <p>
+	 * StrucId: {@value TAAXP#STRUC_ID}
+	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
@@ -873,6 +901,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAAXP extends MQStruct {
+		public static final String STRUC_ID = "AXP "; // NON-NLS
+
 		public String strucId; // 4
 		public int exitId;
 		public int exitReason;
@@ -937,6 +967,8 @@ public class MQProbeStructs {
 	/**
 	 * API EXIT AXC structure (similar to MQAXC).
 	 * <p>
+	 * StrucId: {@value TAAXC#STRUC_ID}
+	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
@@ -951,6 +983,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAAXC extends MQStruct {
+		public static final String STRUC_ID = "AXC "; // NON-NLS
+
 		public String strucId; // 4
 		public int environment;
 		public String userId; // 12
@@ -1017,6 +1051,8 @@ public class MQProbeStructs {
 	/**
 	 * zOS intercepted MQ call.
 	 * <p>
+	 * StrucId: {@value TAZOS#STRUC_ID}
+	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
@@ -1033,6 +1069,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAZOS extends MQZOSStruct implements MQProbeRootStruct {
+		public static final String STRUC_ID = "TAZOS"; // NON-NLS
+
 		private static final String TACON_MQH_TYPE_ZOS = "z"; // NON-NLS
 		private static final String TACON_MQH_TYPE_BATCH = "b"; // NON-NLS
 		private static final String TACON_MQH_TYPE_CICS = "c"; // NON-NLS
@@ -1043,7 +1081,7 @@ public class MQProbeStructs {
 		private static final String TACON_MQH_TYPE_HID = "h"; // NON-NLS
 		private static final String TACON_MQH_TYPE_CHEXIT = "x"; // NON-NLS
 
-		public String strucId = "TAZOS"; // NON-NLS
+		public String strucId = STRUC_ID;
 		public TAMQBATCH batchInfo;
 		public MQZOSStruct interceptData;
 		public byte[] msg;
@@ -1082,6 +1120,22 @@ public class MQProbeStructs {
 				// tazos.interceptData = XXX.read(bb, encoding, charSet);
 				break;
 			case TACON_MQH_TYPE_CICS:
+				bb.mark();
+				String nextStrucId = getStringRaw(bb, 4, encoding, charSet);
+				bb.reset();
+
+				switch (nextStrucId) {
+				case TAMQCD.STRUCT_ID:
+					tazos.interceptData = TAMQCD.read(bb, encoding, charSet);
+					tazos.msg = getBytes(bb, tazos.batchInfo.msgLength);
+					break;
+				case CMTA.STRUC_ID:
+					tazos.interceptData = CMTA.read(bb, encoding, charSet);
+					break;
+				default:
+				}
+				break;
+			case TACON_MQH_TYPE_CHEXIT:
 				tazos.interceptData = TAMQCICS.read(bb, encoding, charSet);
 				tazos.msg = getBytes(bb, ((TAMQCICS) tazos.interceptData).mqInfo.dataSize); // tazos.batchInfo.msgLength
 																							// contains same value??
@@ -1093,9 +1147,6 @@ public class MQProbeStructs {
 				tazos.interceptData = TACCD.read(bb, encoding, charSet);
 				tazos.msg = getBytes(bb, ((TACCD) tazos.interceptData).origMsgLength); // tazos.batchInfo.msgLength
 																						// contains same value??
-				break;
-			case TACON_MQH_TYPE_CHEXIT:
-				// tazos.interceptData = XXX.read(bb, encoding, charSet);
 				break;
 			case TACON_MQH_TYPE_CICSSQL:
 				tazos.interceptData = TADB2.read(bb, encoding, charSet);
@@ -1136,7 +1187,15 @@ public class MQProbeStructs {
 				sMap.put("Message", msg); // NON-NLS
 				break;
 			case TACON_MQH_TYPE_CICS:
-				sMap.put("CICSMqData", interceptData.asMap()); // NON-NLS
+				if (interceptData instanceof CMTA) {
+					sMap.put("CICSMqTasks", interceptData.asMap()); // NON-NLS
+				} else if (interceptData instanceof TAMQCD) {
+					sMap.put("CICSMqCallCtx", interceptData.asMap()); // NON-NLS
+					sMap.put("Message", msg); // NON-NLS
+				}
+				break;
+			case TACON_MQH_TYPE_CHEXIT:
+				sMap.put("ChExitData", interceptData.asMap()); // NON-NLS
 				sMap.put("Message", msg); // NON-NLS
 				break;
 			default:
@@ -1148,6 +1207,8 @@ public class MQProbeStructs {
 
 	/**
 	 * zOS Batch MQ interceptor data.
+	 * <p>
+	 * StrucId: {@value TAMQBATCH#STRUC_ID}
 	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
@@ -1166,6 +1227,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAMQBATCH extends MQZOSStruct {
+		public static final String STRUC_ID = "mqh "; // NON-NLS
+
 		public String strucId; // 4
 		public int structSize;
 		public String type; // 1
@@ -1243,6 +1306,8 @@ public class MQProbeStructs {
 	/**
 	 * zOS intercepted MQ call contextual information.
 	 * <p>
+	 * StrucId: {@value TAMQCD#STRUCT_ID}
+	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
@@ -1284,6 +1349,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAMQCD extends MQZOSStruct {
+		public static final String STRUCT_ID = "mcd "; // NON-NLS
+
 		public String strucId; // 4
 		public int apiType;
 		public int apiCall;
@@ -1445,6 +1512,8 @@ public class MQProbeStructs {
 	/**
 	 * z/OS Host Information Data.
 	 * <p>
+	 * StrucId: {@value TAHID#STRUC_ID}
+	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
@@ -1457,6 +1526,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAHID extends MQZOSStruct {
+		public static final String STRUC_ID = "hid "; // NON-NLS
+
 		public String strucId; // 4
 		public String osName; // 16
 		public String osRelease; // 6
@@ -1515,6 +1586,8 @@ public class MQProbeStructs {
 	/**
 	 * z/OS DB2 SQL command.
 	 * <p>
+	 * StrucId: {@value TADB2#STRUC_ID}
+	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
@@ -1554,6 +1627,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TADB2 extends MQZOSStruct {
+		public static final String STRUC_ID = "db2 "; // NON-NLS
+
 		public String strucId; // 4
 		public short stmtType;
 		byte[] align1; // 2
@@ -1699,6 +1774,8 @@ public class MQProbeStructs {
 	/**
 	 * EXEC CICS operational information.
 	 * <p>
+	 * StrucId: {@value TACCD#STRUC_ID}
+	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
@@ -1733,6 +1810,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TACCD extends MQZOSStruct {
+		public static final String STRUC_ID = "ccd "; // NON-NLS
+
 		public String strucId; // 4
 		public String funcCode; // 2
 		public String subCmds; // 4
@@ -1901,8 +1980,6 @@ public class MQProbeStructs {
 			tamqcics.encoding = encoding;
 			tamqcics.charSet = charSet;
 
-			bb.order(ByteOrder.LITTLE_ENDIAN);
-
 			tamqcics.strucId = getString(bb, 8, encoding, charSet);
 			tamqcics.mqInfo = TAMQINFO.read(bb, encoding, charSet);
 			tamqcics.cicsInfo = TACICSINFO.read(bb, encoding, charSet);
@@ -1925,7 +2002,7 @@ public class MQProbeStructs {
 	}
 
 	/**
-	 * CICS contextual information
+	 * CICS contextual information.
 	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
@@ -1975,8 +2052,6 @@ public class MQProbeStructs {
 			tacicsinfo.encoding = encoding;
 			tacicsinfo.charSet = charSet;
 
-			bb.order(ByteOrder.LITTLE_ENDIAN);
-
 			tacicsinfo.strucId = getString(bb, 4, encoding, charSet);
 			tacicsinfo.sysplxNum = getString(bb, 8, encoding, charSet);
 			tacicsinfo.sysplxId = getString(bb, 2, encoding, charSet);
@@ -2007,6 +2082,164 @@ public class MQProbeStructs {
 			sMap.put("TermId", termId); // NON-NLS
 			sMap.put("UserId", userId); // NON-NLS
 			sMap.put("Timer", timer); // NON-NLS
+
+			return sMap;
+		}
+	}
+
+	/**
+	 * CICS MQ Task Area.
+	 * <p>
+	 * StrucId: {@value CMTA#STRUC_ID}
+	 * <p>
+	 * It provides such fields and types:
+	 * <ul>
+	 * <li>StrucId (String)</li>
+	 * <li>TcbToken (String)</li>
+	 * <li>DmbDataspace (String)</li>
+	 * <li>TxQueue (String)</li>
+	 * <li>AptmStatus (int)</li>
+	 * <li>QmgrStatus (int)</li>
+	 * <li>JobName (String)</li>
+	 * <li>AddressSpaceId (String)</li>
+	 * <li>Flags (String)</li>
+	 * <li>MqCalls (int[])</li>
+	 * <li>MqSkipCount (int)</li>
+	 * <li>MqAbendCount (int)</li>
+	 * <li>MqTotalCount (int)</li>
+	 * <li>ExcCalls (int[])</li>
+	 * <li>ExcSkipCount (int)</li>
+	 * <li>ExcAbendCount (int)</li>
+	 * <li>ExcTotalCount (int)</li>
+	 * <li>SqlCalls (int[])</li>
+	 * <li>SqlSkipCount (int)</li>
+	 * <li>SqlAbendCount (int)</li>
+	 * <li>SqlTotalCount (int)</li>
+	 * <li>TcpCalls (int[])</li>
+	 * <li>TcpSkipCount (int)</li>
+	 * <li>TcpAbendCount (int)</li>
+	 * <li>TcpTotalCount (int)</li>
+	 * </ul>
+	 */
+	public static class CMTA extends MQZOSStruct {
+		public static final String STRUC_ID = "cmta"; // NON-NLS
+
+		public String strucId; // 4
+		byte[] unused0; // 4
+		public String tcbToken; // 16
+		public String dmbDataspace; // 16
+		public String txQueue; // 16
+		public int aptmStatus;
+		public int qmgrStatus;
+		byte[] unused1; // 4
+		byte[] unused2; // 4
+		public String jobName; // 8
+		public String addressSpaceId; // 2
+		public String flags; // 1
+		byte[] filler1; // 5
+		public int[] mqCalls; // 11
+		public int mqSkipCount;
+		public int mqAbendCount;
+		public int mqTotalCount;
+		public int[] excCalls; // 29
+		public int excSkipCount;
+		public int excAbendCount;
+		public int excTotalCount;
+		public int[] sqlCalls; // 45
+		public int sqlSkipCount;
+		public int sqlAbendCount;
+		public int sqlTotalCount;
+		public int[] tcpCalls; // 26
+		public int tcpSkipCount;
+		public int tcpAbendCount;
+		public int tcpTotalCount;
+		byte[] filler2; // 4;
+		public double cmtaend;
+
+		/**
+		 * Reads bytes brom provided byte buffer {@code bb} into {@code CMTA} data structure.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @return {@code CMTA} structure build from byte buffer {@code bb} bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 */
+		public static CMTA read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
+			CMTA cmta = new CMTA();
+			cmta.encoding = encoding;
+			cmta.charSet = charSet;
+
+			cmta.strucId = getString(bb, 4, encoding, charSet);
+			cmta.unused0 = getBytes(bb, 4);
+			cmta.tcbToken = getString(bb, 16, encoding, charSet);
+			cmta.dmbDataspace = getStringRaw(bb, 16, encoding, charSet);
+			cmta.txQueue = getString(bb, 16, encoding, charSet);
+			cmta.aptmStatus = bb.getInt();
+			cmta.qmgrStatus = bb.getInt();
+			cmta.unused1 = getBytes(bb, 4);
+			cmta.unused2 = getBytes(bb, 4);
+			cmta.jobName = getString(bb, 8, encoding, charSet);
+			cmta.addressSpaceId = getStringRaw(bb, 2, encoding, charSet);
+			cmta.flags = getStringRaw(bb, 1, encoding, charSet);
+			cmta.filler1 = getBytes(bb, 5);
+			cmta.mqCalls = getIntArray(bb, 11);
+			cmta.mqSkipCount = bb.getInt();
+			cmta.mqAbendCount = bb.getInt();
+			cmta.mqTotalCount = bb.getInt();
+			cmta.excCalls = getIntArray(bb, 29);
+			cmta.excSkipCount = bb.getInt();
+			cmta.excAbendCount = bb.getInt();
+			cmta.excTotalCount = bb.getInt();
+			cmta.sqlCalls = getIntArray(bb, 45);
+			cmta.sqlSkipCount = bb.getInt();
+			cmta.sqlAbendCount = bb.getInt();
+			cmta.sqlTotalCount = bb.getInt();
+			cmta.tcpCalls = getIntArray(bb, 26);
+			cmta.tcpSkipCount = bb.getInt();
+			cmta.tcpAbendCount = bb.getInt();
+			cmta.tcpTotalCount = bb.getInt();
+			cmta.filler2 = getBytes(bb, 4);
+			cmta.cmtaend = bb.getDouble();
+
+			return cmta;
+		}
+
+		@Override
+		public Map<String, Object> asMap() {
+			Map<String, Object> sMap = super.asMap();
+
+			sMap.put("StrucId", strucId); // NON-NLS
+			sMap.put("TcbToken", tcbToken); // NON-NLS
+			sMap.put("DmbDataspace", dmbDataspace); // NON-NLS
+			sMap.put("TxQueue", txQueue); // NON-NLS
+			sMap.put("AptmStatus", aptmStatus); // NON-NLS
+			sMap.put("QmgrStatus", qmgrStatus); // NON-NLS
+			sMap.put("JobName", jobName); // NON-NLS
+			sMap.put("AddressSpaceId", addressSpaceId); // NON-NLS
+			sMap.put("Flags", flags); // NON-NLS
+			sMap.put("MqCalls", mqCalls); // NON-NLS
+			sMap.put("MqSkipCount", mqSkipCount); // NON-NLS
+			sMap.put("MqAbendCount", mqAbendCount); // NON-NLS
+			sMap.put("MqTotalCount", mqTotalCount); // NON-NLS
+			sMap.put("ExcCalls", excCalls); // NON-NLS
+			sMap.put("ExcSkipCount", excSkipCount); // NON-NLS
+			sMap.put("ExcAbendCount", excAbendCount); // NON-NLS
+			sMap.put("ExcTotalCount", excTotalCount); // NON-NLS
+			sMap.put("SqlCalls", sqlCalls); // NON-NLS
+			sMap.put("SqlSkipCount", sqlSkipCount); // NON-NLS
+			sMap.put("SqlAbendCount", sqlAbendCount); // NON-NLS
+			sMap.put("SqlTotalCount", sqlTotalCount); // NON-NLS
+			sMap.put("TcpCalls", tcpCalls); // NON-NLS
+			sMap.put("TcpSkipCount", tcpSkipCount); // NON-NLS
+			sMap.put("TcpAbendCount", tcpAbendCount); // NON-NLS
+			sMap.put("TcpTotalCount", tcpTotalCount); // NON-NLS
 
 			return sMap;
 		}
@@ -2081,7 +2314,7 @@ public class MQProbeStructs {
 		 * @param bb
 		 *            byte buffer to pull bytes
 		 * @param length
-		 *            size of produced byte array
+		 *            size of produced array
 		 * @return byte array
 		 */
 		static byte[] getBytes(ByteBuffer bb, int length) {
@@ -2089,6 +2322,25 @@ public class MQProbeStructs {
 			bb.get(ba);
 
 			return ba;
+		}
+
+		/**
+		 * Returns provided {@code length} byte array, pulling integers from provided byte buffer {@code bb}.
+		 * 
+		 * @param bb
+		 *            byte buffer to pull integers
+		 * @param lenght
+		 *            size of produced array
+		 * @return integers array
+		 */
+		static int[] getIntArray(ByteBuffer bb, int lenght) {
+			int[] ia = new int[lenght];
+
+			for (int i = 0; i < lenght; i++) {
+				ia[i] = bb.getInt();
+			}
+
+			return ia;
 		}
 
 		/**

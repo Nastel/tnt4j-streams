@@ -7,6 +7,7 @@
 
     <parser name="MqCallContextParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="EVENT"/>
+        <field name="EventName" value="MQCallContext"/>
 
         <!-- MQ call context fields -->
         <field name="MqCallCtx_StrucId" locator="StrucId" locator-type="Label"/>
@@ -91,6 +92,7 @@
 
     <parser name="HostDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="EVENT"/>
+        <field name="EventName" value="HostInfo"/>
 
         <field name="HostData_StrucId" locator="StrucId" locator-type="Label"/>
         <field name="HostData_OsName" locator="OsName" locator-type="Label"/>
@@ -103,6 +105,7 @@
 
     <parser name="DB2DataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="EVENT"/>
+        <field name="EventName" value="DB2SQL"/>
 
         <field name="DB2Data_StrucId" locator="StrucId" locator-type="Label"/>
         <field name="DB2Data_StmtType" locator="StmtType" locator-type="Label" datatype="Number"/>
@@ -146,6 +149,7 @@
 
     <parser name="ExecCICSDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="EVENT"/>
+        <field name="EventName" value="ExecCICSInfo"/>
 
         <field name="ExecCICSData_StrucId" locator="StrucId" locator-type="Label"/>
         <field name="ExecCICSData_FuncCode" locator="FuncCode" locator-type="Label"/>
@@ -162,7 +166,7 @@
         <field name="ExecCICSData_JobType" locator="JobType" locator-type="Label"/>
         <field name="ExecCICSData_ExitTime" locator="ExitTime" locator-type="Label" datatype="Timestamp"/>
         <field name="ExecCICSData_ExitDelta" locator="ExitDelta" locator-type="Label"/>
-        <field name="ExecCICSData_LuwTime" locator="LuwTime" locator-type="Label" datatype="Timestamp"/>
+        <field name="ExecCICSData_LuwTime" locator="LuwTime" locator-type="Label" datatype="Number"/>
         <field name="ExecCICSData_SessTime" locator="SessTime" locator-type="Label" datatype="Timestamp"/>
         <field name="ExecCICSData_ResourceName" locator="ResourceName" locator-type="Label"/>
         <field name="ExecCICSData_ResourceType" locator="ResourceType" locator-type="Label" datatype="Number"/>
@@ -178,100 +182,134 @@
         <field name="ExecCICSData_MsgOffset" locator="MsgOffset" locator-type="Label" datatype="Number"/>
     </parser>
 
-    <parser name="CICSMqDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+    <parser name="CICSMqCallCtxParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="EVENT"/>
+        <field name="EventName" value="CICSMqCallCtx"/>
 
-        <field name="CICSMqData_StrucId" locator="StrucId" locator-type="Label"/>
-        <field name="CICSMqData_MsgId" locator="MsgId" locator-type="Label"/>
+        <field name="CICSMqCallCtx_StrucId" locator="StrucId" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MsgId" locator="MsgId" locator-type="Label"/>
 
         <!-- MQ call (CICS) contextual information -->
-        <field name="CICSMqData_MqInfo_StrucId" locator="MqInfo.StrucId" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_ApiType" locator="MqInfo.ApiType" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_ApiCall" locator="MqInfo.ApiCall" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_CompCode" locator="MqInfo.CompCode" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_Reason" locator="MqInfo.Reason" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_DataSize" locator="MqInfo.DataSize" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_OriginalDataSize" locator="MqInfo.OriginalDataSize" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_StrucId" locator="MqInfo.StrucId" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_ApiType" locator="MqInfo.ApiType" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_ApiCall" locator="MqInfo.ApiCall" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_CompCode" locator="MqInfo.CompCode" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_Reason" locator="MqInfo.Reason" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_DataSize" locator="MqInfo.DataSize" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_OriginalDataSize" locator="MqInfo.OriginalDataSize" locator-type="Label" datatype="Number"/>
 
         <!-- Object descriptor fields -->
-        <field name="CICSMqData_MqInfo_ObjDesc_StrucId" locator="MqInfo.ObjDesc.StrucId" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_ObjDesc_ObjectType" locator="MqInfo.ObjDesc.ObjectType" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_ObjDesc_ObjectName" locator="MqInfo.ObjDesc.ObjectName" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_ObjDesc_ObjectQMgrName" locator="MqInfo.ObjDesc.ObjectQMgrName" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_ObjDesc_DynamicQName" locator="MqInfo.ObjDesc.DynamicQName" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_ObjDesc_AlternateUserId" locator="MqInfo.ObjDesc.AlternateUserId" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_ObjDesc_ResolvedQName" locator="MqInfo.ObjDesc.ResolvedQName" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_ObjDesc_ResolvedQMgrName" locator="MqInfo.ObjDesc.ResolvedQMgrName" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_ObjDesc_StrucId" locator="MqInfo.ObjDesc.StrucId" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_ObjDesc_ObjectType" locator="MqInfo.ObjDesc.ObjectType" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_ObjDesc_ObjectName" locator="MqInfo.ObjDesc.ObjectName" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_ObjDesc_ObjectQMgrName" locator="MqInfo.ObjDesc.ObjectQMgrName" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_ObjDesc_DynamicQName" locator="MqInfo.ObjDesc.DynamicQName" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_ObjDesc_AlternateUserId" locator="MqInfo.ObjDesc.AlternateUserId" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_ObjDesc_ResolvedQName" locator="MqInfo.ObjDesc.ResolvedQName" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_ObjDesc_ResolvedQMgrName" locator="MqInfo.ObjDesc.ResolvedQMgrName" locator-type="Label"/>
 
         <!-- Message options fields -->
-        <field name="CICSMqData_MqInfo_MsgOpt_StrucId" locator="MqInfo.MsgOpt.StrucId" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_MsgOpt_Version" locator="MqInfo.MsgOpt.Version" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_MsgOpt_Options" locator="MqInfo.MsgOpt.Options" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_MsgOpt_WaitInterval" locator="MqInfo.MsgOpt.WaitInterval" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_MsgOpt_ResolvedQName" locator="MqInfo.MsgOpt.ResolvedQName" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_MsgOpt_ResolvedQMgrName" locator="MqInfo.MsgOpt.ResolvedQMgrName" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgOpt_StrucId" locator="MqInfo.MsgOpt.StrucId" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgOpt_Version" locator="MqInfo.MsgOpt.Version" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgOpt_Options" locator="MqInfo.MsgOpt.Options" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgOpt_WaitInterval" locator="MqInfo.MsgOpt.WaitInterval" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgOpt_ResolvedQName" locator="MqInfo.MsgOpt.ResolvedQName" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgOpt_ResolvedQMgrName" locator="MqInfo.MsgOpt.ResolvedQMgrName" locator-type="Label"/>
 
         <!-- Message fields -->
-        <field name="CICSMqData_MqInfo_MsgAge_MsgAge_sec" locator="MqInfo.MsgAge.MsgAge_sec" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_MsgAge_MsgAge_usec" locator="MqInfo.MsgAge.MsgAge_usec" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgAge_MsgAge_sec" locator="MqInfo.MsgAge.MsgAge_sec" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgAge_MsgAge_usec" locator="MqInfo.MsgAge.MsgAge_usec" locator-type="Label" datatype="Number"/>
 
         <!-- MQ MD fields -->
-        <field name="CICSMqData_MqInfo_MsgDesc_StrucId" locator="MqInfo.MsgDesc.StrucId" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_Report" locator="MqInfo.MsgDesc.Report" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_MsgType" locator="MqInfo.MsgDesc.MsgType" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_Expiry" locator="MqInfo.MsgDesc.Expiry" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_Feedback" locator="MqInfo.MsgDesc.Feedback" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_Encoding" locator="MqInfo.MsgDesc.Encoding2" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_CodedCharSetId" locator="MqInfo.MsgDesc.CodedCharSetId" locator-type="Label"
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_StrucId" locator="MqInfo.MsgDesc.StrucId" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_Report" locator="MqInfo.MsgDesc.Report" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_MsgType" locator="MqInfo.MsgDesc.MsgType" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_Expiry" locator="MqInfo.MsgDesc.Expiry" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_Feedback" locator="MqInfo.MsgDesc.Feedback" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_Encoding" locator="MqInfo.MsgDesc.Encoding2" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_CodedCharSetId" locator="MqInfo.MsgDesc.CodedCharSetId" locator-type="Label"
                datatype="Number"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_Format" locator="MqInfo.MsgDesc.Format" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_Priority" locator="MqInfo.MsgDesc.Priority" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_Persistence" locator="MqInfo.MsgDesc.Persistence" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_MsgId" locator="MqInfo.MsgDesc.MsgId" locator-type="Label">
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_Format" locator="MqInfo.MsgDesc.Format" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_Priority" locator="MqInfo.MsgDesc.Priority" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_Persistence" locator="MqInfo.MsgDesc.Persistence" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_MsgId" locator="MqInfo.MsgDesc.MsgId" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
                 WmqUtils.getString($fieldValue, ${^.MsgCharSet});
             ]]></field-transform>
         </field>
-        <field name="CICSMqData_MqInfo_MsgDesc_CorrelId" locator="MqInfo.MsgDesc.CorrelId" locator-type="Label">
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_CorrelId" locator="MqInfo.MsgDesc.CorrelId" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
                 WmqUtils.getString($fieldValue, ${^.MsgCharSet});
             ]]></field-transform>
         </field>
-        <field name="CICSMqData_MqInfo_MsgDesc_BackoutCount" locator="MqInfo.MsgDesc.BackoutCount" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_ReplyToQ" locator="MqInfo.MsgDesc.ReplyToQ" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_ReplyToQMgr" locator="MqInfo.MsgDesc.ReplyToQMgr" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_UserIdentifier" locator="MqInfo.MsgDesc.UserIdentifier" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_AccountingToken" locator="MqInfo.MsgDesc.AccountingToken" locator-type="Label">
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_BackoutCount" locator="MqInfo.MsgDesc.BackoutCount" locator-type="Label"
+               datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_ReplyToQ" locator="MqInfo.MsgDesc.ReplyToQ" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_ReplyToQMgr" locator="MqInfo.MsgDesc.ReplyToQMgr" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_UserIdentifier" locator="MqInfo.MsgDesc.UserIdentifier" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_AccountingToken" locator="MqInfo.MsgDesc.AccountingToken" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
                 WmqUtils.getString($fieldValue, ${^.MsgCharSet});
             ]]></field-transform>
         </field>
-        <field name="CICSMqData_MqInfo_MsgDesc_ApplIdentityData" locator="MqInfo.MsgDesc.ApplIdentityData" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_PutApplType" locator="MqInfo.MsgDesc.PutApplType" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_PutApplName" locator="MqInfo.MsgDesc.PutApplName" locator-type="Label"/>
-        <field name="CICSMqData_MqInfo_MsgDesc_PutTime" formattingPattern="{0} {1}" format="yyyyMMdd HHmmssSS" datatype="DateTime"
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_ApplIdentityData" locator="MqInfo.MsgDesc.ApplIdentityData" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_PutApplType" locator="MqInfo.MsgDesc.PutApplType" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_PutApplName" locator="MqInfo.MsgDesc.PutApplName" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_PutTime" formattingPattern="{0} {1}" format="yyyyMMdd HHmmssSS" datatype="DateTime"
                timezone="GMT">
             <field-locator locator="MqInfo.MsgDesc.PutDate" locator-type="Label"/>
             <field-locator locator="MqInfo.MsgDesc.PutTime" locator-type="Label"/>
         </field>
-        <field name="CICSMqData_MqInfo_MsgDesc_ApplOriginData" locator="MqInfo.MsgDesc.ApplOriginData" locator-type="Label"/>
+        <field name="CICSMqCallCtx_MqInfo_MsgDesc_ApplOriginData" locator="MqInfo.MsgDesc.ApplOriginData" locator-type="Label"/>
 
         <!-- CICS contextual fields -->
-        <field name="CICSMqData_CicsInfo_StrucId" locator="CicsInfo.StrucId" locator-type="Label"/>
-        <field name="CICSMqData_CicsInfo_SysplxNum" locator="CicsInfo.SysplxNum" locator-type="Label"/>
-        <field name="CICSMqData_CicsInfo_SysplxId" locator="CicsInfo.SysplxId" locator-type="Label"/>
-        <field name="CICSMqData_CicsInfo_CicsVer" locator="CicsInfo.CicsVer" locator-type="Label"/>
-        <field name="CICSMqData_CicsInfo_CicsName" locator="CicsInfo.CicsName" locator-type="Label"/>
-        <field name="CICSMqData_CicsInfo_CicsTask" locator="CicsInfo.CicsTask" locator-type="Label"/>
-        <field name="CICSMqData_CicsInfo_TranName" locator="CicsInfo.TranName" locator-type="Label"/>
-        <field name="CICSMqData_CicsInfo_TaskNum" locator="CicsInfo.TaskNum" locator-type="Label" datatype="Number"/>
-        <field name="CICSMqData_CicsInfo_TermId" locator="CicsInfo.TermId" locator-type="Label"/>
-        <field name="CICSMqData_CicsInfo_UserId" locator="CicsInfo.UserId" locator-type="Label"/>
-        <field name="CICSMqData_CicsInfo_Timer" locator="CicsInfo.Timer" locator-type="Label" datatype="Timestamp"/>
+        <field name="CICSMqCallCtx_CicsInfo_StrucId" locator="CicsInfo.StrucId" locator-type="Label"/>
+        <field name="CICSMqCallCtx_CicsInfo_SysplxNum" locator="CicsInfo.SysplxNum" locator-type="Label"/>
+        <field name="CICSMqCallCtx_CicsInfo_SysplxId" locator="CicsInfo.SysplxId" locator-type="Label"/>
+        <field name="CICSMqCallCtx_CicsInfo_CicsVer" locator="CicsInfo.CicsVer" locator-type="Label"/>
+        <field name="CICSMqCallCtx_CicsInfo_CicsName" locator="CicsInfo.CicsName" locator-type="Label"/>
+        <field name="CICSMqCallCtx_CicsInfo_CicsTask" locator="CicsInfo.CicsTask" locator-type="Label"/>
+        <field name="CICSMqCallCtx_CicsInfo_TranName" locator="CicsInfo.TranName" locator-type="Label"/>
+        <field name="CICSMqCallCtx_CicsInfo_TaskNum" locator="CicsInfo.TaskNum" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqCallCtx_CicsInfo_TermId" locator="CicsInfo.TermId" locator-type="Label"/>
+        <field name="CICSMqCallCtx_CicsInfo_UserId" locator="CicsInfo.UserId" locator-type="Label"/>
+        <field name="CICSMqCallCtx_CicsInfo_Timer" locator="CicsInfo.Timer" locator-type="Label" datatype="Timestamp"/>
+    </parser>
+
+    <parser name="CICSMqTasksParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="EVENT"/>
+        <field name="EventName" value="CICSMqCallCtx"/>
+
+        <field name="CICSMqTasks_StrucId" locator="StrucId" locator-type="Label"/>
+        <field name="CICSMqTasks_TcbToken" locator="TcbToken" locator-type="Label"/>
+        <field name="CICSMqTasks_DmbDataspace" locator="DmbDataspace" locator-type="Label"/>
+        <field name="CICSMqTasks_TxQueue" locator="TxQueue" locator-type="Label"/>
+        <field name="CICSMqTasks_AptmStatus" locator="AptmStatus" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqTasks_QmgrStatus" locator="QmgrStatus" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqTasks_JobName" locator="JobName" locator-type="Label"/>
+        <field name="CICSMqTasks_AddressSpaceId" locator="AddressSpaceId" locator-type="Label"/>
+        <field name="CICSMqTasks_Flags" locator="Flags" locator-type="Label"/>
+        <field name="CICSMqTasks_MqCalls" locator="MqCalls" locator-type="Label"/>
+        <field name="CICSMqTasks_MqSkipCount" locator="MqSkipCount" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqTasks_MqAbendCount" locator="MqAbendCount" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqTasks_MqTotalCount" locator="MqTotalCount" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqTasks_ExcCalls" locator="ExcCalls" locator-type="Label"/>
+        <field name="CICSMqTasks_ExcSkipCount" locator="ExcSkipCount" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqTasks_ExcAbendCount" locator="ExcAbendCount" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqTasks_ExcTotalCount" locator="ExcTotalCount" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqTasks_SqlCalls" locator="SqlCalls" locator-type="Label"/>
+        <field name="CICSMqTasks_SqlSkipCount" locator="SqlSkipCount" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqTasks_SqlAbendCount" locator="SqlAbendCount" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqTasks_SqlTotalCount" locator="SqlTotalCount" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqTasks_TcpCalls" locator="TcpCalls" locator-type="Label"/>
+        <field name="CICSMqTasks_TcpSkipCount" locator="TcpSkipCount" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqTasks_TcpAbendCount" locator="TcpAbendCount" locator-type="Label" datatype="Number"/>
+        <field name="CICSMqTasks_TcpTotalCount" locator="TcpTotalCount" locator-type="Label" datatype="Number"/>
     </parser>
 
     <parser name="ZOSProbeMapParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="EVENT"/>
+        <!--<field name="EventName" value=""/>-->
 
         <!-- Message fields -->
         <field name="MsgEncoding" locator="Encoding" locator-type="Label" datatype="Number"/>
@@ -308,13 +346,17 @@
         <embedded-activity name="ExecCICSData" locator="ExecCICSData" locator-type="Label">
             <parser-ref name="ExecCICSDataParser" aggregation="Merge"/>
         </embedded-activity>
-        <embedded-activity name="CICSMqData" locator="CICSMqData" locator-type="Label">
-            <parser-ref name="CICSMqDataParser" aggregation="Merge"/>
+        <embedded-activity name="CICSMqCallCtx" locator="CICSMqCallCtx" locator-type="Label">
+            <parser-ref name="CICSMqCallCtxParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="CICSMqTasks" locator="CICSMqTasks" locator-type="Label">
+            <parser-ref name="CICSMqTasksParser" aggregation="Merge"/>
         </embedded-activity>
     </parser>
 
     <parser name="MQProbeMapParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="EVENT"/>
+        <field name="EventName" value="ApiExitInfo"/>
 
         <!-- Message fields -->
         <field name="MsgEncoding" locator="Encoding" locator-type="Label" datatype="Number"/>
