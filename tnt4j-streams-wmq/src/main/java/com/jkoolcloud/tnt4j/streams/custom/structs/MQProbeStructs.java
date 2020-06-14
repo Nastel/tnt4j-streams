@@ -25,6 +25,11 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.jkoolcloud.tnt4j.core.OpLevel;
+import com.jkoolcloud.tnt4j.sink.EventSink;
+import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
+import com.jkoolcloud.tnt4j.streams.utils.WmqStreamConstants;
 import com.jkoolcloud.tnt4j.streams.utils.WmqUtils;
 
 /**
@@ -58,6 +63,7 @@ import com.jkoolcloud.tnt4j.streams.utils.WmqUtils;
  * @version $Revision: 1 $
  */
 public class MQProbeStructs {
+	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(MQProbeStructs.class);
 
 	/**
 	 * API exit interface on UNIX, Windows and AS/400.
@@ -1071,15 +1077,15 @@ public class MQProbeStructs {
 	public static class TAZOS extends MQZOSStruct implements MQProbeRootStruct {
 		public static final String STRUC_ID = "TAZOS"; // NON-NLS
 
-		private static final String TACON_MQH_TYPE_ZOS = "z"; // NON-NLS
-		private static final String TACON_MQH_TYPE_BATCH = "b"; // NON-NLS
-		private static final String TACON_MQH_TYPE_CICS = "c"; // NON-NLS
-		private static final String TACON_MQH_TYPE_IMS = "i"; // NON-NLS
-		private static final String TACON_MQH_TYPE_EXECCICS = "e"; // NON-NLS
-		private static final String TACON_MQH_TYPE_CICSSQL = "s"; // NON-NLS
-		private static final String TACON_MQH_TYPE_BATCHSQL = "t"; // NON-NLS
-		private static final String TACON_MQH_TYPE_HID = "h"; // NON-NLS
-		private static final String TACON_MQH_TYPE_CHEXIT = "x"; // NON-NLS
+		static final String TACON_MQH_TYPE_ZOS = "z"; // NON-NLS
+		static final String TACON_MQH_TYPE_BATCH = "b"; // NON-NLS
+		static final String TACON_MQH_TYPE_CICS = "c"; // NON-NLS
+		static final String TACON_MQH_TYPE_IMS = "i"; // NON-NLS
+		static final String TACON_MQH_TYPE_EXECCICS = "e"; // NON-NLS
+		static final String TACON_MQH_TYPE_CICSSQL = "s"; // NON-NLS
+		static final String TACON_MQH_TYPE_BATCHSQL = "t"; // NON-NLS
+		static final String TACON_MQH_TYPE_HID = "h"; // NON-NLS
+		static final String TACON_MQH_TYPE_CHEXIT = "x"; // NON-NLS
 
 		public String strucId = STRUC_ID;
 		public TAMQBATCH batchInfo;
@@ -1108,6 +1114,14 @@ public class MQProbeStructs {
 			tazos.charSet = charSet;
 
 			tazos.batchInfo = TAMQBATCH.read(bb, encoding, charSet);
+
+			bb.mark();
+			String nextStrucId = getStringRaw(bb, 4, encoding, charSet);
+			bb.reset();
+
+			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+					"MQProbeStructs.parsing.zos.struct", tazos.batchInfo.type, nextStrucId);
+
 			switch (tazos.batchInfo.type) {
 			case TACON_MQH_TYPE_BATCH:
 				tazos.interceptData = TAMQCD.read(bb, encoding, charSet);
@@ -1116,14 +1130,7 @@ public class MQProbeStructs {
 			case TACON_MQH_TYPE_HID:
 				tazos.interceptData = TAHID.read(bb, encoding, charSet);
 				break;
-			case TACON_MQH_TYPE_ZOS:
-				// tazos.interceptData = XXX.read(bb, encoding, charSet);
-				break;
 			case TACON_MQH_TYPE_CICS:
-				bb.mark();
-				String nextStrucId = getStringRaw(bb, 4, encoding, charSet);
-				bb.reset();
-
 				switch (nextStrucId) {
 				case TAMQCD.STRUCT_ID:
 					tazos.interceptData = TAMQCD.read(bb, encoding, charSet);
@@ -1133,30 +1140,32 @@ public class MQProbeStructs {
 					tazos.interceptData = CMTA.read(bb, encoding, charSet);
 					break;
 				default:
+					throw new UnsupportedOperationException(
+							StreamsResources.getStringFormatted(WmqStreamConstants.RESOURCE_BUNDLE_NAME,
+									"MQProbeStructs.unsupported.batch.type.struct", tazos.batchInfo.type, nextStrucId));
 				}
 				break;
-			case TACON_MQH_TYPE_CHEXIT:
-				tazos.interceptData = TAMQCICS.read(bb, encoding, charSet);
-				tazos.msg = getBytes(bb, ((TAMQCICS) tazos.interceptData).mqInfo.dataSize); // tazos.batchInfo.msgLength
-																							// contains same value??
-				break;
-			case TACON_MQH_TYPE_IMS:
-				// tazos.interceptData = XXX.read(bb, encoding, charSet);
-				break;
+			// case TACON_MQH_TYPE_CHEXIT:
+			// tazos.interceptData = TAMQCICS.read(bb, encoding, charSet);
+			// tazos.msg = getBytes(bb, tazos.batchInfo.msgLength);
+			// break;
 			case TACON_MQH_TYPE_EXECCICS:
 				tazos.interceptData = TACCD.read(bb, encoding, charSet);
-				tazos.msg = getBytes(bb, ((TACCD) tazos.interceptData).origMsgLength); // tazos.batchInfo.msgLength
-																						// contains same value??
+				tazos.msg = getBytes(bb, tazos.batchInfo.msgLength);
 				break;
 			case TACON_MQH_TYPE_CICSSQL:
 				tazos.interceptData = TADB2.read(bb, encoding, charSet);
-				tazos.msg = getBytes(bb, ((TADB2) tazos.interceptData).sqlLen); // tazos.batchInfo.msgLength contains
-																				// same value??
+				tazos.msg = getBytes(bb, tazos.batchInfo.msgLength);
 				break;
+			case TACON_MQH_TYPE_CHEXIT:
 			case TACON_MQH_TYPE_BATCHSQL:
-				// tazos.interceptData = XXX.read(bb, encoding, charSet);
-				break;
+			case TACON_MQH_TYPE_ZOS:
+			case TACON_MQH_TYPE_IMS:
 			default:
+				// tazos.interceptData = XXX.read(bb, encoding, charSet);
+				throw new UnsupportedOperationException(
+						StreamsResources.getStringFormatted(WmqStreamConstants.RESOURCE_BUNDLE_NAME,
+								"MQProbeStructs.unsupported.batch.type", tazos.batchInfo.type));
 			}
 
 			tazos.pad = getBytes(bb, bb.remaining());
@@ -1216,7 +1225,7 @@ public class MQProbeStructs {
 	 * <li>StructSize (int)</li>
 	 * <li>Type (String)</li>
 	 * <li>TranName (String)</li>
-	 * <li>TranNumber (String)</li>
+	 * <li>TranNumber (long)</li>
 	 * <li>McdOffset (int)</li>
 	 * <li>McdLength (int)</li>
 	 * <li>MsgOffset (int)</li>
@@ -1234,7 +1243,7 @@ public class MQProbeStructs {
 		public String type; // 1
 		byte[] unused; // 3
 		public String tranName; // 8 /* only 4 bytes for CICS */
-		public String tranNbr; // 8 /* only 4 bytes for CICS */
+		public long tranNbr; // 8 /* only 4 bytes for CICS */
 		public int mcdOffset;
 		public int mcdLength;
 		public int msgOffset;
@@ -1269,7 +1278,16 @@ public class MQProbeStructs {
 			tamqbatch.type = getString(bb, 1, encoding, charSet);
 			tamqbatch.unused = getBytes(bb, 3);
 			tamqbatch.tranName = getString(bb, 8, encoding, charSet);
-			tamqbatch.tranNbr = getString(bb, 8, encoding, charSet);
+			switch (tamqbatch.type) {
+			case TAZOS.TACON_MQH_TYPE_EXECCICS:
+			case TAZOS.TACON_MQH_TYPE_CICS:
+			case TAZOS.TACON_MQH_TYPE_CICSSQL:
+				tamqbatch.tranNbr = bb.getInt();
+				int unused = bb.getInt();
+				break;
+			default:
+				tamqbatch.tranNbr = bb.getLong();
+			}
 			tamqbatch.mcdOffset = bb.getInt();
 			tamqbatch.mcdLength = bb.getInt();
 			tamqbatch.msgOffset = bb.getInt();
@@ -1324,19 +1342,19 @@ public class MQProbeStructs {
 	 * <li>ObjectType (int)</li>
 	 * <li>UserId (String)</li>
 	 * <li>ProcessId (String)</li>
-	 * <li>ThreadId (String)</li>
+	 * <li>ThreadId (byte[])</li>
 	 * <li>ProgramName (String)</li>
 	 * <li>Offset (long)</li>
 	 * <li>JobName (String)</li>
 	 * <li>JobType (String)</li>
 	 * <li>ExitTime (long)</li>
-	 * <li>ExitDelta (String)</li>
-	 * <li>MsgAge (String)</li>
+	 * <li>ExitDelta (long)</li>
+	 * <li>MsgAge (long)</li>
 	 * <li>SessionTime (long)</li>
 	 * <li>LuwTime (long)</li>
 	 * <li>MsgSig (byte[])</li>
 	 * <li>CpuTime (long)</li>
-	 * <li>NetUowId (String)</li>
+	 * <li>NetUowId (byte[])</li>
 	 * <li>MqiCpuTime (long)</li>
 	 * <li>ClientIp (String)</li>
 	 * <li>FirstTransId (String)</li>
@@ -1367,15 +1385,15 @@ public class MQProbeStructs {
 		byte[] align01; // 20
 		public String userId; // 8
 		public String processId; // 8
-		public String threadId; // 16
+		public byte[] threadId; // 16
 		public String programName; // 20
 		public long offset;
 		public String jobName; // 8
 		public String jobType; // 3
 		byte[] align1; // 1
 		public long exitTime; // 8
-		public String exitDelta; // 8
-		public String msgAge; // 8
+		public long exitDelta; // 8
+		public long msgAge; // 8
 		public long sessTime; // 8
 		public long luwTime; // 8
 		public String luwType;
@@ -1383,7 +1401,7 @@ public class MQProbeStructs {
 		public byte[] msgSig; // 36
 		byte[] align3; // 4
 		public long cpuTime; // 8
-		public String netUowId; // 27
+		public byte[] netUowId; // 27
 		byte[] align4; // 1
 		public long mqiCpuTime; // 8
 		public String clientIp; // 46
@@ -1432,23 +1450,23 @@ public class MQProbeStructs {
 			tamqcd.align01 = getBytes(bb, 20);
 			tamqcd.userId = getString(bb, 8, encoding, charSet);
 			tamqcd.processId = getStringRaw(bb, 8, encoding, charSet);
-			tamqcd.threadId = getStringRaw(bb, 16, encoding, charSet);
+			tamqcd.threadId = getBytes(bb, 16);
 			tamqcd.programName = getString(bb, 20, encoding, charSet);
 			tamqcd.offset = bb.getInt();
 			tamqcd.jobName = getString(bb, 8, encoding, charSet);
 			tamqcd.jobType = getString(bb, 3, encoding, charSet);
 			tamqcd.align1 = getBytes(bb, 1);
 			tamqcd.exitTime = timestamp8(bb);
-			tamqcd.exitDelta = getStringRaw(bb, 8, encoding, charSet);
-			tamqcd.msgAge = getString(bb, 8, encoding, charSet);
+			tamqcd.exitDelta = timestamp8(bb);
+			tamqcd.msgAge = timestamp8(bb);
 			tamqcd.sessTime = timestamp8(bb);
 			tamqcd.luwTime = timestamp8(bb);
 			tamqcd.luwType = getString(bb, 1, encoding, charSet);
 			tamqcd.align2 = getBytes(bb, 3);
 			tamqcd.msgSig = getBytes(bb, 36);
 			tamqcd.align3 = getBytes(bb, 4);
-			tamqcd.cpuTime = timestamp8(bb);
-			tamqcd.netUowId = getStringRaw(bb, 27, encoding, charSet);
+			tamqcd.cpuTime = timestamp8(bb) * 16;
+			tamqcd.netUowId = getBytes(bb, 27);
 			tamqcd.align4 = getBytes(bb, 1);
 			tamqcd.mqiCpuTime = timestamp8(bb);
 			tamqcd.clientIp = getString(bb, 46, encoding, charSet);
@@ -1599,16 +1617,16 @@ public class MQProbeStructs {
 	 * <li>DatabaseName (String)</li>
 	 * <li>UserId (String)</li>
 	 * <li>ProcessId (String)</li>
-	 * <li>ThreadId (String)</li>
+	 * <li>ThreadId (byte[])</li>
 	 * <li>ProgramName (String)</li>
 	 * <li>CallOffset (int)</li>
 	 * <li>JobName (String)</li>
 	 * <li>JobType (String)</li>
 	 * <li>ExitTime (long)</li>
-	 * <li>ExitDelta (String)</li>
+	 * <li>ExitDelta (long)</li>
 	 * <li>LuwTime (long)</li>
 	 * <li>SessTime (long)</li>
-	 * <li>NetUowId (String)</li>
+	 * <li>NetUowId (byte[])</li>
 	 * <li>DbrmName (String)</li>
 	 * <li>PlanName (String)</li>
 	 * <li>PrimAuth (String)</li>
@@ -1639,17 +1657,17 @@ public class MQProbeStructs {
 		public String databaseName; // 8
 		public String userId; // 8
 		public String processId; // 8
-		public String threadId; // 16
+		public byte[] threadId; // 16
 		public String programName; // 8
 		public int callOffset;
 		public String jobName; // 8
 		public String jobType; // 3
 		byte[] align2; // 1
 		public long exitTime; // 8
-		public String exitDelta; // 8
+		public long exitDelta; // 8
 		public long luwTime; // 8
 		public long sessTime; // 8
-		public String netUowId; // 27
+		public byte[] netUowId; // 27
 		byte[] align3; // 1
 		public String dbrmName; // 8
 		public String planName; // 8
@@ -1697,17 +1715,17 @@ public class MQProbeStructs {
 			tadb2.databaseName = getString(bb, 8, encoding, charSet);
 			tadb2.userId = getString(bb, 8, encoding, charSet);
 			tadb2.processId = getStringRaw(bb, 8, encoding, charSet);
-			tadb2.threadId = getStringRaw(bb, 16, encoding, charSet);
+			tadb2.threadId = getBytes(bb, 16);
 			tadb2.programName = getString(bb, 8, encoding, charSet);
 			tadb2.callOffset = bb.getInt();
 			tadb2.jobName = getString(bb, 8, encoding, charSet);
 			tadb2.jobType = getString(bb, 3, encoding, charSet);
 			tadb2.align2 = getBytes(bb, 1);
 			tadb2.exitTime = timestamp8(bb);
-			tadb2.exitDelta = getStringRaw(bb, 8, encoding, charSet);
+			tadb2.exitDelta = timestamp8(bb);
 			tadb2.luwTime = timestamp8(bb);
 			tadb2.sessTime = timestamp8(bb);
-			tadb2.netUowId = getStringRaw(bb, 27, encoding, charSet);
+			tadb2.netUowId = getBytes(bb, 27);
 			tadb2.align3 = getBytes(bb, 1);
 			tadb2.dbrmName = getString(bb, 8, encoding, charSet);
 			tadb2.planName = getString(bb, 8, encoding, charSet);
@@ -1716,7 +1734,7 @@ public class MQProbeStructs {
 			tadb2.corrId = getBytes(bb, 12);
 			tadb2.stmtNo = bb.getShort();
 			tadb2.sectNo = bb.getShort();
-			tadb2.cpuTime = timestamp8(bb);
+			tadb2.cpuTime = timestamp8(bb) * 16;
 			tadb2.sqlCpuTime = timestamp8(bb);
 			tadb2.firstTransId = getStringRaw(bb, 4, encoding, charSet);
 			tadb2.transGrpId = getStringRaw(bb, 28, encoding, charSet);
@@ -1779,26 +1797,26 @@ public class MQProbeStructs {
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
-	 * <li>FuncCode (String)</li>
-	 * <li>SubCmds (String)</li>
+	 * <li>FuncCode (byte[])</li>
+	 * <li>SubCmds (byte[])</li>
 	 * <li>CompCode (int)</li>
 	 * <li>Reason (int)</li>
 	 * <li>QmgrName (String)</li>
 	 * <li>UserId (String)</li>
 	 * <li>ProcessId (String)</li>
-	 * <li>ThreadId (String)</li>
+	 * <li>ThreadId (byte[])</li>
 	 * <li>ProgramName (String)</li>
 	 * <li>CallOffset (int)</li>
 	 * <li>JobName (String)</li>
 	 * <li>JobType (String)</li>
 	 * <li>ExitTime (long)</li>
-	 * <li>ExitDelta (String)</li>
+	 * <li>ExitDelta (long)</li>
 	 * <li>LuwTime (long)</li>
 	 * <li>SessTime (long)</li>
 	 * <li>ResourceName (String)</li>
 	 * <li>ResourceType (byte)</li>
 	 * <li>CpuTime (long)</li>
-	 * <li>NetUowId (String)</li>
+	 * <li>NetUowId (byte[])</li>
 	 * <li>ApiCpuTime (long)</li>
 	 * <li>FirstTransId (String)</li>
 	 * <li>TransGrpId (String)</li>
@@ -1813,22 +1831,22 @@ public class MQProbeStructs {
 		public static final String STRUC_ID = "ccd "; // NON-NLS
 
 		public String strucId; // 4
-		public String funcCode; // 2
-		public String subCmds; // 4
+		public byte[] funcCode; // 2
+		public byte[] subCmds; // 4
 		byte[] align1; // 2
 		public int compCode;
 		public int reason;
 		public String qmgrName; // 4
 		public String userId; // 8
 		public String processId; // 8
-		public String threadId; // 16
+		public byte[] threadId; // 16
 		public String programName; // 8
 		public int callOffset;
 		public String jobName; // 8
 		public String jobType; // 3
 		byte[] align2; // 1
 		public long exitTime; // 8
-		public String exitDelta; // 8
+		public long exitDelta; // 8
 		public long luwTime; // 8
 		public long sessTime; // 8
 		public String resourceName; // 8
@@ -1836,7 +1854,7 @@ public class MQProbeStructs {
 		byte[] align3; // 3
 		byte[] align4; // 4
 		public long cpuTime; // 8
-		public String netUowId; // 27
+		public byte[] netUowId; // 27
 		byte[] align5; // 1
 		public long apiCpuTime; // 8
 		public String firstTransId; // 4
@@ -1868,30 +1886,30 @@ public class MQProbeStructs {
 			taccd.charSet = charSet;
 
 			taccd.strucId = getString(bb, 4, encoding, charSet);
-			taccd.funcCode = getString(bb, 2, encoding, charSet);
-			taccd.subCmds = getString(bb, 4, encoding, charSet);
+			taccd.funcCode = getBytes(bb, 2);
+			taccd.subCmds = getBytes(bb, 4);
 			taccd.align1 = getBytes(bb, 2);
 			taccd.compCode = bb.getInt();
 			taccd.reason = bb.getInt();
 			taccd.qmgrName = getString(bb, 4, encoding, charSet);
 			taccd.userId = getString(bb, 8, encoding, charSet);
 			taccd.processId = getStringRaw(bb, 8, encoding, charSet);
-			taccd.threadId = getStringRaw(bb, 16, encoding, charSet);
+			taccd.threadId = getBytes(bb, 16);
 			taccd.programName = getString(bb, 8, encoding, charSet);
 			taccd.callOffset = bb.getInt();
 			taccd.jobName = getString(bb, 8, encoding, charSet);
 			taccd.jobType = getString(bb, 3, encoding, charSet);
 			taccd.align2 = getBytes(bb, 1);
 			taccd.exitTime = timestamp8(bb);
-			taccd.exitDelta = getStringRaw(bb, 8, encoding, charSet);
+			taccd.exitDelta = timestamp8(bb);
 			taccd.luwTime = timestamp8(bb);
 			taccd.sessTime = timestamp8(bb);
 			taccd.resourceName = getString(bb, 8, encoding, charSet);
 			taccd.resourceType = bb.get();
 			taccd.align3 = getBytes(bb, 3);
 			taccd.align4 = getBytes(bb, 4);
-			taccd.cpuTime = timestamp8(bb);
-			taccd.netUowId = getStringRaw(bb, 27, encoding, charSet);
+			taccd.cpuTime = timestamp8(bb) * 16;
+			taccd.netUowId = getBytes(bb, 27);
 			taccd.align5 = getBytes(bb, 1);
 			taccd.apiCpuTime = timestamp8(bb);
 			taccd.firstTransId = getString(bb, 4, encoding, charSet);
@@ -2095,26 +2113,30 @@ public class MQProbeStructs {
 	 * It provides such fields and types:
 	 * <ul>
 	 * <li>StrucId (String)</li>
-	 * <li>TcbToken (String)</li>
-	 * <li>DmbDataspace (String)</li>
+	 * <li>TcbToken (byte[])</li>
+	 * <li>DmbDataspace (byte[])</li>
 	 * <li>TxQueue (String)</li>
 	 * <li>AptmStatus (int)</li>
 	 * <li>QmgrStatus (int)</li>
 	 * <li>JobName (String)</li>
-	 * <li>AddressSpaceId (String)</li>
-	 * <li>Flags (String)</li>
+	 * <li>AddressSpaceId (byte[])</li>
+	 * <li>Flags (byte[])</li>
+	 * <li>MQCallsByName (Map<String, Integer>)</li>
 	 * <li>MqCalls (int[])</li>
 	 * <li>MqSkipCount (int)</li>
 	 * <li>MqAbendCount (int)</li>
 	 * <li>MqTotalCount (int)</li>
+	 * <li>ExcCallsByName (Map<String, Integer>)</li>
 	 * <li>ExcCalls (int[])</li>
 	 * <li>ExcSkipCount (int)</li>
 	 * <li>ExcAbendCount (int)</li>
 	 * <li>ExcTotalCount (int)</li>
+	 * <li>SqlCallsByName (Map<String, Integer>)</li>
 	 * <li>SqlCalls (int[])</li>
 	 * <li>SqlSkipCount (int)</li>
 	 * <li>SqlAbendCount (int)</li>
 	 * <li>SqlTotalCount (int)</li>
+	 * <li>TcpCallsByName (Map<String, Integer>)</li>
 	 * <li>TcpCalls (int[])</li>
 	 * <li>TcpSkipCount (int)</li>
 	 * <li>TcpAbendCount (int)</li>
@@ -2124,18 +2146,40 @@ public class MQProbeStructs {
 	public static class CMTA extends MQZOSStruct {
 		public static final String STRUC_ID = "cmta"; // NON-NLS
 
+		/* Labels for MQ calls counters */
+		private static final String[] CMTA_MQCMDS_ARRAY = { "MQOPEN", "MQCLOSE", "MQGET", "MQPUT", "MQPUT1", "MQINQ",
+				"UNKNOWN", "MQSET", "MQBACK", "MQCMIT" };
+
+		/* Labels for EXEC CICS API counters */
+		private static final String[] CMTA_EXCAPI_ARRAY = { "ENVIRONMENT", "TERMINAL", "FILE", "TRANSIENT", "TEMPORARY",
+				"STORAGE", "PROGRAM", "INTERVAL", "TASK12", "JOURNALING", "SYNCPOINT", "BMS", "DUMP1C", "BATCH",
+				"BTS20", "BTS22", "BTS34", "BTS36", "WEB", "DOCUMENT", "EXTRACT", "DIAGNOSTIC", "INTERVAL1", "SPOOL",
+				"TASK", "SECURITY", "CONSOLE", "AUTHENTICATION", "DUMP" };
+
+		/* Labels for EXEC SQL API counters */
+		private static final String[] CMTA_SQLAPI_ARRAY = { "UNKNOWN", "OPEN", "FETCH", "CLOSE", "PREPARE", "EXECUTE",
+				"DESCRIBE", "EXPLAIN", "UPDATE", "DELETE", "TRUNCATE", "UNKNOWN", "SET", "GRANT", "REVOKE", "ROLLBACK",
+				"LOCK", "CREATE", "COMMIT", "INTOPEN", "DROP", "ALTER", "COMMENT", "CONNECT", "LABEL", "UNKNOWN",
+				"UNKNOWN", "UNKNOWN", "RELEASE", "CALL", "ALLOCATE", "ASSOCIATE", "SIGNAL", "HOLD", "FREE", "DECLARE",
+				"SAVEPOINT", "REFRESH", "GET", "MERGE", "EXCHANGE", "SELECT", "INSERT", "REMOTE", "RENAME" };
+
+		/* Labels for IP CICS Socket API counters */
+		private static final String[] CMTA_TCPAPI_ARRAY = { "UNKNOWN", "ACCEPT", "BIND", "CLOSE", "CONNECT", "FCNTL",
+				"GET", "IOCTL", "LISTEN", "READ", "RECV", "SELECT", "SEND", "SHUTDOWN", "SOCKET", "WRITE", "GIVESOCKET",
+				"TAKESOCKET", "GLOBAL", "TASK", "SYNC", "INITAPI", "SETIBMOPT", "CANCEL", "FREEADDRINFO", "NTOP_PTON" };
+
 		public String strucId; // 4
 		byte[] unused0; // 4
-		public String tcbToken; // 16
-		public String dmbDataspace; // 16
+		public byte[] tcbToken; // 16
+		public byte[] dmbDataspace; // 16
 		public String txQueue; // 16
 		public int aptmStatus;
 		public int qmgrStatus;
 		byte[] unused1; // 4
 		byte[] unused2; // 4
 		public String jobName; // 8
-		public String addressSpaceId; // 2
-		public String flags; // 1
+		public byte[] addressSpaceId; // 2
+		public byte[] flags; // 1
 		byte[] filler1; // 5
 		public int[] mqCalls; // 11
 		public int mqSkipCount;
@@ -2178,16 +2222,16 @@ public class MQProbeStructs {
 
 			cmta.strucId = getString(bb, 4, encoding, charSet);
 			cmta.unused0 = getBytes(bb, 4);
-			cmta.tcbToken = getString(bb, 16, encoding, charSet);
-			cmta.dmbDataspace = getStringRaw(bb, 16, encoding, charSet);
-			cmta.txQueue = getString(bb, 16, encoding, charSet);
+			cmta.tcbToken = getBytes(bb, 16);
+			cmta.dmbDataspace = getBytes(bb, 16);
+			cmta.txQueue = getStringRaw(bb, 16, encoding, charSet);
 			cmta.aptmStatus = bb.getInt();
 			cmta.qmgrStatus = bb.getInt();
 			cmta.unused1 = getBytes(bb, 4);
 			cmta.unused2 = getBytes(bb, 4);
 			cmta.jobName = getString(bb, 8, encoding, charSet);
-			cmta.addressSpaceId = getStringRaw(bb, 2, encoding, charSet);
-			cmta.flags = getStringRaw(bb, 1, encoding, charSet);
+			cmta.addressSpaceId = getBytes(bb, 2);
+			cmta.flags = getBytes(bb, 1);
 			cmta.filler1 = getBytes(bb, 5);
 			cmta.mqCalls = getIntArray(bb, 11);
 			cmta.mqSkipCount = bb.getInt();
@@ -2224,24 +2268,38 @@ public class MQProbeStructs {
 			sMap.put("JobName", jobName); // NON-NLS
 			sMap.put("AddressSpaceId", addressSpaceId); // NON-NLS
 			sMap.put("Flags", flags); // NON-NLS
+			sMap.put("MQCallsByName", callsMap(CMTA_MQCMDS_ARRAY, mqCalls)); // NON-NLS
 			sMap.put("MqCalls", mqCalls); // NON-NLS
 			sMap.put("MqSkipCount", mqSkipCount); // NON-NLS
 			sMap.put("MqAbendCount", mqAbendCount); // NON-NLS
 			sMap.put("MqTotalCount", mqTotalCount); // NON-NLS
+			sMap.put("ExcCallsByName", callsMap(CMTA_EXCAPI_ARRAY, excCalls)); // NON-NLS
 			sMap.put("ExcCalls", excCalls); // NON-NLS
 			sMap.put("ExcSkipCount", excSkipCount); // NON-NLS
 			sMap.put("ExcAbendCount", excAbendCount); // NON-NLS
 			sMap.put("ExcTotalCount", excTotalCount); // NON-NLS
+			sMap.put("SqlCallsByName", callsMap(CMTA_SQLAPI_ARRAY, sqlCalls)); // NON-NLS
 			sMap.put("SqlCalls", sqlCalls); // NON-NLS
 			sMap.put("SqlSkipCount", sqlSkipCount); // NON-NLS
 			sMap.put("SqlAbendCount", sqlAbendCount); // NON-NLS
 			sMap.put("SqlTotalCount", sqlTotalCount); // NON-NLS
+			sMap.put("TcpCallsByName", callsMap(CMTA_TCPAPI_ARRAY, tcpCalls)); // NON-NLS
 			sMap.put("TcpCalls", tcpCalls); // NON-NLS
 			sMap.put("TcpSkipCount", tcpSkipCount); // NON-NLS
 			sMap.put("TcpAbendCount", tcpAbendCount); // NON-NLS
 			sMap.put("TcpTotalCount", tcpTotalCount); // NON-NLS
 
 			return sMap;
+		}
+
+		private static Map<String, Integer> callsMap(String[] apiNames, int[] apiCalls) {
+			Map<String, Integer> callsMap = new LinkedHashMap<>(apiNames.length);
+
+			for (int i = 0; i < apiNames.length; i++) {
+				callsMap.put(apiNames[i], apiCalls[i]);
+			}
+
+			return callsMap;
 		}
 	}
 
@@ -2435,7 +2493,7 @@ public class MQProbeStructs {
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
-		 * @return timestamp value
+		 * @return timestamp value in microseconds
 		 * 
 		 * @see #getBytes(java.nio.ByteBuffer, int)
 		 * @see #toString(byte[])
@@ -2446,11 +2504,27 @@ public class MQProbeStructs {
 		}
 
 		/**
+		 * Makes timestamp value from provided 16 zOS TOD bytes value.
+		 *
+		 * @param bb
+		 *            byte buffer to pull bytes
+		 * @return timestamp value in microseconds
+		 *
+		 * @see #toString(byte[], int, int)
+		 * @see #timestamp(String)
+		 */
+		public static long timestamp16(ByteBuffer bb) {
+			byte[] zOSTODBytes = getBytes(bb, 16);
+
+			return timestamp(toString(zOSTODBytes, 1, 8));
+		}
+
+		/**
 		 * Makes timestamp value from provided zOS TOD bytes value.
 		 * 
 		 * @param zOSTODBytes
 		 *            zOS TOD value bytes
-		 * @return timestamp value
+		 * @return timestamp value in microseconds
 		 * 
 		 * @see #toString(byte[])
 		 * @see #timestamp(String)
@@ -2460,40 +2534,21 @@ public class MQProbeStructs {
 		}
 
 		/**
-		 * Makes timestamp value from provided 16 zOS TOD bytes value.
-		 * 
-		 * @param zOSTODBytes
-		 *            zOS TOD value bytes
-		 * @return timestamp value
-		 * 
-		 * @see #toString(byte[], int, int)
-		 * @see #timestamp(String)
-		 */
-		public static long timestamp16(byte[] zOSTODBytes) {
-			if (zOSTODBytes == null || zOSTODBytes.length != 16) {
-				return -1;
-			}
-
-			String todS = toString(zOSTODBytes, 1, 8);
-
-			return timestamp(todS);
-		}
-
-		/**
 		 * Makes timestamp value from provided zOS TOD string.
 		 * 
 		 * @param todS
 		 *            zOS TOD value string
-		 * @return timestamp value
+		 * @return timestamp value in microseconds
 		 */
 		public static long timestamp(String todS) {
 			BigInteger bi = new BigInteger(todS, 16); // 686 stripped off
 			long tod = bi.longValue();
 
 			if (tod != 0) {
-				tod = tod >>> 12; // remove rightmost 3 bytes and replace with zeros
-				tod = tod - 2208988800000000l; // subtract 1970
-				tod = tod / 1000; // make millis out of micros
+				tod >>>= 12; // remove rightmost 3 bytes and replace with zeros
+				if (tod >= 2208988800000000L) {
+					tod -= 2208988800000000L; // subtract 1970
+				}
 			}
 
 			return tod;

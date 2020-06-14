@@ -70,7 +70,13 @@ public class MQMessageToMQProbeStructMap extends AbstractMQMessagePreParser<Map<
 				mqStruct = MQProbeStructs.TAZOS.read(bb, enc, charSet);
 				break;
 			default:
+				throw new UnsupportedOperationException(
+						StreamsResources.getStringFormatted(WmqStreamConstants.RESOURCE_BUNDLE_NAME,
+								"MQMessageToMQProbeStructMap.unsupported.root.struct", strId));
 			}
+		} catch (UnsupportedOperationException exc) {
+			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+					"MQMessageToMQProbeStructMap.unsupported.struct.found", exc.getLocalizedMessage());
 		} catch (BufferUnderflowException exc) {
 			Utils.logThrowable(LOGGER, OpLevel.ERROR,
 					StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
