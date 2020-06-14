@@ -452,23 +452,11 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 		return super.applyParsers(data, tags);
 	}
 
-	/**
-	 * Marks stream state for picked item from buffer and performs post parsing actions for provided activity data item.
-	 *
-	 * @param item
-	 *            processed activity data item
-	 *
-	 * @see #postParse(com.jkoolcloud.tnt4j.streams.scenario.WsResponse)
-	 */
-	protected void pickAndPostParseItem(WsResponse<RQ, RS> item) {
-		postParse(item);
-	}
-
 	@Override
-	protected void setCurrentItem(WsResponse<RQ, RS> item) {
-		pickAndPostParseItem(getCurrentItem());
+	protected Object getItemFromBuffer() throws InterruptedException {
+		postParse(getCurrentItem());
 
-		super.setCurrentItem(item);
+		return super.getItemFromBuffer();
 	}
 
 	/**
