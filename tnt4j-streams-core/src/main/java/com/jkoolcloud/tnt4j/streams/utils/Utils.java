@@ -1443,7 +1443,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @return returns HEX dump representation of provided bytes array
 	 */
 	public static String toHexDump(byte[] b, int offset, int len) {
-		if (b == null) {
+		if (ArrayUtils.isEmpty(b)) {
 			return "<EMPTY>"; // NON-NLS
 		}
 
