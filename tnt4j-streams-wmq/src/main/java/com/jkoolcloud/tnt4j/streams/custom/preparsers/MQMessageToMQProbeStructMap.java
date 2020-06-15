@@ -51,14 +51,10 @@ public class MQMessageToMQProbeStructMap extends AbstractMQMessagePreParser<Map<
 		byte[] msgData = new byte[mqMsg.getDataLength()];
 		mqMsg.readFully(msgData);
 		LOGGER.log(OpLevel.TRACE, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
-				"WmqStream.message.data", msgData.length, Utils.toHexDump(msgData));
+				"WmqStream.message.data", msgData.length, WmqUtils.hexDump(msgData, charSet));
 
 		ByteBuffer bb = ByteBuffer.wrap(msgData);
-
-		byte[] bStrId = new byte[4];
-		System.arraycopy(msgData, 0, bStrId, 0, 4);
-		String strId = WmqUtils.getString(bStrId, charSet);
-
+		String strId = WmqUtils.getString(msgData, 0, 4, charSet);
 		MQProbeStructs.MQProbeRootStruct mqStruct = null;
 
 		try {

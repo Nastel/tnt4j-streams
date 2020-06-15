@@ -21,8 +21,8 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
-import com.jkoolcloud.tnt4j.streams.utils.Utils;
 import com.jkoolcloud.tnt4j.streams.utils.WmqStreamConstants;
+import com.jkoolcloud.tnt4j.streams.utils.WmqUtils;
 
 /**
  * RAW activity data pre-parser capable to convert incoming activity data from {@link com.ibm.mq.MQMessage} to
@@ -35,10 +35,11 @@ public class MQMessageToBinPreParser extends AbstractMQMessagePreParser<byte[]> 
 
 	@Override
 	public byte[] preParse(MQMessage mqMsg) throws Exception {
+		int charSet = mqMsg.characterSet;
 		byte[] msgData = new byte[mqMsg.getDataLength()];
 		mqMsg.readFully(msgData);
 		LOGGER.log(OpLevel.TRACE, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
-				"WmqStream.message.data", msgData.length, Utils.toHexDump(msgData));
+				"WmqStream.message.data", msgData.length, WmqUtils.hexDump(msgData, charSet));
 
 		return msgData;
 	}

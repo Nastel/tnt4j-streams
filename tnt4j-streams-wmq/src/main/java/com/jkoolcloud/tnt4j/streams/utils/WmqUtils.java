@@ -16,8 +16,11 @@
 
 package com.jkoolcloud.tnt4j.streams.utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,6 +28,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.ibm.mq.constants.MQConstants;
@@ -43,7 +47,7 @@ import com.jkoolcloud.tnt4j.streams.parsers.MessageType;
 /**
  * WMQ utility methods used by TNT4J-Streams-WMQ module.
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  */
 public class WmqUtils {
 
@@ -368,8 +372,8 @@ public class WmqUtils {
 	/**
 	 * Converts byte array content in the specified {@code ccsid} into a Java {@link java.lang.String}.
 	 * <p>
-	 * Does all the same as {@link #getString(byte[], Object, boolean)} setting {@code stripHeaders} parameter to
-	 * {@code false}.
+	 * Does all the same as {@link #getString(byte[], int, int, Object)} setting {@code offset} to {@code 0} and
+	 * {@code length} to {@code strBytes.length}
 	 *
 	 * @param strBytes
 	 *            the byte array to convert
@@ -381,10 +385,17 @@ public class WmqUtils {
 	 *             if there is no charset mapping for the supplied {@code ccsid} value or the platform cannot convert
 	 *             from the charset
 	 *
-	 * @see #getString(byte[], Object, boolean)
+	 * @see #getString(byte[], int, int, Object)
 	 */
 	public static String getString(byte[] strBytes, Object ccsid) throws UnsupportedEncodingException {
-		return getString(strBytes, ccsid, MQ_BIN_STR_PRESERVE_DLH_XQH);
+		if (strBytes == null) {
+			return null;
+		}
+		if (strBytes.length == 0) {
+			return "";
+		}
+
+		return getString(strBytes, 0, strBytes.length, ccsid);
 	}
 
 	/**
@@ -434,12 +445,15 @@ public class WmqUtils {
 	 *             from the charset
 	 *
 	 * @see #getPayloadOffsetAndCCSID(byte[])
-	 * @see com.ibm.mq.headers.Charsets#convert(byte[], int, int, int)
+	 * @see #getString(byte[], int, int, Object)
 	 */
 	public static String getString(byte[] strBytes, Object ccsid, int conversionFlags)
 			throws UnsupportedEncodingException {
 		if (strBytes == null) {
 			return null;
+		}
+		if (strBytes.length == 0) {
+			return "";
 		}
 
 		int offset = 0;
@@ -451,7 +465,51 @@ public class WmqUtils {
 			}
 		}
 
-		return Charsets.convert(strBytes, offset, strBytes.length - offset, getCCSID(ccsid));
+		return getString(strBytes, offset, strBytes.length - offset, getCCSID(ccsid));
+	}
+
+	/**
+	 * Converts byte array content in the specified {@code ccsid} into a Java {@link java.lang.String}.
+	 * 
+	 * @param strBytes
+	 *            the byte array to convert
+	 * @param offset
+	 *            index of first byte to pick for conversion
+	 * @param length
+	 *            amount of bytes to convert
+	 * @param ccsid
+	 *            coded charset identifier, or {@code null} to use default ({@code ccsid=0}) charset
+	 * @return he string made from provided bytes using defined {@code ccsid}, or {@code null} if {@code strBytes} is
+	 *         {@code null}
+	 * @throws UnsupportedEncodingException
+	 *             if there is no charset mapping for the supplied {@code ccsid} value or the platform cannot convert
+	 *             from the charset
+	 * @throws ArrayIndexOutOfBoundsException
+	 *             if {@code offset} is out of array bounds {@code offset &lt; 0 || offset &gt;= strBytes.length} or
+	 *             {@code length} in addition to {@code offset} pops out of array bounds {@code offset + length &gt;
+	 *             strBytes.length}
+	 */
+	public static String getString(byte[] strBytes, int offset, int length, Object ccsid)
+			throws UnsupportedEncodingException, ArrayIndexOutOfBoundsException {
+		if (strBytes == null) {
+			return null;
+		}
+		if (strBytes.length == 0) {
+			return "";
+		}
+
+		if (offset < 0 || offset >= strBytes.length) {
+			throw new ArrayIndexOutOfBoundsException(StreamsResources.getStringFormatted(
+					WmqStreamConstants.RESOURCE_BUNDLE_NAME, "WmqUtils.index.out.of.range", offset, strBytes.length));
+		}
+
+		if (offset + length > strBytes.length) {
+			throw new ArrayIndexOutOfBoundsException(
+					StreamsResources.getStringFormatted(WmqStreamConstants.RESOURCE_BUNDLE_NAME,
+							"WmqUtils.length.out.of.range", offset, length, strBytes.length));
+		}
+
+		return Charsets.convert(strBytes, offset, length, getCCSID(ccsid));
 	}
 
 	private static int getCCSID(Object ccsidObj) throws UnsupportedEncodingException {
@@ -504,9 +562,9 @@ public class WmqUtils {
 			return new int[] { offset, ccsid };
 		}
 
-		String structId = new String(msgData, offset, 4, StandardCharsets.UTF_8);
+		String strucId = new String(msgData, offset, 4, Charset.defaultCharset());
 
-		switch (structId) {
+		switch (strucId) {
 		case "XQH ": // NON-NLS
 			return getPayloadOffsetAndCCSID(msgData, offset + MQXQH.SIZE, getInt(msgData, offset + 132));
 		case "DLH ": // NON-NLS
@@ -535,5 +593,111 @@ public class WmqUtils {
 		}
 
 		return msgData;
+	}
+
+	private static final String EOL = System.getProperty("line.separator");
+	private static final String _hexcodes = "0123456789ABCDEF"; // NON-NLS
+	private static final int[] _shifts = new int[] { 28, 24, 20, 16, 12, 8, 4, 0 };
+	private static final char SPACE = ' ';
+	private static final char CTRL_CHAR = '.';
+	private static final String HEX_TEXT_SPACER = "  "; // NON-NLS
+
+	/**
+	 * Makes a HEX dump string representation of provided {@code data} byte array. Bytes to chars conversion is done
+	 * according provided {@code ccsid}.
+	 * 
+	 * @param data
+	 *            byte array make HEX dump
+	 * @param ccsid
+	 *            coded charset identifier
+	 * @return returns HEX dump representation of provided byte array
+	 */
+	public static String hexDump(byte[] data, int ccsid) {
+		if (ArrayUtils.isEmpty(data)) {
+			return "<EMPTY>"; // NON-NLS
+		}
+
+		String hexStr;
+		try (ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length * 2)) {
+			hexDump(data, 0, bos, 0, ccsid);
+			hexStr = EOL + bos.toString(Utils.UTF8);
+		} catch (Exception exc) {
+			hexStr = "HEX FAIL: " + Utils.getExceptionMessages(exc); // NON-NLS
+		}
+
+		return hexStr;
+	}
+
+	private static void hexDump(byte[] data, long offset, OutputStream stream, int index, int ccsid)
+			throws IOException, ArrayIndexOutOfBoundsException, IllegalArgumentException {
+		if (index >= 0 && index < data.length) {
+			if (stream == null) {
+				throw new IllegalArgumentException(StreamsResources.getString(WmqStreamConstants.RESOURCE_BUNDLE_NAME,
+						"WmqUtils.hex.dump.null.stream"));
+			} else {
+				long display_offset = offset + (long) index;
+				StringBuilder buffer = new StringBuilder(74);
+
+				for (int j = index; j < data.length; j += 16) {
+					int chars_read = data.length - j;
+					if (chars_read > 16) {
+						chars_read = 16;
+					}
+
+					dumpOffset(buffer, display_offset).append(SPACE);
+
+					int k;
+					for (k = 0; k < 16; ++k) {
+						if (k < chars_read) {
+							dumpByte(buffer, data[k + j]);
+						} else {
+							buffer.append(HEX_TEXT_SPACER);
+						}
+
+						buffer.append(SPACE);
+					}
+
+					for (k = 0; k < chars_read; ++k) {
+						String chStr = getString(data, k + j, 1, ccsid);
+						char ch = chStr.charAt(0);
+						if (isPrintableChar(ch)) {
+							buffer.append(ch);
+						} else {
+							buffer.append(CTRL_CHAR);
+						}
+					}
+
+					buffer.append(EOL);
+					stream.write(buffer.toString().getBytes(Charset.defaultCharset()));
+					stream.flush();
+					buffer.setLength(0);
+					display_offset += (long) chars_read;
+				}
+
+			}
+		} else {
+			throw new ArrayIndexOutOfBoundsException(StreamsResources.getStringFormatted(
+					WmqStreamConstants.RESOURCE_BUNDLE_NAME, "WmqUtils.index.out.of.range", index, data.length));
+		}
+	}
+
+	private static boolean isPrintableChar(char ch) {
+		return (ch >= 32 && ch < 127) || (ch >= 160 && ch < 65277);
+	}
+
+	private static StringBuilder dumpOffset(StringBuilder _lbuffer, long value) {
+		for (int j = 0; j < 8; ++j) {
+			_lbuffer.append(_hexcodes.charAt((int) (value >> _shifts[j]) & 15));
+		}
+
+		return _lbuffer;
+	}
+
+	private static StringBuilder dumpByte(StringBuilder _cbuffer, byte value) {
+		for (int j = 0; j < 2; ++j) {
+			_cbuffer.append(_hexcodes.charAt(value >> _shifts[j + 6] & 15));
+		}
+
+		return _cbuffer;
 	}
 }
