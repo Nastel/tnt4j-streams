@@ -2387,14 +2387,14 @@ public class MQProbeStructs {
 		 * 
 		 * @param bb
 		 *            byte buffer to pull integers
-		 * @param lenght
+		 * @param length
 		 *            size of produced array
 		 * @return integers array
 		 */
-		static int[] getIntArray(ByteBuffer bb, int lenght) {
-			int[] ia = new int[lenght];
+		static int[] getIntArray(ByteBuffer bb, int length) {
+			int[] ia = new int[length];
 
-			for (int i = 0; i < lenght; i++) {
+			for (int i = 0; i < length; i++) {
 				ia[i] = bb.getInt();
 			}
 
@@ -2407,7 +2407,7 @@ public class MQProbeStructs {
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
-		 * @param lenght
+		 * @param length
 		 *            amount of bytes to use for a string
 		 * @return string build from byte buffer contained bytes
 		 * 
@@ -2417,8 +2417,8 @@ public class MQProbeStructs {
 		 * 
 		 * @see #getString(java.nio.ByteBuffer, int, int, int)
 		 */
-		String getString(ByteBuffer bb, int lenght) throws UnsupportedEncodingException {
-			return getString(bb, lenght, encoding, charSet);
+		String getString(ByteBuffer bb, int length) throws UnsupportedEncodingException {
+			return getString(bb, length, encoding, charSet);
 		}
 
 		/**

@@ -1448,8 +1448,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		}
 
 		String hexStr;
-		ByteArrayOutputStream bos = new ByteArrayOutputStream(b.length * 2);
-		try {
+		try (ByteArrayOutputStream bos = new ByteArrayOutputStream(b.length * 2)) {
 			if (len > 0 && len < b.length) {
 				byte[] bc = Arrays.copyOfRange(b, offset, offset + len);
 				HexDump.dump(bc, 0, bos, offset);
@@ -1457,7 +1456,6 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 				HexDump.dump(b, 0, bos, offset);
 			}
 			hexStr = NEW_LINE + bos.toString(UTF8);
-			bos.close();
 		} catch (Exception exc) {
 			hexStr = "HEX FAIL: " + getExceptionMessages(exc); // NON-NLS
 		}
@@ -2826,8 +2824,8 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 				}
 
 				StackTraceElement[] strs = it.getStackTrace();
-				int sLenght = Math.min(depth, strs.length);
-				for (int si = 0; si < sLenght; si++) {
+				int sLength = Math.min(depth, strs.length);
+				for (int si = 0; si < sLength; si++) {
 					sb.append("\tat ").append(strs[si]).append("\n"); // NON-NLS
 				}
 			}
