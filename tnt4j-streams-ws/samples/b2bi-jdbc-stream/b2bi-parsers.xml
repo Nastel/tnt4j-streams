@@ -599,10 +599,6 @@
         <field name="Correlator" formattingPattern="Dataflow_{0}">
             <field-locator id="DataFlowId" locator="DataFlowId" locator-type="Activity" required="false"/>
         </field>
-        <field name="Correlator" formattingPattern="File_{0}_{1}">
-            <field-locator id="DocumentName" locator="DocumentName" locator-type="Activity"/>
-            <field-locator id="DocumentSize" locator="DocumentSize" locator-type="Activity"/>
-        </field>
         <field name="Correlator" formattingPattern="CorrelatorsSet_{0}">
             <field-locator id="DocumentId" locator="DocumentId" locator-type="Activity"/>
         </field>
