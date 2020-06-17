@@ -71,7 +71,7 @@
         "c": "CICS MQ data",
         "i": "IMS MQ data",
         "e": "EXEC CICS data",
-        "h": "host info data",
+        "h": "Host info data",
         "x": "Channel exit MQ data",
         "s": "CICS SQL data",
         "t": "Batch SQL data"
