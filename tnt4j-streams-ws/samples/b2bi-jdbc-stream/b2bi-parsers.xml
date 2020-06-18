@@ -102,16 +102,15 @@
             <field-locator id="EventKey" locator="EVENT_EVENT_KEY" locator-type="Label"/>
         </field>
         <field name="EventName" locator="EVENT_ENTITY_TYPE" locator-type="Label"/>
-        <field name="StartTime" locator="AF_CREATE_TS" locator-type="Label"/>
-        <field name="EndTime" locator="EVENT_TIME" locator-type="Label" datatype="Number" units="Milliseconds" timezone="GMT-04:00"/>
+        <field name="StartTime" locator="EVENT_CREATETS" locator-type="Label"/>
+        <field name="EndTime" locator="EVENT_MODIFYTS" locator-type="Label"/>
 
         <field name="EntityKey" locator="EVENT_ENTITY_KEY" locator-type="Label"/>
         <field name="DataFlowId" locator="EVENT_DATA_FLOW_ID" locator-type="Label" datatype="Number" format="long"/>
         <field name="Counter" locator="EVENT_COUNTER" locator-type="Label" datatype="Number" format="long"/>
         <field name="EventCode" locator="EVENT_EVENT_CODE" locator-type="Label"/>
         <field name="LockId" locator="EVENT_LOCKID" locator-type="Label" datatype="Number" format="int"/>
-        <field name="CreateTs" locator="EVENT_CREATETS" locator-type="Label"/>
-        <field name="ModifyTs" locator="EVENT_MODIFYTS" locator-type="Label"/>
+        <field name="CreateTs" locator="EVENT_TIME" locator-type="Label" datatype="Number" units="Milliseconds" timezone="GMT-04:00"/>
         <field name="CreateUserId" locator="EVENT_CREATEUSERID" locator-type="Label"/>
         <field name="ModifyUserId" locator="EVENT_MODIFYUSERID" locator-type="Label"/>
         <field name="CreateProgId" locator="EVENT_CREATEPROGID" locator-type="Label"/>
@@ -216,16 +215,15 @@
             <field-locator id="EventKey" locator="EVENT_EVENT_KEY" locator-type="Label"/>
         </field>
         <field name="EventName" locator="EVENT_ENTITY_TYPE" locator-type="Label"/>
-        <field name="StartTime" locator="AF_CREATE_TS" locator-type="Label"/>
-        <field name="EndTime" locator="EVENT_TIME" locator-type="Label" datatype="Number" units="Milliseconds" timezone="GMT-04:00"/>
+        <field name="StartTime" locator="EVENT_CREATETS" locator-type="Label"/>
+        <field name="EndTime" locator="EVENT_MODIFYTS" locator-type="Label"/>
 
         <field name="EntityKey" locator="EVENT_ENTITY_KEY" locator-type="Label"/>
         <field name="DataFlowId" locator="EVENT_DATA_FLOW_ID" locator-type="Label" datatype="Number" format="long"/>
         <field name="Counter" locator="EVENT_COUNTER" locator-type="Label" datatype="Number" format="long"/>
         <field name="EventCode" locator="EVENT_EVENT_CODE" locator-type="Label"/>
         <field name="LockId" locator="EVENT_LOCKID" locator-type="Label" datatype="Number" format="int"/>
-        <field name="CreateTs" locator="EVENT_CREATETS" locator-type="Label"/>
-        <field name="ModifyTs" locator="EVENT_MODIFYTS" locator-type="Label"/>
+        <field name="CreateTs" locator="EVENT_TIME" locator-type="Label" datatype="Number" units="Milliseconds" timezone="GMT-04:00"/>
         <field name="CreateUserId" locator="EVENT_CREATEUSERID" locator-type="Label"/>
         <field name="ModifyUserId" locator="EVENT_MODIFYUSERID" locator-type="Label"/>
         <field name="CreateProgId" locator="EVENT_CREATEPROGID" locator-type="Label"/>
@@ -809,57 +807,57 @@
         <entry id="LastAFileRecordMDate">
             <key>LastAFileRecordMDate</key>
             <value>${AF_ModifyTs}</value>
-            <default>2020-05-10 00:00:00.000</default>
+            <default>2020-06-16 18:00:00.000</default>
         </entry>
         <entry id="LastEventRecordMDate">
             <key>LastEventRecordMDate</key>
             <value>${E_ModifyTs}</value>
-            <default>2020-05-10 00:00:00.000</default>
+            <default>2020-06-16 18:00:00.000</default>
         </entry>
         <entry id="LastEventApplRecordMDate">
             <key>LastEventApplRecordMDate</key>
             <value>${E_App_ModifyTs}</value>
-            <default>2020-05-10 00:00:00.000</default>
+            <default>2020-06-16 18:00:00.000</default>
         </entry>
         <entry id="LastRouteRecordMDate">
             <key>LastRouteRecordMDate</key>
             <value>${R_ModifyTs}</value>
-            <default>2020-05-10 00:00:00.000</default>
+            <default>2020-06-16 18:00:00.000</default>
         </entry>
         <entry id="LastDeliveryRecordMDate">
             <key>LastDeliveryRecordMDate</key>
             <value>${D_ModifyTs}</value>
-            <default>2020-05-10 00:00:00.000</default>
+            <default>2020-06-16 18:00:00.000</default>
         </entry>
         <entry id="LastCorrelationSetRecordMDate">
             <key>LastCorrelationSetRecordMDate</key>
             <value>${CS_RecTime}</value>
-            <default>2020-05-10 00:00:00.000</default>
+            <default>2020-06-16 18:00:00.000</default>
         </entry>
         <entry id="LastWorkflowContextRecordMDate">
             <key>LastWorkflowContextRecordMDate</key>
             <value>${WC_StartTime}</value>
-            <default>2020-05-10 00:00:00.000</default>
+            <default>2020-06-16 18:00:00.000</default>
         </entry>
         <entry id="LastDocumentsRecordMDate">
             <key>LastDocumentsRecordMDate</key>
             <value>${Doc_ModifyTs}</value>
-            <default>2020-05-10 00:00:00.000</default>
+            <default>2020-06-16 18:00:00.000</default>
         </entry>
         <entry id="LastSessionsRecordMDate">
             <key>LastSessionsRecordMDate</key>
             <value>${S_StartTime}</value>
-            <default>2020-05-10 00:00:00.000</default>
+            <default>2020-06-16 18:00:00.000</default>
         </entry>
         <entry id="LastXfersRecordMDate">
             <key>LastXfersRecordMDate</key>
             <value>${XF_StartTime}}</value>
-            <default>2020-05-10 00:00:00.000</default>
+            <default>2020-06-16 18:00:00.000</default>
         </entry>
         <entry id="LastNonXfersRecordMDate">
             <key>LastNonXfersRecordMDate</key>
             <value>${NXF_StartTime}</value>
-            <default>2020-05-10 00:00:00.000</default>
+            <default>2020-06-16 18:00:00.000</default>
         </entry>
         <entry id="CachedApplName">
             <key>${DataFlowId}</key>

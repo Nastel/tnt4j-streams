@@ -76,8 +76,6 @@
                           , FE.ENTITY_TYPE AS EVENT_ENTITY_TYPE
                           , FE.DATA_FLOW_ID AS EVENT_DATA_FLOW_ID
                           , FE.TIME AS EVENT_TIME
-                          , FAF.CREATETS AS AF_CREATE_TS
-                          , FAF.MODIFYTS AS AF_MODIFY_TS
                           , FE.COUNTER AS EVENT_COUNTER
                           , FE.EVENT_CODE AS EVENT_EVENT_CODE
                           , FE.LOCKID AS EVENT_LOCKID
@@ -98,7 +96,6 @@
                              FOR XML PATH ('attr'), root ('attributes')
                             ) AS EVT_ATTRS
                         FROM FG_EVENT FE
-                            LEFT OUTER JOIN FG_ARRIVEDFILE FAF ON (FAF.ARRIVEDFILE_KEY = FE.ARRIVEDFILE_KEY)
                         WHERE FE.MODIFYTS >= ?
                           AND FE.MODIFYTS < DATEADD(minute, -5, getdate())  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY FE.CREATETS, FE.COUNTER ASC
@@ -117,8 +114,6 @@
                           , FE.ENTITY_TYPE AS EVENT_ENTITY_TYPE
                           , FE.DATA_FLOW_ID AS EVENT_DATA_FLOW_ID
                           , FE.TIME AS EVENT_TIME
-                          , FAF.CREATETS AS AF_CREATE_TS
-                          , FAF.MODIFYTS AS AF_MODIFY_TS
                           , FE.COUNTER AS EVENT_COUNTER
                           , FE.EVENT_CODE AS EVENT_EVENT_CODE
                           , FE.LOCKID AS EVENT_LOCKID
@@ -143,7 +138,6 @@
                         FROM FG_EVENT FE
                             LEFT OUTER JOIN FG_EVENT FER ON (FER.EVENT_CODE = 'FG_0503' AND FER.ARRIVEDFILE_KEY = FE.ARRIVEDFILE_KEY)
                             LEFT OUTER JOIN FG_EVENTATTR FEA on (FER.EVENT_KEY = FEA.EVENT_KEY AND FEA.NAME = 'RoutingChannelTemplateName')
-                            LEFT OUTER JOIN FG_ARRIVEDFILE FAF ON (FAF.ARRIVEDFILE_KEY = FE.ARRIVEDFILE_KEY)
                         WHERE FE.EVENT_CODE = 'FG_0425'
                           AND FER.MODIFYTS >= ?
                           AND FER.MODIFYTS < DATEADD(minute, -5, getdate())  -- Don't pick entries younger than 5min. - update for them may be still in progress
@@ -298,12 +292,7 @@
                           , WC.EVENT_LEVEL AS WORKFLOW_EVENT_LEVEL
                         FROM WORKFLOW_CONTEXT WC
                         WHERE WC.START_TIME >= ? OR WC.END_TIME >= ?
-                          AND EXISTS (SELECT DL.WORKFLOW_ID
-                                        FROM WORKFLOW_LINKAGE WL
-                                            INNER JOIN DOCUMENT_LIFESPAN DL ON (WL.C_WF_ID = DL.WORKFLOW_ID)
-                                        WHERE WL.ROOT_WF_ID = WC.WORKFLOW_ID
-                                           OR DL.WORKFLOW_ID = WC.WORKFLOW_ID
-                                     )  -- pick only document related workflow events
+                          AND WC.DOC_ID IS NOT NULL  -- pick only document related workflow events
                           AND WC.START_TIME < DATEADD(minute, -5, getdate())  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY WC.START_TIME, WC.WORKFLOW_ID ASC
                         OFFSET 0 ROWS FETCH FIRST 10000 ROWS ONLY -- limit rows number per query iteration
