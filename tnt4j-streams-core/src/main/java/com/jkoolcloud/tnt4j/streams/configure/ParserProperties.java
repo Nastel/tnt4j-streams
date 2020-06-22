@@ -60,7 +60,7 @@ public interface ParserProperties {
 	/**
 	 * Constant for name of built-in {@value} property.
 	 *
-	 * @deprecated use {@link #PROP_ACTIVITY_DELIM}
+	 * @deprecated use {@link #PROP_ACTIVITY_DELIM} instead
 	 */
 	@Deprecated
 	String PROP_READ_LINES = "ReadLines"; // NON-NLS

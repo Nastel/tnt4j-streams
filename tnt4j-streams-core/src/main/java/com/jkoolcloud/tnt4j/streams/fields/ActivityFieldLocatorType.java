@@ -51,7 +51,7 @@ public enum ActivityFieldLocatorType {
 	 * raw activity data using a regular expression pattern defined as a sequence of repeating match patterns. Match
 	 * identifier can be group sequence number or name.
 	 *
-	 * @deprecated use {@link #Label} instead.
+	 * @deprecated use {@link #Label} instead
 	 */
 	@Deprecated
 	REMatchId(String.class),
