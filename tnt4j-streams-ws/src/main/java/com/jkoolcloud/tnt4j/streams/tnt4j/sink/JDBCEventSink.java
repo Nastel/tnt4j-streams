@@ -322,26 +322,33 @@ public class JDBCEventSink extends LoggedEventSink {
 				}
 				LOGGER.log(OpLevel.INFO, "Sent {0} upsert queries to database", qCount);
 			} catch (SQLException exc) {
-				Utils.logThrowable(LOGGER, OpLevel.ERROR, "Failed to process whole upsert batch: {0}", exc);
+				Utils.logThrowable(LOGGER, OpLevel.ERROR, "Failed to obtain DB connection or metadata: {0}", exc);
 			} finally {
 				Utils.close(dbConn);
 			}
 		}
 	}
 
-	private int batchQueries(Connection dbConn, List<String> batch) throws SQLException {
-		Statement dbSt = dbConn.createStatement(); // TODO: prepared statements batching
-		for (String sql : batch) {
-			dbSt.addBatch(sql);
-			incrementBytesSent(sql.length());
+	private int batchQueries(Connection dbConn, List<String> batch) {
+		Statement dbSt = null;
+		int qCount = 0;
+		try {
+			dbSt = dbConn.createStatement(); // TODO: prepared statements batching
+			for (String sql : batch) {
+				dbSt.addBatch(sql);
+				incrementBytesSent(sql.length());
+			}
+			dbSt.executeBatch();
+			if (!dbConn.getAutoCommit()) {
+				dbConn.commit();
+			}
+			qCount = batch.size();
+			batch.clear();
+		} catch (SQLException exc) {
+			Utils.logThrowable(LOGGER, OpLevel.ERROR, "Failed to process whole upsert batch: {0}", exc);
+		} finally {
+			Utils.close(dbSt);
 		}
-		dbSt.executeBatch();
-		if (!dbConn.getAutoCommit()) {
-			dbConn.commit();
-		}
-		int qCount = batch.size();
-		Utils.close(dbSt);
-		batch.clear();
 
 		return qCount;
 	}
