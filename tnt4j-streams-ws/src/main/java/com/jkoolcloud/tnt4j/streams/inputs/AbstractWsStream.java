@@ -55,6 +55,9 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  * <li>SynchronizeRequests - flag indicating that stream issued WebService requests shall be synchronized and handled in
  * configuration defined sequence - waiting for prior request to complete before issuing next. Default value -
  * {@code false}. (Optional)</li>
+ * <li>DropRecurrentRequests - flag indicating whether to drop streaming stream input buffer contained recurring
+ * requests, when stream input scheduler invokes requests faster than they can be processed (parsed and sent to sink,
+ * e.g. because of sink/JKool limiter throttling). Default value - {@code true}. (Optional)</li>
  * <li>List of Quartz configuration properties. See
  * <a href= "http://www.quartz-scheduler.org/documentation/quartz-2.3.0/configuration/">Quartz Configuration
  * Reference</a> for details.</li>
@@ -65,7 +68,7 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  * @param <RS>
  *            type of handled response data
  *
- * @version $Revision: 3 $
+ * @version $Revision: 4 $
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  */
@@ -95,7 +98,10 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 
 	private Scheduler scheduler;
 	private boolean synchronizeRequests = false;
+	private boolean dropRecurrentRequests = true;
 	private Properties quartzProperties = new Properties();
+
+	private final Set<String> parsedRequests = new HashSet<>();
 
 	@Override
 	public void setProperty(String name, String value) {
@@ -103,6 +109,8 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 
 		if (WsStreamProperties.PROP_SYNCHRONIZE_REQUESTS.equalsIgnoreCase(name)) {
 			synchronizeRequests = Utils.toBoolean(value);
+		} else if (WsStreamProperties.PROP_DROP_RECURRENT_REQUESTS.equalsIgnoreCase(name)) {
+			dropRecurrentRequests = Utils.toBoolean(value);
 		} else if (name.startsWith("org.quartz.")) { // NON-NLS
 			quartzProperties.setProperty(name, value);
 		}
@@ -121,6 +129,9 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	public Object getProperty(String name) {
 		if (WsStreamProperties.PROP_SYNCHRONIZE_REQUESTS.equalsIgnoreCase(name)) {
 			return synchronizeRequests;
+		}
+		if (WsStreamProperties.PROP_DROP_RECURRENT_REQUESTS.equalsIgnoreCase(name)) {
+			return dropRecurrentRequests;
 		}
 
 		return super.getProperty(name);
@@ -322,7 +333,61 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 			scheduler = null;
 		}
 
+		synchronized (parsedRequests) {
+			parsedRequests.clear();
+		}
+
 		super.cleanup();
+	}
+
+	@Override
+	protected boolean isItemConsumed(WsResponse<RQ, RS> item) {
+		if (item == null || item.getData() == null) {
+			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+					"AbstractWsStream.response.consumption.null");
+			return true;
+		}
+
+		if (dropRecurrentRequests) {
+			WsResponse<RQ, RS> recurringItem = getRecurrentResponse(item, inputBuffer);
+
+			if (recurringItem != null) {
+				logger().log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+						"AbstractWsStream.response.consumption.drop", item.getOriginalRequest().fqn());
+				inputBuffer.remove(recurringItem);
+				closeResponse(recurringItem.getData());
+			}
+		}
+
+		return isResponseConsumed(item);
+	}
+
+	/**
+	 * Checks whether provided response item is consumed, and stream should take next response from buffer.
+	 * 
+	 * @param item
+	 *            response item to check
+	 * @return {@code true} if response is consumed, {@code false} - otherwise
+	 */
+	protected boolean isResponseConsumed(WsResponse<RQ, RS> item) {
+		return true;
+	}
+
+	@Override
+	protected void setCurrentItem(WsResponse<RQ, RS> item) {
+		super.setCurrentItem(item);
+
+		if (item != null) {
+			requestParsingStarted(item);
+		}
+	}
+
+	@Override
+	protected void cleanupItem(WsResponse<RQ, RS> item) {
+		if (item != null && item.getData() != null) {
+			closeResponse(item.getData());
+			responseConsumed(item);
+		}
 	}
 
 	/**
@@ -806,7 +871,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 * @throws InterruptedException
 	 *             if current thread got interrupted when acquiring semaphore
 	 */
-	protected Semaphore acquireSemaphore(WsRequest<?> request) throws InterruptedException {
+	protected Semaphore acquireSemaphore(WsRequest<RQ> request) throws InterruptedException {
 		if (semaphore != null) {
 			while (!semaphore.tryAcquire()) {
 				Thread.sleep(50);
@@ -841,7 +906,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 * @param request
 	 *            request semaphore was obtained for
 	 */
-	protected void releaseSemaphore(Semaphore acquiredSemaphore, String lockName, WsRequest<?> request) {
+	protected void releaseSemaphore(Semaphore acquiredSemaphore, String lockName, WsRequest<RQ> request) {
 		if (acquiredSemaphore != null && acquiredSemaphore.availablePermits() < 1) {
 			logger().log(OpLevel.DEBUG,
 					StreamsResources.getString(WsStreamConstants.RESOURCE_BUNDLE_NAME,
@@ -857,7 +922,123 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 * @param request
 	 *            failed request
 	 */
-	protected void requestFailed(WsRequest<?> request) {
+	protected void requestFailed(WsRequest<RQ> request) {
+	}
+
+	/**
+	 * Performs actions on response item before parsing.
+	 * 
+	 * @param rItem
+	 *            parsed response item
+	 */
+	protected void requestParsingStarted(WsResponse<RQ, RS> rItem) {
+		String reqName = rItem.getOriginalRequest().fqn();
+		if (reqName != null) {
+			synchronized (parsedRequests) {
+				parsedRequests.add(reqName);
+			}
+		}
+	}
+
+	/**
+	 * Performs actions on consumed response item.
+	 * 
+	 * @param rItem
+	 *            consumed response item
+	 */
+	protected void responseConsumed(WsResponse<RQ, RS> rItem) {
+		String qName = rItem.getOriginalRequest().fqn();
+		if (qName != null) {
+			synchronized (parsedRequests) {
+				parsedRequests.remove(qName);
+			}
+		}
+	}
+
+	/**
+	 * Checks if request has any response currently processed or pending on input buffer.
+	 * 
+	 * @param req
+	 *            request instance to check
+	 * @return {@code true} if request has any response currently processed or pending on input buffer, {@code false} -
+	 *         otherwise
+	 */
+	@SuppressWarnings("unchecked")
+	protected boolean isRequestOngoing(WsRequest<RQ> req) {
+		String reqName = req.fqn();
+
+		synchronized (parsedRequests) {
+			for (String pqName : parsedRequests) {
+				if (reqName.equals(pqName)) {
+					logger().log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+							"AbstractWsStream.response.in.progress", reqName);
+					return true;
+				}
+			}
+		}
+
+		for (Object item : inputBuffer) {
+			if (item instanceof WsResponse) {
+				WsResponse<RQ, RS> respItem = (WsResponse<RQ, RS>) item;
+
+				if (reqName.equals(respItem.getOriginalRequest().fqn())) {
+					logger().log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+							"AbstractWsStream.response.pending", reqName);
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns recurrent response for currently parsed response.
+	 * 
+	 * @param cItem
+	 *            currently parsed response
+	 * @param buffer
+	 *            input buffer instance
+	 * @return recurrent response for currently processed response, or {@code null} if no recurring responses available
+	 *         in input buffer
+	 */
+	@SuppressWarnings("unchecked")
+	protected WsResponse<RQ, RS> getRecurrentResponse(WsResponse<RQ, RS> cItem, Queue<?> buffer) {
+		for (Object item : buffer) {
+			if (item instanceof WsResponse) {
+				WsResponse<RQ, RS> respItem = (WsResponse<RQ, RS>) item;
+
+				if (respItem.getOriginalRequest().fqn().equals(cItem.getOriginalRequest().fqn())) {
+					return respItem;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Closes response instance.
+	 * 
+	 * @param resp
+	 *            response to close
+	 */
+	protected void closeResponse(RS resp) {
+	}
+
+	/**
+	 * Checks if stream is configured to drop recurring requests and if request is recurring: currently processed by
+	 * parser or pending in input buffer.
+	 * 
+	 * @param req
+	 *            request to check
+	 * @return {@code true} is stream shall drop recurring requests and request is processed or pending in input buffer,
+	 *         {@code false} - otherwise
+	 * 
+	 * @see #isRequestOngoing(com.jkoolcloud.tnt4j.streams.scenario.WsRequest)
+	 */
+	protected boolean isDropRecurring(WsRequest<RQ> req) {
+		return dropRecurrentRequests && isRequestOngoing(req);
 	}
 
 	/**

@@ -362,6 +362,10 @@ public class RestStream extends AbstractHttpStream {
 						return;
 					}
 
+					if (stream.isDropRecurring(request)) {
+						continue;
+					}
+
 					respStr = null;
 					acquiredSemaphore = null;
 					processedRequest = null;
@@ -415,6 +419,10 @@ public class RestStream extends AbstractHttpStream {
 			for (WsRequest<String> request : scenarioStep.requestsArray()) {
 				if (stream.isShotDown()) {
 					return;
+				}
+
+				if (stream.isDropRecurring(request)) {
+					continue;
 				}
 
 				respStr = null;

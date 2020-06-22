@@ -114,6 +114,15 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 	}
 
 	/**
+	 * Returns fully qualified name of request.
+	 * 
+	 * @return fully qualified name of request
+	 */
+	public String fqn() {
+		return scenarioStep.getName() + ":" + id; // NON-NLS
+	}
+
+	/**
 	 * Returns request (command/query/etc.) parameters map.
 	 *
 	 * @return request parameters map

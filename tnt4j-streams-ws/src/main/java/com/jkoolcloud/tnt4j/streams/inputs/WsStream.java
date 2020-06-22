@@ -346,6 +346,10 @@ public class WsStream extends AbstractHttpStream {
 						return;
 					}
 
+					if (stream.isDropRecurring(request)) {
+						continue;
+					}
+
 					respStr = null;
 					acquiredSemaphore = null;
 					processedRequest = null;

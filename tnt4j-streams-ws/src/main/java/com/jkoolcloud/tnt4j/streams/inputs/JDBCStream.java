@@ -18,8 +18,9 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.Closeable;
 import java.sql.*;
-import java.sql.Date;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.Semaphore;
 
 import javax.sql.DataSource;
@@ -53,9 +54,6 @@ import com.zaxxer.hikari.HikariDataSource;
  * This activity stream supports the following configuration properties (in addition to those supported by
  * {@link AbstractWsStream}):
  * <ul>
- * <li>DropRecurrentResultSets - flag indicating whether to drop streaming stream input buffer contained recurring
- * result sets, when stream input scheduler invokes JDBC queries faster than they can be processed (parsed and sent to
- * sink, e.g. because of sink/JKool limiter throttling). Default value - {@code true}. (Optional)</li>
  * <li>QueryFetchRows - number of rows to be fetched from database per query returned {@link java.sql.ResultSet} cursor
  * access. Value {@code 0} implies to use default JDBC setting. See {@link java.sql.Statement#setFetchSize(int)} for
  * details. Default value - {@code 0}. (Optional)</li>
@@ -70,7 +68,7 @@ import com.zaxxer.hikari.HikariDataSource;
  * accessed in multi-thread manner.</li>
  * </ul>
  *
- * @version $Revision: 2 $
+ * @version $Revision: 3 $
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  * @see java.sql.DriverManager#getConnection(String, java.util.Properties)
@@ -80,7 +78,6 @@ import com.zaxxer.hikari.HikariDataSource;
 public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(JDBCStream.class);
 
-	private static final String QUERY_NAME_PROP = "QueryName"; // NON-NLS
 	private static final String ROW_PROP = ".Rs.Row."; // NON-NLS
 
 	private static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd"; // NON-NLS
@@ -92,12 +89,10 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	 */
 	protected Map<String, String> jdbcProperties = new HashMap<>();
 
-	private boolean dropRecurrentResultSets = true;
 	private int fetchSize = 0;
 	private int maxRows = 0;
 
 	private Map<String, DataSource> dbDataSources = new HashMap<>(3);
-	private final Set<String> parsedQueries = new HashSet<>();
 
 	/**
 	 * Constructs an empty JDBCStream. Requires configuration settings to set input stream source.
@@ -115,9 +110,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	public void setProperty(String name, String value) {
 		super.setProperty(name, value);
 
-		if (WsStreamProperties.PROP_DROP_RECURRENT_RESULT_SETS.equalsIgnoreCase(name)) {
-			dropRecurrentResultSets = Utils.toBoolean(value);
-		} else if (WsStreamProperties.PROP_QUERY_FETCH_ROWS.equalsIgnoreCase(name)) {
+		if (WsStreamProperties.PROP_QUERY_FETCH_ROWS.equalsIgnoreCase(name)) {
 			fetchSize = Integer.parseInt(value);
 		} else if (WsStreamProperties.PROP_QUERY_MAX_ROWS.equalsIgnoreCase(name)) {
 			maxRows = Integer.parseInt(value);
@@ -128,9 +121,6 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 
 	@Override
 	public Object getProperty(String name) {
-		if (WsStreamProperties.PROP_DROP_RECURRENT_RESULT_SETS.equalsIgnoreCase(name)) {
-			return dropRecurrentResultSets;
-		}
 		if (WsStreamProperties.PROP_QUERY_FETCH_ROWS.equalsIgnoreCase(name)) {
 			return fetchSize;
 		}
@@ -163,10 +153,6 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	protected void cleanup() {
 		super.cleanup();
 
-		synchronized (parsedQueries) {
-			parsedQueries.clear();
-		}
-
 		for (DataSource dbDataSource : dbDataSources.values()) {
 			if (dbDataSource instanceof Closeable) {
 				Utils.close((Closeable) dbDataSource);
@@ -174,23 +160,6 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 		}
 
 		dbDataSources.clear();
-	}
-
-	@Override
-	protected void setCurrentItem(WsResponse<String, ResultSet> item) {
-		super.setCurrentItem(item);
-
-		if (item != null) {
-			queryParsingStarted(item);
-		}
-	}
-
-	@Override
-	protected void cleanupItem(WsResponse<String, ResultSet> item) {
-		if (item != null && item.getData() != null) {
-			closeRS(item.getData());
-			queryConsumed(item);
-		}
 	}
 
 	@Override
@@ -204,29 +173,12 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	}
 
 	@Override
-	protected boolean isItemConsumed(WsResponse<String, ResultSet> item) {
-		if (item == null || item.getData() == null) {
-			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-					"JDBCStream.rs.consumption.null");
-			return true;
-		}
-
-		if (dropRecurrentResultSets) {
-			WsResponse<String, ResultSet> recurringItem = getRecurrentResultSet(item, inputBuffer);
-
-			if (recurringItem != null) {
-				logger().log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-						"JDBCStream.rs.consumption.drop", item.getParameterStringValue(QUERY_NAME_PROP));
-				inputBuffer.remove(recurringItem);
-				closeRS(recurringItem.getData());
-			}
-		}
-
+	protected boolean isResponseConsumed(WsResponse<String, ResultSet> item) {
 		ResultSet rs = item.getData();
 		try {
 			if (rs.isClosed() || !rs.next()) {
-				closeRS(rs);
-				queryConsumed(item);
+				closeResponse(rs);
+				responseConsumed(item);
 
 				logger().log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 						"JDBCStream.rs.consumption.done", item.getParameterValue(ROW_PROP));
@@ -251,14 +203,15 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 					StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"JDBCStream.rs.consumption.exception", exc);
 
-			closeRS(item.getData());
-			queryConsumed(item);
+			closeResponse(item.getData());
+			responseConsumed(item);
 
 			return true;
 		}
 	}
 
-	private void closeRS(ResultSet rs) {
+	@Override
+	protected void closeResponse(ResultSet rs) {
 		Statement st = null;
 		Connection conn = null;
 
@@ -277,85 +230,6 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 		Utils.close(rs);
 		Utils.close(st);
 		Utils.close(conn);
-	}
-
-	private void queryParsingStarted(WsResponse<String, ResultSet> cItem) {
-		String qName = cItem.getParameterStringValue(QUERY_NAME_PROP);
-		if (qName != null) {
-			synchronized (parsedQueries) {
-				parsedQueries.add(qName);
-			}
-		}
-	}
-
-	private void queryConsumed(WsResponse<String, ResultSet> cItem) {
-		String qName = cItem.getParameterStringValue(QUERY_NAME_PROP);
-		if (qName != null) {
-			synchronized (parsedQueries) {
-				parsedQueries.remove(qName);
-			}
-		}
-	}
-
-	/**
-	 * Returns recurrent response for currently processed response.
-	 * 
-	 * @param cItem
-	 *            currently parser processed response
-	 * @param buffer
-	 *            input buffer instance
-	 * @return recurrent response for currently processed response, or {@code null} if no recurring responses available
-	 *         in input buffer
-	 */
-	@SuppressWarnings("unchecked")
-	protected WsResponse<String, ResultSet> getRecurrentResultSet(WsResponse<String, ResultSet> cItem,
-			Queue<?> buffer) {
-		for (Object item : buffer) {
-			if (item instanceof WsResponse) {
-				WsResponse<String, ResultSet> respItem = (WsResponse<String, ResultSet>) item;
-
-				if (respItem.getParameterStringValue(QUERY_NAME_PROP)
-						.equals(cItem.getParameterStringValue(QUERY_NAME_PROP))) {
-					return respItem;
-				}
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Checks if query is currently processed or pending on input buffer.
-	 * 
-	 * @param qName
-	 *            query name
-	 * @return {@code true} if query is currently processed or pending on input buffer, {@code false} - otherwise
-	 */
-	@SuppressWarnings("unchecked")
-	protected boolean isQueryOngoing(String qName) {
-		synchronized (parsedQueries) {
-			for (String pqName : parsedQueries) {
-				if (qName.equals(pqName)) {
-					LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-							"JDBCStream.query.in.progress", qName);
-					return true;
-				}
-			}
-		}
-
-		for (Object item : inputBuffer) {
-			if (item instanceof WsResponse) {
-				WsResponse<String, ResultSet> respItem = (WsResponse<String, ResultSet>) item;
-
-				if (qName.equals(respItem.getParameterStringValue(QUERY_NAME_PROP))) {
-					LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-							"JDBCStream.query.pending", qName);
-					return true;
-				}
-			}
-		}
-
-		return false;
 	}
 
 	@Override
@@ -694,16 +568,14 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 
 			if (!scenarioStep.isEmpty()) {
 				ResultSet respRs;
-				Semaphore acquiredSemaphore = null;
+				Semaphore acquiredSemaphore;
 				WsRequest<String> processedRequest;
-				String qName;
 				for (WsRequest<String> request : scenarioStep.requestsArray()) {
 					if (stream.isShotDown()) {
 						return;
 					}
 
-					qName = scenarioStep.getName() + ":" + request.getId(); // NON-NLS
-					if (stream.dropRecurrentResultSets && stream.isQueryOngoing(qName)) {
+					if (stream.isDropRecurring(request)) {
 						continue;
 					}
 
@@ -726,9 +598,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 								"JDBCStream.execute.exception", stream.getName(), processedRequest.getId(), exc);
 					} finally {
 						if (respRs != null) {
-							WsResponse<String, ResultSet> resp = new WsResponse<>(respRs, processedRequest);
-							resp.addParameter(QUERY_NAME_PROP, qName, true);
-							stream.addInputToBuffer(resp);
+							stream.addInputToBuffer(new WsResponse<>(respRs, processedRequest));
 						} else {
 							stream.requestFailed(processedRequest);
 							stream.releaseSemaphore(acquiredSemaphore, scenarioStep.getName(), request);

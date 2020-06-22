@@ -49,7 +49,7 @@ public interface WsStreamProperties extends StreamProperties {
 	/**
 	 * Constant for name of built-in stream {@value} property.
 	 */
-	public static final String PROP_DROP_RECURRENT_RESULT_SETS = "DropRecurrentResultSets"; // NON-NLS
+	public static final String PROP_DROP_RECURRENT_REQUESTS = "DropRecurrentRequests"; // NON-NLS
 	/**
 	 * Constant for name of built-in stream {@value} property.
 	 */

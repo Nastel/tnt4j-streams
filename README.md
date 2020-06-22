@@ -5334,13 +5334,17 @@ request/invocation/execution parameters and scheduler. Steps are invoked/execute
 Generic configuration properties:
 * `SynchronizeRequests` - flag indicating that stream issued requests shall be synchronized and handled in configuration defined sequence - 
 waiting for prior request to complete before issuing next one. This property can be defined under `stream` or scenario `step` tags and 
-synchronize requests under according scope. Default value - `false`. (Optional)
+synchronize requests under according scope. Default value - `true`. (Optional)
+* `DropRecurrentRequests` - flag indicating whether to drop streaming stream input buffer contained recurring requests, when stream input 
+scheduler invokes requests faster than they can be processed (parsed and sent to sink, e.g. because of sink/JKool limiter throttling). 
+Default value - `true`. (Optional)
 * List of Quartz configuration properties. See [Quartz Configuration Reference](http://www.quartz-scheduler.org/documentation/quartz-2.3.0/configuration/) 
 for details. (Optional)
 
     sample:
 ```xml
     <property name="SynchronizeRequests" value="true"/>
+    <property name="DropRecurrentRequests" value="false"/>
     <!-- Quartz configuration -->
     <property name="org.quartz.scheduler.instanceName" value="MyStreamScheduler"/>
     <property name="org.quartz.threadPool.threadCount" value="5"/>
@@ -5399,9 +5403,6 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 
 ##### JDBCStream parameters
 
- * `DropRecurrentResultSets` - flag indicating whether to drop streaming stream input buffer contained recurring result sets, when stream 
- input scheduler invokes JDBC queries faster than they can be processed (parsed and sent to sink, e.g. because of sink/JKool limiter 
- throttling). Default value - `true`. (Optional)
  * `QueryFetchRows` - number of rows to be fetched from database per query returned `java.sql.ResultSet` cursor access. Value `0` implies to 
  use default JDBC setting. See [JDBC Statement.setFetchSize()](https://docs.oracle.com/javase/7/docs/api/java/sql/Statement.html#setFetchSize(int)) 
  for details. Default value - `0`. (Optional)
@@ -5415,7 +5416,6 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 
     sample:
  ```xml
-     <property name="DropRecurrentResultSets" value="false"/>
      <property name="QueryFetchRows" value="500"/>
      <property name="QueryMaxRows" value="50000"/>
  ```

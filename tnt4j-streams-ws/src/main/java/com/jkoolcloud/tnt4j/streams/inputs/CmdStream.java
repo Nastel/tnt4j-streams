@@ -128,6 +128,10 @@ public class CmdStream extends AbstractWsStream<String, String> {
 						return;
 					}
 
+					if (stream.isDropRecurring(request)) {
+						continue;
+					}
+
 					respStr = null;
 					acquiredSemaphore = null;
 					processedRequest = null;
