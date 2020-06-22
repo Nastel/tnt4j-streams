@@ -15,7 +15,7 @@
 
     <properties>
         <quartz.version>2.3.2</quartz.version>
-        <hikaricp.version>3.4.2</hikaricp.version>
+        <hikaricp.version>3.4.5</hikaricp.version>
     </properties>
 
     <build>
