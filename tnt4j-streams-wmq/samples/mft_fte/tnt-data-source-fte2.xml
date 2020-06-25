@@ -20,8 +20,16 @@
             <field-locator locator="/transaction/status/@resultCode" locator-type="Label" datatype="Number"/>
         </field>
         <field name="ServerName" locator="/transaction/originator/hostName" locator-type="Label"/>
-        <field name="StartTime" locator="/transaction/action/@time" locator-type="Label" datatype="DateTime"
-               format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT"/>
+        <field name="StartTime" formattingPattern="{0}" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT">
+            <field-locator locator="/transaction/transferSet/@startTime" locator-type="Label" required="false"/>
+            <field-locator locator="/transaction/transferSet/@time" locator-type="Label" required="false"/>
+        </field>
+        <field name="EndTime" locator="/transaction/action/@time" locator-type="Label" datatype="DateTime"
+               format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT">
+            <field-transform lang="groovy"><![CDATA[
+                $fieldValue == null ? ${StartTime} : $fieldValue;
+            ]]></field-transform>
+        </field>
         <field name="CompCode" separator="">
             <field-locator locator="/transaction/transferSet/item/status/@resultCode" locator-type="Label"
                            datatype="Number"/>
@@ -45,15 +53,15 @@
     <!--<property name="QueueManager" value="MB8QMGR"/>-->
     <!--<property name="Queue" value="NASTEL.FTE.EVENTS"/>-->
 
-        <!-- In case of SSL Connection: cipher suite value must match one defined for server connection channel -->
-        <!--<property name="CMQC.SSL_CIPHER_SUITE_PROPERTY" value="TLS_RSA_WITH_AES_128_CBC_SHA256"/>-->
-        <!-- Also dont forget to configure Java Key/Trust stores over system properties: -->
-        <!--                             -Djavax.net.ssl.trustStore=[sysPath]/client.jks -->
-        <!--                             -Djavax.net.ssl.trustStorePassword=clientpass -->
-        <!--                             -Djavax.net.ssl.keyStore=[sysPath]/client.jks -->
-        <!--                             -Djavax.net.ssl.keyStorePassword=clientpass -->
-        <!-- and if you are using non IBM java on client side add sys property: -->
-        <!--                             -Dcom.ibm.mq.cfg.useIBMCipherMappings=false -->
+    <!-- In case of SSL Connection: cipher suite value must match one defined for server connection channel -->
+    <!--<property name="CMQC.SSL_CIPHER_SUITE_PROPERTY" value="TLS_RSA_WITH_AES_128_CBC_SHA256"/>-->
+    <!-- Also dont forget to configure Java Key/Trust stores over system properties: -->
+    <!--                             -Djavax.net.ssl.trustStore=[sysPath]/client.jks -->
+    <!--                             -Djavax.net.ssl.trustStorePassword=clientpass -->
+    <!--                             -Djavax.net.ssl.keyStore=[sysPath]/client.jks -->
+    <!--                             -Djavax.net.ssl.keyStorePassword=clientpass -->
+    <!-- and if you are using non IBM java on client side add sys property: -->
+    <!--                             -Dcom.ibm.mq.cfg.useIBMCipherMappings=false -->
 
     <!--<parser-ref name="MQFTEParser"/>-->
     <!--</stream>-->

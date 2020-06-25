@@ -112,8 +112,16 @@
         </field>
         <field name="ServerName" locator="/transaction/originator/hostName" locator-type="Label"/>
         <field name="ServerOs" locator="/transaction/sourceAgent/systemInfo/@name" locator-type="Label"/>
-        <field name="StartTime" locator="/transaction/action/@time" locator-type="Label" datatype="DateTime"
-               format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT"/>
+        <field name="StartTime" formattingPattern="{0}" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT">
+            <field-locator locator="/transaction/transferSet/@startTime" locator-type="Label" required="false"/>
+            <field-locator locator="/transaction/transferSet/@time" locator-type="Label" required="false"/>
+        </field>
+        <field name="EndTime" locator="/transaction/action/@time" locator-type="Label" datatype="DateTime"
+               format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT">
+            <field-transform lang="groovy"><![CDATA[
+                $fieldValue == null ? ${StartTime} : $fieldValue;
+            ]]></field-transform>
+        </field>
         <field name="Correlator" locator="/transaction/@ID" locator-type="Label"/>
         <field name="Exception" separator="">
             <field-locator locator="/transaction/transferSet/item/status/supplement" locator-type="Label" required="false"/>
@@ -172,8 +180,16 @@
         <field name="ResMgrType" value="MESSAGING_SERVER"/>
         <field name="ServerName" locator="/transaction/originator/hostName" locator-type="Label"/>
         <field name="ServerOs" locator="/transaction/sourceAgent/systemInfo/@name" locator-type="Label"/>
-        <field name="StartTime" locator="/transaction/action/@time" locator-type="Label" datatype="DateTime"
-               format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT"/>
+        <field name="StartTime" formattingPattern="{0}" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT">
+            <field-locator locator="/transaction/transferSet/@startTime" locator-type="Label" required="false"/>
+            <field-locator locator="/transaction/transferSet/@time" locator-type="Label" required="false"/>
+        </field>
+        <field name="EndTime" locator="/transaction/action/@time" locator-type="Label" datatype="DateTime"
+               format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT">
+            <field-transform lang="groovy"><![CDATA[
+                $fieldValue == null ? ${StartTime} : $fieldValue;
+            ]]></field-transform>
+        </field>
         <field name="MFT_JOB_NAME" locator="/transaction/job/name" locator-type="Label" required="false">
             <parser-ref name="JobNameParser" aggregation="Merge"/>
         </field>
@@ -210,8 +226,16 @@
         </field>
         <field name="ServerName" locator="/transaction/originator/hostName" locator-type="Label"/>
         <field name="ServerOs" locator="/transaction/sourceAgent/systemInfo/@name" locator-type="Label"/>
-        <field name="StartTime" locator="/transaction/action/@time" locator-type="Label" datatype="DateTime"
-               format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT"/>
+        <field name="StartTime" formattingPattern="{0}" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT">
+            <field-locator locator="/transaction/transferSet/@startTime" locator-type="Label" required="false"/>
+            <field-locator locator="/transaction/transferSet/@time" locator-type="Label" required="false"/>
+        </field>
+        <field name="EndTime" locator="/transaction/action/@time" locator-type="Label" datatype="DateTime"
+               format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT">
+            <field-transform lang="groovy"><![CDATA[
+                $fieldValue == null ? ${StartTime} : $fieldValue;
+            ]]></field-transform>
+        </field>
         <field name="ResultCode" locator="/transaction/status/@resultCode" locator-type="Label" datatype="Number" transparent="true"/>
 
         <field name="ReasonCode" separator="">
