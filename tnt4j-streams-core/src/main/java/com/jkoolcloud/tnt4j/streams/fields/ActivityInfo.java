@@ -1453,7 +1453,7 @@ public class ActivityInfo {
 			eventName = otherAi.eventName;
 		}
 		if (eventType == null || eventType == OpType.NOOP) {
-			eventType = otherAi.eventType;
+			eventType = substitute(eventType, otherAi.eventType);
 		}
 		if (eventStatus == null) {
 			eventStatus = otherAi.eventStatus;
