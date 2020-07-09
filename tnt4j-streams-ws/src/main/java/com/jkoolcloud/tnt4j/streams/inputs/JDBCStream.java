@@ -68,7 +68,7 @@ import com.zaxxer.hikari.HikariDataSource;
  * accessed in multi-thread manner.</li>
  * </ul>
  *
- * @version $Revision: 3 $
+ * @version $Revision: 4 $
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  * @see java.sql.DriverManager#getConnection(String, java.util.Properties)
@@ -181,7 +181,8 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 				responseConsumed(item);
 
 				logger().log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-						"JDBCStream.rs.consumption.done", item.getParameterValue(ROW_PROP));
+						"JDBCStream.rs.consumption.done", item.getOriginalRequest().getId(),
+						item.getParameterValue(ROW_PROP));
 				item.getParameters().remove(ROW_PROP);
 
 				return true;
@@ -195,13 +196,13 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 
 			param.setValue(rs.getRow());
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-					"JDBCStream.rs.consumption.marker.new", rs.getRow());
+					"JDBCStream.rs.consumption.marker.new", item.getOriginalRequest().getId(), rs.getRow());
 
 			return false;
 		} catch (SQLException exc) {
 			Utils.logThrowable(logger(), OpLevel.WARNING,
 					StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-					"JDBCStream.rs.consumption.exception", exc);
+					"JDBCStream.rs.consumption.exception", item.getOriginalRequest().getId(), exc);
 
 			closeResponse(item.getData());
 			responseConsumed(item);
@@ -246,26 +247,26 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	 *            DB user name
 	 * @param pass
 	 *            DB user password
-	 * @param query
-	 *            DB query
-	 * @param params
-	 *            DB query parameters map
+	 * @param dbRequest
+	 *            DB request defining query, parameters and additional metadata
 	 * @return JDBC call returned result set {@link java.sql.ResultSet}
 	 * 
 	 * @throws SQLException
 	 *             if exception occurs while performing JDBC call
 	 */
-	protected ResultSet executeJdbcCall(String url, String user, String pass, String query,
-			Map<String, WsRequest.Parameter> params) throws SQLException {
+	protected ResultSet executeJdbcCall(String url, String user, String pass, WsRequest<String> dbRequest)
+			throws SQLException {
 		if (StringUtils.isEmpty(url)) {
 			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-					"JDBCStream.db.conn.not.defined", url);
+					"JDBCStream.db.conn.not.defined", dbRequest.getId());
 			return null;
 		}
 
+		String query = dbRequest.getData();
+
 		if (StringUtils.isEmpty(query)) {
 			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-					"JDBCStream.query.not.defined", query);
+					"JDBCStream.query.not.defined", dbRequest.getId(), query);
 			return null;
 		}
 
@@ -283,7 +284,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 					"JDBCStream.db.connection.obtained", url, cod.durationHMS());
 
 			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-					"JDBCStream.preparing.query", query);
+					"JDBCStream.preparing.query", dbRequest.getId(), query);
 
 			statement = dbConn.prepareStatement(query); // ResultSet.TYPE_SCROLL_INSENSITIVE,
 														// ResultSet.CONCUR_READ_ONLY);
@@ -294,15 +295,16 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 				statement.setMaxRows(maxRows);
 			}
 
-			addStatementParameters(statement, params);
+			addStatementParameters(statement, dbRequest);
 
 			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-					"JDBCStream.executing.query", url);
+					"JDBCStream.executing.query", dbRequest.getId(), url);
 			Duration qed = Duration.arm();
 			rs = statement.executeQuery();
 
 			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-					"JDBCStream.query.execution.completed", url, qed.durationHMS(), cod.durationHMS());
+					"JDBCStream.query.execution.completed", url, dbRequest.getId(), qed.durationHMS(),
+					cod.durationHMS());
 
 			return rs;
 		} catch (SQLException exc) {
@@ -354,14 +356,15 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	 *
 	 * @param statement
 	 *            prepared SQL statement parameters to set
-	 * @param params
-	 *            SQL query parameters map
+	 * @param dbRequest
+	 *            DB request defining query parameters and additional metadata
 	 * 
 	 * @throws SQLException
 	 *             if exception occurs while setting prepared statement parameter
 	 */
-	protected void addStatementParameters(PreparedStatement statement, Map<String, WsRequest.Parameter> params)
+	protected void addStatementParameters(PreparedStatement statement, WsRequest<String> dbRequest)
 			throws SQLException {
+		Map<String, WsRequest.Parameter> params = dbRequest.getParameters();
 		if (params != null) {
 			for (Map.Entry<String, WsRequest.Parameter> param : params.entrySet()) {
 				try {
@@ -379,13 +382,14 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 						value = fillInRequestData(value, format);
 						if (!param.getValue().isTransient()) {
 							if (isNullValue(value)) {
-								setNullParameter(statement, pIdx, Types.INTEGER, type.toUpperCase());
+								setNullParameter(statement, dbRequest.getId(), pIdx, Types.INTEGER, type.toUpperCase());
 							} else {
 								int iValue = Integer.parseInt(value);
 								statement.setInt(pIdx, iValue);
 								LOGGER.log(OpLevel.INFO,
 										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+										"JDBCStream.set.query.parameter", dbRequest.getId(), pIdx, value,
+										type.toUpperCase());
 							}
 						}
 						break;
@@ -393,13 +397,14 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 						value = fillInRequestData(value, format);
 						if (!param.getValue().isTransient()) {
 							if (isNullValue(value)) {
-								setNullParameter(statement, pIdx, Types.BIGINT, type.toUpperCase());
+								setNullParameter(statement, dbRequest.getId(), pIdx, Types.BIGINT, type.toUpperCase());
 							} else {
 								long lValue = Long.parseLong(value);
 								statement.setLong(pIdx, lValue);
 								LOGGER.log(OpLevel.INFO,
 										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+										"JDBCStream.set.query.parameter", dbRequest.getId(), pIdx, value,
+										type.toUpperCase());
 							}
 						}
 						break;
@@ -407,13 +412,14 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 						value = fillInRequestData(value, format);
 						if (!param.getValue().isTransient()) {
 							if (isNullValue(value)) {
-								setNullParameter(statement, pIdx, Types.FLOAT, type.toUpperCase());
+								setNullParameter(statement, dbRequest.getId(), pIdx, Types.FLOAT, type.toUpperCase());
 							} else {
 								float fValue = Float.parseFloat(value);
 								statement.setFloat(pIdx, fValue);
 								LOGGER.log(OpLevel.INFO,
 										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+										"JDBCStream.set.query.parameter", dbRequest.getId(), pIdx, value,
+										type.toUpperCase());
 							}
 						}
 						break;
@@ -423,13 +429,13 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 						value = fillInRequestData(value, format);
 						if (!param.getValue().isTransient()) {
 							if (isNullValue(value)) {
-								setNullParameter(statement, pIdx, Types.DOUBLE, "DOUBLE"); // NON-NLS
+								setNullParameter(statement, dbRequest.getId(), pIdx, Types.DOUBLE, "DOUBLE"); // NON-NLS
 							} else {
 								double dValue = Double.parseDouble(value);
 								statement.setDouble(pIdx, dValue);
 								LOGGER.log(OpLevel.INFO,
 										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-										"JDBCStream.set.query.parameter", pIdx, value, "DOUBLE"); // NON-NLS
+										"JDBCStream.set.query.parameter", dbRequest.getId(), pIdx, value, "DOUBLE"); // NON-NLS
 							}
 						}
 						break;
@@ -437,13 +443,14 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 						value = fillInRequestData(value, StringUtils.isEmpty(format) ? DEFAULT_DATE_PATTERN : format);
 						if (!param.getValue().isTransient()) {
 							if (isNullValue(value)) {
-								setNullParameter(statement, pIdx, Types.DATE, type.toUpperCase());
+								setNullParameter(statement, dbRequest.getId(), pIdx, Types.DATE, type.toUpperCase());
 							} else {
 								Date dtValue = Date.valueOf(value);
 								statement.setDate(pIdx, dtValue);
 								LOGGER.log(OpLevel.INFO,
 										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+										"JDBCStream.set.query.parameter", dbRequest.getId(), pIdx, value,
+										type.toUpperCase());
 							}
 						}
 						break;
@@ -451,13 +458,14 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 						value = fillInRequestData(value, StringUtils.isEmpty(format) ? DEFAULT_TIME_PATTERN : format);
 						if (!param.getValue().isTransient()) {
 							if (isNullValue(value)) {
-								setNullParameter(statement, pIdx, Types.TIME, type.toUpperCase());
+								setNullParameter(statement, dbRequest.getId(), pIdx, Types.TIME, type.toUpperCase());
 							} else {
 								Time tValue = Time.valueOf(value);
 								statement.setTime(pIdx, tValue);
 								LOGGER.log(OpLevel.INFO,
 										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+										"JDBCStream.set.query.parameter", dbRequest.getId(), pIdx, value,
+										type.toUpperCase());
 							}
 						}
 						break;
@@ -467,13 +475,15 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 								StringUtils.isEmpty(format) ? DEFAULT_TIMESTAMP_PATTERN : format);
 						if (!param.getValue().isTransient()) {
 							if (isNullValue(value)) {
-								setNullParameter(statement, pIdx, Types.TIMESTAMP, type.toUpperCase());
+								setNullParameter(statement, dbRequest.getId(), pIdx, Types.TIMESTAMP,
+										type.toUpperCase());
 							} else {
 								Timestamp tsValue = Timestamp.valueOf(value);
 								statement.setTimestamp(pIdx, tsValue);
 								LOGGER.log(OpLevel.INFO,
 										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+										"JDBCStream.set.query.parameter", dbRequest.getId(), pIdx, value,
+										type.toUpperCase());
 							}
 						}
 						break;
@@ -481,13 +491,14 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 						value = fillInRequestData(value, format);
 						if (!param.getValue().isTransient()) {
 							if (isNullValue(value)) {
-								setNullParameter(statement, pIdx, Types.BOOLEAN, type.toUpperCase());
+								setNullParameter(statement, dbRequest.getId(), pIdx, Types.BOOLEAN, type.toUpperCase());
 							} else {
 								boolean bValue = Boolean.parseBoolean(value);
 								statement.setBoolean(pIdx, bValue);
 								LOGGER.log(OpLevel.INFO,
 										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+										"JDBCStream.set.query.parameter", dbRequest.getId(), pIdx, value,
+										type.toUpperCase());
 							}
 						}
 						break;
@@ -495,13 +506,14 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 						value = fillInRequestData(value, format);
 						if (!param.getValue().isTransient()) {
 							if (isNullValue(value)) {
-								setNullParameter(statement, pIdx, Types.BINARY, type.toUpperCase());
+								setNullParameter(statement, dbRequest.getId(), pIdx, Types.BINARY, type.toUpperCase());
 							} else {
 								byte[] baValue = Utils.decodeHex(value);
 								statement.setBytes(pIdx, baValue);
 								LOGGER.log(OpLevel.INFO,
 										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-										"JDBCStream.set.query.parameter", pIdx, value, type.toUpperCase());
+										"JDBCStream.set.query.parameter", dbRequest.getId(), pIdx, value,
+										type.toUpperCase());
 							}
 						}
 						break;
@@ -510,12 +522,12 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 						value = fillInRequestData(value, format);
 						if (!param.getValue().isTransient()) {
 							if (isNullValue(value)) {
-								setNullParameter(statement, pIdx, Types.VARCHAR, "VARCHAR"); // NON-NLS
+								setNullParameter(statement, dbRequest.getId(), pIdx, Types.VARCHAR, "VARCHAR"); // NON-NLS
 							} else {
 								statement.setString(pIdx, value);
 								LOGGER.log(OpLevel.INFO,
 										StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-										"JDBCStream.set.query.parameter", pIdx, value, "VARCHAR"); // NON-NLS
+										"JDBCStream.set.query.parameter", dbRequest.getId(), pIdx, value, "VARCHAR"); // NON-NLS
 							}
 						}
 						break;
@@ -527,8 +539,10 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 				} catch (SQLException exc) {
 					throw exc;
 				} catch (Throwable exc) {
-					throw new SQLException(StreamsResources.getStringFormatted(WsStreamConstants.RESOURCE_BUNDLE_NAME,
-							"JDBCStream.failed.to.set.query.parameter", param.getValue()), exc);
+					throw new SQLException(
+							StreamsResources.getStringFormatted(WsStreamConstants.RESOURCE_BUNDLE_NAME,
+									"JDBCStream.failed.to.set.query.parameter", dbRequest.getId(), param.getValue()),
+							exc);
 				}
 			}
 		}
@@ -538,11 +552,11 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 		return "null".equalsIgnoreCase(value); // NON-NLS
 	}
 
-	private static void setNullParameter(PreparedStatement statement, int pIdx, int type, String typeName)
+	private static void setNullParameter(PreparedStatement statement, String reqId, int pIdx, int type, String typeName)
 			throws SQLException {
 		statement.setNull(pIdx, type);
 		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-				"JDBCStream.set.query.parameter.null", pIdx, typeName);
+				"JDBCStream.set.query.parameter.null", reqId, pIdx, typeName);
 	}
 
 	@Override
@@ -586,8 +600,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 						acquiredSemaphore = stream.acquireSemaphore(request);
 						processedRequest = stream.fillInRequest(request);
 						respRs = stream.executeJdbcCall(scenarioStep.getUrlStr(), scenarioStep.getUsername(),
-								decPassword(scenarioStep.getPassword()), processedRequest.getData(),
-								processedRequest.getParameters());
+								decPassword(scenarioStep.getPassword()), processedRequest);
 					} catch (VoidRequestException exc) {
 						stream.logger().log(OpLevel.INFO,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
