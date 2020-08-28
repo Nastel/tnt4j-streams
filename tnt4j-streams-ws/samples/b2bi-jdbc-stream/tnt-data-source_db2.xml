@@ -312,7 +312,7 @@
                           , WC.NODEEXECUTED AS WORKFLOW_NODEEXECUTED
                           , WC.EVENT_LEVEL AS WORKFLOW_EVENT_LEVEL
                         FROM WORKFLOW_CONTEXT WC
-                        WHERE WC.START_TIME >= ? OR WC.END_TIME >= ?
+                        WHERE (WC.START_TIME >= ? OR WC.END_TIME >= ?)
                           AND WC.DOC_ID IS NOT NULL  -- pick only document related workflow events
                           AND WC.START_TIME < (CURRENT TIMESTAMP - 5 MINUTES)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY WC.START_TIME, WC.WORKFLOW_ID ASC
@@ -416,7 +416,7 @@
                            , S.PRINCIPAL AS SESSION_PRINCIPAL
                            , S.STATE AS SESSION_STATE
                       FROM ACT_SESSION S
-                      WHERE S.CON_START_TIME >= ? OR S.DIS_END_TIME >= ?
+                      WHERE (S.CON_START_TIME >= ? OR S.DIS_END_TIME >= ?)
                         AND S.CON_START_TIME < (CURRENT TIMESTAMP - 5 MINUTES)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                       ORDER BY S.CON_START_TIME, S.SESSION_ID ASC
                       LIMIT 10000 -- limit rows number per query iteration
@@ -452,7 +452,7 @@
                            , XF.WFSTEP AS XFER_WFSTEP
                            , XF.IS_SECURE AS XFER_IS_SECURE
                       FROM ACT_XFER XF
-                      WHERE XF.START_TIME >= ? OR XF.END_TIME >= ?
+                      WHERE (XF.START_TIME >= ? OR XF.END_TIME >= ?)
                         AND XF.START_TIME < (CURRENT TIMESTAMP - 5 MINUTES)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                       ORDER BY XF.START_TIME, XF.XFER_ID ASC
                       LIMIT 10000 -- limit rows number per query iteration
@@ -478,7 +478,7 @@
                            , NXF.IS_SUCCESS AS NON_XFER_IS_SUCCESS
                            , NXF.ERROR_MSG AS NON_XFER_ERROR_MSG
                       FROM ACT_NON_XFER NXF
-                      WHERE NXF.START_TIME >= ? OR NXF.END_TIME >= ?
+                      WHERE (NXF.START_TIME >= ? OR NXF.END_TIME >= ?)
                         AND NXF.START_TIME < (CURRENT TIMESTAMP - 5 MINUTES)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                       ORDER BY NXF.START_TIME, NXF.NON_XFER_ID ASC
                       LIMIT 10000 -- limit rows number per query iteration
