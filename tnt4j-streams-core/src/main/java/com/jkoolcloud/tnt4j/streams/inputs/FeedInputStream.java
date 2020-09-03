@@ -377,7 +377,7 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 	}
 
 	private class SocketInput implements FeedInput {
-		private ServerSocket svrSocket = null;
+		private ServerSocket srvSocket = null;
 		private Socket socket = null;
 
 		private int socketPort;
@@ -388,15 +388,16 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 
 		@Override
 		public InputStream getInputStream() throws IOException {
-			svrSocket = new ServerSocket(socketPort);
+			srvSocket = new ServerSocket(socketPort);
 			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"FeedInputStream.waiting.for.connection", socketPort);
-			socket = svrSocket.accept();
+
+			socket = srvSocket.accept();
 			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"FeedInputStream.accepted.connection", socket);
 			// only accept one connection, close down server socket
-			Utils.close(svrSocket);
-			svrSocket = null;
+			Utils.close(srvSocket);
+			srvSocket = null;
 
 			return socket.getInputStream();
 		}
@@ -409,10 +410,10 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 		@Override
 		public void cleanup() {
 			Utils.close(socket);
-			Utils.close(svrSocket);
+			Utils.close(srvSocket);
 
 			socket = null;
-			svrSocket = null;
+			srvSocket = null;
 		}
 
 		@Override

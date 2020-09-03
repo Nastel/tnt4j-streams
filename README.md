@@ -4958,7 +4958,17 @@ This stream does not have any additional configuration parameters.
 
 Also see ['Standard Java input stream parameters'](#standard-java-input-stream-parameters).
 
+#### Socket input stream parameters
+
+Stream class: `com.jkoolcloud.tnt4j.streams.inputs.SocketInputStream`
+
+ * `Port` - port number to run server socket. Default value - `12569`. (Optional)
+
+Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffered streams parameters'](#buffered-streams-parameters). 
+
 #### Http stream parameters
+
+Stream class: `com.jkoolcloud.tnt4j.streams.inputs.HttpStream`
 
  * `Port` - port number to run Http server. Default value - `8080`. (Optional)
  * `UseSSL` - flag indicating to use SSL. Default value - `false`. (Optional)
@@ -5019,21 +5029,21 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 ```xml
     <property name="Topic" value="TNT4JKafkaTestTopic"/>
     <property name="Offset" value="2"/>
-    
+
     <property name="Topic" value="TNT4JKafkaTestTopic|TNT4JKafkaProductionTopic"/>
     <property name="Offset" value="2|0"/>
-    
+
     <property name="Topic" value="TNT4JKafkaTestTopic|TNT4JKafkaProductionTopic"/>
     <property name="Offset" value="2|-1"/>
-    
+
     <property name="Topic" value="TNT4JKafkaTestTopic|TNT4JKafkaProductionTopic|TNT4JKafkaRnDTopic"/>
-    <property name="Offset" value="2||12"/> 
-    
+    <property name="Offset" value="2||12"/>
+
     <property name="Topic" value="TNT4JKafkaTestTopic|TNT4JKafkaProductionTopic|TNT4JKafkaRnDTopic"/>
     <property name="Offset" value="5"/>
-    
-    <property name="FileName" value="./config/consumer.properties"/>    
-    
+
+    <property name="FileName" value="./config/consumer.properties"/>
+
     <property name="bootstrap.servers" value="localhost:6667"/>
     <property name="group.id" value="tnt4j-streams-kafka"/>
     <property name="key.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer"/>
