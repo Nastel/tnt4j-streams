@@ -22,7 +22,6 @@ package com.jkoolcloud.tnt4j.streams.utils;
  * @version $Revision: 1 $
  */
 public final class FlumeConstants {
-
 	/**
 	 * Resource bundle name constant for TNT4J-Streams "flume-plugin" module.
 	 */

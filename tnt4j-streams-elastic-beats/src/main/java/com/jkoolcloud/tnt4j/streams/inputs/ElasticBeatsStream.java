@@ -203,7 +203,7 @@ public class ElasticBeatsStream extends AbstractBufferedStream<Map<?, ?>> {
 							new SslContextBuilder(sslCertificateFilePath, sslKeyFilePath, passPhrase).buildContext(),
 							timeout * 1000));
 				} catch (FileNotFoundException e) {
-					LOGGER.log(OpLevel.ERROR, StreamsResources.getBundle(BeatsStreamConstants.RESOURCE_BUNDLE_NAME),
+					logger().log(OpLevel.ERROR, StreamsResources.getBundle(BeatsStreamConstants.RESOURCE_BUNDLE_NAME),
 							"ElasticBeatsStream.ssl.file.not.found.error", e);
 				}
 			}
@@ -239,20 +239,20 @@ public class ElasticBeatsStream extends AbstractBufferedStream<Map<?, ?>> {
 
 		@Override
 		public void onNewMessage(ChannelHandlerContext ctx, Message message) {
-			LOGGER.log(OpLevel.TRACE, StreamsResources.getBundle(BeatsStreamConstants.RESOURCE_BUNDLE_NAME),
+			logger().log(OpLevel.TRACE, StreamsResources.getBundle(BeatsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"ElasticBeatsStream.message.received", ctx, message.getIdentityStream(), message.getSequence());
 			addInputToBuffer(message.getData());
 		}
 
 		@Override
 		public void onNewConnection(ChannelHandlerContext ctx) {
-			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(BeatsStreamConstants.RESOURCE_BUNDLE_NAME),
+			logger().log(OpLevel.INFO, StreamsResources.getBundle(BeatsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"ElasticBeatsStream.connection.opened", ctx);
 		}
 
 		@Override
 		public void onConnectionClose(ChannelHandlerContext ctx) {
-			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(BeatsStreamConstants.RESOURCE_BUNDLE_NAME),
+			logger().log(OpLevel.WARNING, StreamsResources.getBundle(BeatsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"ElasticBeatsStream.connection.closed", ctx);
 		}
 
@@ -264,7 +264,7 @@ public class ElasticBeatsStream extends AbstractBufferedStream<Map<?, ?>> {
 
 		@Override
 		public void onChannelInitializeException(ChannelHandlerContext ctx, Throwable cause) {
-			LOGGER.log(OpLevel.ERROR, StreamsResources.getBundle(BeatsStreamConstants.RESOURCE_BUNDLE_NAME),
+			logger().log(OpLevel.ERROR, StreamsResources.getBundle(BeatsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"ElasticBeatsStream.channel.initialization.error", ctx, cause);
 		}
 	}

@@ -21,7 +21,7 @@ package com.jkoolcloud.tnt4j.streams.utils;
  *
  * @version $Revision: 1 $
  */
-public class BeatsStreamConstants {
+public final class BeatsStreamConstants {
 	/**
 	 * Resource bundle name constant for TNT4J-Streams "elastic-beats" module.
 	 */

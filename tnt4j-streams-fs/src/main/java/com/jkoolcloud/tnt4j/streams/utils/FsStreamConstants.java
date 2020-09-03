@@ -21,7 +21,7 @@ package com.jkoolcloud.tnt4j.streams.utils;
  *
  * @version $Revision: 1 $
  */
-public class FsStreamConstants {
+public final class FsStreamConstants {
 	/**
 	 * Resource bundle name constant for TNT4J-Streams "fs" module.
 	 */
