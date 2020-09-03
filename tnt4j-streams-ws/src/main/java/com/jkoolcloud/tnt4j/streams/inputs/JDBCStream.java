@@ -62,13 +62,15 @@ import com.zaxxer.hikari.HikariDataSource;
  * Default value - {@code 0}. (Optional)</li>
  * <li>set of <a href="https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby">HikariCP supported
  * properties</a> used to configure JDBC data source. (Optional)</li>
+ * <li>set of JDBC or driver vendor specified {@link javax.sql.DataSource} configuration properties prefixed by
+ * {@value #DS_PROP_PREFIX}. (Optional)</li>
  * <li>when {@value com.jkoolcloud.tnt4j.streams.configure.StreamProperties#PROP_USE_EXECUTOR_SERVICE} is set to
  * {@code true} and {@value com.jkoolcloud.tnt4j.streams.configure.StreamProperties#PROP_EXECUTOR_THREADS_QTY} is
  * greater than {@code 1}, value for that property is reset to {@code 1} since {@link java.sql.ResultSet} can't be
  * accessed in multi-thread manner.</li>
  * </ul>
  *
- * @version $Revision: 4 $
+ * @version $Revision: 5 $
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  * @see java.sql.DriverManager#getConnection(String, java.util.Properties)
@@ -79,15 +81,23 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(JDBCStream.class);
 
 	private static final String ROW_PROP = ".Rs.Row."; // NON-NLS
+	/**
+	 * Name prefix for JDBC or driver vendor specified {@link javax.sql.DataSource} configuration properties.
+	 */
+	protected static final String DS_PROP_PREFIX = "jdbc."; // NON-NLS
 
 	private static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd"; // NON-NLS
 	private static final String DEFAULT_TIME_PATTERN = "HH:mm:ss"; // NON-NLS
 	private static final String DEFAULT_TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS"; // NON-NLS
 
 	/**
-	 * Contains custom HikariCP configuration properties used to configure JDBC data source.
+	 * Contains HikariCP configuration properties used to configure JDBC data source.
 	 */
-	protected Map<String, String> jdbcProperties = new HashMap<>();
+	protected Map<String, String> cpProperties = new HashMap<>();
+	/**
+	 * Contains JDBC or driver vendor specified {@link javax.sql.DataSource} configuration properties.
+	 */
+	protected Map<String, String> dsProperties = new HashMap<>();
 
 	private int fetchSize = 0;
 	private int maxRows = 0;
@@ -115,7 +125,11 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 		} else if (WsStreamProperties.PROP_QUERY_MAX_ROWS.equalsIgnoreCase(name)) {
 			maxRows = Integer.parseInt(value);
 		} else if (!StreamsConstants.isStreamCfgProperty(name, WsStreamProperties.class)) {
-			jdbcProperties.put(name, decPassword(value));
+			if (name.toLowerCase().startsWith(DS_PROP_PREFIX) && name.length() > DS_PROP_PREFIX.length()) {
+				dsProperties.put(name, decPassword(value));
+			} else {
+				cpProperties.put(name, decPassword(value));
+			}
 		}
 	}
 
@@ -133,7 +147,17 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 			return pValue;
 		}
 
-		return jdbcProperties.get(name);
+		pValue = cpProperties.get(name);
+		if (pValue != null) {
+			return pValue;
+		}
+
+		pValue = dsProperties.get(name);
+		if (pValue != null) {
+			return pValue;
+		}
+
+		return dsProperties.get(name.substring(DS_PROP_PREFIX.length()));
 	}
 
 	@Override
@@ -177,8 +201,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 		ResultSet rs = item.getData();
 		try {
 			if (rs.isClosed() || !rs.next()) {
-				closeResponse(rs);
-				responseConsumed(item);
+				cleanupItem(item);
 
 				logger().log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 						"JDBCStream.rs.consumption.done", item.getOriginalRequest().getId(),
@@ -204,8 +227,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 					StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"JDBCStream.rs.consumption.exception", item.getOriginalRequest().getId(), exc);
 
-			closeResponse(item.getData());
-			responseConsumed(item);
+			cleanupItem(item);
 
 			return true;
 		}
@@ -317,8 +339,10 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 	}
 
 	/**
-	 * Obtains database connection for provided connection URL and user credentials. Additional set of HikariCP
-	 * configuration properties are taken from {@link #jdbcProperties} map.
+	 * Obtains database connection for provided connection URL and user credentials.
+	 * <p>
+	 * Set of HikariCP configuration properties are picked from {@link #cpProperties} map. Additional set of JDBC or
+	 * driver vendor specified {@link javax.sql.DataSource} properties are from {@link #dsProperties} map.
 	 * 
 	 * @param url
 	 *            DB connection URL
@@ -335,15 +359,21 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 		DataSource hds = dbDataSources.get(url);
 
 		if (hds == null) {
-			Properties dbProps = new Properties();
-			dbProps.putAll(jdbcProperties);
+			Properties cpProps = new Properties();
+			cpProps.putAll(cpProperties);
 
-			HikariConfig dbConfig = new HikariConfig(dbProps);
+			HikariConfig dbConfig = new HikariConfig(cpProps);
 			dbConfig.setJdbcUrl(url);
 			dbConfig.setUsername(user);
 			dbConfig.setPassword(pass);
 
+			Properties dsProps = new Properties();
+			for (Map.Entry<String, String> dsProp : dsProperties.entrySet()) {
+				dsProps.put(dsProp.getKey().substring(DS_PROP_PREFIX.length()), dsProp.getValue());
+			}
+
 			hds = new HikariDataSource(dbConfig);
+			((HikariDataSource) hds).setDataSourceProperties(dsProps);
 
 			dbDataSources.put(url, hds);
 		}

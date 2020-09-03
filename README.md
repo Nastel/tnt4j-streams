@@ -5428,6 +5428,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
  for details. Default value - `0. (Optional)
  * set of [HikariCP supported properties](https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby) used to configure JDBC data 
  source. (Optional)
+ * set of JDBC or driver vendor specified `javax.sql.DataSource` configuration properties prefixed by `jdbc.`. (Optional)
  * when `UseExecutors` is set to `true` and `ExecutorThreadsQuantity` is greater than `1`, value for that property is reset to `1` since 
  `java.sql.ResultSet` can't be accessed in multi-thread manner.
 
@@ -5435,6 +5436,15 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
  ```xml
      <property name="QueryFetchRows" value="500"/>
      <property name="QueryMaxRows" value="50000"/>
+     <!-- HikariCP configuration properties -->
+     <property name="autoCommit" value="false"/>
+     <property name="readOnly" value="true"/>
+     <property name="maximumPoolSize" value="5"/>
+     <property name="maxLifetime" value="1680000"/> <!-- 28 minutes -->
+     <property name="idleTimeout" value="600000"/> <!-- 10 minutes -->
+     <property name="connectionTimeout" value="30000"/> <!-- 30 seconds -->
+     <!-- Oracle JDBC data source configuration properties -->
+     <property name="jdbc.v$session.program" value="B2Bi-JDBC-Stream"/>
  ```
 
 Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffered streams parameters'](#buffered-streams-parameters).
