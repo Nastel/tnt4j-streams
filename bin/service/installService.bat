@@ -57,7 +57,7 @@ rem #### installing service ####
  --DisplayName "%NAME%"      ^
  --Install "%SERVICE_PROVIDER%"      ^
  --LogPath "%LOG_PATH%"      ^
- --StdOutput       ^
+ --StdOutput  ""     ^
  --StdError auto      ^
  --Classpath %FILE_PATH%\*;%FILE_PATH%\lib\*  ^
  --Jvm "%JVM_DLL_PATH%\jvm.dll"      ^
