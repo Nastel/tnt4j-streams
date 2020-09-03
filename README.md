@@ -5393,6 +5393,13 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
     <property name="DefaultMaxPerRouteConnections" value="4"/>
 ```
 
+This stream request parameters `req-param` having `id` prefixed `H:` will add as HTTP message (`GET`/`POST`) headers, e.g.:
+```xml
+    <req-param id="H:Authorization" value="Basic dXNlcjpwYXNz"/>
+    <req-param id="H:Cache-Control" value="no-cache"/> 
+    <req-param id="H:Content-MD5" value="Q2hlY2sgSW50ZWdyaXR5IQ=="/> 
+```
+
 Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffered streams parameters'](#buffered-streams-parameters).
 
 ##### CmdStream parameters

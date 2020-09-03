@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 
-import javax.xml.bind.DatatypeConverter;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -59,9 +57,11 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  * Implements a scheduled JAX-RS service call activity stream, where each call response is assumed to represent a single
  * activity or event which should be recorded.
  * <p>
- * Service call is performed by invoking {@link org.apache.http.client.HttpClient#execute(HttpUriRequest)} with GET or
- * POST method request depending on scenario step configuration parameter 'method'. Default method is GET. Stream uses
- * {@link org.apache.http.impl.conn.PoolingHttpClientConnectionManager} to handle connections pool used by HTTP client.
+ * Service call is performed by invoking
+ * {@link org.apache.http.client.HttpClient#execute(org.apache.http.client.methods.HttpUriRequest, org.apache.http.protocol.HttpContext)}
+ * with GET or POST method request depending on scenario step configuration parameter 'method'. Default method is GET.
+ * Stream uses {@link org.apache.http.impl.conn.PoolingHttpClientConnectionManager} to handle connections pool used by
+ * HTTP client.
  * <p>
  * This activity stream requires parsers that can support {@link String} data to parse
  * {@link com.jkoolcloud.tnt4j.streams.scenario.WsResponse#getData()} provided string.
@@ -78,10 +78,13 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  * @version $Revision: 3 $
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
- * @see org.apache.http.client.HttpClient#execute(HttpUriRequest)
+ * @see org.apache.http.client.HttpClient#execute(HttpUriRequest, HttpContext)
  */
 public class RestStream extends AbstractHttpStream {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(RestStream.class);
+
+	private static final String REQ_HEAD_PARAM_PREFIX = "H:"; // NON-NLS
+	private static final String REQ_HEAD_PARAM_AUTH = REQ_HEAD_PARAM_PREFIX + HttpHeaders.AUTHORIZATION; //
 
 	private int maxTotalPoolConnections = 5;
 	private int defaultMaxPerRouteConnections = 2;
@@ -155,15 +158,15 @@ public class RestStream extends AbstractHttpStream {
 	 *
 	 * @param client
 	 *            HTTP client instance to execute request
-	 * @param uriStr
-	 *            JAX-RS service URI
+	 * @param req
+	 *            request instance
 	 * @return service response string
 	 * 
 	 * @throws Exception
 	 *             if exception occurs while performing JAX-RS service call
 	 */
-	public static String executeGET(CloseableHttpClient client, String uriStr) throws Exception {
-		return executeGET(client, uriStr, null, null);
+	public static String executeGET(CloseableHttpClient client, WsRequest<String> req) throws Exception {
+		return executeGET(client, req.getData(), req.getParameters());
 	}
 
 	/**
@@ -173,19 +176,15 @@ public class RestStream extends AbstractHttpStream {
 	 *            HTTP client instance to execute request
 	 * @param uriStr
 	 *            JAX-RS service URI
-	 * @param username
-	 *            user name used to perform request if service authentication is needed, or {@code null} if no
-	 *            authentication
-	 * @param password
-	 *            password used to perform request if service authentication is needed, or {@code null} if no
-	 *            authentication
+	 * @param reqParams
+	 *            request parameters map
 	 * @return service response string
 	 * 
 	 * @throws Exception
 	 *             if exception occurs while performing JAX-RS service call
 	 */
-	public static String executeGET(CloseableHttpClient client, String uriStr, String username, String password)
-			throws Exception {
+	public static String executeGET(CloseableHttpClient client, String uriStr,
+			Map<String, WsRequest.Parameter> reqParams) throws Exception {
 		if (StringUtils.isEmpty(uriStr)) {
 			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"RestStream.cant.execute.get.request", uriStr);
@@ -196,7 +195,7 @@ public class RestStream extends AbstractHttpStream {
 				"RestStream.invoking.get.request", uriStr);
 
 		HttpGet get = new HttpGet(uriStr);
-		String respStr = executeRequest(client, get, username, password);
+		String respStr = executeRequest(client, get, reqParams);
 
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"RestStream.received.response", uriStr, respStr);
@@ -209,17 +208,15 @@ public class RestStream extends AbstractHttpStream {
 	 *
 	 * @param client
 	 *            HTTP client instance to execute request
-	 * @param uriStr
-	 *            JAX-RS service URI
-	 * @param reqData
-	 *            request data
+	 * @param req
+	 *            request instance
 	 * @return service response string
 	 * 
 	 * @throws Exception
 	 *             if exception occurs while performing JAX-RS service call
 	 */
-	public static String executePOST(CloseableHttpClient client, String uriStr, String reqData) throws Exception {
-		return executePOST(client, uriStr, reqData, null, null);
+	public static String executePOST(CloseableHttpClient client, WsRequest<String> req) throws Exception {
+		return executePOST(client, req.getScenarioStep().getUrlStr(), req.getData(), req.getParameters());
 	}
 
 	/**
@@ -231,19 +228,15 @@ public class RestStream extends AbstractHttpStream {
 	 *            JAX-RS service URI
 	 * @param reqData
 	 *            request data
-	 * @param username
-	 *            user name used to perform request if service authentication is needed, or {@code null} if no
-	 *            authentication
-	 * @param password
-	 *            password used to perform request if service authentication is needed, or {@code null} if no
-	 *            authentication
+	 * @param reqParams
+	 *            request parameters map
 	 * @return service response string
 	 * 
 	 * @throws Exception
 	 *             if exception occurs while performing JAX-RS service call
 	 */
-	public static String executePOST(CloseableHttpClient client, String uriStr, String reqData, String username,
-			String password) throws Exception {
+	public static String executePOST(CloseableHttpClient client, String uriStr, String reqData,
+			Map<String, WsRequest.Parameter> reqParams) throws Exception {
 		if (StringUtils.isEmpty(uriStr)) {
 			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"RestStream.cant.execute.post.request", uriStr);
@@ -251,7 +244,7 @@ public class RestStream extends AbstractHttpStream {
 		}
 
 		if (StringUtils.isEmpty(reqData)) {
-			return executeGET(client, uriStr, username, password);
+			return executeGET(client, uriStr, reqParams);
 		}
 
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -264,7 +257,7 @@ public class RestStream extends AbstractHttpStream {
 		reqEntity.setContentType("application/json"); // NON-NLS
 		post.setEntity(reqEntity);
 
-		String respStr = executeRequest(client, post, username, password);
+		String respStr = executeRequest(client, post, reqParams);
 
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"RestStream.received.response", uriStr, respStr);
@@ -272,8 +265,8 @@ public class RestStream extends AbstractHttpStream {
 		return respStr;
 	}
 
-	private static String executeRequest(CloseableHttpClient client, HttpUriRequest req, String username,
-			String password) throws IOException {
+	private static String executeRequest(CloseableHttpClient client, HttpUriRequest req,
+			Map<String, WsRequest.Parameter> reqParams) throws IOException {
 		if (client == null) {
 			throw new IllegalArgumentException(
 					StreamsResources.getString(WsStreamConstants.RESOURCE_BUNDLE_NAME, "RestStream.client.null"));
@@ -283,10 +276,19 @@ public class RestStream extends AbstractHttpStream {
 		try {
 			HttpContext ctx = HttpClientContext.create();
 
-			if (StringUtils.isNotEmpty(username)) {
-				String credentialsStr = username + ":" + password; // NON-NLS
-				String encoding = DatatypeConverter.printBase64Binary(credentialsStr.getBytes());
-				req.addHeader(HttpHeaders.AUTHORIZATION, "Basic " + encoding); // NON-NLS
+			if (reqParams != null) {
+				int idx = 0;
+				for (Map.Entry<String, WsRequest.Parameter> pe : reqParams.entrySet()) {
+					if (pe.getKey().startsWith(REQ_HEAD_PARAM_PREFIX) && !pe.getValue().isTransient()) {
+						String pName = pe.getKey().substring(REQ_HEAD_PARAM_PREFIX.length());
+						if (StringUtils.isEmpty(pName)) {
+							throw new IllegalArgumentException(StreamsResources.getStringFormatted(
+									WsStreamConstants.RESOURCE_BUNDLE_NAME, "RestStream.header.param.null", idx));
+						}
+						req.addHeader(pName, pe.getValue().getStringValue());
+					}
+					idx++;
+				}
 			}
 
 			response = client.execute(req, ctx);
@@ -312,6 +314,48 @@ public class RestStream extends AbstractHttpStream {
 		} finally {
 			EntityUtils.consumeQuietly(entity);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @see #makeCredentialsParam(String, String)
+	 */
+	@Override
+	protected WsRequest<String> fillInRequest(WsRequest<String> req) throws VoidRequestException {
+		if (req.getParameter(REQ_HEAD_PARAM_AUTH) == null) {
+			WsRequest.Parameter hAuthParam = makeCredentialsParam(req.getScenarioStep().getUsername(),
+					req.getScenarioStep().getPassword());
+
+			if (hAuthParam != null) {
+				req.addParameter(hAuthParam);
+			}
+		}
+
+		return super.fillInRequest(req);
+	}
+
+	/**
+	 * Creates request parameter of HTTP message header {@code "Authorization"} for basic authentication.
+	 * 
+	 * @param username
+	 *            user name used to perform request if service authentication is needed, or {@code null} if no
+	 *            authentication
+	 * @param password
+	 *            password used to perform request if service authentication is needed, or {@code null} if no
+	 *            authentication
+	 * @return request parameter instance containing basic authentication value, or {@code null} if no proper
+	 *         credentials provided
+	 */
+	protected static WsRequest.Parameter makeCredentialsParam(String username, String password) {
+		if (StringUtils.isNotEmpty(username)) {
+			String credentialsStr = username + ":" + decPassword(password); // NON-NLS
+			String encoding = Utils.base64EncodeStr(credentialsStr.getBytes());
+
+			return new WsRequest.Parameter(REQ_HEAD_PARAM_AUTH, "Basic " + encoding); // NON-NLS);
+		}
+
+		return null;
 	}
 
 	/**
@@ -372,9 +416,7 @@ public class RestStream extends AbstractHttpStream {
 					try {
 						acquiredSemaphore = stream.acquireSemaphore(request);
 						processedRequest = stream.fillInRequest(request);
-						respStr = stream.executePOST(stream.client, scenarioStep.getUrlStr(),
-								processedRequest.getData(), scenarioStep.getUsername(),
-								decPassword(scenarioStep.getPassword()));
+						respStr = stream.executePOST(stream.client, processedRequest);
 					} catch (VoidRequestException exc) {
 						stream.logger().log(OpLevel.INFO,
 								StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -431,8 +473,7 @@ public class RestStream extends AbstractHttpStream {
 				try {
 					acquiredSemaphore = stream.acquireSemaphore(request);
 					processedRequest = stream.fillInRequest(request, scenarioStep.getUrlStr());
-					respStr = stream.executeGET(stream.client, processedRequest.getData(), scenarioStep.getUsername(),
-							decPassword(scenarioStep.getPassword()));
+					respStr = stream.executeGET(stream.client, processedRequest);
 				} catch (VoidRequestException exc) {
 					stream.logger().log(OpLevel.INFO,
 							StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -490,18 +531,18 @@ public class RestStream extends AbstractHttpStream {
 		StringBuilder uriBuilder = new StringBuilder();
 		uriBuilder.append(uri);
 
-		int i = uri.indexOf('?');
-
-		if (i == -1) {
-			uriBuilder.append('?');
-		} else if (i != uri.length() - 1) {
-			uriBuilder.append('&');
-		}
-
 		List<NameValuePair> params = makeParamsList(request);
 		String paramsStr = URLEncodedUtils.format(params, StandardCharsets.UTF_8);
 
 		if (StringUtils.isNotEmpty(paramsStr)) {
+			int i = uri.indexOf('?');
+
+			if (i == -1) {
+				uriBuilder.append('?');
+			} else if (i != uri.length() - 1) {
+				uriBuilder.append('&');
+			}
+
 			uriBuilder.append(paramsStr);
 		}
 
@@ -519,7 +560,7 @@ public class RestStream extends AbstractHttpStream {
 		List<NameValuePair> params = new ArrayList<>(request.getParameters().size());
 
 		for (Map.Entry<String, WsRequest.Parameter> param : request.getParameters().entrySet()) {
-			if (param.getValue().isTransient()) {
+			if (param.getValue().isTransient() || param.getKey().startsWith(REQ_HEAD_PARAM_PREFIX)) {
 				continue;
 			}
 
