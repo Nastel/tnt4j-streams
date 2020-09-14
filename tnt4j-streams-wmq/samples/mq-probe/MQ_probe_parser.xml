@@ -96,11 +96,16 @@
                 return "0x000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
             ]]></field-transform>
         </field>
-        <field name="Correlator" locator="MsgDesc.CorrelId" locator-type="Label">
-            <field-transform lang="groovy" phase="raw"><![CDATA[
+        <field name="Correlator">
+			<field-locator locator="MsgDesc.CorrelId" locator-type="Label">
+				<field-transform lang="groovy" phase="raw"><![CDATA[
                 String crlStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
                 return "0x000000000000000000000000000000000000000000000000".equals(crlStr) ? null : crlStr;
-            ]]></field-transform>
+				]]></field-transform>
+			</field-locator>
+			<field-locator locator="LuwTime" locator-type="Activity">
+			</field-locator>
+			
         </field>
         <field name="BackoutCount" locator="MsgDesc.BackoutCount" locator-type="Label" datatype="Number"/>
         <field name="ReplyToQ" locator="MsgDesc.ReplyToQ" locator-type="Label"/>
@@ -184,11 +189,15 @@
         <field name="PlanName" locator="PlanName" locator-type="Label"/>
         <field name="PrimAuth" locator="PrimAuth" locator-type="Label"/>
         <field name="ConnId" locator="ConnId" locator-type="Label"/>
-        <field name="Correlator" locator="CorrId" locator-type="Label">
-            <field-transform lang="groovy" phase="raw"><![CDATA[
+        <field name="Correlator">
+			<field-locator locator="CorrId" locator-type="Label">
+				<field-transform lang="groovy" phase="raw"><![CDATA[
                 String crlStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
                 return "0x000000000000000000000000000000000000000000000000".equals(crlStr) ? null : crlStr;
-            ]]></field-transform>
+				]]></field-transform>
+			</field-locator>
+			<field-locator locator="LuwTime" locator-type="Activity">
+			</field-locator>
         </field>
         <field name="StmtNo" locator="StmtNo" locator-type="Label" datatype="Number"/>
         <field name="SectNo" locator="SectNo" locator-type="Label" datatype="Number"/>
@@ -256,6 +265,11 @@
                 String idStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
                 return "0x000000000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
             ]]></field-transform>
+        </field>
+		<field name="Correlator">
+			<field-locator locator="LuwTime" locator-type="Activity">
+			</field-locator>
+			
         </field>
         <field name="ApiCpuTime" locator="ApiCpuTime" locator-type="Label" datatype="Number" value-type="age.usec"/>
         <field name="FirstTransId" locator="FirstTransId" locator-type="Label"/>
