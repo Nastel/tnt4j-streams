@@ -40,6 +40,10 @@
         <field name="ObjectType" locator="ObjectType" locator-type="Label">
             <field-map-ref resource="MQ_PROBE_MAPPINGS.ObjectType"/>
         </field>
+		<field name="ResourceName" formattingPattern="{0}={1}">
+            <field-locator locator="ObjectType" locator-type="Activity"/>
+            <field-locator locator="ObjectName" locator-type="Activity"/>
+        </field>
         <field name="UserName" locator="UserId" locator-type="Label"/>
         <field name="PId" locator="ProcessId" locator-type="Label"/>
         <field name="TId" locator="ThreadId" locator-type="Label">
