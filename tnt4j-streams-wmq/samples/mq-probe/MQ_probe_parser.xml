@@ -40,8 +40,9 @@
         <field name="ObjectType" locator="ObjectType" locator-type="Label">
             <field-map-ref resource="MQ_PROBE_MAPPINGS.ObjectType"/>
         </field>
-		<field name="ResourceName" formattingPattern="{0}={1}">
+		<field name="ResourceName" formattingPattern="{0}={1}:{2}">
             <field-locator locator="ObjectType" locator-type="Activity"/>
+            <field-locator locator="QMgrName" locator-type="Activity"/>
             <field-locator locator="ObjectName" locator-type="Activity"/>
         </field>
         <field name="UserName" locator="UserId" locator-type="Label"/>
