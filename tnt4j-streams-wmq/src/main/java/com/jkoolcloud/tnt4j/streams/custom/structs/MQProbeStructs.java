@@ -112,8 +112,12 @@ public class MQProbeStructs {
 			bb.order(ByteOrder.LITTLE_ENDIAN);
 
 			tamqapint.strucId = getString(bb, 8, encoding, charSet);
-			tamqapint.mqInfo = TAMQINFO.read(bb, encoding, charSet);
-			tamqapint.apiIntInfo = TAAPINTINFO.read(bb, encoding, charSet);
+			if (bb.remaining() >= TAMQINFO.STRUCT_SIZE) {
+				tamqapint.mqInfo = TAMQINFO.read(bb, encoding, charSet);
+			}
+			if (bb.remaining() >= TAAPINTINFO.STRUCT_SIZE) {
+				tamqapint.apiIntInfo = TAAPINTINFO.read(bb, encoding, charSet);
+			}
 			tamqapint.msgId = getStringRaw(bb, 8, encoding, charSet);
 			tamqapint.msg = getBytes(bb, tamqapint.mqInfo.dataSize);
 			tamqapint.pad = getBytes(bb, bb.remaining());
@@ -126,8 +130,8 @@ public class MQProbeStructs {
 			Map<String, Object> sMap = super.asMap();
 
 			sMap.put("StrucId", strucId); // NON-NLS
-			sMap.put("MqInfo", mqInfo.asMap()); // NON-NLS
-			sMap.put("ApiIntInfo", apiIntInfo.asMap()); // NON-NLS
+			sMap.put("MqInfo", mqInfo == null ? null : mqInfo.asMap()); // NON-NLS
+			sMap.put("ApiIntInfo", apiIntInfo == null ? null : apiIntInfo.asMap()); // NON-NLS
 			sMap.put("MsgId", msgId); // NON-NLS
 			sMap.put("Message", msg); // NON-NLS
 
@@ -163,6 +167,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAAPINTINFO extends MQStruct {
 		public static final String STRUC_ID = "APIPARMS"; // NON-NLS
+		private static final int STRUCT_SIZE = 1160;
 
 		public String strucId; // 8
 		public String hostName; // 64
@@ -216,11 +221,21 @@ public class MQProbeStructs {
 			taapintinfo.objType = bb.getInt();
 			taapintinfo.cpuCount = bb.getInt();
 			taapintinfo.unused = getBytes(bb, 4);
-			taapintinfo.exitTime = TIME_INFO.read(bb, encoding, charSet);
-			taapintinfo.exitDelta = APXDELTA.read(bb, encoding, charSet);
-			taapintinfo.exitSigntr = APXSIGNTR.read(bb, encoding, charSet);
-			taapintinfo.exitParms = TAAXP.read(bb, encoding, charSet);
-			taapintinfo.exitContext = TAAXC.read(bb, encoding, charSet);
+			if (bb.remaining() >= TIME_INFO.STRUCT_SIZE) {
+				taapintinfo.exitTime = TIME_INFO.read(bb, encoding, charSet);
+			}
+			if (bb.remaining() >= APXDELTA.STRUCT_SIZE) {
+				taapintinfo.exitDelta = APXDELTA.read(bb, encoding, charSet);
+			}
+			if (bb.remaining() >= APXSIGNTR.STRUCT_SIZE) {
+				taapintinfo.exitSigntr = APXSIGNTR.read(bb, encoding, charSet);
+			}
+			if (bb.remaining() >= TAAXP.STRUCT_SIZE) {
+				taapintinfo.exitParms = TAAXP.read(bb, encoding, charSet);
+			}
+			if (bb.remaining() >= TAAXC.STRUCT_SIZE) {
+				taapintinfo.exitContext = TAAXC.read(bb, encoding, charSet);
+			}
 
 			return taapintinfo;
 		}
@@ -240,11 +255,11 @@ public class MQProbeStructs {
 			sMap.put("OsType", osType); // NON-NLS
 			sMap.put("ObjType", objType); // NON-NLS
 			sMap.put("CpuCount", cpuCount); // NON-NLS
-			sMap.put("ExitTime", exitTime.asMap()); // NON-NLS
-			sMap.put("ExitDelta", exitDelta.asMap()); // NON-NLS
-			sMap.put("ExitSigntr", exitSigntr.asMap()); // NON-NLS
-			sMap.put("ExitParms", exitParms.asMap()); // NON-NLS
-			sMap.put("ExitContext", exitContext.asMap()); // NON-NLS
+			sMap.put("ExitTime", exitTime == null ? null : exitTime.asMap()); // NON-NLS
+			sMap.put("ExitDelta", exitDelta == null ? null : exitDelta.asMap()); // NON-NLS
+			sMap.put("ExitSigntr", exitSigntr == null ? null : exitSigntr.asMap()); // NON-NLS
+			sMap.put("ExitParms", exitParms == null ? null : exitParms.asMap()); // NON-NLS
+			sMap.put("ExitContext", exitContext == null ? null : exitContext.asMap()); // NON-NLS
 
 			return sMap;
 		}
@@ -272,6 +287,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAMQINFO extends MQStruct {
 		public static final String STRUC_ID = "mq  "; // NON-NLS
+		private static final int STRUCT_SIZE = 32;
 
 		public String strucId; // 4
 		public int apiType;
@@ -314,11 +330,19 @@ public class MQProbeStructs {
 			tamqinfo.dataSize = bb.getInt();
 			tamqinfo.originalDataSize = bb.getInt();
 			tamqinfo.pad = getBytes(bb, 4);
-			tamqinfo.objDesc = TAOD.read(bb, encoding, charSet);
+			if (bb.remaining() >= TAMD.STRUCT_SIZE) {
+				tamqinfo.objDesc = TAOD.read(bb, encoding, charSet);
+			}
 			// bb.order(ByteOrder.LITTLE_ENDIAN);
-			tamqinfo.msgOpt = TAMSGOPT.read(bb, encoding, charSet);
-			tamqinfo.msgAge = MSGAGE.read(bb, encoding, charSet);
-			tamqinfo.msgDesc = TAMD.read(bb, encoding, charSet);
+			if (bb.remaining() >= TAMSGOPT.STRUCT_SIZE) {
+				tamqinfo.msgOpt = TAMSGOPT.read(bb, encoding, charSet);
+			}
+			if (bb.remaining() >= MSGAGE.STRUCT_SIZE) {
+				tamqinfo.msgAge = MSGAGE.read(bb, encoding, charSet);
+			}
+			if (bb.remaining() >= TAMD.STRUCT_SIZE) {
+				tamqinfo.msgDesc = TAMD.read(bb, encoding, charSet);
+			}
 
 			return tamqinfo;
 		}
@@ -334,10 +358,10 @@ public class MQProbeStructs {
 			sMap.put("Reason", reason); // NON-NLS
 			sMap.put("DataSize", dataSize); // NON-NLS
 			sMap.put("OriginalDataSize", originalDataSize); // NON-NLS
-			sMap.put("ObjDesc", objDesc.asMap()); // NON-NLS
-			sMap.put("MsgOpt", msgOpt.asMap()); // NON-NLS
-			sMap.put("MsgAge", msgAge.asMap()); // NON-NLS
-			sMap.put("MsgDesc", msgDesc.asMap()); // NON-NLS
+			sMap.put("ObjDesc", objDesc == null ? null : objDesc.asMap()); // NON-NLS
+			sMap.put("MsgOpt", msgOpt == null ? null : msgOpt.asMap()); // NON-NLS
+			sMap.put("MsgAge", msgAge == null ? null : msgAge.asMap()); // NON-NLS
+			sMap.put("MsgDesc", msgDesc == null ? null : msgDesc.asMap()); // NON-NLS
 
 			return sMap;
 		}
@@ -362,6 +386,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAOD extends MQStruct {
 		public static final String STRUC_ID = ""; // NON-NLS
+		private static final int STRUCT_SIZE = 288;
 
 		public String strucId; // 4
 		public int objectType;
@@ -441,6 +466,7 @@ public class MQProbeStructs {
 	public static class TAMSGOPT extends MQStruct {
 		public static final String STRUC_ID = "GMO "; // NON-NLS
 		public static final String STRUC_ID2 = "PMO "; // NON-NLS
+		private static final int STRUCT_SIZE = 112;
 
 		public String strucId; // 4
 		public int version;
@@ -528,6 +554,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAMD extends MQStruct {
 		public static final String STRUC_ID = "MD "; // NON-NLS
+		private static final int STRUCT_SIZE = 320;
 
 		public String strucId; // 4
 		public int report;
@@ -647,6 +674,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TIME_INFO extends MQStruct {
+		private static final int STRUCT_SIZE = 32;
+
 		public int time_sec;
 		public int time_mls;
 		public int time_usec;
@@ -712,6 +741,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class APXDELTA extends MQStruct {
+		private static final int STRUCT_SIZE = 4;
+
 		public int delta_sec;
 		public int delta_usec;
 
@@ -770,6 +801,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class APXSIGNTR extends MQStruct {
+		private static final int STRUCT_SIZE = 104;
+
 		public int readCount;
 		public int writeCount;
 		public int otherCount;
@@ -848,6 +881,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class MSGAGE extends MQStruct {
+		private static final int STRUCT_SIZE = 4;
+
 		public int msgage_sec;
 		public int msgage_usec;
 
@@ -908,6 +943,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAAXP extends MQStruct {
 		public static final String STRUC_ID = "AXP "; // NON-NLS
+		private static final int STRUCT_SIZE = 80;
 
 		public String strucId; // 4
 		public int exitId;
@@ -990,6 +1026,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAAXC extends MQStruct {
 		public static final String STRUC_ID = "AXC "; // NON-NLS
+		private static final int STRUCT_SIZE = 392;
 
 		public String strucId; // 4
 		public int environment;
@@ -1477,7 +1514,9 @@ public class MQProbeStructs {
 			tamqcd.clientPort = bb.getInt();
 			tamqcd.userCorrelator = getString(bb, 64, encoding, charSet);
 			tamqcd.mdOffset = bb.getInt();
-			tamqcd.msgDesc = TAMD.read(bb, encoding, charSet);
+			if (bb.remaining() >= TAMD.STRUCT_SIZE) {
+				tamqcd.msgDesc = TAMD.read(bb, encoding, charSet);
+			}
 
 			return tamqcd;
 		}
@@ -1521,7 +1560,7 @@ public class MQProbeStructs {
 			sMap.put("ClientPort", clientPort); // NON-NLS
 			sMap.put("UserCorrelator", userCorrelator); // NON-NLS
 			sMap.put("MDOffset", mdOffset); // NON-NLS
-			sMap.put("MsgDesc", msgDesc.asMap()); // NON-NLS
+			sMap.put("MsgDesc", msgDesc == null ? null : msgDesc.asMap()); // NON-NLS
 
 			return sMap;
 		}
@@ -1999,8 +2038,12 @@ public class MQProbeStructs {
 			tamqcics.charSet = charSet;
 
 			tamqcics.strucId = getString(bb, 8, encoding, charSet);
-			tamqcics.mqInfo = TAMQINFO.read(bb, encoding, charSet);
-			tamqcics.cicsInfo = TACICSINFO.read(bb, encoding, charSet);
+			if (bb.remaining() >= TAMQINFO.STRUCT_SIZE) {
+				tamqcics.mqInfo = TAMQINFO.read(bb, encoding, charSet);
+			}
+			if (bb.remaining() >= TACICSINFO.STRUCT_SIZE) {
+				tamqcics.cicsInfo = TACICSINFO.read(bb, encoding, charSet);
+			}
 			tamqcics.msgId = getStringRaw(bb, 8, encoding, charSet);
 
 			return tamqcics;
@@ -2011,8 +2054,8 @@ public class MQProbeStructs {
 			Map<String, Object> sMap = super.asMap();
 
 			sMap.put("StrucId", strucId); // NON-NLS
-			sMap.put("MqInfo", mqInfo.asMap()); // NON-NLS
-			sMap.put("CicsInfo", cicsInfo.asMap()); // NON-NLS
+			sMap.put("MqInfo", mqInfo == null ? null : mqInfo.asMap()); // NON-NLS
+			sMap.put("CicsInfo", cicsInfo == null ? null : cicsInfo.asMap()); // NON-NLS
 			sMap.put("MsgId", msgId); // NON-NLS
 
 			return sMap;
@@ -2038,6 +2081,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TACICSINFO extends MQZOSStruct {
+		private static final int STRUCT_SIZE = 60;
+
 		public String strucId; // 4
 		public String sysplxNum; // 8
 		public String sysplxId; // 2
