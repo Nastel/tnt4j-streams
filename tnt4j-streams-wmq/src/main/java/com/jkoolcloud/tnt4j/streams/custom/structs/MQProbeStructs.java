@@ -20,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -568,7 +569,7 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAMD extends MQStruct {
-		public static final String STRUC_ID = "MD "; // NON-NLS
+		public static final String STRUC_ID = "MD  "; // NON-NLS
 		private static final int STRUC_SIZE = 320;
 
 		public String strucId; // 4
@@ -1232,7 +1233,7 @@ public class MQProbeStructs {
 			bb.reset();
 
 			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
-					"MQProbeStructs.parsing.zos.struct", tazos.batchInfo.type, nextStrucId);
+					"MQProbeStructs.parsing.zos.struct", tazos.batchInfo.type, nextStrucId, bb.remaining());
 
 			switch (tazos.batchInfo.type) {
 			case TACON_MQH_TYPE_BATCH:
@@ -2612,6 +2613,8 @@ public class MQProbeStructs {
 		 */
 		static String checkStruct(ByteBuffer bb, int encoding, int charSet, int strSize, int strIdLength,
 				String... strIds) throws UnsupportedEncodingException, MQStructException {
+			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+					"MQProbeStructs.checking.struct", Arrays.toString(strIds), strSize, bb.remaining());
 			checkStructSize(bb, strSize);
 			bb.mark();
 			String strucId = getStringRaw(bb, strIdLength, encoding, charSet);
