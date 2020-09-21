@@ -82,7 +82,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAMQAPINT extends MQStruct implements MQProbeRootStruct {
 		public static final String STRUC_ID = "APIEXIT "; // NON-NLS
-		private static final int STRUCT_SIZE = 16;
+		private static final int STRUC_SIZE = 16;
 
 		public String strucId; // 8
 		public TAMQINFO mqInfo;
@@ -114,12 +114,8 @@ public class MQProbeStructs {
 			bb.order(ByteOrder.LITTLE_ENDIAN);
 
 			tamqapint.strucId = getString(bb, 8, encoding, charSet);
-			if (bb.remaining() >= TAMQINFO.STRUCT_SIZE) {
-				tamqapint.mqInfo = TAMQINFO.read(bb, encoding, charSet);
-			}
-			if (bb.remaining() >= TAAPINTINFO.STRUCT_SIZE) {
-				tamqapint.apiIntInfo = TAAPINTINFO.read(bb, encoding, charSet);
-			}
+			tamqapint.mqInfo = TAMQINFO.read(bb, encoding, charSet);
+			tamqapint.apiIntInfo = TAAPINTINFO.read(bb, encoding, charSet);
 			tamqapint.msgId = getStringRaw(bb, 8, encoding, charSet);
 			tamqapint.msg = getBytes(bb, tamqapint.mqInfo.dataSize);
 			tamqapint.pad = getBytes(bb, bb.remaining());
@@ -169,7 +165,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAAPINTINFO extends MQStruct {
 		public static final String STRUC_ID = "APIPARMS"; // NON-NLS
-		private static final int STRUCT_SIZE = 1160;
+		private static final int STRUC_SIZE = 1160;
 
 		public String strucId; // 8
 		public String hostName; // 64
@@ -207,7 +203,7 @@ public class MQProbeStructs {
 		 */
 		public static TAAPINTINFO read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			try {
-				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 8, STRUC_ID);
+				String strucId = checkStruct(bb, encoding, charSet, STRUC_SIZE, 8, STRUC_ID);
 
 				TAAPINTINFO taapintinfo = new TAAPINTINFO();
 				taapintinfo.encoding = encoding;
@@ -226,21 +222,11 @@ public class MQProbeStructs {
 				taapintinfo.objType = bb.getInt();
 				taapintinfo.cpuCount = bb.getInt();
 				taapintinfo.unused = getBytes(bb, 4);
-				if (bb.remaining() >= TIME_INFO.STRUCT_SIZE) {
-					taapintinfo.exitTime = TIME_INFO.read(bb, encoding, charSet);
-				}
-				if (bb.remaining() >= APXDELTA.STRUCT_SIZE) {
-					taapintinfo.exitDelta = APXDELTA.read(bb, encoding, charSet);
-				}
-				if (bb.remaining() >= APXSIGNTR.STRUCT_SIZE) {
-					taapintinfo.exitSigntr = APXSIGNTR.read(bb, encoding, charSet);
-				}
-				if (bb.remaining() >= TAAXP.STRUCT_SIZE) {
-					taapintinfo.exitParms = TAAXP.read(bb, encoding, charSet);
-				}
-				if (bb.remaining() >= TAAXC.STRUCT_SIZE) {
-					taapintinfo.exitContext = TAAXC.read(bb, encoding, charSet);
-				}
+				taapintinfo.exitTime = TIME_INFO.read(bb, encoding, charSet);
+				taapintinfo.exitDelta = APXDELTA.read(bb, encoding, charSet);
+				taapintinfo.exitSigntr = APXSIGNTR.read(bb, encoding, charSet);
+				taapintinfo.exitParms = TAAXP.read(bb, encoding, charSet);
+				taapintinfo.exitContext = TAAXC.read(bb, encoding, charSet);
 
 				return taapintinfo;
 			} catch (MQStructException exc) {
@@ -298,7 +284,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAMQINFO extends MQStruct {
 		public static final String STRUC_ID = "mq  "; // NON-NLS
-		private static final int STRUCT_SIZE = 32;
+		private static final int STRUC_SIZE = 32;
 
 		public String strucId; // 4
 		public int apiType;
@@ -330,7 +316,7 @@ public class MQProbeStructs {
 		 */
 		public static TAMQINFO read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			try {
-				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 4, STRUC_ID);
+				String strucId = checkStruct(bb, encoding, charSet, STRUC_SIZE, 4, STRUC_ID);
 
 				TAMQINFO tamqinfo = new TAMQINFO();
 				tamqinfo.encoding = encoding;
@@ -344,19 +330,11 @@ public class MQProbeStructs {
 				tamqinfo.dataSize = bb.getInt();
 				tamqinfo.originalDataSize = bb.getInt();
 				tamqinfo.pad = getBytes(bb, 4);
-				if (bb.remaining() >= TAMD.STRUCT_SIZE) {
-					tamqinfo.objDesc = TAOD.read(bb, encoding, charSet);
-				}
+				tamqinfo.objDesc = TAOD.read(bb, encoding, charSet);
 				// bb.order(ByteOrder.LITTLE_ENDIAN);
-				if (bb.remaining() >= TAMSGOPT.STRUCT_SIZE) {
-					tamqinfo.msgOpt = TAMSGOPT.read(bb, encoding, charSet);
-				}
-				if (bb.remaining() >= MSGAGE.STRUCT_SIZE) {
-					tamqinfo.msgAge = MSGAGE.read(bb, encoding, charSet);
-				}
-				if (bb.remaining() >= TAMD.STRUCT_SIZE) {
-					tamqinfo.msgDesc = TAMD.read(bb, encoding, charSet);
-				}
+				tamqinfo.msgOpt = TAMSGOPT.read(bb, encoding, charSet);
+				tamqinfo.msgAge = MSGAGE.read(bb, encoding, charSet);
+				tamqinfo.msgDesc = TAMD.read(bb, encoding, charSet);
 
 				return tamqinfo;
 			} catch (MQStructException exc) {
@@ -406,7 +384,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAOD extends MQStruct {
 		public static final String STRUC_ID = ""; // NON-NLS
-		private static final int STRUCT_SIZE = 288;
+		private static final int STRUC_SIZE = 288;
 
 		public String strucId; // 4
 		public int objectType;
@@ -435,7 +413,7 @@ public class MQProbeStructs {
 		 */
 		public static TAOD read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			try {
-				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 4);
+				String strucId = checkStruct(bb, encoding, charSet, STRUC_SIZE, 4);
 
 				TAOD taod = new TAOD();
 				taod.encoding = encoding;
@@ -494,7 +472,7 @@ public class MQProbeStructs {
 	public static class TAMSGOPT extends MQStruct {
 		public static final String STRUC_ID = "GMO "; // NON-NLS
 		public static final String STRUC_ID2 = "PMO "; // NON-NLS
-		private static final int STRUCT_SIZE = 112;
+		private static final int STRUC_SIZE = 112;
 
 		public String strucId; // 4
 		public int version;
@@ -520,7 +498,7 @@ public class MQProbeStructs {
 		 */
 		public static TAMSGOPT read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			try {
-				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 4, STRUC_ID, STRUC_ID2);
+				String strucId = checkStruct(bb, encoding, charSet, STRUC_SIZE, 4, STRUC_ID, STRUC_ID2);
 
 				TAMSGOPT tamsgopt = new TAMSGOPT();
 				tamsgopt.encoding = encoding;
@@ -591,7 +569,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAMD extends MQStruct {
 		public static final String STRUC_ID = "MD "; // NON-NLS
-		private static final int STRUCT_SIZE = 320;
+		private static final int STRUC_SIZE = 320;
 
 		public String strucId; // 4
 		public int report;
@@ -634,7 +612,7 @@ public class MQProbeStructs {
 		 */
 		public static TAMD read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			try {
-				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 4, STRUC_ID);
+				String strucId = checkStruct(bb, encoding, charSet, STRUC_SIZE, 4, STRUC_ID);
 
 				TAMD tamd = new TAMD();
 				tamd.encoding = encoding;
@@ -719,7 +697,7 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TIME_INFO extends MQStruct {
-		private static final int STRUCT_SIZE = 32;
+		private static final int STRUC_SIZE = 32;
 
 		public int time_sec;
 		public int time_mls;
@@ -746,7 +724,7 @@ public class MQProbeStructs {
 		 */
 		public static TIME_INFO read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			try {
-				checkStructSize(bb, STRUCT_SIZE);
+				checkStructSize(bb, STRUC_SIZE);
 
 				TIME_INFO time = new TIME_INFO();
 				time.encoding = encoding;
@@ -795,7 +773,7 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class APXDELTA extends MQStruct {
-		private static final int STRUCT_SIZE = 4;
+		private static final int STRUC_SIZE = 4;
 
 		public int delta_sec;
 		public int delta_usec;
@@ -817,7 +795,7 @@ public class MQProbeStructs {
 		 */
 		public static APXDELTA read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			try {
-				checkStructSize(bb, STRUCT_SIZE);
+				checkStructSize(bb, STRUC_SIZE);
 
 				APXDELTA apxdelta = new APXDELTA();
 				apxdelta.encoding = encoding;
@@ -864,7 +842,7 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class APXSIGNTR extends MQStruct {
-		private static final int STRUCT_SIZE = 104;
+		private static final int STRUC_SIZE = 104;
 
 		public int readCount;
 		public int writeCount;
@@ -896,7 +874,7 @@ public class MQProbeStructs {
 		 */
 		public static APXSIGNTR read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			try {
-				checkStructSize(bb, STRUCT_SIZE);
+				checkStructSize(bb, STRUC_SIZE);
 
 				APXSIGNTR apxsigntr = new APXSIGNTR();
 				apxsigntr.encoding = encoding;
@@ -953,7 +931,7 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class MSGAGE extends MQStruct {
-		private static final int STRUCT_SIZE = 4;
+		private static final int STRUC_SIZE = 4;
 
 		public int msgage_sec;
 		public int msgage_usec;
@@ -975,7 +953,7 @@ public class MQProbeStructs {
 		 */
 		static MSGAGE read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			try {
-				checkStructSize(bb, STRUCT_SIZE);
+				checkStructSize(bb, STRUC_SIZE);
 
 				MSGAGE msgage = new MSGAGE();
 				msgage.encoding = encoding;
@@ -1024,7 +1002,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAAXP extends MQStruct {
 		public static final String STRUC_ID = "AXP "; // NON-NLS
-		private static final int STRUCT_SIZE = 80;
+		private static final int STRUC_SIZE = 80;
 
 		public String strucId; // 4
 		public int exitId;
@@ -1053,7 +1031,7 @@ public class MQProbeStructs {
 		 */
 		public static TAAXP read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			try {
-				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 4, STRUC_ID);
+				String strucId = checkStruct(bb, encoding, charSet, STRUC_SIZE, 4, STRUC_ID);
 
 				TAAXP taaxp = new TAAXP();
 				taaxp.encoding = encoding;
@@ -1115,7 +1093,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAAXC extends MQStruct {
 		public static final String STRUC_ID = "AXC "; // NON-NLS
-		private static final int STRUCT_SIZE = 392;
+		private static final int STRUC_SIZE = 392;
 
 		public String strucId; // 4
 		public int environment;
@@ -1145,7 +1123,7 @@ public class MQProbeStructs {
 		 */
 		public static TAAXC read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			try {
-				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 4, STRUC_ID);
+				String strucId = checkStruct(bb, encoding, charSet, STRUC_SIZE, 4, STRUC_ID);
 
 				TAAXC taaxc = new TAAXC();
 				taaxc.encoding = encoding;
@@ -1266,7 +1244,7 @@ public class MQProbeStructs {
 				break;
 			case TACON_MQH_TYPE_CICS:
 				switch (nextStrucId) {
-				case TAMQCD.STRUCT_ID:
+				case TAMQCD.STRUC_ID:
 					tazos.interceptData = TAMQCD.read(bb, encoding, charSet);
 					tazos.msg = getBytes(bb, tazos.batchInfo.msgLength);
 					break;
@@ -1371,7 +1349,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAMQBATCH extends MQZOSStruct {
 		public static final String STRUC_ID = "mqh "; // NON-NLS
-		private static final int STRUCT_SIZE = 64;
+		private static final int STRUC_SIZE = 64;
 
 		public String strucId; // 4
 		public int structSize;
@@ -1459,7 +1437,7 @@ public class MQProbeStructs {
 	/**
 	 * zOS intercepted MQ call contextual information.
 	 * <p>
-	 * StrucId: {@value TAMQCD#STRUCT_ID}
+	 * StrucId: {@value TAMQCD#STRUC_ID}
 	 * <p>
 	 * It provides such fields and types:
 	 * <ul>
@@ -1502,8 +1480,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAMQCD extends MQZOSStruct {
-		public static final String STRUCT_ID = "mcd "; // NON-NLS
-		private static final int STRUCT_SIZE = 756;
+		public static final String STRUC_ID = "mcd "; // NON-NLS
+		private static final int STRUC_SIZE = 756;
 
 		public String strucId; // 4
 		public int apiType;
@@ -1613,9 +1591,7 @@ public class MQProbeStructs {
 			tamqcd.clientPort = bb.getInt();
 			tamqcd.userCorrelator = getString(bb, 64, encoding, charSet);
 			tamqcd.mdOffset = bb.getInt();
-			if (bb.remaining() >= TAMD.STRUCT_SIZE) {
-				tamqcd.msgDesc = TAMD.read(bb, encoding, charSet);
-			}
+			tamqcd.msgDesc = TAMD.read(bb, encoding, charSet);
 
 			return tamqcd;
 		}
@@ -1683,7 +1659,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAHID extends MQZOSStruct {
 		public static final String STRUC_ID = "hid "; // NON-NLS
-		private static final int STRUCT_SIZE = 334;
+		private static final int STRUC_SIZE = 334;
 
 		public String strucId; // 4
 		public String osName; // 16
@@ -1785,7 +1761,7 @@ public class MQProbeStructs {
 	 */
 	public static class TADB2 extends MQZOSStruct {
 		public static final String STRUC_ID = "db2 "; // NON-NLS
-		private static final int STRUCT_SIZE = 380;
+		private static final int STRUC_SIZE = 380;
 
 		public String strucId; // 4
 		public short stmtType;
@@ -1969,7 +1945,7 @@ public class MQProbeStructs {
 	 */
 	public static class TACCD extends MQZOSStruct {
 		public static final String STRUC_ID = "ccd "; // NON-NLS
-		private static final int STRUCT_SIZE = 316;
+		private static final int STRUC_SIZE = 316;
 
 		public String strucId; // 4
 		public byte[] funcCode; // 2
@@ -2114,8 +2090,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAMQCICS extends MQZOSStruct {
-		private static final String STRUC_ID = "CICSEXIT"; // NON-NLS
-		private static final int STRUCT_SIZE = 16;
+		public static final String STRUC_ID = "CICSEXIT"; // NON-NLS
+		private static final int STRUC_SIZE = 16;
 
 		public String strucId; // 8
 		public TAMQINFO mqInfo;
@@ -2143,12 +2119,8 @@ public class MQProbeStructs {
 			tamqcics.charSet = charSet;
 
 			tamqcics.strucId = getString(bb, 8, encoding, charSet);
-			if (bb.remaining() >= TAMQINFO.STRUCT_SIZE) {
-				tamqcics.mqInfo = TAMQINFO.read(bb, encoding, charSet);
-			}
-			if (bb.remaining() >= TACICSINFO.STRUCT_SIZE) {
-				tamqcics.cicsInfo = TACICSINFO.read(bb, encoding, charSet);
-			}
+			tamqcics.mqInfo = TAMQINFO.read(bb, encoding, charSet);
+			tamqcics.cicsInfo = TACICSINFO.read(bb, encoding, charSet);
 			tamqcics.msgId = getStringRaw(bb, 8, encoding, charSet);
 
 			return tamqcics;
@@ -2186,8 +2158,8 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TACICSINFO extends MQZOSStruct {
-		private static final String STRUC_ID = "cics"; // NON-NLS
-		private static final int STRUCT_SIZE = 60;
+		public static final String STRUC_ID = "cics"; // NON-NLS
+		private static final int STRUC_SIZE = 60;
 
 		public String strucId; // 4
 		public String sysplxNum; // 8
@@ -2218,7 +2190,7 @@ public class MQProbeStructs {
 		 */
 		public static TACICSINFO read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
 			try {
-				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 4, STRUC_ID);
+				String strucId = checkStruct(bb, encoding, charSet, STRUC_SIZE, 4, STRUC_ID);
 
 				TACICSINFO tacicsinfo = new TACICSINFO();
 				tacicsinfo.encoding = encoding;
@@ -2305,7 +2277,7 @@ public class MQProbeStructs {
 	 */
 	public static class CMTA extends MQZOSStruct {
 		public static final String STRUC_ID = "cmta"; // NON-NLS
-		private static final int STRUCT_SIZE = 259;
+		private static final int STRUC_SIZE = 259;
 
 		/* Labels for MQ calls counters */
 		private static final String[] CMTA_MQCMDS_ARRAY = { "MQOPEN", "MQCLOSE", "MQGET", "MQPUT", "MQPUT1", "MQINQ",
@@ -2609,7 +2581,7 @@ public class MQProbeStructs {
 		 */
 		static void checkStructSize(ByteBuffer bb, int strSize) throws MQStructException {
 			if (bb.remaining() < strSize) {
-				throw new MQStructException(MQStructException.INVALID_STRUCT_SIZE,
+				throw new MQStructException(MQStructException.INVALID_STRUC_SIZE,
 						StreamsResources.getStringFormatted(WmqStreamConstants.RESOURCE_BUNDLE_NAME,
 								"MQProbeStructs.struct.invalid.size", strSize, bb.remaining()));
 			}
@@ -2642,14 +2614,14 @@ public class MQProbeStructs {
 				String... strIds) throws UnsupportedEncodingException, MQStructException {
 			checkStructSize(bb, strSize);
 			bb.mark();
-			String strucId = getString(bb, strIdLength, encoding, charSet);
+			String strucId = getStringRaw(bb, strIdLength, encoding, charSet);
 			if (ArrayUtils.isNotEmpty(strIds) && !StringUtils.equalsAny(strucId, strIds)) {
 				bb.reset();
-				throw new MQStructException(MQStructException.INVALID_STRUCT_ID, StreamsResources.getStringFormatted(
+				throw new MQStructException(MQStructException.INVALID_STRUC_ID, StreamsResources.getStringFormatted(
 						WmqStreamConstants.RESOURCE_BUNDLE_NAME, "MQProbeStructs.struct.invalid.id", strucId));
 			}
 
-			return strucId;
+			return StringUtils.trim(strucId);
 		}
 	}
 
@@ -2660,8 +2632,8 @@ public class MQProbeStructs {
 	private static class MQStructException extends Exception {
 		private static final long serialVersionUID = -3736561187997386523L;
 
-		private static final int INVALID_STRUCT_SIZE = 1;
-		private static final int INVALID_STRUCT_ID = 2;
+		private static final int INVALID_STRUC_SIZE = 1;
+		private static final int INVALID_STRUC_ID = 2;
 
 		private int faultType;
 
