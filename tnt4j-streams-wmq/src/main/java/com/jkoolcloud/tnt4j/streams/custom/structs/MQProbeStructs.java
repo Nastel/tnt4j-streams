@@ -23,6 +23,7 @@ import java.nio.ByteOrder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
@@ -81,6 +82,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAMQAPINT extends MQStruct implements MQProbeRootStruct {
 		public static final String STRUC_ID = "APIEXIT "; // NON-NLS
+		private static final int STRUCT_SIZE = 16;
 
 		public String strucId; // 8
 		public TAMQINFO mqInfo;
@@ -204,40 +206,49 @@ public class MQProbeStructs {
 		 *             convert from the charset
 		 */
 		public static TAAPINTINFO read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
-			TAAPINTINFO taapintinfo = new TAAPINTINFO();
-			taapintinfo.encoding = encoding;
-			taapintinfo.charSet = charSet;
+			try {
+				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 8, STRUC_ID);
 
-			taapintinfo.strucId = getString(bb, 8, encoding, charSet);
-			taapintinfo.hostName = getString(bb, 64, encoding, charSet);
-			taapintinfo.applName = getString(bb, 64, encoding, charSet);
-			taapintinfo.GTID = getString(bb, 320, encoding, charSet);
-			taapintinfo.objName = getString(bb, 256, encoding, charSet);
-			taapintinfo.rslvObjName = getString(bb, 64, encoding, charSet);
-			taapintinfo.rslvQMgr = getString(bb, 49, encoding, charSet);
-			taapintinfo.ipAddress = getString(bb, 64, encoding, charSet);
-			taapintinfo.osType = getString(bb, 256, encoding, charSet);
-			taapintinfo.unused0 = getBytes(bb, 3);
-			taapintinfo.objType = bb.getInt();
-			taapintinfo.cpuCount = bb.getInt();
-			taapintinfo.unused = getBytes(bb, 4);
-			if (bb.remaining() >= TIME_INFO.STRUCT_SIZE) {
-				taapintinfo.exitTime = TIME_INFO.read(bb, encoding, charSet);
-			}
-			if (bb.remaining() >= APXDELTA.STRUCT_SIZE) {
-				taapintinfo.exitDelta = APXDELTA.read(bb, encoding, charSet);
-			}
-			if (bb.remaining() >= APXSIGNTR.STRUCT_SIZE) {
-				taapintinfo.exitSigntr = APXSIGNTR.read(bb, encoding, charSet);
-			}
-			if (bb.remaining() >= TAAXP.STRUCT_SIZE) {
-				taapintinfo.exitParms = TAAXP.read(bb, encoding, charSet);
-			}
-			if (bb.remaining() >= TAAXC.STRUCT_SIZE) {
-				taapintinfo.exitContext = TAAXC.read(bb, encoding, charSet);
-			}
+				TAAPINTINFO taapintinfo = new TAAPINTINFO();
+				taapintinfo.encoding = encoding;
+				taapintinfo.charSet = charSet;
 
-			return taapintinfo;
+				taapintinfo.strucId = strucId;
+				taapintinfo.hostName = getString(bb, 64, encoding, charSet);
+				taapintinfo.applName = getString(bb, 64, encoding, charSet);
+				taapintinfo.GTID = getString(bb, 320, encoding, charSet);
+				taapintinfo.objName = getString(bb, 256, encoding, charSet);
+				taapintinfo.rslvObjName = getString(bb, 64, encoding, charSet);
+				taapintinfo.rslvQMgr = getString(bb, 49, encoding, charSet);
+				taapintinfo.ipAddress = getString(bb, 64, encoding, charSet);
+				taapintinfo.osType = getString(bb, 256, encoding, charSet);
+				taapintinfo.unused0 = getBytes(bb, 3);
+				taapintinfo.objType = bb.getInt();
+				taapintinfo.cpuCount = bb.getInt();
+				taapintinfo.unused = getBytes(bb, 4);
+				if (bb.remaining() >= TIME_INFO.STRUCT_SIZE) {
+					taapintinfo.exitTime = TIME_INFO.read(bb, encoding, charSet);
+				}
+				if (bb.remaining() >= APXDELTA.STRUCT_SIZE) {
+					taapintinfo.exitDelta = APXDELTA.read(bb, encoding, charSet);
+				}
+				if (bb.remaining() >= APXSIGNTR.STRUCT_SIZE) {
+					taapintinfo.exitSigntr = APXSIGNTR.read(bb, encoding, charSet);
+				}
+				if (bb.remaining() >= TAAXP.STRUCT_SIZE) {
+					taapintinfo.exitParms = TAAXP.read(bb, encoding, charSet);
+				}
+				if (bb.remaining() >= TAAXC.STRUCT_SIZE) {
+					taapintinfo.exitContext = TAAXC.read(bb, encoding, charSet);
+				}
+
+				return taapintinfo;
+			} catch (MQStructException exc) {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+						"MQProbeStructs.struct.read.exception", TAAPINTINFO.class.getSimpleName(),
+						exc.getLocalizedMessage());
+				return null;
+			}
 		}
 
 		@Override
@@ -318,33 +329,42 @@ public class MQProbeStructs {
 		 *             convert from the charset
 		 */
 		public static TAMQINFO read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
-			TAMQINFO tamqinfo = new TAMQINFO();
-			tamqinfo.encoding = encoding;
-			tamqinfo.charSet = charSet;
+			try {
+				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 4, STRUC_ID);
 
-			tamqinfo.strucId = getString(bb, 4, encoding, charSet);
-			tamqinfo.apiType = bb.getInt();
-			tamqinfo.apiCall = bb.getInt();
-			tamqinfo.compCode = bb.getInt();
-			tamqinfo.reason = bb.getInt();
-			tamqinfo.dataSize = bb.getInt();
-			tamqinfo.originalDataSize = bb.getInt();
-			tamqinfo.pad = getBytes(bb, 4);
-			if (bb.remaining() >= TAMD.STRUCT_SIZE) {
-				tamqinfo.objDesc = TAOD.read(bb, encoding, charSet);
-			}
-			// bb.order(ByteOrder.LITTLE_ENDIAN);
-			if (bb.remaining() >= TAMSGOPT.STRUCT_SIZE) {
-				tamqinfo.msgOpt = TAMSGOPT.read(bb, encoding, charSet);
-			}
-			if (bb.remaining() >= MSGAGE.STRUCT_SIZE) {
-				tamqinfo.msgAge = MSGAGE.read(bb, encoding, charSet);
-			}
-			if (bb.remaining() >= TAMD.STRUCT_SIZE) {
-				tamqinfo.msgDesc = TAMD.read(bb, encoding, charSet);
-			}
+				TAMQINFO tamqinfo = new TAMQINFO();
+				tamqinfo.encoding = encoding;
+				tamqinfo.charSet = charSet;
 
-			return tamqinfo;
+				tamqinfo.strucId = strucId;
+				tamqinfo.apiType = bb.getInt();
+				tamqinfo.apiCall = bb.getInt();
+				tamqinfo.compCode = bb.getInt();
+				tamqinfo.reason = bb.getInt();
+				tamqinfo.dataSize = bb.getInt();
+				tamqinfo.originalDataSize = bb.getInt();
+				tamqinfo.pad = getBytes(bb, 4);
+				if (bb.remaining() >= TAMD.STRUCT_SIZE) {
+					tamqinfo.objDesc = TAOD.read(bb, encoding, charSet);
+				}
+				// bb.order(ByteOrder.LITTLE_ENDIAN);
+				if (bb.remaining() >= TAMSGOPT.STRUCT_SIZE) {
+					tamqinfo.msgOpt = TAMSGOPT.read(bb, encoding, charSet);
+				}
+				if (bb.remaining() >= MSGAGE.STRUCT_SIZE) {
+					tamqinfo.msgAge = MSGAGE.read(bb, encoding, charSet);
+				}
+				if (bb.remaining() >= TAMD.STRUCT_SIZE) {
+					tamqinfo.msgDesc = TAMD.read(bb, encoding, charSet);
+				}
+
+				return tamqinfo;
+			} catch (MQStructException exc) {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+						"MQProbeStructs.struct.read.exception", TAMQINFO.class.getSimpleName(),
+						exc.getLocalizedMessage());
+				return null;
+			}
 		}
 
 		@Override
@@ -414,21 +434,29 @@ public class MQProbeStructs {
 		 *             convert from the charset
 		 */
 		public static TAOD read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
-			TAOD taod = new TAOD();
-			taod.encoding = encoding;
-			taod.charSet = charSet;
+			try {
+				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 4);
 
-			taod.strucId = getString(bb, 4, encoding, charSet);
-			taod.objectType = bb.getInt();
-			taod.objectName = getString(bb, 48, encoding, charSet);
-			taod.objectQMgrName = getString(bb, 48, encoding, charSet);
-			taod.dynamicQName = getString(bb, 48, encoding, charSet);
-			taod.alternateUserId = getString(bb, 12, encoding, charSet);
-			taod.resolvedQName = getString(bb, 48, encoding, charSet);
-			taod.resolvedQMgrName = getString(bb, 48, encoding, charSet);
-			taod.unused = getBytes(bb, 28);
+				TAOD taod = new TAOD();
+				taod.encoding = encoding;
+				taod.charSet = charSet;
 
-			return taod;
+				taod.strucId = strucId;
+				taod.objectType = bb.getInt();
+				taod.objectName = getString(bb, 48, encoding, charSet);
+				taod.objectQMgrName = getString(bb, 48, encoding, charSet);
+				taod.dynamicQName = getString(bb, 48, encoding, charSet);
+				taod.alternateUserId = getString(bb, 12, encoding, charSet);
+				taod.resolvedQName = getString(bb, 48, encoding, charSet);
+				taod.resolvedQMgrName = getString(bb, 48, encoding, charSet);
+				taod.unused = getBytes(bb, 28);
+
+				return taod;
+			} catch (MQStructException exc) {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+						"MQProbeStructs.struct.read.exception", TAOD.class.getSimpleName(), exc.getLocalizedMessage());
+				return null;
+			}
 		}
 
 		@Override
@@ -491,18 +519,27 @@ public class MQProbeStructs {
 		 *             convert from the charset
 		 */
 		public static TAMSGOPT read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
-			TAMSGOPT tamsgopt = new TAMSGOPT();
-			tamsgopt.encoding = encoding;
-			tamsgopt.charSet = charSet;
+			try {
+				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 4, STRUC_ID, STRUC_ID2);
 
-			tamsgopt.strucId = getString(bb, 4, encoding, charSet);
-			tamsgopt.version = bb.getInt();
-			tamsgopt.options = bb.getInt();
-			tamsgopt.waitInterval = bb.getInt();
-			tamsgopt.resolvedQName = getString(bb, 48, encoding, charSet);
-			tamsgopt.resolvedQMgrName = getString(bb, 48, encoding, charSet);
+				TAMSGOPT tamsgopt = new TAMSGOPT();
+				tamsgopt.encoding = encoding;
+				tamsgopt.charSet = charSet;
 
-			return tamsgopt;
+				tamsgopt.strucId = strucId;
+				tamsgopt.version = bb.getInt();
+				tamsgopt.options = bb.getInt();
+				tamsgopt.waitInterval = bb.getInt();
+				tamsgopt.resolvedQName = getString(bb, 48, encoding, charSet);
+				tamsgopt.resolvedQMgrName = getString(bb, 48, encoding, charSet);
+
+				return tamsgopt;
+			} catch (MQStructException exc) {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+						"MQProbeStructs.struct.read.exception", TAMSGOPT.class.getSimpleName(),
+						exc.getLocalizedMessage());
+				return null;
+			}
 		}
 
 		@Override
@@ -596,35 +633,43 @@ public class MQProbeStructs {
 		 *             convert from the charset
 		 */
 		public static TAMD read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
-			TAMD tamd = new TAMD();
-			tamd.encoding = encoding;
-			tamd.charSet = charSet;
+			try {
+				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 4, STRUC_ID);
 
-			tamd.strucId = getString(bb, 4, encoding, charSet);
-			tamd.report = bb.getInt();
-			tamd.msgType = bb.getInt();
-			tamd.expiry = bb.getInt();
-			tamd.feedback = bb.getInt();
-			tamd.encoding2 = bb.getInt();
-			tamd.codedCharSetId = bb.getInt();
-			tamd.format = getString(bb, 8, encoding, charSet);
-			tamd.priority = bb.getInt();
-			tamd.persistence = bb.getInt();
-			tamd.msgId = getBytes(bb, 24);
-			tamd.correlId = getBytes(bb, 24);
-			tamd.backoutCount = bb.getInt();
-			tamd.replyToQ = getString(bb, 48, encoding, charSet);
-			tamd.replyToQMgr = getString(bb, 48, encoding, charSet);
-			tamd.userIdentifier = getString(bb, 12, encoding, charSet);
-			tamd.accountingToken = getBytes(bb, 32);
-			tamd.applIdentityData = getString(bb, 32, encoding, charSet);
-			tamd.putApplType = bb.getInt();
-			tamd.putApplName = getString(bb, 28, encoding, charSet);
-			tamd.putDate = getString(bb, 8, encoding, charSet);
-			tamd.putTime = getString(bb, 8, encoding, charSet);
-			tamd.applOriginData = getString(bb, 4, encoding, charSet);
+				TAMD tamd = new TAMD();
+				tamd.encoding = encoding;
+				tamd.charSet = charSet;
 
-			return tamd;
+				tamd.strucId = strucId;
+				tamd.report = bb.getInt();
+				tamd.msgType = bb.getInt();
+				tamd.expiry = bb.getInt();
+				tamd.feedback = bb.getInt();
+				tamd.encoding2 = bb.getInt();
+				tamd.codedCharSetId = bb.getInt();
+				tamd.format = getString(bb, 8, encoding, charSet);
+				tamd.priority = bb.getInt();
+				tamd.persistence = bb.getInt();
+				tamd.msgId = getBytes(bb, 24);
+				tamd.correlId = getBytes(bb, 24);
+				tamd.backoutCount = bb.getInt();
+				tamd.replyToQ = getString(bb, 48, encoding, charSet);
+				tamd.replyToQMgr = getString(bb, 48, encoding, charSet);
+				tamd.userIdentifier = getString(bb, 12, encoding, charSet);
+				tamd.accountingToken = getBytes(bb, 32);
+				tamd.applIdentityData = getString(bb, 32, encoding, charSet);
+				tamd.putApplType = bb.getInt();
+				tamd.putApplName = getString(bb, 28, encoding, charSet);
+				tamd.putDate = getString(bb, 8, encoding, charSet);
+				tamd.putTime = getString(bb, 8, encoding, charSet);
+				tamd.applOriginData = getString(bb, 4, encoding, charSet);
+
+				return tamd;
+			} catch (MQStructException exc) {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+						"MQProbeStructs.struct.read.exception", TAMD.class.getSimpleName(), exc.getLocalizedMessage());
+				return null;
+			}
 		}
 
 		@Override
@@ -700,19 +745,28 @@ public class MQProbeStructs {
 		 *             convert from the charset
 		 */
 		public static TIME_INFO read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
-			TIME_INFO time = new TIME_INFO();
-			time.encoding = encoding;
-			time.charSet = charSet;
+			try {
+				checkStructSize(bb, STRUCT_SIZE);
 
-			time.time_sec = bb.getInt();
-			time.time_mls = bb.getInt();
-			time.time_usec = bb.getInt();
-			time.time_tz = bb.getInt();
-			time.offset_secs = bb.getInt();
-			time.offset_msecs = bb.getInt();
-			time.timer = bb.getDouble();
+				TIME_INFO time = new TIME_INFO();
+				time.encoding = encoding;
+				time.charSet = charSet;
 
-			return time;
+				time.time_sec = bb.getInt();
+				time.time_mls = bb.getInt();
+				time.time_usec = bb.getInt();
+				time.time_tz = bb.getInt();
+				time.offset_secs = bb.getInt();
+				time.offset_msecs = bb.getInt();
+				time.timer = bb.getDouble();
+
+				return time;
+			} catch (MQStructException exc) {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+						"MQProbeStructs.struct.read.exception", TIME_INFO.class.getSimpleName(),
+						exc.getLocalizedMessage());
+				return null;
+			}
 		}
 
 		@Override
@@ -762,14 +816,23 @@ public class MQProbeStructs {
 		 *             convert from the charset
 		 */
 		public static APXDELTA read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
-			APXDELTA apxdelta = new APXDELTA();
-			apxdelta.encoding = encoding;
-			apxdelta.charSet = charSet;
+			try {
+				checkStructSize(bb, STRUCT_SIZE);
 
-			apxdelta.delta_sec = bb.getInt();
-			apxdelta.delta_usec = bb.getInt();
+				APXDELTA apxdelta = new APXDELTA();
+				apxdelta.encoding = encoding;
+				apxdelta.charSet = charSet;
 
-			return apxdelta;
+				apxdelta.delta_sec = bb.getInt();
+				apxdelta.delta_usec = bb.getInt();
+
+				return apxdelta;
+			} catch (MQStructException exc) {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+						"MQProbeStructs.struct.read.exception", APXDELTA.class.getSimpleName(),
+						exc.getLocalizedMessage());
+				return null;
+			}
 		}
 
 		@Override
@@ -832,24 +895,33 @@ public class MQProbeStructs {
 		 *             convert from the charset
 		 */
 		public static APXSIGNTR read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
-			APXSIGNTR apxsigntr = new APXSIGNTR();
-			apxsigntr.encoding = encoding;
-			apxsigntr.charSet = charSet;
+			try {
+				checkStructSize(bb, STRUCT_SIZE);
 
-			apxsigntr.readCount = bb.getInt();
-			apxsigntr.writeCount = bb.getInt();
-			apxsigntr.otherCount = bb.getInt();
-			apxsigntr.luwType = bb.getInt();
-			apxsigntr.sesSig = getBytes(bb, 16);
-			apxsigntr.luwSig = getBytes(bb, 16);
-			apxsigntr.msgSig = getBytes(bb, 37);
-			apxsigntr.unused = getBytes(bb, 3);
-			apxsigntr.sesSigLen = bb.getInt();
-			apxsigntr.luwSigLen = bb.getInt();
-			apxsigntr.msgSigLen = bb.getInt();
-			apxsigntr.unused2 = getBytes(bb, 4);
+				APXSIGNTR apxsigntr = new APXSIGNTR();
+				apxsigntr.encoding = encoding;
+				apxsigntr.charSet = charSet;
 
-			return apxsigntr;
+				apxsigntr.readCount = bb.getInt();
+				apxsigntr.writeCount = bb.getInt();
+				apxsigntr.otherCount = bb.getInt();
+				apxsigntr.luwType = bb.getInt();
+				apxsigntr.sesSig = getBytes(bb, 16);
+				apxsigntr.luwSig = getBytes(bb, 16);
+				apxsigntr.msgSig = getBytes(bb, 37);
+				apxsigntr.unused = getBytes(bb, 3);
+				apxsigntr.sesSigLen = bb.getInt();
+				apxsigntr.luwSigLen = bb.getInt();
+				apxsigntr.msgSigLen = bb.getInt();
+				apxsigntr.unused2 = getBytes(bb, 4);
+
+				return apxsigntr;
+			} catch (MQStructException exc) {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+						"MQProbeStructs.struct.read.exception", APXSIGNTR.class.getSimpleName(),
+						exc.getLocalizedMessage());
+				return null;
+			}
 		}
 
 		@Override
@@ -902,14 +974,23 @@ public class MQProbeStructs {
 		 *             convert from the charset
 		 */
 		static MSGAGE read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
-			MSGAGE msgage = new MSGAGE();
-			msgage.encoding = encoding;
-			msgage.charSet = charSet;
+			try {
+				checkStructSize(bb, STRUCT_SIZE);
 
-			msgage.msgage_sec = bb.getInt();
-			msgage.msgage_usec = bb.getInt();
+				MSGAGE msgage = new MSGAGE();
+				msgage.encoding = encoding;
+				msgage.charSet = charSet;
 
-			return msgage;
+				msgage.msgage_sec = bb.getInt();
+				msgage.msgage_usec = bb.getInt();
+
+				return msgage;
+			} catch (MQStructException exc) {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+						"MQProbeStructs.struct.read.exception", MSGAGE.class.getSimpleName(),
+						exc.getLocalizedMessage());
+				return null;
+			}
 		}
 
 		@Override
@@ -971,21 +1052,29 @@ public class MQProbeStructs {
 		 *             convert from the charset
 		 */
 		public static TAAXP read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
-			TAAXP taaxp = new TAAXP();
-			taaxp.encoding = encoding;
-			taaxp.charSet = charSet;
+			try {
+				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 4, STRUC_ID);
 
-			taaxp.strucId = getString(bb, 4, encoding, charSet);
-			taaxp.exitId = bb.getInt();
-			taaxp.exitReason = bb.getInt();
-			taaxp.exitResponse = bb.getInt();
-			taaxp.exitResponse2 = bb.getInt();
-			taaxp.feedback = bb.getInt();
-			taaxp.apiCallerType = bb.getInt();
-			taaxp.function = bb.getInt();
-			taaxp.qMgrName = getString(bb, 48, encoding, charSet);
+				TAAXP taaxp = new TAAXP();
+				taaxp.encoding = encoding;
+				taaxp.charSet = charSet;
 
-			return taaxp;
+				taaxp.strucId = strucId;
+				taaxp.exitId = bb.getInt();
+				taaxp.exitReason = bb.getInt();
+				taaxp.exitResponse = bb.getInt();
+				taaxp.exitResponse2 = bb.getInt();
+				taaxp.feedback = bb.getInt();
+				taaxp.apiCallerType = bb.getInt();
+				taaxp.function = bb.getInt();
+				taaxp.qMgrName = getString(bb, 48, encoding, charSet);
+
+				return taaxp;
+			} catch (MQStructException exc) {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+						"MQProbeStructs.struct.read.exception", TAAXP.class.getSimpleName(), exc.getLocalizedMessage());
+				return null;
+			}
 		}
 
 		@Override
@@ -1055,22 +1144,30 @@ public class MQProbeStructs {
 		 *             convert from the charset
 		 */
 		public static TAAXC read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
-			TAAXC taaxc = new TAAXC();
-			taaxc.encoding = encoding;
-			taaxc.charSet = charSet;
+			try {
+				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 4, STRUC_ID);
 
-			taaxc.strucId = getString(bb, 4, encoding, charSet);
-			taaxc.environment = bb.getInt();
-			taaxc.userId = getString(bb, 12, encoding, charSet);
-			taaxc.securityId = getBytes(bb, 40);
-			taaxc.connectionName = getString(bb, 264, encoding, charSet);
-			taaxc.applName = getString(bb, 28, encoding, charSet);
-			taaxc.applType = bb.getInt();
-			taaxc.processId = bb.getInt();
-			taaxc.threadId = bb.getInt();
-			taaxc.unused = getBytes(bb, 28);
+				TAAXC taaxc = new TAAXC();
+				taaxc.encoding = encoding;
+				taaxc.charSet = charSet;
 
-			return taaxc;
+				taaxc.strucId = strucId;
+				taaxc.environment = bb.getInt();
+				taaxc.userId = getString(bb, 12, encoding, charSet);
+				taaxc.securityId = getBytes(bb, 40);
+				taaxc.connectionName = getString(bb, 264, encoding, charSet);
+				taaxc.applName = getString(bb, 28, encoding, charSet);
+				taaxc.applType = bb.getInt();
+				taaxc.processId = bb.getInt();
+				taaxc.threadId = bb.getInt();
+				taaxc.unused = getBytes(bb, 28);
+
+				return taaxc;
+			} catch (MQStructException exc) {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+						"MQProbeStructs.struct.read.exception", TAAXC.class.getSimpleName(), exc.getLocalizedMessage());
+				return null;
+			}
 		}
 
 		@Override
@@ -1215,33 +1312,33 @@ public class MQProbeStructs {
 			Map<String, Object> sMap = super.asMap();
 
 			sMap.put("StrucId", strucId); // NON-NLS
-			sMap.put("BatchInfo", batchInfo.asMap()); // NON-NLS
+			sMap.put("BatchInfo", batchInfo == null ? null : batchInfo.asMap()); // NON-NLS
 			switch (batchInfo.type) {
 			case TACON_MQH_TYPE_BATCH:
-				sMap.put("MqCallCtx", interceptData.asMap()); // NON-NLS
+				sMap.put("MqCallCtx", interceptData == null ? null : interceptData.asMap()); // NON-NLS
 				sMap.put("Message", msg); // NON-NLS
 				break;
 			case TACON_MQH_TYPE_HID:
-				sMap.put("HostData", interceptData.asMap()); // NON-NLS
+				sMap.put("HostData", interceptData == null ? null : interceptData.asMap()); // NON-NLS
 				break;
 			case TACON_MQH_TYPE_CICSSQL:
-				sMap.put("DB2Data", interceptData.asMap()); // NON-NLS
+				sMap.put("DB2Data", interceptData == null ? null : interceptData.asMap()); // NON-NLS
 				sMap.put("Message", msg); // NON-NLS
 				break;
 			case TACON_MQH_TYPE_EXECCICS:
-				sMap.put("ExecCICSData", interceptData.asMap()); // NON-NLS
+				sMap.put("ExecCICSData", interceptData == null ? null : interceptData.asMap()); // NON-NLS
 				sMap.put("Message", msg); // NON-NLS
 				break;
 			case TACON_MQH_TYPE_CICS:
 				if (interceptData instanceof CMTA) {
-					sMap.put("CICSMqTasks", interceptData.asMap()); // NON-NLS
+					sMap.put("CICSMqTasks", interceptData == null ? null : interceptData.asMap()); // NON-NLS
 				} else if (interceptData instanceof TAMQCD) {
-					sMap.put("CICSMqCallCtx", interceptData.asMap()); // NON-NLS
+					sMap.put("CICSMqCallCtx", interceptData == null ? null : interceptData.asMap()); // NON-NLS
 					sMap.put("Message", msg); // NON-NLS
 				}
 				break;
 			case TACON_MQH_TYPE_CHEXIT:
-				sMap.put("ChExitData", interceptData.asMap()); // NON-NLS
+				sMap.put("ChExitData", interceptData == null ? null : interceptData.asMap()); // NON-NLS
 				sMap.put("Message", msg); // NON-NLS
 				break;
 			default:
@@ -1274,6 +1371,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAMQBATCH extends MQZOSStruct {
 		public static final String STRUC_ID = "mqh "; // NON-NLS
+		private static final int STRUCT_SIZE = 64;
 
 		public String strucId; // 4
 		public int structSize;
@@ -1405,6 +1503,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAMQCD extends MQZOSStruct {
 		public static final String STRUCT_ID = "mcd "; // NON-NLS
+		private static final int STRUCT_SIZE = 756;
 
 		public String strucId; // 4
 		public int apiType;
@@ -1433,7 +1532,7 @@ public class MQProbeStructs {
 		public long msgAge; // 8
 		public long sessTime; // 8
 		public long luwTime; // 8
-		public String luwType;
+		public String luwType; // 1
 		byte[] align2; // 3
 		public byte[] msgSig; // 36
 		byte[] align3; // 4
@@ -1584,6 +1683,7 @@ public class MQProbeStructs {
 	 */
 	public static class TAHID extends MQZOSStruct {
 		public static final String STRUC_ID = "hid "; // NON-NLS
+		private static final int STRUCT_SIZE = 334;
 
 		public String strucId; // 4
 		public String osName; // 16
@@ -1685,6 +1785,7 @@ public class MQProbeStructs {
 	 */
 	public static class TADB2 extends MQZOSStruct {
 		public static final String STRUC_ID = "db2 "; // NON-NLS
+		private static final int STRUCT_SIZE = 380;
 
 		public String strucId; // 4
 		public short stmtType;
@@ -1868,6 +1969,7 @@ public class MQProbeStructs {
 	 */
 	public static class TACCD extends MQZOSStruct {
 		public static final String STRUC_ID = "ccd "; // NON-NLS
+		private static final int STRUCT_SIZE = 316;
 
 		public String strucId; // 4
 		public byte[] funcCode; // 2
@@ -2012,6 +2114,9 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TAMQCICS extends MQZOSStruct {
+		private static final String STRUC_ID = "CICSEXIT"; // NON-NLS
+		private static final int STRUCT_SIZE = 16;
+
 		public String strucId; // 8
 		public TAMQINFO mqInfo;
 		public TACICSINFO cicsInfo;
@@ -2081,6 +2186,7 @@ public class MQProbeStructs {
 	 * </ul>
 	 */
 	public static class TACICSINFO extends MQZOSStruct {
+		private static final String STRUC_ID = "cics"; // NON-NLS
 		private static final int STRUCT_SIZE = 60;
 
 		public String strucId; // 4
@@ -2111,23 +2217,32 @@ public class MQProbeStructs {
 		 *             convert from the charset
 		 */
 		public static TACICSINFO read(ByteBuffer bb, int encoding, int charSet) throws UnsupportedEncodingException {
-			TACICSINFO tacicsinfo = new TACICSINFO();
-			tacicsinfo.encoding = encoding;
-			tacicsinfo.charSet = charSet;
+			try {
+				String strucId = checkStruct(bb, encoding, charSet, STRUCT_SIZE, 4, STRUC_ID);
 
-			tacicsinfo.strucId = getString(bb, 4, encoding, charSet);
-			tacicsinfo.sysplxNum = getString(bb, 8, encoding, charSet);
-			tacicsinfo.sysplxId = getString(bb, 2, encoding, charSet);
-			tacicsinfo.cicsVer = getStringRaw(bb, 2, encoding, charSet);
-			tacicsinfo.cicsName = getStringRaw(bb, 8, encoding, charSet);
-			tacicsinfo.cicsTask = getStringRaw(bb, 8, encoding, charSet);
-			tacicsinfo.tranName = getStringRaw(bb, 4, encoding, charSet);
-			tacicsinfo.taskNum = bb.getInt();
-			tacicsinfo.termId = getStringRaw(bb, 4, encoding, charSet);
-			tacicsinfo.userId = getStringRaw(bb, 8, encoding, charSet);
-			tacicsinfo.timer = timestamp8(bb);
+				TACICSINFO tacicsinfo = new TACICSINFO();
+				tacicsinfo.encoding = encoding;
+				tacicsinfo.charSet = charSet;
 
-			return tacicsinfo;
+				tacicsinfo.strucId = strucId;
+				tacicsinfo.sysplxNum = getString(bb, 8, encoding, charSet);
+				tacicsinfo.sysplxId = getString(bb, 2, encoding, charSet);
+				tacicsinfo.cicsVer = getStringRaw(bb, 2, encoding, charSet);
+				tacicsinfo.cicsName = getStringRaw(bb, 8, encoding, charSet);
+				tacicsinfo.cicsTask = getStringRaw(bb, 8, encoding, charSet);
+				tacicsinfo.tranName = getStringRaw(bb, 4, encoding, charSet);
+				tacicsinfo.taskNum = bb.getInt();
+				tacicsinfo.termId = getStringRaw(bb, 4, encoding, charSet);
+				tacicsinfo.userId = getStringRaw(bb, 8, encoding, charSet);
+				tacicsinfo.timer = timestamp8(bb);
+
+				return tacicsinfo;
+			} catch (MQStructException exc) {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+						"MQProbeStructs.struct.read.exception", TACICSINFO.class.getSimpleName(),
+						exc.getLocalizedMessage());
+				return null;
+			}
 		}
 
 		@Override
@@ -2190,6 +2305,7 @@ public class MQProbeStructs {
 	 */
 	public static class CMTA extends MQZOSStruct {
 		public static final String STRUC_ID = "cmta"; // NON-NLS
+		private static final int STRUCT_SIZE = 259;
 
 		/* Labels for MQ calls counters */
 		private static final String[] CMTA_MQCMDS_ARRAY = { "MQOPEN", "MQCLOSE", "MQGET", "MQPUT", "MQPUT1", "MQINQ",
@@ -2478,6 +2594,108 @@ public class MQProbeStructs {
 			sMap.put("CharSet", charSet);// NON-NLS
 
 			return sMap;
+		}
+
+		/**
+		 * Checks if MQ Probe struct fits remaining byte buffer size.
+		 * 
+		 * @param bb
+		 *            byte buffer to check if struct fits
+		 * @param strSize
+		 *            struct size in bytes
+		 * 
+		 * @throws MQStructException
+		 *             if struct does not fit remaining buffer size
+		 */
+		static void checkStructSize(ByteBuffer bb, int strSize) throws MQStructException {
+			if (bb.remaining() < strSize) {
+				throw new MQStructException(MQStructException.INVALID_STRUCT_SIZE,
+						StreamsResources.getStringFormatted(WmqStreamConstants.RESOURCE_BUNDLE_NAME,
+								"MQProbeStructs.struct.invalid.size", strSize, bb.remaining()));
+			}
+		}
+
+		/**
+		 * Checks if MQ Probe struct is defined in byte buffer remaining set of bytes.
+		 * 
+		 * @param bb
+		 *            byte buffer to read struct
+		 * @param encoding
+		 *            encoding to use for conversion
+		 * @param charSet
+		 *            character set to use conversion
+		 * @param strSize
+		 *            struct size in bytes
+		 * @param strIdLength
+		 *            struct id length in bytes
+		 * @param strIds
+		 *            array of expected structure ids
+		 * @return struct id found within next byte buffer bytes
+		 * 
+		 * @throws UnsupportedEncodingException
+		 *             if there is no charset mapping for the supplied {@code charSet} value or the platform cannot
+		 *             convert from the charset
+		 * @throws MQStructException
+		 *             if struct does not fit remaining buffer size or found struct id does not match expected
+		 */
+		static String checkStruct(ByteBuffer bb, int encoding, int charSet, int strSize, int strIdLength,
+				String... strIds) throws UnsupportedEncodingException, MQStructException {
+			checkStructSize(bb, strSize);
+			bb.mark();
+			String strucId = getString(bb, strIdLength, encoding, charSet);
+			if (ArrayUtils.isNotEmpty(strIds) && !StringUtils.equalsAny(strucId, strIds)) {
+				bb.reset();
+				throw new MQStructException(MQStructException.INVALID_STRUCT_ID, StreamsResources.getStringFormatted(
+						WmqStreamConstants.RESOURCE_BUNDLE_NAME, "MQProbeStructs.struct.invalid.id", strucId));
+			}
+
+			return strucId;
+		}
+	}
+
+	/**
+	 * This exception is thrown when invalid expected MQ Probe structure is found: invalid structure id or structure
+	 * size.
+	 */
+	private static class MQStructException extends Exception {
+		private static final long serialVersionUID = -3736561187997386523L;
+
+		private static final int INVALID_STRUCT_SIZE = 1;
+		private static final int INVALID_STRUCT_ID = 2;
+
+		private int faultType;
+
+		/**
+		 * Constructs an {@code MQStructException} with the specified fault type identifier.
+		 * 
+		 * @param faultType
+		 *            MQ Probe structure fault type identifier
+		 */
+		MQStructException(int faultType) {
+			this.faultType = faultType;
+		}
+
+		/**
+		 * Constructs an {@code MQStructException} with the specified fault type identifier and detail message.
+		 * 
+		 * @param faultType
+		 *            MQ Probe structure fault type identifier
+		 * @param message
+		 *            fault detail message
+		 */
+		MQStructException(int faultType, String message) {
+			super(message);
+
+			this.faultType = faultType;
+		}
+
+		/**
+		 * Returns fault type identifier.
+		 * 
+		 * @return fault type identifier
+		 */
+		int getFaultType() {
+			return faultType;
 		}
 	}
 
