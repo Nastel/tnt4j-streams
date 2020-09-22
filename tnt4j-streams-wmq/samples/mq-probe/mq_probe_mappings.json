@@ -72,6 +72,22 @@
         "1": "WARNING",
         "": "ERROR"
     },
+    "ObjectType": {
+        "0": "NONE",
+        "1": "QUEUE",
+        "2": "NAMELIST",
+        "3": "PROCESS",
+        "4": "STORAGE_CLASS",
+        "5": "QMGR",
+        "6": "CHANNEL",
+        "7": "AUTH_INFO",
+        "8": "TOPIC",
+        "9": "COMM_INFO",
+        "10": "CF_STRUC",
+        "11": "LISTENER",
+        "12": "SERVICE",
+        "": "QMGR"
+    },
     "Severity": {
         "0": "INFO",
         "1": "WARNING",

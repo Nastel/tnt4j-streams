@@ -36,12 +36,8 @@
                 StringUtils.substringBefore ($fieldValue, " ");
             ]]></field-transform>
         </field>
-        <field name="ObjType" locator="ObjectType" locator-type="Label" datatype="Number">
-            <field-transform lang="groovy" phase="formatted"><![CDATA[
-                $fieldValue instanceof Number
-                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQOT_.*")
-                    : $fieldValue
-            ]]></field-transform>
+        <field name="ObjType" locator="ObjectType" locator-type="Label">
+            <field-map-ref resource="MQ_PROBE_MAPPINGS.ObjectType"/>
         </field>
         <field name="ResourceName" formattingPattern="{0}={1}:{2}">
             <field-locator locator="ObjType" locator-type="Activity"/>
@@ -347,12 +343,8 @@
 
         <!-- Object descriptor fields -->
         <field name="Tag" locator="MqInfo.ObjDesc.StrucId" locator-type="Label"/>
-        <field name="ObjType" locator="MqInfo.ObjDesc.ObjectType" locator-type="Label" datatype="Number">
-            <field-transform lang="groovy" phase="formatted"><![CDATA[
-                $fieldValue instanceof Number
-                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQOT_.*")
-                    : $fieldValue
-            ]]></field-transform>
+        <field name="ObjType" locator="ObjectType" locator-type="Label">
+            <field-map-ref resource="MQ_PROBE_MAPPINGS.ObjectType"/>
         </field>
         <field name="ObjectName" locator="MqInfo.ObjDesc.ObjectName" locator-type="Label"/>
         <field name="ObjectQMgrName" locator="MqInfo.ObjDesc.ObjectQMgrName" locator-type="Label"/>
@@ -605,12 +597,8 @@
 
         <!-- Object descriptor fields -->
         <field name="Tag" locator="MqInfo.ObjDesc.StrucId" locator-type="Label"/>
-        <field name="ObjType" locator="MqInfo.ObjDesc.ObjectType" locator-type="Label" datatype="Number">
-            <field-transform lang="groovy" phase="formatted"><![CDATA[
-                $fieldValue instanceof Number
-                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQOT_.*")
-                    : $fieldValue
-            ]]></field-transform>
+        <field name="ObjType" locator="ObjectType" locator-type="Label">
+            <field-map-ref resource="MQ_PROBE_MAPPINGS.ObjectType"/>
         </field>
         <field name="ObjectName" locator="MqInfo.ObjDesc.ObjectName" locator-type="Label"/>
         <field name="ObjectQMgrName" locator="MqInfo.ObjDesc.ObjectQMgrName" locator-type="Label"/>
@@ -724,12 +712,8 @@
         <field name="ResolvedQMgr" locator="ApiIntInfo.RslvQMgr" locator-type="Label"/>
         <field name="IpAddress" locator="ApiIntInfo.IpAddress" locator-type="Label"/>
         <field name="OsType" locator="ApiIntInfo.OsType" locator-type="Label"/>
-        <field name="ObjType" locator="ApiIntInfo.ObjType" locator-type="Label" datatype="Number">
-            <field-transform lang="groovy" phase="formatted"><![CDATA[
-                $fieldValue instanceof Number
-                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQOT_.*")
-                    : $fieldValue
-            ]]></field-transform>
+        <field name="ObjType" locator="ObjectType" locator-type="Label">
+            <field-map-ref resource="MQ_PROBE_MAPPINGS.ObjectType"/>
         </field>
         <field name="CpuCount" locator="ApiIntInfo.CpuCount" locator-type="Label" datatype="Number"/>
 
