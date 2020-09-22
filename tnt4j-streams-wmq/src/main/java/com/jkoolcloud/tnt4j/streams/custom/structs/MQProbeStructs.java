@@ -2617,11 +2617,13 @@ public class MQProbeStructs {
 					"MQProbeStructs.checking.struct", Arrays.toString(strIds), strSize, bb.remaining());
 			checkStructSize(bb, strSize);
 			bb.mark();
-			String strucId = getStringRaw(bb, strIdLength, encoding, charSet);
+			byte[] sturcIdBytes = getBytes(bb, 4);
+			String strucId = WmqUtils.getString(sturcIdBytes, charSet);
 			if (ArrayUtils.isNotEmpty(strIds) && !StringUtils.equalsAny(strucId, strIds)) {
 				bb.reset();
-				throw new MQStructException(MQStructException.INVALID_STRUC_ID, StreamsResources.getStringFormatted(
-						WmqStreamConstants.RESOURCE_BUNDLE_NAME, "MQProbeStructs.struct.invalid.id", strucId));
+				throw new MQStructException(MQStructException.INVALID_STRUC_ID,
+						StreamsResources.getStringFormatted(WmqStreamConstants.RESOURCE_BUNDLE_NAME,
+								"MQProbeStructs.struct.invalid.id", strucId, WmqUtils.hexDump(sturcIdBytes, charSet)));
 			}
 
 			return StringUtils.trim(strucId);
