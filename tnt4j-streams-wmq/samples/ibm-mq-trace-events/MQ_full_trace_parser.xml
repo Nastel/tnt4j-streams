@@ -148,12 +148,19 @@
     </field>
 
     <field name="ObjType" locator="MQGACF_ACTIVITY_TRACE.MQIACF_OBJECT_TYPE" locator-type="Label">
+        <field-map source="MQOT_NONE" target="NONE"/>
         <field-map source="MQOT_Q" target="QUEUE"/>
-        <field-map source="MQOT_TOPIC" target="TOPIC"/>
         <field-map source="MQOT_NAMELIST" target="NAMELIST"/>
         <field-map source="MQOT_PROCESS" target="PROCESS"/>
         <field-map source="MQOT_STORAGE_CLASS" target="STORAGE_CLASS"/>
         <field-map source="MQOT_Q_MGR" target="QMGR"/>
+        <field-map source="MQOT_CHANNEL" target="CHANNEL"/>
+        <field-map source="MQOT_AUTH_INFO" target="AUTH_INFO"/>
+        <field-map source="MQOT_TOPIC" target="TOPIC"/>
+        <field-map source="MQOT_COMM_INFO" target="COMM_INFO"/>
+        <field-map source="MQOT_CF_STRUC" target="CF_STRUC"/>
+        <field-map source="MQOT_LISTENER" target="LISTENER"/>
+        <field-map source="MQOT_SERVICE" target="SERVICE"/>
         <field-map source="" target="QMGR"/>
     </field>
 
