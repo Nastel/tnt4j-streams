@@ -8,8 +8,24 @@
     <java-object name="MQMsgToMQProbeMapPreParser" class="com.jkoolcloud.tnt4j.streams.custom.preparsers.MQMessageToMQProbeStructMap"/>
 
     <parser name="MqCallContextParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="EVENT"/>
         <field name="EventName" locator="ApiCall" locator-type="Activity"/>
+        <field name="EventType" locator="EventName" locator-type="Activity">
+            <field-map source="MQXF_PUT1" target="SEND"/>
+            <field-map source="MQXF_PUT" target="SEND"/>
+            <field-map source="MQXF_GET" target="RECEIVE"/>
+            <field-map source="MQXF_CALLBACK" target="RECEIVE"/>
+            <field-map source="MQXF_CB" target="RECEIVE"/>
+            <field-map source="MQXF_CONN" target="START"/>
+            <field-map source="MQXF_CONNX" target="START"/>
+            <field-map source="MQXF_DISC" target="END"/>
+            <field-map source="MQXF_OPEN" target="OPEN"/>
+            <field-map source="MQXF_CLOSE" target="CLOSE"/>
+            <field-map source="MQXF_BEGIN" target="START"/>
+            <field-map source="MQXF_CMIT" target="STOP"/>
+            <field-map source="MQXF_BACK" target="STOP"/>
+            <field-map source="MQXF_INQ" target="INQUIRE "/>
+            <field-map source="" target="OTHER"/>
+        </field>
 
         <!-- MQ call context fields -->
         <field name="Tag" locator="StrucId" locator-type="Label"/>
@@ -37,11 +53,15 @@
                 StringUtils.substringBefore ($fieldValue, " ");
             ]]></field-transform>
         </field>
-        <field name="ObjectType" locator="ObjectType" locator-type="Label">
-            <field-map-ref resource="MQ_PROBE_MAPPINGS.ObjectType"/>
+        <field name="ObjType" locator="ObjectType" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQOT_.*")
+                    : $fieldValue
+            ]]></field-transform>
         </field>
-		<field name="ResourceName" formattingPattern="{0}={1}:{2}">
-            <field-locator locator="ObjectType" locator-type="Activity"/>
+        <field name="ResourceName" formattingPattern="{0}={1}:{2}">
+            <field-locator locator="ObjType" locator-type="Activity"/>
             <field-locator locator="QMgrName" locator-type="Activity"/>
             <field-locator locator="ObjectName" locator-type="Activity"/>
         </field>
@@ -49,8 +69,8 @@
         <field name="PId" locator="ProcessId" locator-type="Label"/>
         <field name="TId" locator="ThreadId" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String idStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x00000000000000000000000000000000".equals(idStr) ? null : idStr;
+                String idStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "00000000000000000000000000000000".equals(idStr) ? null : idStr;
             ]]></field-transform>
         </field>
         <field name="ApplName" locator="ProgramName" locator-type="Label"/>
@@ -64,15 +84,15 @@
         <field name="LuwTime" locator="LuwTime" locator-type="Label" datatype="Number" value-type="age.usec"/>
         <field name="MsgSig" locator="MsgSig" locator-type="Label" transparent="true">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String sigStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x000000000000000000000000000000000000000000000000000000000000000000000000".equals(sigStr) ? null : sigStr;
+                String sigStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "000000000000000000000000000000000000000000000000000000000000000000000000".equals(sigStr) ? null : sigStr;
             ]]></field-transform>
         </field>
         <field name="CpuTime" locator="CpuTime" locator-type="Label" datatype="Number" value-type="age.usec"/>
         <field name="NetUowId" locator="NetUowId" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String idStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x000000000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
+                String idStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "000000000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
             ]]></field-transform>
         </field>
         <field name="MqiCpuTime" locator="MqiCpuTime" locator-type="Label" datatype="Number" value-type="age.usec"/>
@@ -86,31 +106,58 @@
 
         <!-- MQ MD fields -->
         <field name="Tag" locator="MsgDesc.StrucId" locator-type="Label"/>
-        <field name="Report" locator="MsgDesc.Report" locator-type="Label" datatype="Number"/>
-        <field name="MsgType" locator="MsgDesc.MsgType" locator-type="Label" datatype="Number"/>
-        <field name="Expiry" locator="MsgDesc.Expiry" locator-type="Label" datatype="Number"/>
-        <field name="Feedback" locator="MsgDesc.Feedback" locator-type="Label" datatype="Number"/>
-        <field name="Encoding" locator="MsgDesc.Encoding2" locator-type="Label" datatype="Number"/>
-        <field name="CodedCharSetId" locator="MsgDesc.CodedCharSetId" locator-type="Label" datatype="Number"/>
-        <field name="Format" locator="MsgDesc.Format" locator-type="Label"/>
-        <field name="Priority" locator="MsgDesc.Priority" locator-type="Label" datatype="Number"/>
-        <field name="Persistence" locator="MsgDesc.Persistence" locator-type="Label" datatype="Number"/>
-        <field name="MsgId" locator="MsgDesc.MsgId" locator-type="Label" transparent="true">
-            <field-transform lang="groovy" phase="raw"><![CDATA[
-                String idStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
+        <field name="Report" locator="MsgDesc.Report" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQRO_.*")
+                    : $fieldValue
             ]]></field-transform>
         </field>
+        <field name="MsgType" locator="MsgDesc.MsgType" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQMT_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
+        <field name="Expiry" locator="MsgDesc.Expiry" locator-type="Label" datatype="Number"/>
+        <field name="Feedback" locator="MsgDesc.Feedback" locator-type="Label" datatype="Number"/>
+        <field name="Encoding" locator="MsgDesc.Encoding2" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQENC_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
+        <field name="CodedCharSetId" locator="MsgDesc.CodedCharSetId" locator-type="Label" datatype="Number"/>
+        <field name="FormatName" locator="MsgDesc.Format" locator-type="Label"/>
+        <field name="Priority" locator="MsgDesc.Priority" locator-type="Label" datatype="Number"/>
+        <field name="Persistence" locator="MsgDesc.Persistence" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQPER_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
+        <field name="MsgId" locator="MsgDesc.MsgId" locator-type="Label" datatype="Binary"/>
+        <field name="CorrelId" locator="MsgDesc.CorrelId" locator-type="Label" datatype="Binary"/>
+
         <field name="Correlator">
-			<field-locator locator="MsgDesc.CorrelId" locator-type="Label">
-				<field-transform lang="groovy" phase="raw"><![CDATA[
-                String crlStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x000000000000000000000000000000000000000000000000".equals(crlStr) ? null : crlStr;
-				]]></field-transform>
-			</field-locator>
-			<field-locator locator="LuwTime" locator-type="Activity">
-			</field-locator>
-			
+            <!-- * Collect msgid for correlator, remove if applications do not create unique message ids   -->
+            <field-locator locator="MsgId" locator-type="Activity">
+                <filter name="MsgidValueFilter">
+                    <value handle="exclude">000000000000000000000000000000000000000000000000</value>
+                </filter>
+            </field-locator>
+
+            <!-- Collect correlId for correlator, remove if applications do not create unique message ids -->
+            <field-locator locator="CorrelId" locator-type="Activity">
+                <filter name="CorrelidValueFilter">
+                    <value handle="exclude">000000000000000000000000000000000000000000000000</value>
+                </filter>
+                <!-- LUW time is unique for CICS commit point -->
+            </field-locator>
+            <field-locator locator="LuwTime" locator-type="Activity"/>
         </field>
         <field name="BackoutCount" locator="MsgDesc.BackoutCount" locator-type="Label" datatype="Number"/>
         <field name="ReplyToQ" locator="MsgDesc.ReplyToQ" locator-type="Label"/>
@@ -118,13 +165,23 @@
         <field name="UserIdentifier" locator="MsgDesc.UserIdentifier" locator-type="Label"/>
         <field name="AccountingToken" locator="MsgDesc.AccountingToken" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String tStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x0000000000000000000000000000000000000000000000000000000000000000".equals(tStr) ? null : tStr;
+                String tStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "0000000000000000000000000000000000000000000000000000000000000000".equals(tStr) ? null : tStr;
             ]]></field-transform>
         </field>
         <field name="ApplIdentityData" locator="MsgDesc.ApplIdentityData" locator-type="Label"/>
-        <field name="PutApplType" locator="MsgDesc.PutApplType" locator-type="Label" datatype="Number"/>
-        <field name="PutApplName" locator="MsgDesc.PutApplName" locator-type="Label"/>
+        <field name="ApplType" locator="MsgDesc.PutApplType" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQAT_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
+        <field name="ProgramName" locator="MsgDesc.PutApplName" locator-type="Label">
+            <field-transform name="pgmName" lang="groovy"><![CDATA[
+                Utils.getFileName($fieldValue)
+            ]]></field-transform>
+        </field>
         <field name="PutTime" formattingPattern="{0} {1}" format="yyyyMMdd HHmmssSS" datatype="DateTime" timezone="GMT">
             <field-locator locator="MsgDesc.PutDate" locator-type="Label"/>
             <field-locator locator="MsgDesc.PutTime" locator-type="Label"/>
@@ -172,8 +229,8 @@
         <field name="PId" locator="ProcessId" locator-type="Label"/>
         <field name="TId" locator="ThreadId" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String idStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x00000000000000000000000000000000".equals(idStr) ? null : idStr;
+                String idStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "00000000000000000000000000000000".equals(idStr) ? null : idStr;
             ]]></field-transform>
         </field>
         <field name="ApplName" locator="ProgramName" locator-type="Label"/>
@@ -186,8 +243,8 @@
         <field name="SessionTime" locator="SessTime" locator-type="Label" datatype="Timestamp" units="Microseconds"/>
         <field name="NetUowId" locator="NetUowId" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String idStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x000000000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
+                String idStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "000000000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
             ]]></field-transform>
         </field>
         <field name="DbrmName" locator="DbrmName" locator-type="Label"/>
@@ -195,14 +252,13 @@
         <field name="PrimAuth" locator="PrimAuth" locator-type="Label"/>
         <field name="ConnId" locator="ConnId" locator-type="Label"/>
         <field name="Correlator">
-			<field-locator locator="CorrId" locator-type="Label">
-				<field-transform lang="groovy" phase="raw"><![CDATA[
-                String crlStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x000000000000000000000000000000000000000000000000".equals(crlStr) ? null : crlStr;
-				]]></field-transform>
-			</field-locator>
-			<field-locator locator="LuwTime" locator-type="Activity">
-			</field-locator>
+            <field-locator locator="CorrId" locator-type="Label">
+                <field-transform lang="groovy" phase="raw"><![CDATA[
+                    String crlStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                    return "000000000000000000000000000000000000000000000000".equals(crlStr) ? null : crlStr;
+                ]]></field-transform>
+            </field-locator>
+            <field-locator locator="LuwTime" locator-type="Activity"/>
         </field>
         <field name="StmtNo" locator="StmtNo" locator-type="Label" datatype="Number"/>
         <field name="SectNo" locator="SectNo" locator-type="Label" datatype="Number"/>
@@ -223,13 +279,13 @@
         <field name="Tag" locator="StrucId" locator-type="Label"/>
         <field name="FuncCode" locator="FuncCode" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                $fieldValue == null ? null : Utils.toHexString($fieldValue);
+                $fieldValue == null ? null : Utils.encodeHex($fieldValue);
             ]]></field-transform>
             <field-map-ref resource="MQ_PROBE_MAPPINGS.FuncCode"/>
         </field>
         <field name="SubCmds" locator="SubCmds" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                $fieldValue == null ? null : Utils.toHexString($fieldValue);
+                $fieldValue == null ? null : Utils.encodeHex($fieldValue);
             ]]></field-transform>
         </field>
         <field name="CompCode" locator="CompCode" locator-type="Label">
@@ -245,8 +301,8 @@
         <field name="PId" locator="ProcessId" locator-type="Label"/>
         <field name="TId" locator="ThreadId" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String idStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x00000000000000000000000000000000".equals(idStr) ? null : idStr;
+                String idStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "00000000000000000000000000000000".equals(idStr) ? null : idStr;
             ]]></field-transform>
         </field>
         <field name="ApplName" locator="ProgramName" locator-type="Label"/>
@@ -267,14 +323,12 @@
         <field name="CpuTime" locator="CpuTime" locator-type="Label" datatype="Number" value-type="age.usec"/>
         <field name="NetUowId" locator="NetUowId" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String idStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x000000000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
+                String idStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "000000000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
             ]]></field-transform>
         </field>
-		<field name="Correlator">
-			<field-locator locator="LuwTime" locator-type="Activity">
-			</field-locator>
-			
+        <field name="Correlator">
+            <field-locator locator="LuwTime" locator-type="Activity"/>
         </field>
         <field name="ApiCpuTime" locator="ApiCpuTime" locator-type="Label" datatype="Number" value-type="age.usec"/>
         <field name="FirstTransId" locator="FirstTransId" locator-type="Label"/>
@@ -314,8 +368,12 @@
 
         <!-- Object descriptor fields -->
         <field name="Tag" locator="MqInfo.ObjDesc.StrucId" locator-type="Label"/>
-        <field name="ObjectType" locator="MqInfo.ObjDesc.ObjectType" locator-type="Label">
-            <field-map-ref resource="MQ_PROBE_MAPPINGS.ObjectType"/>
+        <field name="ObjType" locator="MqInfo.ObjDesc.ObjectType" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQOT_.*")
+                    : $fieldValue
+            ]]></field-transform>
         </field>
         <field name="ObjectName" locator="MqInfo.ObjDesc.ObjectName" locator-type="Label"/>
         <field name="ObjectQMgrName" locator="MqInfo.ObjDesc.ObjectQMgrName" locator-type="Label"/>
@@ -345,25 +403,49 @@
 
         <!-- MQ MD fields -->
         <field name="Tag" locator="MqInfo.MsgDesc.StrucId" locator-type="Label"/>
-        <field name="Report" locator="MqInfo.MsgDesc.Report" locator-type="Label" datatype="Number"/>
-        <field name="MsgType" locator="MqInfo.MsgDesc.MsgType" locator-type="Label" datatype="Number"/>
+        <field name="Report" locator="MqInfo.MsgDesc.Report" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQRO_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
+        <field name="MsgType" locator="MqInfo.MsgDesc.MsgType" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQMT_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
         <field name="Expiry" locator="MqInfo.MsgDesc.Expiry" locator-type="Label" datatype="Number"/>
         <field name="Feedback" locator="MqInfo.MsgDesc.Feedback" locator-type="Label" datatype="Number"/>
-        <field name="Encoding" locator="MqInfo.MsgDesc.Encoding2" locator-type="Label" datatype="Number"/>
+        <field name="Encoding" locator="MqInfo.MsgDesc.Encoding2" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQENC_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
         <field name="CodedCharSetId" locator="MqInfo.MsgDesc.CodedCharSetId" locator-type="Label" datatype="Number"/>
         <field name="Format" locator="MqInfo.MsgDesc.Format" locator-type="Label"/>
         <field name="Priority" locator="MqInfo.MsgDesc.Priority" locator-type="Label" datatype="Number"/>
-        <field name="Persistence" locator="MqInfo.MsgDesc.Persistence" locator-type="Label" datatype="Number"/>
+        <field name="Persistence" locator="MqInfo.MsgDesc.Persistence" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQPER_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
         <field name="TrackingId" locator="MqInfo.MsgDesc.MsgId" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String idStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
+                String idStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
             ]]></field-transform>
         </field>
         <field name="Correlator" locator="MqInfo.MsgDesc.CorrelId" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String crlStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x000000000000000000000000000000000000000000000000".equals(crlStr) ? null : crlStr;
+                String crlStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "000000000000000000000000000000000000000000000000".equals(crlStr) ? null : crlStr;
             ]]></field-transform>
         </field>
         <field name="BackoutCount" locator="MqInfo.MsgDesc.BackoutCount" locator-type="Label" datatype="Number"/>
@@ -372,13 +454,23 @@
         <field name="UserIdentifier" locator="MqInfo.MsgDesc.UserIdentifier" locator-type="Label"/>
         <field name="AccountingToken" locator="MqInfo.MsgDesc.AccountingToken" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String tStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x0000000000000000000000000000000000000000000000000000000000000000".equals(tStr) ? null : tStr;
+                String tStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "0000000000000000000000000000000000000000000000000000000000000000".equals(tStr) ? null : tStr;
             ]]></field-transform>
         </field>
         <field name="ApplIdentityData" locator="MqInfo.MsgDesc.ApplIdentityData" locator-type="Label"/>
-        <field name="PutApplType" locator="MqInfo.MsgDesc.PutApplType" locator-type="Label" datatype="Number"/>
-        <field name="PutApplName" locator="MqInfo.MsgDesc.PutApplName" locator-type="Label"/>
+        <field name="ApplType" locator="MqInfo.MsgDesc.PutApplType" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQAT_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
+        <field name="ProgramName" locator="MqInfo.MsgDesc.PutApplName" locator-type="Label">
+            <field-transform name="pgmName" lang="groovy"><![CDATA[
+                Utils.getFileName($fieldValue)
+            ]]></field-transform>
+        </field>
         <field name="PutTime" formattingPattern="{0} {1}" format="yyyyMMdd HHmmssSS" datatype="DateTime" timezone="GMT">
             <field-locator locator="MqInfo.MsgDesc.PutDate" locator-type="Label"/>
             <field-locator locator="MqInfo.MsgDesc.PutTime" locator-type="Label"/>
@@ -406,14 +498,14 @@
         <field name="Tag" locator="StrucId" locator-type="Label"/>
         <field name="TcbToken" locator="TcbToken" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String tStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x00000000000000000000000000000000".equals(tStr) ? null : tStr;
+                String tStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "00000000000000000000000000000000".equals(tStr) ? null : tStr;
             ]]></field-transform>
         </field>
         <field name="DmbDataspace" locator="DmbDataspace" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String spcStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x00000000000000000000000000000000".equals(spcStr) ? null : spcStr;
+                String spcStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "00000000000000000000000000000000".equals(spcStr) ? null : spcStr;
             ]]></field-transform>
         </field>
         <field name="TxQueue" locator="TxQueue" locator-type="Label"/>
@@ -422,12 +514,12 @@
         <field name="JobName" locator="JobName" locator-type="Label"/>
         <field name="AddressSpaceId" locator="AddressSpaceId" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                $fieldValue == null ? null : Utils.toHexString($fieldValue);
+                $fieldValue == null ? null : Utils.encodeHex($fieldValue);
             ]]></field-transform>
         </field>
         <field name="Flags" locator="Flags" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                $fieldValue == null ? null : Utils.toHexString($fieldValue);
+                $fieldValue == null ? null : Utils.encodeHex($fieldValue);
             ]]></field-transform>
             <field-map-ref resource="MQ_PROBE_MAPPINGS.FlagsCMTA"/>
         </field>
@@ -539,8 +631,12 @@
 
         <!-- Object descriptor fields -->
         <field name="Tag" locator="MqInfo.ObjDesc.StrucId" locator-type="Label"/>
-        <field name="ObjectType" locator="MqInfo.ObjDesc.ObjectType" locator-type="Label">
-            <field-map-ref resource="MQ_PROBE_MAPPINGS.ObjectType"/>
+        <field name="ObjType" locator="MqInfo.ObjDesc.ObjectType" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQOT_.*")
+                    : $fieldValue
+            ]]></field-transform>
         </field>
         <field name="ObjectName" locator="MqInfo.ObjDesc.ObjectName" locator-type="Label"/>
         <field name="ObjectQMgrName" locator="MqInfo.ObjDesc.ObjectQMgrName" locator-type="Label"/>
@@ -570,25 +666,49 @@
 
         <!-- MQ MD fields -->
         <field name="Tag" locator="MqInfo.MsgDesc.StrucId" locator-type="Label"/>
-        <field name="Report" locator="MqInfo.MsgDesc.Report" locator-type="Label" datatype="Number"/>
-        <field name="MsgType" locator="MqInfo.MsgDesc.MsgType" locator-type="Label" datatype="Number"/>
+        <field name="Report" locator="MqInfo.MsgDesc.Report" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQRO_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
+        <field name="MsgType" locator="MqInfo.MsgDesc.MsgType" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQMT_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
         <field name="Expiry" locator="MqInfo.MsgDesc.Expiry" locator-type="Label" datatype="Number"/>
         <field name="FeedbackMD" locator="MqInfo.MsgDesc.Feedback" locator-type="Label" datatype="Number"/>
-        <field name="Encoding" locator="MqInfo.MsgDesc.Encoding2" locator-type="Label" datatype="Number"/>
+        <field name="Encoding" locator="MqInfo.MsgDesc.Encoding2" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQENC_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
         <field name="CodedCharSetId" locator="MqInfo.MsgDesc.CodedCharSetId" locator-type="Label" datatype="Number"/>
         <field name="Format" locator="MqInfo.MsgDesc.Format" locator-type="Label"/>
         <field name="Priority" locator="MqInfo.MsgDesc.Priority" locator-type="Label" datatype="Number"/>
-        <field name="Persistence" locator="MqInfo.MsgDesc.Persistence" locator-type="Label" datatype="Number"/>
+        <field name="Persistence" locator="MqInfo.MsgDesc.Persistence" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQPER_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
         <field name="MsgId" locator="MqInfo.MsgDesc.MsgId" locator-type="Label" transparent="true">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String idStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
+                String idStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
             ]]></field-transform>
         </field>
         <field name="Correlator" locator="MqInfo.MsgDesc.CorrelId" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String crlStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x000000000000000000000000000000000000000000000000".equals(crlStr) ? null : crlStr;
+                String crlStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "000000000000000000000000000000000000000000000000".equals(crlStr) ? null : crlStr;
             ]]></field-transform>
         </field>
         <field name="BackoutCount" locator="MqInfo.MsgDesc.BackoutCount" locator-type="Label" datatype="Number"/>
@@ -597,13 +717,19 @@
         <field name="UserName" locator="MqInfo.MsgDesc.UserIdentifier" locator-type="Label"/>
         <field name="AccountingToken" locator="MqInfo.MsgDesc.AccountingToken" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String tStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x0000000000000000000000000000000000000000000000000000000000000000".equals(tStr) ? null : tStr;
+                String tStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "0000000000000000000000000000000000000000000000000000000000000000".equals(tStr) ? null : tStr;
             ]]></field-transform>
         </field>
         <field name="ApplIdentityData" locator="MqInfo.MsgDesc.ApplIdentityData" locator-type="Label"/>
-        <field name="PutApplType" locator="MqInfo.MsgDesc.PutApplType" locator-type="Label" datatype="Number"/>
-        <field name="PutApplName" locator="MqInfo.MsgDesc.PutApplName" locator-type="Label"/>
+        <field name="ApplType" locator="MqInfo.MsgDesc.PutApplType" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQAT_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
+        <field name="ProgramName" locator="MqInfo.MsgDesc.PutApplName" locator-type="Label"/>
         <field name="PutTime" formattingPattern="{0} {1}" format="yyyyMMdd HHmmssSS" datatype="DateTime" timezone="GMT">
             <field-locator locator="MqInfo.MsgDesc.PutDate" locator-type="Label"/>
             <field-locator locator="MqInfo.MsgDesc.PutTime" locator-type="Label"/>
@@ -620,8 +746,12 @@
         <field name="ResolvedQMgr" locator="ApiIntInfo.RslvQMgr" locator-type="Label"/>
         <field name="IpAddress" locator="ApiIntInfo.IpAddress" locator-type="Label"/>
         <field name="OsType" locator="ApiIntInfo.OsType" locator-type="Label"/>
-        <field name="ObjType" locator="ApiIntInfo.ObjType" locator-type="Label">
-            <field-map-ref resource="MQ_PROBE_MAPPINGS.ObjectType"/>
+        <field name="ObjType" locator="ApiIntInfo.ObjType" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQOT_.*")
+                    : $fieldValue
+            ]]></field-transform>
         </field>
         <field name="CpuCount" locator="ApiIntInfo.CpuCount" locator-type="Label" datatype="Number"/>
 
@@ -652,20 +782,20 @@
         <field name="LuwType" locator="ApiIntInfo.ExitSigntr.LuwType" locator-type="Label" datatype="Number"/>
         <field name="SesSig" locator="ApiIntInfo.ExitSigntr.SesSig" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String sigStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x00000000000000000000000000000000".equals(sigStr) ? null : sigStr;
+                String sigStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "00000000000000000000000000000000".equals(sigStr) ? null : sigStr;
             ]]></field-transform>
         </field>
         <field name="LuwSig" locator="ApiIntInfo.ExitSigntr.LuwSig" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String sigStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x00000000000000000000000000000000".equals(sigStr) ? null : sigStr;
+                String sigStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "00000000000000000000000000000000".equals(sigStr) ? null : sigStr;
             ]]></field-transform>
         </field>
         <field name="MsgSig" locator="ApiIntInfo.ExitSigntr.MsgSig" locator-type="Label" transparent="true">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                String sigStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-                return "0x000000000000000000000000000000000000000000000000000000000000000000000000".equals(sigStr) ? null : sigStr;
+                String sigStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                return "00000000000000000000000000000000000000000000000000000000000000000000000".equals(sigStr) ? null : sigStr;
             ]]></field-transform>
         </field>
         <field name="SesSigLen" locator="ApiIntInfo.ExitSigntr.SesSigLen" locator-type="Label" datatype="Number"/>
@@ -689,13 +819,19 @@
         <field name="UserId" locator="ApiIntInfo.ExitContext.UserId" locator-type="Label"/>
         <field name="SecurityId" locator="ApiIntInfo.ExitContext.SecurityId" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-               String idStr = $fieldValue == null ? null : Utils.toHexString($fieldValue);
-               return "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
+               String idStr = $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+               return "00000000000000000000000000000000000000000000000000000000000000000000000000000000".equals(idStr) ? null : idStr;
            ]]></field-transform>
         </field>
         <field name="ConnectionName" locator="ApiIntInfo.ExitContext.ConnectionName" locator-type="Label"/>
         <field name="ExitApplName" locator="ApiIntInfo.ExitContext.ApplName" locator-type="Label"/>
-        <field name="ApplType" locator="ApiIntInfo.ExitContext.ApplType" locator-type="Label" datatype="Number"/>
+        <field name="ApplType" locator="ApiIntInfo.ExitContext.ApplType" locator-type="Label" datatype="Number">
+            <field-transform lang="groovy" phase="formatted"><![CDATA[
+                $fieldValue instanceof Number
+                    ? WmqUtils.lookupMQConstantName($fieldValue, "MQAT_.*")
+                    : $fieldValue
+            ]]></field-transform>
+        </field>
         <field name="ProcessId" locator="ApiIntInfo.ExitContext.ProcessId" locator-type="Label" datatype="Number"/>
         <field name="ThreadId" locator="ApiIntInfo.ExitContext.ThreadId" locator-type="Label" datatype="Number"/>
 

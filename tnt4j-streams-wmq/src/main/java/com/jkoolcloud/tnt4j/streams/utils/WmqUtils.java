@@ -628,6 +628,19 @@ public class WmqUtils {
 		return hexStr;
 	}
 
+	/**
+	 * Resolves MQ constant name for provided value using defined constant name mask.
+	 * 
+	 * @param value
+	 *            MQ constant value
+	 * @param mask
+	 *            MQ constant name mask
+	 * @return resolved MQ constant name
+	 */
+	public static String lookupMQConstantName(Number value, String mask) {
+		return MQConstants.lookup(value.intValue(), mask);
+	}
+
 	private static void hexDump(byte[] data, long offset, OutputStream stream, int index, int ccsid)
 			throws IOException, ArrayIndexOutOfBoundsException, IllegalArgumentException {
 		if (index >= 0 && index < data.length) {
