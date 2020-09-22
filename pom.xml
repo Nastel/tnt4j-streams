@@ -224,9 +224,9 @@
         <!--<module>tnt4j-streams-hdfs</module>-->
         <!--<module>tnt4j-streams-jms</module>-->
         <!--<module>tnt4j-streams-kafka</module>-->
-        <!--<module>tnt4j-streams-mqtt</module>-->
-        <module>tnt4j-streams-msoffice</module>
-        <!--<module>tnt4j-streams-wmq</module>-->
+        <module>tnt4j-streams-mqtt</module>
+        <!--module>tnt4j-streams-msoffice</module-->
+        <module>tnt4j-streams-wmq</module>
         <!--<module>tnt4j-streams-ws</module>-->
         <!--<module>tnt4j-streams-chronicle</module>-->
         <!--<module>tnt4j-streams-flume-plugin</module>-->

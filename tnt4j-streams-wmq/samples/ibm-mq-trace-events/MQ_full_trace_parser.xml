@@ -18,7 +18,7 @@
     </field>
 
     <!--  Uncomment the following to pass a binary copy of the message data with the event   -->
-    <!--field name="BinaryMessage" locator="MQGACF_ACTIVITY_TRACE.MQBACF_MESSAGE_DATA" locator-type="Label" datatype="Binary"-->
+    <!--field name="BinaryMessage" locator="MQGACF_ACTIVITY_TRACE.MQBACF_MESSAGE_DATA" locator-type="Label" datatype="Binary"/-->
 
     <!--  Uncomment the following to parse specfic fields out of an XML message, see sample XML above  -->
 
@@ -146,6 +146,16 @@
                 : (${TrackingIdNorm} != null ? ${TrackingIdNorm} : null)
         ]]></field-transform>
     </field>
+	
+    <field name="ObjType" locator="MQGACF_ACTIVITY_TRACE.MQIACF_OBJECT_TYPE" locator-type="Label">
+            <field-map source="MQOT_Q" target="QUEUE"/>
+            <field-map source="MQOT_TOPIC" target="TOPIC"/>
+            <field-map source="MQOT_NAMELIST" target="NAMELIST"/>
+            <field-map source="MQOT_PROCESS" target="PROCESS"/>
+            <field-map source="MQOT_STORAGE_CLASS" target="STORAGE_CLASS"/>
+            <field-map source="MQOT_Q_MGR" target="QMGR"/>
+            <field-map source="" target="QMGR"/>
+	</field>
 
     <!-- Extract the fields that identify where the message is destined -->
     <field name="QMgrName" locator="MQCA_Q_MGR_NAME" locator-type="Label"/>
@@ -187,20 +197,12 @@
         <!-- ResourceName identifies the target for events and views such as topology.
                 Exp : format OBJECT_TYPE=Q_MGR_NAME.OBJECT_NAME - QUEUE=AGNT1:BankRequestQueue_R	-->
         <!-- OBJECT_TYPE -->
-        <field-locator locator="MQGACF_ACTIVITY_TRACE.MQIACF_OBJECT_TYPE" locator-type="Label">
-            <field-map source="MQOT_Q" target="QUEUE"/>
-            <field-map source="MQOT_TOPIC" target="TOPIC"/>
-            <field-map source="MQOT_NAMELIST" target="NAMELIST"/>
-            <field-map source="MQOT_PROCESS" target="PROCESS"/>
-            <field-map source="MQOT_STORAGE_CLASS" target="STORAGE_CLASS"/>
-            <field-map source="MQOT_Q_MGR" target="QMGR"/>
-            <field-map source="" target="QMGR"/>
-        </field-locator>
+		<field-locator locator="ObjType" locator-type="Activity"/>
         <!-- QMGR_NAME -->
         <!-- comment the following to not include qmgr name in ResourceName -->
         <field-locator locator="MQCA_Q_MGR_NAME" locator-type="Label"/>
         <!-- Always include the most applicable name in the call, e.g. alias, dynamic or remote queue used by the application. -->
-        <field-locator locator="DerivedName" locator-type="Activity"/>
+        <field-locator locator="DerivedName" locator-type="Activity"/> 
     </field>
 
     <!-- general message fields -->
@@ -305,8 +307,7 @@
     <field name="TraceDataLength" locator="MQIACF_TRACE_DATA_LENGTH" locator-type="Label" datatype="Number"/>
     <field name="PointerSize" locator="MQIACF_POINTER_SIZE" locator-type="Label" datatype="Number"/>
     <field name="Platform" locator="MQIA_PLATFORM" locator-type="Label"/>
-    <field name="ThreadId" locator="MQGACF_ACTIVITY_TRACE.MQIACF_THREAD_ID" locator-type="Label" datatype="Number"/>
-    <field name="ObjType" locator="MQGACF_ACTIVITY_TRACE.MQIACF_OBJECT_TYPE" locator-type="Label"/>
+    <field name="ThreadId" locator="MQGACF_ACTIVITY_TRACE.MQIACF_THREAD_ID" locator-type="Label" datatype="Number"/>	
     <field name="ObjQMgrName" locator="MQGACF_ACTIVITY_TRACE.MQCACF_OBJECT_Q_MGR_NAME" locator-type="Label"/>
 
     <field name="ObjHandle" locator="MQGACF_ACTIVITY_TRACE.MQIACF_HOBJ" locator-type="Label"/>
