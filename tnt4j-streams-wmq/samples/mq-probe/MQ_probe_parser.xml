@@ -9,23 +9,6 @@
 
     <parser name="MqCallContextParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventName" locator="ApiCall" locator-type="Activity"/>
-        <field name="EventType" locator="EventName" locator-type="Activity">
-            <field-map source="MQXF_PUT1" target="SEND"/>
-            <field-map source="MQXF_PUT" target="SEND"/>
-            <field-map source="MQXF_GET" target="RECEIVE"/>
-            <field-map source="MQXF_CALLBACK" target="RECEIVE"/>
-            <field-map source="MQXF_CB" target="RECEIVE"/>
-            <field-map source="MQXF_CONN" target="START"/>
-            <field-map source="MQXF_CONNX" target="START"/>
-            <field-map source="MQXF_DISC" target="END"/>
-            <field-map source="MQXF_OPEN" target="OPEN"/>
-            <field-map source="MQXF_CLOSE" target="CLOSE"/>
-            <field-map source="MQXF_BEGIN" target="START"/>
-            <field-map source="MQXF_CMIT" target="STOP"/>
-            <field-map source="MQXF_BACK" target="STOP"/>
-            <field-map source="MQXF_INQ" target="INQUIRE "/>
-            <field-map source="" target="OTHER"/>
-        </field>
 
         <!-- MQ call context fields -->
         <field name="Tag" locator="StrucId" locator-type="Label"/>
@@ -196,7 +179,6 @@
     </parser>
 
     <parser name="HostDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="EVENT"/>
         <field name="EventName" value="HostInfo"/>
 
         <field name="Tag" locator="StrucId" locator-type="Label"/>
@@ -209,7 +191,6 @@
     </parser>
 
     <parser name="DB2DataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="EVENT"/>
         <field name="EventName" value="DB2SQL"/>
 
         <field name="Tag" locator="StrucId" locator-type="Label"/>
@@ -273,19 +254,18 @@
     </parser>
 
     <parser name="ExecCICSDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="EVENT"/>
         <field name="EventName" locator="FuncCode" locator-type="Activity"/>
 
         <field name="Tag" locator="StrucId" locator-type="Label"/>
         <field name="FuncCode" locator="FuncCode" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                $fieldValue == null ? null : Utils.toHexString($fieldValue);
             ]]></field-transform>
             <field-map-ref resource="MQ_PROBE_MAPPINGS.FuncCode"/>
         </field>
         <field name="SubCmds" locator="SubCmds" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                $fieldValue == null ? null : Utils.toHexString($fieldValue);
             ]]></field-transform>
         </field>
         <field name="CompCode" locator="CompCode" locator-type="Label">
@@ -341,7 +321,6 @@
     </parser>
 
     <parser name="ChExitParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="EVENT"/>
         <field name="EventName" locator="ApiCall" locator-type="Activity"/>
 
         <field name="Tag" locator="StrucId" locator-type="Label"/>
@@ -427,7 +406,7 @@
             ]]></field-transform>
         </field>
         <field name="CodedCharSetId" locator="MqInfo.MsgDesc.CodedCharSetId" locator-type="Label" datatype="Number"/>
-        <field name="Format" locator="MqInfo.MsgDesc.Format" locator-type="Label"/>
+        <field name="FormatName" locator="MqInfo.MsgDesc.Format" locator-type="Label"/>
         <field name="Priority" locator="MqInfo.MsgDesc.Priority" locator-type="Label" datatype="Number"/>
         <field name="Persistence" locator="MqInfo.MsgDesc.Persistence" locator-type="Label" datatype="Number">
             <field-transform lang="groovy" phase="formatted"><![CDATA[
@@ -492,7 +471,6 @@
     </parser>
 
     <parser name="CICSMqTasksParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="EVENT"/>
         <field name="EventName" value="CICSMqTasks"/>
 
         <field name="Tag" locator="StrucId" locator-type="Label"/>
@@ -519,7 +497,7 @@
         </field>
         <field name="Flags" locator="Flags" locator-type="Label">
             <field-transform lang="groovy" phase="raw"><![CDATA[
-                $fieldValue == null ? null : Utils.encodeHex($fieldValue);
+                $fieldValue == null ? null : Utils.toHexString($fieldValue);
             ]]></field-transform>
             <field-map-ref resource="MQ_PROBE_MAPPINGS.FlagsCMTA"/>
         </field>
@@ -546,9 +524,6 @@
     </parser>
 
     <parser name="ZOSProbeMapParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="EVENT"/>
-        <!--<field name="EventName" value=""/>-->
-
         <!-- Message fields -->
         <field name="MsgEncoding" locator="Encoding" locator-type="Label" datatype="Number"/>
         <field name="MsgCharSet" locator="CharSet" locator-type="Label" datatype="Number"/>
@@ -596,7 +571,6 @@
     </parser>
 
     <parser name="MQProbeMapParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="EVENT"/>
         <field name="EventName" value="ApiExitInfo"/>
 
         <!-- Message fields -->
@@ -690,7 +664,7 @@
             ]]></field-transform>
         </field>
         <field name="CodedCharSetId" locator="MqInfo.MsgDesc.CodedCharSetId" locator-type="Label" datatype="Number"/>
-        <field name="Format" locator="MqInfo.MsgDesc.Format" locator-type="Label"/>
+        <field name="FormatName" locator="MqInfo.MsgDesc.Format" locator-type="Label"/>
         <field name="Priority" locator="MqInfo.MsgDesc.Priority" locator-type="Label" datatype="Number"/>
         <field name="Persistence" locator="MqInfo.MsgDesc.Persistence" locator-type="Label" datatype="Number">
             <field-transform lang="groovy" phase="formatted"><![CDATA[
@@ -729,7 +703,11 @@
                     : $fieldValue
             ]]></field-transform>
         </field>
-        <field name="ProgramName" locator="MqInfo.MsgDesc.PutApplName" locator-type="Label"/>
+        <field name="ProgramName" locator="MqInfo.MsgDesc.PutApplName" locator-type="Label">
+            <field-transform name="pgmName" lang="groovy"><![CDATA[
+                Utils.getFileName($fieldValue)
+            ]]></field-transform>
+        </field>
         <field name="PutTime" formattingPattern="{0} {1}" format="yyyyMMdd HHmmssSS" datatype="DateTime" timezone="GMT">
             <field-locator locator="MqInfo.MsgDesc.PutDate" locator-type="Label"/>
             <field-locator locator="MqInfo.MsgDesc.PutTime" locator-type="Label"/>
@@ -845,7 +823,6 @@
     <parser name="MQProbeEventsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <reference name="MQMsgToMQProbeMapPreParser"/>
 
-        <field name="EventType" value="EVENT"/>
         <field name="StrucId" locator="StrucId" locator-type="Label" transparent="true"/>
 
         <embedded-activity name="MQProbeData" locator="$DATA$" locator-type="Label">
@@ -856,5 +833,9 @@
                 <matchExp>groovy:"APIEXIT".equals(${StrucId}.trim())</matchExp>
             </parser-ref>
         </embedded-activity>
+
+        <field name="EventType" locator="EventName" locator-type="Activity">
+            <field-map-ref resource="MQ_PROBE_MAPPINGS.EventType"/>
+        </field>
     </parser>
 </tnt-data-source>

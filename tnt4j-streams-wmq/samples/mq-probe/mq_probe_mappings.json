@@ -1,4 +1,32 @@
 {
+    "EventType": {
+        "MQPUT": "SEND",
+        "MQPUT1": "SEND",
+        "MQGET": "RECEIVE",
+        "MQCALLBACK": "RECEIVE",
+        "MQCB": "RECEIVE",
+        "MQCONN": "START",
+        "MQCONNX": "START",
+        "MQDISC": "END",
+        "MQOPEN": "OPEN",
+        "MQCLOSE": "CLOSE",
+        "MQBEGIN": "START",
+        "MQCMIT": "STOP",
+        "MQBACK": "STOP",
+        "MQINQ": "INQUIRE",
+        "MQSET": "SET",
+
+        "READ": "RECEIVE",
+        "WRITE": "SEND",
+        "REWRITE": "SEND",
+        "READNEXT": "RECEIVE",
+        "READPREV": "RECEIVE",
+        "WRITEQ TD": "SEND",
+        "READQ TD": "RECEIVE",
+        "WRITEQ TS": "SEND",
+        "READQ TS": "RECEIVE",
+        "": "EVENT"
+    },
     "ApiCall": {
         "1": "MQINIT",
         "2": "MQTERM",
