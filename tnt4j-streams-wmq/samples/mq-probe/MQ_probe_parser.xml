@@ -52,7 +52,7 @@
                 return "00000000000000000000000000000000".equals(idStr) ? null : idStr;
             ]]></field-transform>
         </field>
-        <field name="ApplName2" locator="ProgramName" locator-type="Label"/>
+        <field name="ProgramName" locator="ProgramName" locator-type="Label"/>
         <field name="Offset" locator="Offset" locator-type="Label" datatype="Number"/>
         <field name="JobName" locator="JobName" locator-type="Label"/>
         <field name="JobType" locator="JobType" locator-type="Label"/>
@@ -559,7 +559,7 @@
         <!-- API exit interface context fields -->
         <field name="Tag" locator="ApiIntInfo.StrucId" locator-type="Label"/>
         <field name="HostName" locator="ApiIntInfo.HostName" locator-type="Label"/>
-        <field name="ApplName2" locator="ApiIntInfo.ApplName" locator-type="Label"/>
+        <field name="ProgramName" locator="ApiIntInfo.ApplName" locator-type="Label"/>
         <field name="GTID" locator="ApiIntInfo.GTID" locator-type="Label"/>
         <field name="ObjName" locator="ApiIntInfo.ObjName" locator-type="Label"/>
         <field name="ResolvedObjName" locator="ApiIntInfo.RslvObjName" locator-type="Label"/>
