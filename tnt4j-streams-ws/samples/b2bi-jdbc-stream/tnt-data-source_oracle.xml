@@ -265,7 +265,7 @@
                         WHERE CS.REC_TIME >= ?
                           AND CS.REC_TIME < (sysdate - interval '5' minute) -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY CS.REC_TIME, CS.OBJECT_ID ASC
-                        FETCH FIRST 10000 ROWS ONLY -- limit rows number per query iteration
+                        FETCH FIRST 40000 ROWS ONLY -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastCorrelationSetRecordMDate}" type="TIMESTAMP"/>
@@ -315,7 +315,7 @@
                           AND WC.DOC_ID IS NOT NULL  -- pick only document related workflow events
                           AND WC.START_TIME < (sysdate - interval '5' minute)  -- Don't pick entries younger than 5min. - update for them may be still in progress
                         ORDER BY WC.START_TIME, WC.WORKFLOW_ID ASC
-                        FETCH FIRST 10000 ROWS ONLY -- limit rows number per query iteration
+                        FETCH FIRST 40000 ROWS ONLY -- limit rows number per query iteration
                     ]]>
                     <!-- parameter index is incremented automatically -->
                     <req-param value="${LastWorkflowContextRecordMDate}" type="TIMESTAMP"/>
