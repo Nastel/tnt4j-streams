@@ -8,7 +8,7 @@
     <java-object name="MQMsgToMQProbeMapPreParser" class="com.jkoolcloud.tnt4j.streams.custom.preparsers.MQMessageToMQProbeStructMap"/>
 
     <parser name="MqCallContextParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-		<field name="Tag" value="MqCallContextParser" />									
+        <field name="Tag" value="MqCallContextParser"/>
         <field name="EventName" locator="ApiCall" locator-type="Activity"/>
 
         <!-- MQ call context fields -->
@@ -176,7 +176,7 @@
     </parser>
 
     <parser name="HostDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-		<field name="Tag" value="HostDataParser" />									   
+        <field name="Tag" value="HostDataParser"/>
         <field name="EventName" value="HostInfo"/>
 
         <field name="Tag" locator="StrucId" locator-type="Label"/>
@@ -189,7 +189,7 @@
     </parser>
 
     <parser name="DB2DataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="Tag" value="DB2DataParser" />										  
+        <field name="Tag" value="DB2DataParser"/>
         <field name="EventName" value="DB2SQL"/>
 
         <field name="Tag" locator="StrucId" locator-type="Label"/>
@@ -253,7 +253,7 @@
     </parser>
 
     <parser name="ExecCICSDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="Tag" value="ExecCICSDataParser" />									   
+        <field name="Tag" value="ExecCICSDataParser"/>
         <field name="EventName" locator="FuncCode" locator-type="Activity"/>
 
         <field name="Tag" locator="StrucId" locator-type="Label"/>
@@ -321,7 +321,7 @@
     </parser>
 
     <parser name="CICSMqTasksParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="Tag" value="CICSMqTasksParser" />									  
+        <field name="Tag" value="CICSMqTasksParser"/>
         <field name="EventName" value="CICSMqTasks"/>
 
         <field name="Tag" locator="StrucId" locator-type="Label"/>
@@ -375,9 +375,8 @@
     </parser>
 
     <parser name="ZOSProbeMapParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="Tag" value="ZOSProbeMapParser" />		
-
-		<!-- Message fields -->
+        <field name="Tag" value="ZOSProbeMapParser"/>
+        <!-- Message fields -->
         <field name="MsgEncoding" locator="Encoding" locator-type="Label" datatype="Number"/>
         <field name="MsgCharSet" locator="CodedCharSetId" locator-type="Activity" datatype="Number"/>
         <field name="Message" locator="Message" locator-type="Label">
@@ -385,9 +384,8 @@
                 WmqUtils.getString($fieldValue, ${MsgCharSet});
             ]]></field-transform>
         </field>
-		<!--field name="BinaryMessage" locator="Message" locator-type="Label" datatype="Binary"/-->
-		
-        
+        <!--field name="BinaryMessage" locator="Message" locator-type="Label" datatype="Binary"/-->
+
         <!-- Batch info fields -->
         <field name="Tag" locator="BatchInfo.StrucId" locator-type="Label"/>
         <field name="BatchStructSize" locator="BatchInfo.StructSize" locator-type="Label" datatype="Number"/>
@@ -423,25 +421,24 @@
         <embedded-activity name="CICSMqTasks" locator="CICSMqTasks" locator-type="Label">
             <parser-ref name="CICSMqTasksParser" aggregation="Merge"/>
         </embedded-activity>
-        <field name="ApplName" locator="TranName" locator-type="Activity"/>			
-
+        <field name="ApplName" locator="TranName" locator-type="Activity"/>
     </parser>
 
     <parser name="MQProbeMapParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-		<field name="Tag" value="MQProbeMapParser" />										 
+        <field name="Tag" value="MQProbeMapParser"/>
         <field name="EventName" value="ApiExitInfo"/>
 
         <!-- Message fields -->
         <field name="MsgEncoding" locator="Encoding" locator-type="Label" datatype="Number"/>
         <field name="MsgCharSet" locator="MqInfo.MsgDesc.CodedCharSetId" locator-type="Label" datatype="Number"/>
         <field name="MessageId" locator="MsgId" locator-type="Label"/>
-		
+
         <field name="Message" locator="Message" locator-type="Label">
             <field-transform lang="groovy"><![CDATA[
                 WmqUtils.getString($fieldValue, ${MsgCharSet});
             ]]></field-transform>
         </field>
-		<!--field name="BinaryMessage" locator="Message" locator-type="Label" datatype="Binary"/-->
+        <!--field name="BinaryMessage" locator="Message" locator-type="Label" datatype="Binary"/-->
         <field name="Tag" locator="StrucId" locator-type="Label"/>
 
         <!-- MQ call (CICS) contextual information -->
