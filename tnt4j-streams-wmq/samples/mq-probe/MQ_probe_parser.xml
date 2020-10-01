@@ -8,7 +8,6 @@
     <java-object name="MQMsgToMQProbeMapPreParser" class="com.jkoolcloud.tnt4j.streams.custom.preparsers.MQMessageToMQProbeStructMap"/>
 
     <parser name="MqCallContextParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-		<field name="Tag" value="MqCallContextParser" />									
         <field name="EventName" locator="ApiCall" locator-type="Activity"/>
 
         <!-- MQ call context fields -->
@@ -102,7 +101,7 @@
         </field>
         <field name="Expiry" locator="MsgDesc.Expiry" locator-type="Label" datatype="Number"/>
         <field name="Feedback" locator="MsgDesc.Feedback" locator-type="Label" datatype="Number"/>
-        <field name="Encoding" locator="MsgDesc.Encoding" locator-type="Label" datatype="Number">
+        <field name="Encoding" locator="MsgDesc.Encoding2" locator-type="Label" datatype="Number">
             <field-transform lang="groovy" phase="formatted"><![CDATA[
                 $fieldValue instanceof Number
                     ? WmqUtils.lookupMQConstantName($fieldValue, "MQENC_.*")
@@ -150,14 +149,14 @@
             ]]></field-transform>
         </field>
         <field name="ApplIdentityData" locator="MsgDesc.ApplIdentityData" locator-type="Label"/>
-        <field name="PutApplType" locator="MsgDesc.PutApplType" locator-type="Label" datatype="Number">
+        <field name="ApplType" locator="MsgDesc.PutApplType" locator-type="Label" datatype="Number">
             <field-transform lang="groovy" phase="formatted"><![CDATA[
                 $fieldValue instanceof Number
                     ? WmqUtils.lookupMQConstantName($fieldValue, "MQAT_.*")
                     : $fieldValue
             ]]></field-transform>
         </field>
-        <field name="PutApplName" locator="MsgDesc.PutApplName" locator-type="Label">
+        <field name="ApplName" locator="MsgDesc.PutApplName" locator-type="Label">
             <field-transform name="pgmName" lang="groovy"><![CDATA[
                 Utils.getFileName($fieldValue)
             ]]></field-transform>
@@ -176,7 +175,6 @@
     </parser>
 
     <parser name="HostDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-		<field name="Tag" value="HostDataParser" />									   
         <field name="EventName" value="HostInfo"/>
 
         <field name="Tag" locator="StrucId" locator-type="Label"/>
@@ -189,7 +187,6 @@
     </parser>
 
     <parser name="DB2DataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="Tag" value="DB2DataParser" />										  
         <field name="EventName" value="DB2SQL"/>
 
         <field name="Tag" locator="StrucId" locator-type="Label"/>
@@ -253,7 +250,6 @@
     </parser>
 
     <parser name="ExecCICSDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="Tag" value="ExecCICSDataParser" />									   
         <field name="EventName" locator="FuncCode" locator-type="Activity"/>
 
         <field name="Tag" locator="StrucId" locator-type="Label"/>
@@ -321,7 +317,6 @@
     </parser>
 
     <parser name="CICSMqTasksParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="Tag" value="CICSMqTasksParser" />									  
         <field name="EventName" value="CICSMqTasks"/>
 
         <field name="Tag" locator="StrucId" locator-type="Label"/>
@@ -375,19 +370,15 @@
     </parser>
 
     <parser name="ZOSProbeMapParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="Tag" value="ZOSProbeMapParser" />		
-
-		<!-- Message fields -->
+        <!-- Message fields -->
         <field name="MsgEncoding" locator="Encoding" locator-type="Label" datatype="Number"/>
-        <field name="MsgCharSet" locator="CodedCharSetId" locator-type="Activity" datatype="Number"/>
+        <field name="MsgCharSet" locator="CharSet" locator-type="Label" datatype="Number"/>
         <field name="Message" locator="Message" locator-type="Label">
             <field-transform lang="groovy"><![CDATA[
                 WmqUtils.getString($fieldValue, ${MsgCharSet});
             ]]></field-transform>
         </field>
-		<!--field name="BinaryMessage" locator="Message" locator-type="Label" datatype="Binary"/-->
-		
-        
+
         <!-- Batch info fields -->
         <field name="Tag" locator="BatchInfo.StrucId" locator-type="Label"/>
         <field name="BatchStructSize" locator="BatchInfo.StructSize" locator-type="Label" datatype="Number"/>
@@ -423,25 +414,20 @@
         <embedded-activity name="CICSMqTasks" locator="CICSMqTasks" locator-type="Label">
             <parser-ref name="CICSMqTasksParser" aggregation="Merge"/>
         </embedded-activity>
-        <field name="ApplName" locator="TranName" locator-type="Activity"/>			
-
     </parser>
 
     <parser name="MQProbeMapParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-		<field name="Tag" value="MQProbeMapParser" />										 
         <field name="EventName" value="ApiExitInfo"/>
 
         <!-- Message fields -->
         <field name="MsgEncoding" locator="Encoding" locator-type="Label" datatype="Number"/>
-        <field name="MsgCharSet" locator="MqInfo.MsgDesc.CodedCharSetId" locator-type="Label" datatype="Number"/>
+        <field name="MsgCharSet" locator="CharSet" locator-type="Label" datatype="Number"/>
         <field name="MessageId" locator="MsgId" locator-type="Label"/>
-		
         <field name="Message" locator="Message" locator-type="Label">
             <field-transform lang="groovy"><![CDATA[
                 WmqUtils.getString($fieldValue, ${MsgCharSet});
             ]]></field-transform>
         </field>
-		<!--field name="BinaryMessage" locator="Message" locator-type="Label" datatype="Binary"/-->
         <field name="Tag" locator="StrucId" locator-type="Label"/>
 
         <!-- MQ call (CICS) contextual information -->
@@ -512,13 +498,14 @@
         </field>
         <field name="Expiry" locator="MqInfo.MsgDesc.Expiry" locator-type="Label" datatype="Number"/>
         <field name="FeedbackMD" locator="MqInfo.MsgDesc.Feedback" locator-type="Label" datatype="Number"/>
-        <field name="Encoding" locator="MqInfo.MsgDesc.Encoding" locator-type="Label" datatype="Number">
+        <field name="Encoding" locator="MqInfo.MsgDesc.Encoding2" locator-type="Label" datatype="Number">
             <field-transform lang="groovy" phase="formatted"><![CDATA[
                 $fieldValue instanceof Number
                     ? WmqUtils.lookupMQConstantName($fieldValue, "MQENC_.*")
                     : $fieldValue
             ]]></field-transform>
         </field>
+        <field name="CodedCharSetId" locator="MqInfo.MsgDesc.CodedCharSetId" locator-type="Label" datatype="Number"/>
         <field name="FormatName" locator="MqInfo.MsgDesc.Format" locator-type="Label"/>
         <field name="Priority" locator="MqInfo.MsgDesc.Priority" locator-type="Label" datatype="Number"/>
         <field name="Persistence" locator="MqInfo.MsgDesc.Persistence" locator-type="Label" datatype="Number">
@@ -551,14 +538,14 @@
             ]]></field-transform>
         </field>
         <field name="ApplIdentityData" locator="MqInfo.MsgDesc.ApplIdentityData" locator-type="Label"/>
-        <field name="PutApplType" locator="MqInfo.MsgDesc.PutApplType" locator-type="Label" datatype="Number">
+        <field name="ApplType" locator="MqInfo.MsgDesc.PutApplType" locator-type="Label" datatype="Number">
             <field-transform lang="groovy" phase="formatted"><![CDATA[
                 $fieldValue instanceof Number
                     ? WmqUtils.lookupMQConstantName($fieldValue, "MQAT_.*")
                     : $fieldValue
             ]]></field-transform>
         </field>
-        <field name="PutApplName" locator="MqInfo.MsgDesc.PutApplName" locator-type="Label">
+        <field name="ApplName" locator="MqInfo.MsgDesc.PutApplName" locator-type="Label">
             <field-transform name="pgmName" lang="groovy"><![CDATA[
                 Utils.getFileName($fieldValue)
             ]]></field-transform>
@@ -579,6 +566,9 @@
         <field name="ResolvedQMgr" locator="ApiIntInfo.RslvQMgr" locator-type="Label"/>
         <field name="IpAddress" locator="ApiIntInfo.IpAddress" locator-type="Label"/>
         <field name="OsType" locator="ApiIntInfo.OsType" locator-type="Label"/>
+        <field name="ObjType" locator="ObjectType" locator-type="Label">
+            <field-map-ref resource="MQ_PROBE_MAPPINGS.ObjectType"/>
+        </field>
         <field name="CpuCount" locator="ApiIntInfo.CpuCount" locator-type="Label" datatype="Number"/>
 
         <!-- Exit time fields TODO make proper time values mapping -->
