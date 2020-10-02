@@ -267,14 +267,16 @@ public class ActivityJDBCResultSetParser extends GenericActivityParser<ResultSet
 		return 0;
 	}
 
+	private static final String[] ACTIVITY_DATA_TYPES = { "RESULT SET" }; // NON-NLS
+
 	/**
 	 * Returns type of RAW activity data entries.
 	 *
-	 * @return type of RAW activity data entries - RESULT SET
+	 * @return type of RAW activity data entries - {@code "RESULT SET"}
 	 */
 	@Override
-	protected String getActivityDataType() {
-		return "RESULT SET"; // NON-NLS
+	protected String[] getActivityDataType() {
+		return ACTIVITY_DATA_TYPES;
 	}
 
 	@SuppressWarnings("deprecation")

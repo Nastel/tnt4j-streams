@@ -123,13 +123,15 @@ public class ActivityExcelSheetParser extends AbstractExcelParser<Sheet> {
 		return val;
 	}
 
+	private static final String[] ACTIVITY_DATA_TYPES = { "EXCEL SHEET" }; // NON-NLS
+
 	/**
 	 * Returns type of RAW activity data entries.
 	 *
-	 * @return type of RAW activity data entries - EXCEL SHEET
+	 * @return type of RAW activity data entries - {@code "EXCEL SHEET"}
 	 */
 	@Override
-	protected String getActivityDataType() {
-		return "EXCEL SHEET"; // NON-NLS
+	protected String[] getActivityDataType() {
+		return ACTIVITY_DATA_TYPES;
 	}
 }

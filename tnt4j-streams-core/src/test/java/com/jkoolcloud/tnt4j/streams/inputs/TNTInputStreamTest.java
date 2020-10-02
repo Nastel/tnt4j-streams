@@ -353,8 +353,8 @@ public class TNTInputStreamTest {
 		}
 
 		@Override
-		protected Object getActivityDataType() {
-			return "TEXT"; // NON-NLS
+		protected String[] getActivityDataType() {
+			return new String[] { "TEXT" }; // NON-NLS
 		}
 
 	}

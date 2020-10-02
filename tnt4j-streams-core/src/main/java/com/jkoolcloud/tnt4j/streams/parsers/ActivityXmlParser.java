@@ -598,11 +598,11 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 			} catch (EOFException eof) {
 				Utils.logThrowable(logger(), OpLevel.DEBUG,
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "ActivityParser.data.end",
-						getActivityDataType(), eof);
+						getActivityDataType()[0], eof);
 			} catch (IOException ioe) {
 				Utils.logThrowable(logger(), OpLevel.WARNING,
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"ActivityParser.error.reading", getActivityDataType(), ioe);
+						"ActivityParser.error.reading", getActivityDataType()[0], ioe);
 			}
 		} finally {
 			nextLock.unlock();
@@ -615,14 +615,16 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 		return xmlString;
 	}
 
+	private static final String[] ACTIVITY_DATA_TYPES = { "XML", "TEXT" }; // NON-NLS
+
 	/**
-	 * Returns type of RAW activity data entries.
+	 * Returns types of RAW activity data entries.
 	 *
-	 * @return type of RAW activity data entries - XML
+	 * @return types of RAW activity data entries - {@code "XML"} and {@code "TEXT"}
 	 */
 	@Override
-	protected String getActivityDataType() {
-		return "XML"; // NON-NLS
+	protected String[] getActivityDataType() {
+		return ACTIVITY_DATA_TYPES;
 	}
 
 	@SuppressWarnings("deprecation")

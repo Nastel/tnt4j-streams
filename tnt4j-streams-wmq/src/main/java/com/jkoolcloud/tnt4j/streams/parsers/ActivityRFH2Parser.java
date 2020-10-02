@@ -139,14 +139,16 @@ public class ActivityRFH2Parser extends AbstractActivityMapParser {
 		return dataMap;
 	}
 
+	private static final String[] ACTIVITY_DATA_TYPES = { "RFH2", "BINARY" }; // NON-NLS
+
 	/**
-	 * Returns type of RAW activity data entries.
+	 * Returns types of RAW activity data entries.
 	 *
-	 * @return type of RAW activity data entries - RFH2
+	 * @return types of RAW activity data entries - {@code "RFH2"} and {@code "BINARY"}
 	 */
 	@Override
-	protected String getActivityDataType() {
-		return "RFH2"; // NON-NLS
+	protected String[] getActivityDataType() {
+		return ACTIVITY_DATA_TYPES;
 	}
 
 	/**

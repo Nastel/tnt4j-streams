@@ -172,14 +172,16 @@ public class ActivityJavaObjectParser extends GenericActivityParser<Object> {
 		return val;
 	}
 
+	private static final String[] ACTIVITY_DATA_TYPES = { "OBJECT" }; // NON-NLS
+
 	/**
 	 * Returns type of RAW activity data entries.
 	 *
-	 * @return type of RAW activity data entries - OBJECT
+	 * @return type of RAW activity data entries - {@code "OBJECT"}
 	 */
 	@Override
-	protected String getActivityDataType() {
-		return "OBJECT"; // NON-NLS
+	protected String[] getActivityDataType() {
+		return ACTIVITY_DATA_TYPES;
 	}
 
 	@SuppressWarnings("deprecation")

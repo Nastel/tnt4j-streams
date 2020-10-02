@@ -1392,14 +1392,16 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 		return mqsco; // TODO
 	}
 
+	private static final String[] ACTIVITY_DATA_TYPES = { "PCF MESSAGE" }; // NON-NLS
+
 	/**
 	 * Returns type of RAW activity data entries.
 	 *
-	 * @return type of RAW activity data entries - PCF MESSAGE
+	 * @return type of RAW activity data entries - {@code "PCF MESSAGE"}
 	 */
 	@Override
-	protected String getActivityDataType() {
-		return "PCF MESSAGE"; // NON-NLS
+	protected String[] getActivityDataType() {
+		return ACTIVITY_DATA_TYPES;
 	}
 
 	/**

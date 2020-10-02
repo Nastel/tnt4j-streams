@@ -392,13 +392,15 @@ public class ActivityJMSMessageParser extends AbstractActivityMapParser {
 				"ActivityJMSMessageParser.parsing.custom.jms.message");
 	}
 
+	private static final String[] ACTIVITY_DATA_TYPES = { "JMS MESSAGE" }; // NON-NLS
+
 	/**
 	 * Returns type of RAW activity data entries.
 	 *
-	 * @return type of RAW activity data entries - JMS MESSAGE
+	 * @return type of RAW activity data entries - {@code "JMS MESSAGE"}
 	 */
 	@Override
-	protected String getActivityDataType() {
-		return "JMS MESSAGE"; // NON-NLS
+	protected String[] getActivityDataType() {
+		return ACTIVITY_DATA_TYPES;
 	}
 }

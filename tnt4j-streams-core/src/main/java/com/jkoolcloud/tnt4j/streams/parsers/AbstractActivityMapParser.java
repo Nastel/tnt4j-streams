@@ -256,14 +256,16 @@ public abstract class AbstractActivityMapParser extends GenericActivityParser<Ma
 		return val;
 	}
 
+	private static final String[] ACTIVITY_DATA_TYPES = { "MAP" }; // NON-NLS
+
 	/**
 	 * Returns type of RAW activity data entries.
 	 *
-	 * @return type of RAW activity data entries - MAP
+	 * @return type of RAW activity data entries - {@code "MAP"}
 	 */
 	@Override
-	protected String getActivityDataType() {
-		return "MAP"; // NON-NLS
+	protected String[] getActivityDataType() {
+		return ACTIVITY_DATA_TYPES;
 	}
 
 	@SuppressWarnings("deprecation")

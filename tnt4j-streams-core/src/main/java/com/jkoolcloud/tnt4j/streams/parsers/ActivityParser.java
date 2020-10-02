@@ -412,11 +412,11 @@ public abstract class ActivityParser implements NamedObject {
 	public abstract void addReference(Object refObject) throws IllegalStateException;
 
 	/**
-	 * Returns type of RAW activity data entries.
+	 * Returns types of RAW activity data entries.
 	 *
-	 * @return type of RAW activity data entries
+	 * @return types of RAW activity data entries
 	 */
-	protected abstract Object getActivityDataType();
+	protected abstract String[] getActivityDataType();
 
 	/**
 	 * Returns default data type to be used by parser bound fields.

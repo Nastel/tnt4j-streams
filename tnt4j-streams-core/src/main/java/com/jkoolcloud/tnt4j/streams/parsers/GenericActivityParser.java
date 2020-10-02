@@ -25,6 +25,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
@@ -588,11 +589,11 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 			} catch (EOFException eof) {
 				Utils.logThrowable(logger(), OpLevel.DEBUG,
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "ActivityParser.data.end",
-						getActivityDataType(), eof);
+						getActivityDataType()[0], eof);
 			} catch (IOException ioe) {
 				Utils.logThrowable(logger(), OpLevel.WARNING,
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"ActivityParser.error.reading", getActivityDataType(), ioe);
+						"ActivityParser.error.reading", getActivityDataType()[0], ioe);
 			}
 		} finally {
 			nextLock.unlock();
@@ -601,14 +602,16 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		return str;
 	}
 
+	private static final String[] ACTIVITY_DATA_TYPES = { "TEXT" }; // NON-NLS
+
 	/**
 	 * Returns "logical" type of RAW activity data entries.
 	 *
-	 * @return "logical" type of RAW activity data entries - TEXT
+	 * @return "logical" type of RAW activity data entries - {@code "TEXT"}
 	 */
 	@Override
-	protected String getActivityDataType() {
-		return "TEXT"; // NON-NLS
+	protected String[] getActivityDataType() {
+		return ACTIVITY_DATA_TYPES;
 	}
 
 	@Override
@@ -1323,7 +1326,8 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	}
 
 	private boolean isLogicalTypeSupported(String logicalType) {
-		return logicalType == null || "OBJECT".equals(logicalType) || getActivityDataType().equals(logicalType); // NON-NLS
+		return logicalType == null || "OBJECT".equals(logicalType) // NON-NLS
+				|| ArrayUtils.contains(getActivityDataType(), logicalType);
 	}
 
 	/**

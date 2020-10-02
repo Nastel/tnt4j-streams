@@ -115,13 +115,15 @@ public class ActivityExcelRowParser extends AbstractExcelParser<Row> {
 		return val;
 	}
 
+	private static final String[] ACTIVITY_DATA_TYPES = { "EXCEL ROW" }; // NON-NLS
+
 	/**
 	 * Returns type of RAW activity data entries.
 	 *
-	 * @return type of RAW activity data entries - EXCEL ROW
+	 * @return type of RAW activity data entries - {@code "EXCEL ROW"}
 	 */
 	@Override
-	protected String getActivityDataType() {
-		return "EXCEL ROW"; // NON-NLS
+	protected String[] getActivityDataType() {
+		return ACTIVITY_DATA_TYPES;
 	}
 }

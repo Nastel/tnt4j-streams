@@ -198,11 +198,11 @@ public class IBMMQLogParser extends AbstractActivityMapParser {
 			} catch (EOFException eof) {
 				Utils.logThrowable(logger(), OpLevel.DEBUG,
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "ActivityParser.data.end",
-						getActivityDataType(), eof);
+						getActivityDataType()[0], eof);
 			} catch (IOException ioe) {
 				Utils.logThrowable(logger(), OpLevel.WARNING,
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"ActivityParser.error.reading", getActivityDataType(), ioe);
+						"ActivityParser.error.reading", getActivityDataType()[0], ioe);
 			}
 		} finally {
 			nextLock.unlock();
@@ -215,14 +215,16 @@ public class IBMMQLogParser extends AbstractActivityMapParser {
 		return entryString;
 	}
 
+	private static final String[] ACTIVITY_DATA_TYPES = { "IBM MQ ERR LOG", "TEXT" }; // NON-NLS
+
 	/**
-	 * Returns type of RAW activity data entries.
+	 * Returns types of RAW activity data entries.
 	 *
-	 * @return type of RAW activity data entries - IBM MQ ERR LOG
+	 * @return types of RAW activity data entries - {@code "IBM MQ ERR LOG"} and {@code "TEXT"}
 	 */
 	@Override
-	protected String getActivityDataType() {
-		return "IBM MQ ERR LOG"; // NON-NLS
+	protected String[] getActivityDataType() {
+		return ACTIVITY_DATA_TYPES;
 	}
 
 	/**
