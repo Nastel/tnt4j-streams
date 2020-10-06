@@ -2718,9 +2718,21 @@ Sample stream configuration:
                locator-type="Label"/>
         <field name="ResourceName" locator="/wmb:event/wmb:eventPointData/wmb:messageFlowData/wmb:node/@wmb:nodeLabel"
                locator-type="Label"/>
-        <field name="Message" locator="/wmb:event/wmb:bitstreamData/wmb:bitstream" locator-type="Label"
-               datatype="Binary"
-               format="base64Binary"/>
+
+        <field name="RawMessage" locator="/wmb:event/wmb:bitstreamData/wmb:bitstream" locator-type="Label" transparent="true"/>
+        <field name="RawMessageEncoding" locator="/wmb:event/wmb:bitstreamData/wmb:bitstream/@wmb:encoding" locator-type="Label"
+               transparent="true"/>
+
+        <field name="Message" locator="RawMessage" locator-type="Activity">
+            <field-transform lang="groovy"><![CDATA[
+                "base64Binary".equals(${RawMessageEncoding})
+                    ? Utils.base64Decode($fieldValue, "UTF-8")
+                    "hexBinary".equals(${RawMessageEncoding})
+                        ? Utils.getString(Utils.decodeHex($fieldValue), "UTF-8")
+                        : $fieldValue
+            ]]></field-transform>
+        </field>
+
         <field name="EventName" locator="/wmb:event/wmb:eventPointData/wmb:eventData/wmb:eventIdentity/@wmb:eventName"
                locator-type="Label"/>
         <field name="EventType" locator="/wmb:event/wmb:eventPointData/wmb:messageFlowData/wmb:node/@wmb:nodeType"
@@ -4964,7 +4976,7 @@ Stream class: `com.jkoolcloud.tnt4j.streams.inputs.SocketInputStream`
 
  * `Port` - port number to run server socket. Default value - `12569`. (Optional)
 
-Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffered streams parameters'](#buffered-streams-parameters). 
+Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffered streams parameters'](#buffered-streams-parameters).
 
 #### Http stream parameters
 
