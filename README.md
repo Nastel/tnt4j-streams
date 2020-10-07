@@ -2727,7 +2727,7 @@ Sample stream configuration:
             <field-transform lang="groovy"><![CDATA[
                 "base64Binary".equals(${RawMessageEncoding})
                     ? Utils.base64Decode($fieldValue, "UTF-8")
-                    "hexBinary".equals(${RawMessageEncoding})
+                    : "hexBinary".equals(${RawMessageEncoding})
                         ? Utils.getString(Utils.decodeHex($fieldValue), "UTF-8")
                         : $fieldValue
             ]]></field-transform>
