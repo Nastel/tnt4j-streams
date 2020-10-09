@@ -20,9 +20,7 @@
 
     <target name="deploy" depends="mvn_windows_deploy, mvn_unix_deploy"/>
 
-    <target name="install_libs" depends="mvn_windows_install_libs, mvn_unix_install_libs"/>
-
-    <target name="all" depends="install_libs, pack"/>
+    <target name="all" depends="pack"/>
 
     <target name="mvn_windows_clean" if="isWindows">
         <exec dir="." executable="cmd">
@@ -69,18 +67,6 @@
     <target name="mvn_unix_deploy" if="isUnix">
         <exec dir="." executable="sh">
             <arg line="-c 'mvn deploy -pl ${modules} -am -P pack-all'"/>
-        </exec>
-    </target>
-
-    <target name="mvn_windows_install_libs" if="isWindows">
-        <exec dir="./tnt4j-streams-wmq/lib" executable="cmd">
-            <arg line="/c mvn clean package"/>
-        </exec>
-    </target>
-
-    <target name="mvn_unix_install_libs" if="isUnix">
-        <exec dir="./tnt4j-streams-wmq/lib" executable="sh">
-            <arg line="-c 'mvn clean package'"/>
         </exec>
     </target>
 
