@@ -106,6 +106,18 @@
                             <exclude>original-*.jar</exclude>
                         </excludes>
                     </fileSet>
+                    <!-- module configurations -->
+                    <fileSet>
+                        <directory>/config</directory>
+                        <includes>
+                            <include>**/*.*</include>
+                        </includes>
+                        <!--<excludes>-->
+                        <!--<exclude>**/tnt4j*.properties</exclude>-->
+                        <!--</excludes>-->
+                        <outputDirectory>config</outputDirectory>
+                        <lineEnding>crlf</lineEnding>
+                    </fileSet>
                 </fileSets>
             </sources>
         </moduleSet>
@@ -152,7 +164,8 @@
             </includes>
             <outputDirectory>bin</outputDirectory>
         </fileSet>
-        <!-- user defined property files -->
+        <!-- configuration property files -->
+        <!-- NOTE: file gets not picked from module set! -->
         <fileSet>
             <directory>../tnt4j-streams-kafka/target/config</directory>
             <includes>
@@ -163,33 +176,6 @@
         </fileSet>
         <fileSet>
             <directory>../config</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>config</outputDirectory>
-            <lineEnding>crlf</lineEnding>
-        </fileSet>
-        <fileSet>
-            <directory>../tnt4j-streams-kafka/config</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <excludes>
-                <exclude>**/tnt4j*.properties</exclude>
-            </excludes>
-            <outputDirectory>config</outputDirectory>
-            <lineEnding>crlf</lineEnding>
-        </fileSet>
-        <fileSet>
-            <directory>../tnt4j-streams-wmq/config</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>config</outputDirectory>
-            <lineEnding>crlf</lineEnding>
-        </fileSet>
-        <fileSet>
-            <directory>../tnt4j-streams-ws/config</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
