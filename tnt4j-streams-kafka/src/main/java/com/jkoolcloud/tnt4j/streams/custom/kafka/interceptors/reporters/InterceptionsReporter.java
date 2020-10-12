@@ -44,7 +44,7 @@ public interface InterceptionsReporter {
 	 * @param producerRecord
 	 *            producer record to be sent
 	 * @param clusterResource
-	 *            cluster resource metadata records where sent to
+	 *            cluster resource metadata records were sent to
 	 */
 	void send(TNTKafkaPInterceptor interceptor, ProducerRecord<Object, Object> producerRecord,
 			ClusterResource clusterResource);
@@ -61,7 +61,7 @@ public interface InterceptionsReporter {
 	 * @param e
 	 *            occurred exception
 	 * @param clusterResource
-	 *            cluster resource metadata records where sent to
+	 *            cluster resource metadata records were sent to
 	 */
 	void acknowledge(TNTKafkaPInterceptor interceptor, RecordMetadata recordMetadata, Exception e,
 			ClusterResource clusterResource);
@@ -76,7 +76,7 @@ public interface InterceptionsReporter {
 	 * @param consumerRecords
 	 *            consumed records collection
 	 * @param clusterResource
-	 *            cluster resource metadata records where consumed from
+	 *            cluster resource metadata records were consumed from
 	 */
 	void consume(TNTKafkaCInterceptor interceptor, ConsumerRecords<Object, Object> consumerRecords,
 			ClusterResource clusterResource);
@@ -90,7 +90,7 @@ public interface InterceptionsReporter {
 	 * @param map
 	 *            committed records topics and messages map
 	 * @param clusterResource
-	 *            cluster resource metadata records where consumed from
+	 *            cluster resource metadata records were consumed from
 	 */
 	void commit(TNTKafkaCInterceptor interceptor, Map<TopicPartition, OffsetAndMetadata> map,
 			ClusterResource clusterResource);

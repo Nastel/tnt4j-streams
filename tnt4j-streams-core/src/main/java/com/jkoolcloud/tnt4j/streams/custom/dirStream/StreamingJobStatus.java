@@ -30,7 +30,7 @@ public enum StreamingJobStatus implements StreamingStatus {
 	REJECT,
 
 	/**
-	 * Indicates streaming jobs where dropped off from executor queue before executing (e.g., executor was shot down
+	 * Indicates streaming jobs were dropped off from executor queue before executing (e.g., executor was shot down
 	 * before starting to process that job).
 	 */
 	DROP_OFF,

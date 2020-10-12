@@ -238,7 +238,7 @@ public class InterceptionsManager {
 	 * @param producerRecord
 	 *            producer record to be sent
 	 * @param clusterResource
-	 *            cluster resource metadata records where sent to
+	 *            cluster resource metadata records were sent to
 	 *
 	 * @return producer record to be sent
 	 */
@@ -264,7 +264,7 @@ public class InterceptionsManager {
 	 * @param e
 	 *            occurred exception
 	 * @param clusterResource
-	 *            cluster resource metadata records where sent to
+	 *            cluster resource metadata records were sent to
 	 */
 	public void acknowledge(TNTKafkaPInterceptor interceptor, RecordMetadata recordMetadata, Exception e,
 			ClusterResource clusterResource) {
@@ -284,7 +284,7 @@ public class InterceptionsManager {
 	 * @param consumerRecords
 	 *            consumed records collection
 	 * @param clusterResource
-	 *            cluster resource metadata records where consumed from
+	 *            cluster resource metadata records were consumed from
 	 *
 	 * @return consumed records collection
 	 */
@@ -308,7 +308,7 @@ public class InterceptionsManager {
 	 * @param map
 	 *            committed records topics and messages map
 	 * @param clusterResource
-	 *            cluster resource metadata records where consumed from
+	 *            cluster resource metadata records were consumed from
 	 */
 	public void commit(TNTKafkaCInterceptor interceptor, Map<TopicPartition, OffsetAndMetadata> map,
 			ClusterResource clusterResource) {

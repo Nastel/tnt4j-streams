@@ -140,7 +140,7 @@ public class ZKConfigInit {
 	 *
 	 * @param args
 	 *            command-line arguments
-	 * @return {@code true} if command-line arguments where valid to interpret, {@code false} - otherwise
+	 * @return {@code true} if command-line arguments were valid to interpret, {@code false} - otherwise
 	 */
 	private static boolean processArgs(String... args) {
 		for (String arg : args) {

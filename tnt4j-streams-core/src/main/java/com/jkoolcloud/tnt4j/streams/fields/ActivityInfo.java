@@ -671,7 +671,7 @@ public class ActivityInfo {
 	 *
 	 * @param pattern
 	 *            fqn pattern to fill
-	 * @return fully qualified name of this activity source, or {@code null} if no source defining attributes where
+	 * @return fully qualified name of this activity source, or {@code null} if no source defining attributes were
 	 *         parsed from stream.
 	 */
 	public String getSourceFQN(String pattern) {
