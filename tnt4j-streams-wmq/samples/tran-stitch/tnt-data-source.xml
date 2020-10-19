@@ -37,7 +37,7 @@
         <field name="TrackingId" separator="#!#" value-type="signature">
             <field-locator locator="/messaging_operation/MsgType" locator-type="Label" datatype="Number"/>
             <field-locator locator="/messaging_operation/MsgFormat" locator-type="Label"/>
-            <field-locator locator="/messaging_operation/MsgId" locator-type="Label" datatype="Binary" format="hexBinary"/>
+            <field-locator locator="/messaging_operation/MsgId" locator-type="Label" datatype="Binary"/>
             <field-locator locator="/messaging_operation/MsgUser" locator-type="Label">
                 <field-transform name="UserIdLowerCase" lang="groovy">
                     StringUtils.lowerCase($fieldValue)
@@ -47,7 +47,7 @@
             <field-locator locator="/messaging_operation/MsgPutApplName" locator-type="Label"/>
             <field-locator locator="/messaging_operation/MsgPutDate" locator-type="Label"/>
             <field-locator locator="/messaging_operation/MsgPutTime" locator-type="Label"/>
-            <field-locator locator="/messaging_operation/Correlator" locator-type="Label" datatype="Binary" format="hexBinary"/>
+            <field-locator locator="/messaging_operation/Correlator" locator-type="Label"/>
         </field>
         <field name="StartTime" locator="/messaging_operation/StartTime" locator-type="Label" datatype="DateTime"/>
         <field name="CompCode" locator="/messaging_operation/CompCode" locator-type="Label">
