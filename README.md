@@ -5705,7 +5705,7 @@ Sample of field definition for signature calculation:
         <field-locator locator="/messaging_operation/MsgPutApplName" locator-type="Label"/> 
         <field-locator locator="/messaging_operation/MsgPutDate" locator-type="Label"/> 
         <field-locator locator="/messaging_operation/MsgPutTime" locator-type="Label"/> 
-        <field-locator locator="/messaging_operation/Correlator" locator-type="Label" datatype="Binary" format="hexBinary"/> 
+        <field-locator locator="/messaging_operation/Correlator" locator-type="Label"/> 
     </field>
 ```
 
@@ -5977,7 +5977,7 @@ Sample of field definition for signature calculation:
         <field-locator locator="MQCACF_APPL_NAME" locator-type="Label"/>
         <field-locator locator="MQGACF_ACTIVITY_TRACE.MQCACF_PUT_DATE" locator-type="Label"/>
         <field-locator locator="MQGACF_ACTIVITY_TRACE.MQCACF_PUT_TIME" locator-type="Label"/>
-        <field-locator locator="MQGACF_ACTIVITY_TRACE.MQBACF_CORREL_ID" locator-type="Label" datatype="String" format="bytes"/>
+        <field-locator locator="MQGACF_ACTIVITY_TRACE.MQBACF_CORREL_ID" locator-type="Label" datatype="Binary" required="false"/>
     </field>
 ```
 
