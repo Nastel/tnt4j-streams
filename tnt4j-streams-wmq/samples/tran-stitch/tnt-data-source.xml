@@ -4,8 +4,6 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
     <parser name="WmqMsgOpXmlParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
-        <property name="SignatureDelim" value="#!#"/>
-
         <field name="Message" locator="/messaging_operation/MsgData" locator-type="Label" datatype="String" format="string"/>
         <field name="EventName" locator="/messaging_operation/OperationName" locator-type="Label"/>
         <field name="EventType" locator="/messaging_operation/OperationName" locator-type="Label">

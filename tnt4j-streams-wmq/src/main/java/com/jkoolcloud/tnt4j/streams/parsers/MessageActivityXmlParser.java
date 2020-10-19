@@ -18,14 +18,10 @@ package com.jkoolcloud.tnt4j.streams.parsers;
 
 import java.text.ParseException;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
-import com.jkoolcloud.tnt4j.streams.configure.WmqParserProperties;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityField;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
-import com.jkoolcloud.tnt4j.streams.fields.StreamFieldType;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.WmqStreamConstants;
@@ -35,24 +31,17 @@ import com.jkoolcloud.tnt4j.streams.utils.WmqUtils;
  * This class extends the basic activity XML parser for handling data specific to messaging operations. It provides
  * additional transformations of the raw activity data collected for specific fields.
  * <p>
- * In particular, this class will convert the {@link StreamFieldType#TrackingId} and {@link StreamFieldType#Correlator}
- * fields values from a tokenized list of items into a value in the appropriate form required by the jKoolCloud.
+ * In particular, this class is capable to calculate message signature from tokenized list of field values. Field
+ * {@code value-type} attribute value shall be
+ * {@value com.jkoolcloud.tnt4j.streams.utils.WmqStreamConstants#VT_SIGNATURE} to initiate signature calculation.
  * <p>
- * This parser supports the following configuration properties (in addition to those supported by
- * {@link ActivityXmlParser}):
- * <ul>
- * <li>SignatureDelim - signature fields delimiter. (Optional)</li>
- * </ul>
+ * This activity parser supports configuration properties from
+ * {@link com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser} (and higher hierarchy parsers).
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  */
 public class MessageActivityXmlParser extends ActivityXmlParser {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(MessageActivityXmlParser.class);
-	/**
-	 * Contains the field separator (set by {@code SignatureDelim} property) - Default:
-	 * {@value com.jkoolcloud.tnt4j.streams.parsers.GenericActivityParser#DEFAULT_DELIM}
-	 */
-	protected String sigDelim = DEFAULT_DELIM;
 
 	/**
 	 * Constructs a new MessageActivityXmlParser.
@@ -66,35 +55,13 @@ public class MessageActivityXmlParser extends ActivityXmlParser {
 		return LOGGER;
 	}
 
-	@Override
-	public void setProperty(String name, String value) {
-		super.setProperty(name, value);
-
-		if (WmqParserProperties.PROP_SIG_DELIM.equalsIgnoreCase(name)) {
-			if (StringUtils.isNotEmpty(value)) {
-				sigDelim = value;
-				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"ActivityParser.setting", name, value);
-			}
-		}
-	}
-
-	@Override
-	public Object getProperty(String name) {
-		if (WmqParserProperties.PROP_SIG_DELIM.equalsIgnoreCase(name)) {
-			return sigDelim;
-		}
-
-		return super.getProperty(name);
-	}
-
 	/**
 	 * {@inheritDoc}
 	 * <p>
 	 * This method applies custom handling for setting field values. This method will construct the signature to use for
 	 * the message from the specified value, which is assumed to be a string containing the inputs required for the
-	 * message signature calculation, with each input separated by the delimiter specified in property
-	 * {@code SignatureDelim}.
+	 * message signature calculation, with each input delimited by field property
+	 * {@link com.jkoolcloud.tnt4j.streams.fields.ActivityField#getSeparator()} defined delimiter.
 	 * <p>
 	 * To initiate signature calculation as a field value, {@code field} tag {@code value-type} attribute value has be
 	 * set to {@value com.jkoolcloud.tnt4j.streams.utils.WmqStreamConstants#VT_SIGNATURE}.
@@ -106,7 +73,7 @@ public class MessageActivityXmlParser extends ActivityXmlParser {
 		if (WmqStreamConstants.VT_SIGNATURE.equalsIgnoreCase(field.getValueType())) {
 			logger().log(OpLevel.DEBUG, StreamsResources.getString(WmqStreamConstants.RESOURCE_BUNDLE_NAME,
 					"ActivityPCFParser.calculating.signature"), field);
-			value = WmqUtils.computeSignature(value, sigDelim, logger());
+			value = WmqUtils.computeSignature(value, field.getSeparator(), logger());
 		}
 
 		super.applyFieldValue(ai, field, value);

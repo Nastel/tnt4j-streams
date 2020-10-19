@@ -99,7 +99,6 @@
     </parser>
 
     <parser name="ProgressEventParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
-        <property name="SignatureDelim" value="#!#"/>
         <property name="RequireDefault" value="false"/>
 
         <field name="EventType" value="NOOP"/>
@@ -164,7 +163,6 @@
     </parser>
 
     <parser name="StartedEventParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
-        <property name="SignatureDelim" value="#!#"/>
         <property name="RequireDefault" value="true"/>
 
         <field name="EventType" value="EVENT"/>
@@ -200,7 +198,6 @@
     </parser>
 
     <parser name="CompletedEventParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
-        <property name="SignatureDelim" value="#!#"/>
         <property name="RequireDefault" value="true"/>
 
         <field name="EventType" value="END"/>

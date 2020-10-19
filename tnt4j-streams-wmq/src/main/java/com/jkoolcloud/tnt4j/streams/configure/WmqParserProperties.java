@@ -26,10 +26,5 @@ public interface WmqParserProperties extends ParserProperties {
 	/**
 	 * Constant for name of built-in {@value} property.
 	 */
-	String PROP_SIG_DELIM = "SignatureDelim"; // NON-NLS
-
-	/**
-	 * Constant for name of built-in {@value} property.
-	 */
 	String PROP_TRANSLATE_NUM_VALUES = "TranslateNumValues"; // NON-NLS
 }

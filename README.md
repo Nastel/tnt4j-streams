@@ -2704,7 +2704,6 @@ Sample stream configuration:
     <java-object name="MQMsgToStringPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.MQMessageToStringPreParser"/>
 
     <parser name="EventParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
-        <property name="SignatureDelim" value="#!#"/>
         <property name="Namespace"
                   value="wmb=http://www.ibm.com/xmlns/prod/websphere/messagebroker/6.1.0/monitoring/event"/>
 
@@ -2827,8 +2826,6 @@ string and passes it to parser.
 `QueueManager` property defines name of queue manager and `Queue` property defines name of queue to get messages.
 
 `EventParser` is of type `MessageActivityXmlParser` meaning that it will parse messages de-serialized into XML strings.
-
-`SignatureDelim` property defines that `#!#` should be used as signature delimiter.
 
 `Namespace` property adds `wmb` namespace definition mapping to mapping
 `http://www.ibm.com/xmlns/prod/websphere/messagebroker/6.1.0/monitoring/event`.
@@ -5686,13 +5683,6 @@ Also see [Generic parser parameters](#generic-parser-parameters).
 
 #### Message activity XML parser
 
- * `SignatureDelim` - signature fields delimiter. Default value - `,`. (Optional)
-
-    sample:
-```xml
-    <property name="SignatureDelim" value="#"/>
-```
-
 Also see ['Activity XML parser'](#activity-xml-parser) and [Generic parser parameters](#generic-parser-parameters).
 
 ##### MQ message signature calculation
@@ -5900,12 +5890,10 @@ Also see ['Activity map parser'](#activity-map-parser) and [Generic parser param
  * `TranslateNumValues` - indicates that parser should translate resolved numeric values to corresponding MQ constant names if possible and 
  field/locator data type is `String` (meaning translated value can be assigned to field). If value of particular field should be left as 
  number (e.g., `ReasonCode`), use field/locator attribute `datatype="Number"`. Default value - `true`. (Optional)
- * `SignatureDelim` - signature fields delimiter. Default value - `,`. (Optional)
-
+ 
      sample:
 ```xml
-    <property name="TranslateNumValues" value="false"/>
-    <property name="SignatureDelim" value="#"/>
+    <property name="TranslateNumValues" value="false"/> 
 ```
 
 **NOTE:** when PCF parameter contains binary (`byte[]`) value and locator data type is set to `String` having attribute `charset` undefined, 

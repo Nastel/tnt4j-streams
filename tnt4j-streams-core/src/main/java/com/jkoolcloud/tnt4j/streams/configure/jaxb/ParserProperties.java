@@ -35,7 +35,6 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="FieldDelim"/>
  *     &lt;enumeration value="ValueDelim"/>
  *     &lt;enumeration value="StripQuotes"/>
- *     &lt;enumeration value="SignatureDelim"/>
  *     &lt;enumeration value="RequireDefault"/>
  *     &lt;enumeration value="StripHeaders"/>
  *     &lt;enumeration value="Namespace"/>
@@ -91,15 +90,6 @@ public enum ParserProperties {
 	 */
 	@XmlEnumValue("StripQuotes")
 	STRIP_QUOTES("StripQuotes"),
-
-	/**
-	 * 
-	 * Property value is string identifying the delimiter between signature elements.
-	 * 
-	 * 
-	 */
-	@XmlEnumValue("SignatureDelim")
-	SIGNATURE_DELIM("SignatureDelim"),
 
 	/**
 	 * 
@@ -197,6 +187,7 @@ public enum ParserProperties {
 	 */
 	@XmlEnumValue("MatchStrategy")
 	MATCH_STRATEGY("MatchStrategy");
+
 	private final String value;
 
 	ParserProperties(String v) {

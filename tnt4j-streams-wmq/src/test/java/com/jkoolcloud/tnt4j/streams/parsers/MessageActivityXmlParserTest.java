@@ -33,18 +33,18 @@ import com.jkoolcloud.tnt4j.streams.fields.*;
  */
 public class MessageActivityXmlParserTest {
 
-	private static final String DELIM = ","; // NON-NLS
-
 	@Test
 	public void testProperties() {
 		Map<String, String> propertiesMap = new HashMap<String, String>() {
+			private static final long serialVersionUID = -8871102284218988719L;
+
 			{
-				put(WmqParserProperties.PROP_SIG_DELIM, DELIM);
+				put(WmqParserProperties.PROP_NAMESPACE_AWARE, "false");
 			}
 		};
 		MessageActivityXmlParser parser = new MessageActivityXmlParser();
 		parser.setProperties(propertiesMap.entrySet());
-		assertEquals(DELIM, parser.sigDelim);
+		assertEquals(false, parser.namespaceAware);
 	}
 
 	@Test

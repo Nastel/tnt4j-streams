@@ -80,8 +80,6 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * names if possible and field/locator data type is 'String' (meaning translated value can be assigned to field). If
  * value of particular field should be left as number (e.g., {@code ReasonCode}), use field/locator attribute
  * {@code datatype="Number"}. Default value - {@code true}. (Optional)</li>
- * <li>SignatureDelim - signature fields delimiter. Default value -
- * {@value com.jkoolcloud.tnt4j.streams.parsers.GenericActivityParser#DEFAULT_DELIM}. (Optional)</li>
  * </ul>
  * <p>
  * This activity parser supports those activity field locator types:
@@ -93,7 +91,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Expression}</li>
  * </ul>
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  */
 public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(ActivityPCFParser.class);
@@ -104,7 +102,6 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 	private static final String MQ_TMP_CTX_STRUCT_PREF = "MQ_TMP_CTX_"; // NON-NLS
 
 	private boolean translateNumValues = true;
-	private String sigDelim = DEFAULT_DELIM;
 
 	/**
 	 * Constructs a new ActivityPCFParser.
@@ -127,12 +124,6 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityParser.setting", name, value);
-		} else if (WmqParserProperties.PROP_SIG_DELIM.equalsIgnoreCase(name)) {
-			if (StringUtils.isNotEmpty(value)) {
-				sigDelim = value;
-				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"ActivityParser.setting", name, value);
-			}
 		}
 	}
 
@@ -140,9 +131,6 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 	public Object getProperty(String name) {
 		if (WmqParserProperties.PROP_TRANSLATE_NUM_VALUES.equalsIgnoreCase(name)) {
 			return translateNumValues;
-		}
-		if (WmqParserProperties.PROP_SIG_DELIM.equalsIgnoreCase(name)) {
-			return sigDelim;
 		}
 
 		return super.getProperty(name);
@@ -1409,8 +1397,8 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 	 * <p>
 	 * This method applies custom handling for setting field values. This method will construct the signature to use for
 	 * the message from the specified value, which is assumed to be a string containing the inputs required for the
-	 * message signature calculation, with each input separated by the delimiter specified in property
-	 * {@code SignatureDelim}.
+	 * message signature calculation, with each input delimited by field property
+	 * {@link com.jkoolcloud.tnt4j.streams.fields.ActivityField#getSeparator()} defined delimiter.
 	 * <p>
 	 * To initiate signature calculation as a field value, {@code field} tag {@code value-type} attribute value has be
 	 * set to {@value com.jkoolcloud.tnt4j.streams.utils.WmqStreamConstants#VT_SIGNATURE}.
@@ -1422,7 +1410,7 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 		if (WmqStreamConstants.VT_SIGNATURE.equalsIgnoreCase(field.getValueType())) {
 			logger().log(OpLevel.DEBUG, StreamsResources.getString(WmqStreamConstants.RESOURCE_BUNDLE_NAME,
 					"ActivityPCFParser.calculating.signature"), field);
-			value = WmqUtils.computeSignature(value, sigDelim, logger());
+			value = WmqUtils.computeSignature(value, field.getSeparator(), logger());
 		}
 
 		super.applyFieldValue(ai, field, value);
