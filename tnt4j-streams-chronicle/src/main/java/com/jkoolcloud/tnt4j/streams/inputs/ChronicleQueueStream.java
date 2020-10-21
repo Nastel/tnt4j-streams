@@ -136,7 +136,8 @@ public class ChronicleQueueStream extends TNTParseableInputStream<Object> {
 		tailer = queue.createTailer();
 
 		if (startFromLatest) {
-			tailer.toEnd();
+			readOne0(tailer); // dummy read, seems that going to end without reading fails
+			ExcerptTailer excerptTailer = tailer.toEnd();
 		}
 
 		pauser = Pauser.balanced();
