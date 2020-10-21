@@ -151,5 +151,19 @@ public class TimestampFormatterTest {
 			tpe = pe;
 		}
 		assertTrue(tpe != null);
+		tpe = null;
+		try {
+			UsecTimestamp ts6 = TimestampFormatter.parse("yyyyMMdd HH:mm:ss.SSS", "", null, null);
+		} catch (ParseException pe) {
+			tpe = pe;
+		}
+		assertTrue(tpe != null);
+		tpe = null;
+		try {
+			UsecTimestamp ts7 = TimestampFormatter.parse("yyyyMMdd HH:mm:ss.SSS", null, null, null);
+		} catch (ParseException pe) {
+			tpe = pe;
+		}
+		assertTrue(tpe != null);
 	}
 }
