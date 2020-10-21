@@ -9,7 +9,7 @@
         <field name="EventType" value="EVENT"/>
         <field name="ResourceName" locator="FileName" locator-type="StreamProp"/>
 
-        <field name="StartTime" locator="$.ibm_datetime" format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" locator-type="Label" timezone="GMT"/>
+        <field name="StartTime" locator="$.ibm_datetime" format="yyyy-MM-dd'T'HH:mm:ss.SSSX" locator-type="Label"/>
         <field name="Process" locator="$.ibm_processName" locator-type="Label"/>
         <field name="ProcessId" locator="$.ibm_processId" locator-type="Label"/>
         <field name="ThreadId" locator="$.ibm_threadId" locator-type="Label"/>

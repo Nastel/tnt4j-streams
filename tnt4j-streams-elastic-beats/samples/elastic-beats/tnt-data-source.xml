@@ -7,9 +7,7 @@
         <field name="EventType" value="EVENT"/>
 
         <field name="StartTime">
-            <field-locator locator="@timestamp" locator-type="Label" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-                           timezone="GMT">
-            </field-locator>
+            <field-locator locator="@timestamp" locator-type="Label" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSSX"/>
         </field>
 
         <field name="EventName" formattingPattern="{0} {1}">

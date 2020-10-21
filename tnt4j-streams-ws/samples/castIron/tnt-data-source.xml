@@ -29,7 +29,7 @@
 
         <field name="StartTime">
             <field-locator locator="/*[local-name() = 'logs']/*[local-name() = 'timestamp']" locator-type="Label" datatype="DateTime"
-                           format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT">
+                           format="yyyy-MM-dd'T'HH:mm:ss.SSSX">
                 <field-transform name="PadDateTimeMillis" lang="groovy" phase="raw">
                     <![CDATA[
                         regex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
@@ -85,7 +85,7 @@
         </field>
 
         <field name="StartTime" locator="/ns3:logs/ns2:timestamp" locator-type="Label" datatype="DateTime"
-               format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT" required="false"/>
+               format="yyyy-MM-dd'T'HH:mm:ss.SSSX" required="false"/>
 
     </parser>
 
@@ -119,9 +119,9 @@
         <field name="CastIronType" value="Jobs"/>
 
         <field name="StartTime" locator="/*[local-name() = 'jobs']/@startTime" locator-type="Label" datatype="DateTime"
-               format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT"/>
+               format="yyyy-MM-dd'T'HH:mm:ss.SSSX"/>
         <field name="EndTime" locator="/*[local-name() = 'jobs']/@endTime" locator-type="Label" datatype="DateTime"
-               format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" timezone="GMT"/>
+               format="yyyy-MM-dd'T'HH:mm:ss.SSSX"/>
 
         <field name="ResourceName" locator="/*[local-name() = 'jobs']/@path" locator-type="Label"/>
         <field name="Correlator" locator="/*[local-name() = 'jobs']/@id" locator-type="Label"/>

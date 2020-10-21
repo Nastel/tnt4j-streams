@@ -2064,8 +2064,7 @@ Sample stream configuration:
         <field name="EventType" value="EVENT"/>
 
         <field name="StartTime">
-            <field-locator locator="@timestamp" locator-type="Label" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-                           timezone="GMT">
+            <field-locator locator="@timestamp" locator-type="Label" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSSX">
             </field-locator>
         </field>
 
@@ -2784,7 +2783,7 @@ Sample stream configuration:
         <field name="ElapsedTime" value="0" datatype="Number"/>
         <field name="EndTime" locator="/wmb:event/wmb:eventPointData/wmb:eventData/wmb:eventSequence/@wmb:creationTime"
                locator-type="Label"
-               datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'" timezone="GMT"/>
+               datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSSSSSX"/>
         <!--field name="ReasonCode" locator="/wmb:event/wmb:eventPointData/ReasonCode" locator-type="Label" datatype="Number"/-->
         <!-- *** Use following signature definition for WMQ messages ***
         <field name="TrackingId" separator="#!#" value-type="signature">
@@ -2802,7 +2801,8 @@ Sample stream configuration:
           <field-locator locator="/wmb:event/wmb:applicationData/wmb:simpleContent[@wmb:name='PutTime']/@wmb:value" locator-type="Label"/>
         </field>
         -->
-        <!--field name="StartTime" locator="/wmb:event/wmb:eventPointData/wmb:eventData/wmb:eventSequence/@wmb:creationTime" locator-type="Label" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'" timestamp="GMT"/-->
+        <!--field name="StartTime" locator="/wmb:event/wmb:eventPointData/wmb:eventData/wmb:eventSequence/@wmb:creationTime" 
+            locator-type="Label" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSSSSSX"/-->
         <field name="CompCode" locator="/wmb:event/wmb:eventPointData/wmb:eventData/wmb:eventIdentity/@wmb:eventName"
                locator-type="Label">
             <field-map source="FlowRollback" target="ERROR"/>
@@ -3961,7 +3961,7 @@ Sample stream configuration:
         <field name="EventType" value="EVENT"/>
         <field name="ResourceName" locator="FileName" locator-type="StreamProp"/>
 
-        <field name="StartTime" locator="$.ibm_datetime" format="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" locator-type="Label"/>
+        <field name="StartTime" locator="$.ibm_datetime" format="yyyy-MM-dd'T'HH:mm:ss.SSSX" locator-type="Label"/>
         <field name="Process" locator="$.ibm_processName" locator-type="Label"/>
         <field name="ProcessId" locator="$.ibm_processId" locator-type="Label"/>
         <field name="ThreadId" locator="$.ibm_threadId" locator-type="Label"/>

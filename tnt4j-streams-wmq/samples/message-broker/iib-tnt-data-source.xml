@@ -72,9 +72,9 @@
         </field>
 
         <!-- ElapsedTime ? EndTime ?-->
-        <!--<field name="ElapsedTime" value="0" datatype="Number"/> -->
-        <!-- <field name="EndTime" locator="/wmb:event/wmb:eventPointData/wmb:eventData/wmb:eventSequence/@wmb:creationTime"
-               locator-type="Label" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'" timezone="GMT"/> -->
+        <!--field name="ElapsedTime" value="0" datatype="Number"/-->
+        <!--field name="EndTime" locator="/wmb:event/wmb:eventPointData/wmb:eventData/wmb:eventSequence/@wmb:creationTime"
+               locator-type="Label" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSSSSSX|yyyy-MM-dd'T'HH:mm:ssX"/-->
 
         <!--field name="ReasonCode" locator="/wmb:event/wmb:eventPointData/ReasonCode" locator-type="Label" datatype="Number"/-->
 
@@ -117,7 +117,7 @@
         </field>
     -->
         <field name="StartTime" locator="/wmb:event/wmb:eventPointData/wmb:eventData/wmb:eventSequence/@wmb:creationTime"
-               locator-type="Label" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'" timezone="GMT"/>
+               locator-type="Label" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSSSSSX|yyyy-MM-dd'T'HH:mm:ssX"/>
         <field name="CompCode" locator="/wmb:event/wmb:eventPointData/wmb:eventData/wmb:eventIdentity/@wmb:eventName" locator-type="Label">
             <field-map source="FlowRollback" target="ERROR"/>
             <field-map source="" target="SUCCESS"/>
