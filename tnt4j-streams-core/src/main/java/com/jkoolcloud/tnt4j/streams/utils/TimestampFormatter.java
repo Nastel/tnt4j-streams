@@ -484,7 +484,13 @@ public class TimestampFormatter {
 				return new UsecTimestamp(dateStr, patterns[i], timeZoneId, locale);
 			} catch (ParseException pe) {
 				if (i == patterns.length - 1) {
-					throw pe;
+					ParseException dpe = new ParseException(
+							StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+									"TimestampFormatter.failed.parsing2", dateStr, pattern),
+							pe.getErrorOffset());
+					// dpe.initCause(pe);
+
+					throw dpe;
 				}
 			}
 		}
