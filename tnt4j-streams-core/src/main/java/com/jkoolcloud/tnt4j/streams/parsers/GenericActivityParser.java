@@ -478,26 +478,27 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		for (ActivityField.FieldParserReference spRef : sParsers) {
 			GenericActivityParser<?> sParser = (GenericActivityParser<?>) spRef.getParser();
 
-			if (sParser == pParser) {
-				continue;
-			}
+			if (sParser != pParser) {
+				for (ActivityField spf : sParser.fieldList) {
+					ActivityField pmf = getFieldByRef(fieldsMap, spf.getFieldTypeName());
 
-			for (ActivityField spf : sParser.fieldList) {
-				ActivityField pmf = getFieldByRef(fieldsMap, spf.getFieldTypeName());
+					fieldsMap.put(fieldKey(spf), spf);
 
-				fieldsMap.put(fieldKey(spf), spf);
+					if (pmf != null && spRef.getAggregationType() == AggregationType.Merge) {
+						if (pmf.getParser() != spf.getParser()) {
+							StreamFieldType fieldType = pmf.getFieldType();
 
-				if (pmf != null && spRef.getAggregationType() == AggregationType.Merge) {
-					StreamFieldType fieldType = pmf.getFieldType();
-
-					if (!Utils.isCollectionType(fieldType == null ? null : fieldType.getDataType())) {
-						logger().log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-								"ActivityParser.stacked.field.conflict", f.getParser().getName(), f,
-								spf.getParser().getName(), spf, pmf.getParser().getName(), pmf);
+							if (!Utils.isCollectionType(fieldType == null ? null : fieldType.getDataType())) {
+								logger().log(OpLevel.WARNING,
+										StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+										"ActivityParser.stacked.field.conflict", f.getParser().getName(), f,
+										spf.getParser().getName(), spf, pmf.getParser().getName(), pmf);
+							}
+						}
 					}
-				}
 
-				collectStackedParsersFields(fieldsMap, spf, sParser);
+					collectStackedParsersFields(fieldsMap, spf, sParser);
+				}
 			}
 		}
 	}
