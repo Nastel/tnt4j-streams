@@ -183,49 +183,11 @@
             <version>${jackson.version}</version>
         </dependency>
 
-        <!--dependency>
-            <groupId>org.msgpack</groupId>
-            <artifactId>msgpack-core</artifactId>
-            <version>${msgpack.version}</version>
-        </dependency-->
-        <!--<dependency>-->
-        <!--<groupId>org.apache.storm</groupId>-->
-        <!--<artifactId>storm-core</artifactId>-->
-        <!--<version>1.1.0</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>org.apache.spark</groupId>-->
-        <!--<artifactId>spark-streaming_2.10</artifactId>-->
-        <!--<version>2.1.1</version>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-        <!--<groupId>com.google.protobuf</groupId>-->
-        <!--<artifactId>protobuf-java</artifactId>-->
-        <!--<version>3.1.0</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>org.apache.thrift</groupId>-->
-        <!--<artifactId>libthrift</artifactId>-->
-        <!--<version>0.9.3</version>-->
-        <!--<type>pom</type>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>org.apache.avro</groupId>-->
-        <!--<artifactId>avro</artifactId>-->
-        <!--<version>1.8.1</version>-->
-        <!--</dependency>-->
-
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-jsr223</artifactId>
             <version>${groovy.version}</version>
-        </dependency>
-        <!--<dependency>-->
-        <!--<groupId>xalan</groupId>-->
-        <!--<artifactId>xalan</artifactId>-->
-        <!--<version>2.7.2</version>-->
-        <!--</dependency>-->
+        </dependency>        
         <dependency>
             <groupId>com.schibsted.spt.data</groupId>
             <artifactId>jslt</artifactId>
