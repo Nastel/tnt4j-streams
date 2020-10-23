@@ -31,7 +31,6 @@ import javax.xml.xpath.*;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.*;
@@ -125,7 +124,7 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 	 * @throws ParserConfigurationException
 	 *             if any errors configuring the parser
 	 */
-	protected synchronized void intXmlParser(Map<String, String> uNamespaces) throws ParserConfigurationException {
+	protected synchronized void initXmlParser(Map<String, String> uNamespaces) throws ParserConfigurationException {
 		DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
 		domFactory.setNamespaceAware(namespaceAware);
 		domFactory.setValidating(false);
@@ -192,7 +191,7 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 		}
 
 		try {
-			intXmlParser(uNamespaces);
+			initXmlParser(uNamespaces);
 		} catch (ParserConfigurationException exc) {
 			throw new RuntimeException(exc);
 		}
@@ -248,9 +247,8 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 				if (namespaceAware) {
 					Document tDoc = xmlDoc.getOwnerDocument();
 					// Element docElem = tDoc == null ? null : tDoc.getDocumentElement();
-					if (tDoc == null || StringUtils.isEmpty(tDoc.getNamespaceURI())) {
-						xmlDoc = parseXmlDoc(new ReaderInputStream(new StringReader(Utils.documentToString(xmlDoc)),
-								StandardCharsets.UTF_8));
+					if (tDoc != null && StringUtils.isEmpty(tDoc.getNamespaceURI())) {
+						xmlDoc = nodeToDoc(xmlDoc);
 					}
 				}
 			} else {
@@ -412,6 +410,19 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 		builderLock.lock();
 		try {
 			return builder.parse(ins);
+		} finally {
+			builderLock.unlock();
+		}
+	}
+
+	private Node nodeToDoc(Node node) throws SAXException, IOException {
+		builderLock.lock();
+		try {
+			Document newDocument = builder.newDocument();
+			Node importedNode = newDocument.importNode(node, true);
+			newDocument.appendChild(importedNode);
+
+			return newDocument;
 		} finally {
 			builderLock.unlock();
 		}

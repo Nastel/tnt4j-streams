@@ -328,8 +328,8 @@ public class ActivityXmlParserTest extends GenericActivityParserTestBase<Activit
 				return node;
 			}
 		};
-		parser.intXmlParser(new HashMap<>());
-		stackedParser.intXmlParser(new HashMap<>());
+		parser.initXmlParser(new HashMap<>());
+		stackedParser.initXmlParser(new HashMap<>());
 		String data = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 				+ "<root xmlns:foo=\"http://www.foo.org/\" xmlns:bar=\"http://www.bar.org\">\n" + "\t<employees>\n"
 				+ "\t\t<employee id=\"1\">Johnny Dapp</employee>\n" + "\t\t<employee id=\"2\">Al Pacino</employee>\n"
