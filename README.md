@@ -50,7 +50,6 @@ All you need is to define your data format mapping to TNT4J event mapping in TNT
     * Node.js
     * Collectd
     * Nagios
-    * Fluentd
     * Elastic Beats
 
     just by applying configuration and without additional coding.
@@ -4167,10 +4166,6 @@ Sample files can be found in `samples/zip-fs-file-lines` directory (`tnt4j-strea
 `sample.zip` file contains set of compressed Apache access log files.
 
 See sample [data source configuration](./tnt4j-streams-fs/samples/zip-fs-file-lines/tnt-data-source.xml).
-
-#### Fluentd logs streaming
-
-TODO
 
 #### Integrating TNT4J-Streams into custom API
 
