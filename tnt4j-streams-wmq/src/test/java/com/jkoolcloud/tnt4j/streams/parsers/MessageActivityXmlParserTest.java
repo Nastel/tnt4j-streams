@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.parsers;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,18 +45,21 @@ public class MessageActivityXmlParserTest {
 		};
 		MessageActivityXmlParser parser = new MessageActivityXmlParser();
 		parser.setProperties(propertiesMap.entrySet());
-		assertEquals(false, parser.namespaceAware);
+		assertEquals("Unexpected NamespaceAware property value", false, parser.namespaceAware);
 	}
 
 	@Test
 	public void testApplyFieldValue() throws Exception {
 		MessageActivityXmlParser parser = new MessageActivityXmlParser();
-		ActivityInfo ai = mock(ActivityInfo.class);
+		ActivityInfo ai = new ActivityInfo();
 		ActivityField field = mock(ActivityField.class);
 		Object value = "1, TEST, TEST, TEST,TEST, TEST, TEST, TEST"; // NON-NLS
 		when(field.getFieldType()).thenReturn(StreamFieldType.Correlator);
+		when(field.aggregateFieldValue(value, ai)).thenReturn(value);
 		parser.applyFieldValue(ai, field, value);
 		verify(field).getFieldType();
+		Collection<String> correl = ai.getCorrelator();
+		assertEquals("Correlators count not match", 2, correl.size());
 	}
 
 	@Test
