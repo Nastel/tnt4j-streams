@@ -112,9 +112,9 @@
                         <includes>
                             <include>**/*.*</include>
                         </includes>
-                        <!--<excludes>-->
-                        <!--<exclude>**/tnt4j*.properties</exclude>-->
-                        <!--</excludes>-->
+                        <excludes>
+                            <exclude>**/tnt4j*.properties</exclude>
+                        </excludes>
                         <outputDirectory>config</outputDirectory>
                         <lineEnding>${assembly.line.endings}</lineEnding>
                     </fileSet>
