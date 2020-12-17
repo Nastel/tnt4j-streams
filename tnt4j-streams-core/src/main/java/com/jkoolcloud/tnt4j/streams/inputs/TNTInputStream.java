@@ -589,7 +589,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 		synchronized (streamItemAccountingListeners) {
 			for (StreamItemAccountingListener streamItemAccountingListener : streamItemAccountingListeners) {
 				streamItemAccountingListener.onBytesStreamed(bytesCount);
-				streamItemAccountingListener.updateTotal(getTotalBytes());
+				streamItemAccountingListener.updateTotal(this, getTotalBytes(), getTotalActivities());
 			}
 		}
 	}
@@ -607,7 +607,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 	/**
 	 * Returns average stream rate in activities per second.
-	 * 
+	 *
 	 * @return average stream rate in activities per second
 	 */
 	public double getAverageActivityRate() {
@@ -824,7 +824,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 	/**
 	 * Checks if stream has been started shot down process.
-	 * 
+	 *
 	 * @return {@code true} if stream already has end time set, {@code false} - otherwise
 	 */
 	protected boolean isShotDown() {
@@ -904,7 +904,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 	/**
 	 * Marks start of some stream processing task, e.g. parsing, data polling, etc.
-	 * 
+	 *
 	 * @see #endProcessingTask()
 	 */
 	protected void startProcessingTask() {
@@ -913,7 +913,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 	/**
 	 * Marks end of some stream processing task.
-	 * 
+	 *
 	 * @see #startProcessingTask()
 	 */
 	protected void endProcessingTask() {
@@ -922,7 +922,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 	/**
 	 * Returns flag indicating if stream has any pending tasks on executor service queue.
-	 * 
+	 *
 	 * @return {@code true} if executor service is running and executor tasks queue is not empty, {@code false} -
 	 *         otherwise
 	 */
@@ -932,9 +932,9 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 	/**
 	 * Returns flag indicating if there are some currently running stream processing tasks.
-	 * 
+	 *
 	 * @return {@code true} if stream has running any processing tasks, {@code false} - otherwise.
-	 * 
+	 *
 	 * @see #processingCount()
 	 */
 	protected boolean isProcessing() {
@@ -943,7 +943,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 	/**
 	 * Returns number of currently running stream processing tasks.
-	 * 
+	 *
 	 * @return number of currently running stream processing tasks
 	 */
 	protected int processingCount() {
@@ -953,10 +953,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	/**
 	 * Returns flag indicating if stream has no currently running stream processing tasks and pending executor service
 	 * tasks.
-	 * 
+	 *
 	 * @return {@code true} if stream has no currently running stream processing tasks and pending executor service
 	 *         tasks, {@code false} - otherwise
-	 * 
+	 *
 	 * @see #isProcessing()
 	 * @see #hasPendingExecutions()
 	 */

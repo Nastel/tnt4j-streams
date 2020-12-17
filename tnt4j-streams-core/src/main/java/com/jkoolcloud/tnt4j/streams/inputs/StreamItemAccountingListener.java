@@ -56,9 +56,14 @@ public interface StreamItemAccountingListener {
 	/**
 	 * Updates total count of bytes to be streamed.
 	 *
+	 * @param stream
+	 *            stream instance updating totals
 	 * @param bytes
 	 *            total count of bytes to be streamed
+	 * @param activities
+	 *            total count of activities to be streamed
+	 * 
 	 */
-	void updateTotal(long bytes);
+	void updateTotal(TNTInputStream<?, ?> stream, long bytes, int activities);
 
 }

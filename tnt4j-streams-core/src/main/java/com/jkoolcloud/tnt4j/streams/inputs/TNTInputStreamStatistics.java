@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -69,7 +68,7 @@ public class TNTInputStreamStatistics
 			.createsObjectNamesWith(new StreamsStatsObjectNameFactory()).build();
 	private TNTInputStream<?, ?> refStream = null;
 
-	private Long bytesTotalValue = 0L;
+	private Map<String, StreamTotals> streamTotalsMap = new HashMap<>();
 	private Integer reporterCount;
 
 	private Slf4jReporter sfl4jReporter;
@@ -80,13 +79,14 @@ public class TNTInputStreamStatistics
 	private Counter skippedActivitiesCount;
 	private Counter filteredActivitiesCount;
 	private Counter lostActivitiesCount;
-	private Meter totalActivities;
+	private Meter currentActivity;
 	private Counter processedActivitiesCount;
 	private Counter outputEvents;
 	private Counter outputActivities;
 	private Counter outputSnapshots;
 	private Counter outputOther;
 	private Gauge<Long> bytesTotal;
+	private Gauge<Integer> activitiesTotal;
 	private Counter bytesStreamed;
 
 	private TNTInputStreamStatistics() {
@@ -137,7 +137,7 @@ public class TNTInputStreamStatistics
 		skippedActivitiesCount = metrics.counter(streamName + ":skipped entities"); // NON-NLS
 		filteredActivitiesCount = metrics.counter(streamName + ":filtered entities"); // NON-NLS
 		lostActivitiesCount = metrics.counter(streamName + ":lost entities"); // NON-NLS
-		totalActivities = metrics.meter(streamName + ":total entities"); // NON-NLS
+		currentActivity = metrics.meter(streamName + ":current entity"); // NON-NLS
 		processedActivitiesCount = metrics.counter(streamName + ":processed entities"); // NON-NLS
 
 		outputEvents = metrics.counter(streamName + ":output:events"); // NON-NLS
@@ -151,6 +151,13 @@ public class TNTInputStreamStatistics
 				return getTotalBytesCount();
 			}
 		});
+		activitiesTotal = metrics.register(streamName + ":total activities", new Gauge<Integer>() { // NON-NLS
+			@Override
+			public Integer getValue() {
+				return getTotalActivitiesCount();
+			}
+		});
+
 		bytesStreamed = metrics.counter(streamName + ":bytes streamed"); // NON-NLS
 	}
 
@@ -265,7 +272,7 @@ public class TNTInputStreamStatistics
 	 * @return currently processed activity item index
 	 */
 	public int getCurrentActivity() {
-		return new Long(totalActivities.getCount()).intValue();
+		return (int) currentActivity.getCount();
 	}
 
 	/**
@@ -275,11 +282,17 @@ public class TNTInputStreamStatistics
 	 * @return total size in bytes of activity data items
 	 */
 	public long getTotalBytesCount() {
-		if (refStream == null) {
-			return streamStatistics.values().stream()
-					.collect(Collectors.summingLong(s -> s.refStream == null ? 0 : s.refStream.getTotalBytes()));
-		}
-		return bytesTotalValue;
+		return streamTotalsMap.values().stream().mapToLong(s -> s == null ? 0 : s.bytesTotalValue).sum();
+	}
+
+	/**
+	 * Returns count of activity items available to stream. If total activities count can't be determined, then
+	 * {@code -1} is returned.
+	 * 
+	 * @return total count of activities to be processed by steam
+	 */
+	public int getTotalActivitiesCount() {
+		return streamTotalsMap.values().stream().mapToInt(s -> s == null ? 0 : s.activitiesTotalValue).sum();
 	}
 
 	/**
@@ -298,8 +311,8 @@ public class TNTInputStreamStatistics
 	 * @return new value of current activity index
 	 */
 	protected int incrementCurrentActivitiesCount() {
-		getMainStatisticsModule().totalActivities.mark();
-		totalActivities.mark();
+		getMainStatisticsModule().currentActivity.mark();
+		currentActivity.mark();
 		return getCurrentActivity();
 	}
 
@@ -340,8 +353,20 @@ public class TNTInputStreamStatistics
 	}
 
 	@Override
-	public void updateTotal(long bytes) {
-		bytesTotalValue = bytes;
+	public void updateTotal(TNTInputStream<?, ?> stream, long bytes, int activities) {
+		getMainStatisticsModule().updateTotalsEntry(stream, bytes, activities);
+		updateTotalsEntry(stream, bytes, activities);
+	}
+
+	private void updateTotalsEntry(TNTInputStream<?, ?> stream, long bytes, int activities) {
+		StreamTotals st = streamTotalsMap.get(stream.getName());
+		if (st == null) {
+			st = new StreamTotals();
+			streamTotalsMap.put(stream.getName(), st);
+		}
+
+		st.bytesTotalValue = bytes;
+		st.activitiesTotalValue = activities;
 	}
 
 	// /**
@@ -515,5 +540,10 @@ public class TNTInputStreamStatistics
 				}
 			}
 		}
+	}
+
+	private static class StreamTotals {
+		private Long bytesTotalValue = 0L;
+		private Integer activitiesTotalValue = -1;
 	}
 }
