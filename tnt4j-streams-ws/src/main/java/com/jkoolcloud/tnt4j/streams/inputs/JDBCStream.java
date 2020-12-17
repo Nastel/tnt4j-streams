@@ -367,13 +367,11 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 			dbConfig.setUsername(user);
 			dbConfig.setPassword(pass);
 
-			Properties dsProps = new Properties();
 			for (Map.Entry<String, String> dsProp : dsProperties.entrySet()) {
-				dsProps.put(dsProp.getKey().substring(DS_PROP_PREFIX.length()), dsProp.getValue());
+				dbConfig.addDataSourceProperty(dsProp.getKey().substring(DS_PROP_PREFIX.length()), dsProp.getValue());
 			}
 
 			hds = new HikariDataSource(dbConfig);
-			((HikariDataSource) hds).setDataSourceProperties(dsProps);
 
 			dbDataSources.put(url, hds);
 		}
