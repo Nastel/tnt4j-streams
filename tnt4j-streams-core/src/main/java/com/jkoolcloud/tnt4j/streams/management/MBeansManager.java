@@ -42,7 +42,12 @@ public class MBeansManager {
 	public static void registerMBeans() {
 		try {
 			MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-			server.registerMBean(STREAMS_AGENT_MBEAN, STREAMS_AGENT_MBEAN.getName());
+			if (!server.isRegistered(STREAMS_AGENT_MBEAN.getName())) {
+				server.registerMBean(STREAMS_AGENT_MBEAN, STREAMS_AGENT_MBEAN.getName());
+			} else {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						"MBeansManager.already.registered", STREAMS_AGENT_MBEAN.getName());
+			}
 		} catch (Exception exc) {
 			Utils.logThrowable(LOGGER, OpLevel.WARNING,
 					StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "MBeansManager.register.fail",
@@ -56,7 +61,12 @@ public class MBeansManager {
 	public static void unregisterMBeans() {
 		try {
 			MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-			server.unregisterMBean(STREAMS_AGENT_MBEAN.getName());
+			if (server.isRegistered(STREAMS_AGENT_MBEAN.getName())) {
+				server.unregisterMBean(STREAMS_AGENT_MBEAN.getName());
+			} else {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						"MBeansManager.not.registered", STREAMS_AGENT_MBEAN.getName());
+			}
 		} catch (Exception exc) {
 			Utils.logThrowable(LOGGER, OpLevel.WARNING,
 					StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "MBeansManager.unregister.fail",
