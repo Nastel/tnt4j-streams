@@ -504,6 +504,31 @@ public final class StreamsCache {
 	}
 
 	/**
+	 * Finds all cache stored values having keys prefixed with {@code keyPrefix} string and puts them into new map
+	 * instance. All found values are removed from this cache afterwards.
+	 * 
+	 * @param keyPrefix
+	 *            cache value entry key prefix
+	 * @return cache values map, having keys prefixed with {@code keyPrefix} string
+	 */
+	public static Map<String, Object> drainValuesStarting(String keyPrefix) {
+		Map<String, Object> vMap = new HashMap<>();
+
+		if (valuesCache != null) {
+			Map<String, CacheValue> cEntries = valuesCache.asMap();
+			for (Map.Entry<String, CacheValue> ce : cEntries.entrySet()) {
+				if (ce.getKey().startsWith(keyPrefix)) {
+					vMap.put(ce.getKey(), ce.getValue().value());
+				}
+			}
+
+			valuesCache.invalidateAll(vMap.keySet());
+		}
+
+		return vMap;
+	}
+
+	/**
 	 * Defines cache entry pattern.
 	 */
 	public static class CacheEntry {
