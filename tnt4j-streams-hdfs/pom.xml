@@ -37,7 +37,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <!--<index>true</index>-->
@@ -63,10 +63,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <skipSource>${skip.source.pack}</skipSource>
-                </configuration>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -99,8 +96,8 @@
                     <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jsr305</artifactId>
-                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>commons-net</artifactId>
+                    <groupId>commons-net</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>gson</artifactId>
@@ -127,8 +124,8 @@
                     <groupId>org.apache.commons</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>snappy-java</artifactId>
-                    <groupId>org.xerial.snappy</groupId>
+                    <artifactId>nimbus-jose-jwt</artifactId>
+                    <groupId>com.nimbusds</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>zookeeper</artifactId>

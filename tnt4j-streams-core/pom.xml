@@ -25,7 +25,7 @@
 
         <jesl.version>0.10-SNAPSHOT</jesl.version>
 
-        <httpcomponents.version>4.5.12</httpcomponents.version>
+        <httpcomponents.version>4.5.13</httpcomponents.version>
         <zookeeper.version>3.6.2</zookeeper.version>
 
         <groovy.version>3.0.6</groovy.version>
@@ -88,7 +88,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <!--<index>true</index>-->
@@ -118,10 +118,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <skipSource>${skip.source.pack}</skipSource>
-                </configuration>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -169,10 +166,6 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.ow2.asm</groupId>
-                    <artifactId>asm</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
