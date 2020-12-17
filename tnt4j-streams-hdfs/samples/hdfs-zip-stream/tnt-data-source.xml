@@ -10,7 +10,7 @@
 
         <field name="Location" locator="1" locator-type="Index"/>
         <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="7" locator-type="Index"/>
         <field name="ResourceName" locator="8" locator-type="Index"/>
@@ -33,7 +33,7 @@
 
         <field name="Location" locator="1" locator-type="Index"/>
         <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="7" locator-type="Index"/>
         <field name="ResourceName" locator="8" locator-type="Index"/>

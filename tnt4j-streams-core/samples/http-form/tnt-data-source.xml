@@ -6,7 +6,7 @@
     <parser name="SampleFormDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="Location" locator="clientip" locator-type="Label"/>
         <field name="UserName" locator="auth" locator-type="Label"/>
-        <field name="StartTime" locator="timestamp" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss z"
+        <field name="StartTime" locator="timestamp" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime"
                locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="verb" locator-type="Label"/>

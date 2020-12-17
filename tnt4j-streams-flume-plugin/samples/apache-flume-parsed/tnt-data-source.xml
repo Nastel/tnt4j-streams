@@ -8,7 +8,7 @@
 
         <field name="Location" locator="$.headers.clientip" locator-type="Label"/>
         <field name="UserName" locator="$.headers.auth" locator-type="Label"/>
-        <field name="StartTime" locator="$.headers.logtime" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss z"
+        <field name="StartTime" locator="$.headers.logtime" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime"
                locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="$.headers.method" locator-type="Label"/>

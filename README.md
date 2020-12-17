@@ -1307,7 +1307,7 @@ Sample stream configuration:
 
         <field name="Location" locator="1" locator-type="Index"/>
         <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="7" locator-type="Index"/>
         <field name="ResourceName" locator="8" locator-type="Index"/>
@@ -1330,7 +1330,7 @@ Sample stream configuration:
 
         <field name="Location" locator="1" locator-type="Index"/>
         <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="7" locator-type="Index"/>
         <field name="ResourceName" locator="8" locator-type="Index"/>
@@ -1387,7 +1387,7 @@ Sample stream configuration:
 
         <field name="Location" locator="1" locator-type="Index"/>
         <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="7" locator-type="Index"/>
         <field name="ResourceName" locator="8" locator-type="Index"/>
@@ -1410,7 +1410,7 @@ Sample stream configuration:
 
         <field name="Location" locator="1" locator-type="Index"/>
         <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="7" locator-type="Index"/>
         <field name="ResourceName" locator="8" locator-type="Index"/>
@@ -1489,7 +1489,7 @@ Sample stream configuration:
 
         <field name="Location" locator="1" locator-type="Index"/>
         <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="7" locator-type="Index"/>
         <field name="ResourceName" locator="8" locator-type="Index"/>
@@ -1512,7 +1512,7 @@ Sample stream configuration:
 
         <field name="Location" locator="1" locator-type="Index"/>
         <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="7" locator-type="Index"/>
         <field name="ResourceName" locator="8" locator-type="Index"/>
@@ -1585,7 +1585,7 @@ Sample stream configuration:
 
         <field name="Location" locator="hostname" locator-type="Label"/>
         <field name="UserName" locator="user" locator-type="Label"/>
-        <field name="StartTime" locator="time" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="time" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="method" locator-type="Label"/>
         <field name="ResourceName" locator="uri" locator-type="Label"/>
@@ -1607,7 +1607,7 @@ Sample stream configuration:
 
         <field name="Location" locator="hostname" locator-type="Label"/>
         <field name="UserName" locator="user" locator-type="Label"/>
-        <field name="StartTime" locator="time" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="time" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="method" locator-type="Label"/>
         <field name="ResourceName" locator="uri" locator-type="Label"/>
@@ -1680,7 +1680,7 @@ Sample stream configuration:
 
         <field name="Location" locator="1" locator-type="Index"/>
         <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="7" locator-type="Index"/>
         <field name="ResourceName" locator="8" locator-type="Index"/>
@@ -1799,7 +1799,7 @@ Sample stream configuration:
 
         <field name="Location" locator="1" locator-type="Index"/>
         <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="7" locator-type="Index"/>
         <field name="ResourceName" locator="8" locator-type="Index"/>
@@ -1870,8 +1870,7 @@ Sample stream configuration:
 
         <field name="Location" locator="$.headers.clientip" locator-type="Label"/>
         <field name="UserName" locator="$.headers.auth" locator-type="Label"/>
-        <field name="StartTime" locator="$.headers.logtime" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss z"
-               locale="en-US"/>
+        <field name="StartTime" locator="$.headers.logtime" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="$.headers.method" locator-type="Label"/>
         <field name="ResourceName" locator="$.headers.param" locator-type="Label"/>
@@ -1933,7 +1932,7 @@ Sample stream configuration:
 
         <field name="Location" locator="1" locator-type="Index"/>
         <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="7" locator-type="Index"/>
         <field name="ResourceName" locator="8" locator-type="Index"/>
@@ -2005,8 +2004,7 @@ Sample stream configuration:
 
         <field name="Location" locator="$.clientip" locator-type="Label"/>
         <field name="UserName" locator="$.auth" locator-type="Label"/>
-        <field name="StartTime" locator="$.timestamp" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss z"
-               locale="en-US"/>
+        <field name="StartTime" locator="$.timestamp" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="$.verb" locator-type="Label"/>
         <field name="ResourceName" locator="$.request" locator-type="Label"/>
@@ -2128,7 +2126,7 @@ Sample stream configuration:
 
         <field name="Location" locator="1" locator-type="Index"/>
         <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="7" locator-type="Index"/>
         <field name="ResourceName" locator="8" locator-type="Index"/>
@@ -2194,8 +2192,7 @@ Sample stream configuration:
     <parser name="SampleFormDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="Location" locator="clientip" locator-type="Label"/>
         <field name="UserName" locator="auth" locator-type="Label"/>
-        <field name="StartTime" locator="timestamp" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss z"
-               locale="en-US"/>
+        <field name="StartTime" locator="timestamp" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="verb" locator-type="Label"/>
         <field name="ResourceName" locator="request" locator-type="Label"/>
@@ -2252,7 +2249,7 @@ Sample stream configuration:
 
        <field name="Location" locator="1" locator-type="Index"/>
        <field name="UserName" locator="3" locator-type="Index"/>
-       <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+       <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
        <field name="EventType" value="SEND"/>
        <field name="EventName" locator="7" locator-type="Index"/>
        <field name="ResourceName" locator="8" locator-type="Index"/>
@@ -2354,8 +2351,7 @@ Sample stream configuration:
         <field name="Transport" locator="ActivityTransport" locator-type="Label"/>
         <field name="Location" locator="clientip" locator-type="Label"/>
         <field name="UserName" locator="auth" locator-type="Label"/>
-        <field name="StartTime" locator="timestamp" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss z"
-               locale="en-US"/>
+        <field name="StartTime" locator="timestamp" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime"  locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="verb" locator-type="Label"/>
         <field name="ResourceName" locator="request" locator-type="Label"/>
@@ -2443,8 +2439,7 @@ Sample stream configuration:
     <parser name="SampleObjectParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
         <field name="Location" locator="clientip" locator-type="Label"/>
         <field name="UserName" locator="auth" locator-type="Label"/>
-        <field name="StartTime" locator="timestamp" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss z"
-               locale="en-US"/>
+        <field name="StartTime" locator="timestamp" locator-type="Label" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="verb" locator-type="Label"/>
         <field name="ResourceName" locator="request" locator-type="Label"/>
@@ -2544,7 +2539,7 @@ Sample stream configuration:
 
         <field name="Location" locator="1" locator-type="Index"/>
         <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z"  datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="7" locator-type="Index"/>
         <field name="ResourceName" locator="8" locator-type="Index"/>
@@ -2632,7 +2627,7 @@ Sample stream configuration:
 
         <field name="Location" locator="1" locator-type="Index"/>
         <field name="UserName" locator="3" locator-type="Index"/>
-        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss z" locale="en-US"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z"  datatype="DateTime" locale="en-US"/>
         <field name="EventType" value="SEND"/>
         <field name="EventName" locator="7" locator-type="Index"/>
         <field name="ResourceName" locator="8" locator-type="Index"/>
