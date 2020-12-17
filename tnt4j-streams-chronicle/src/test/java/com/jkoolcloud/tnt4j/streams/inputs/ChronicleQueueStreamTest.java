@@ -78,7 +78,7 @@ public class ChronicleQueueStreamTest {
 			}
 
 			@Override
-			public void updateTotal(long bytes) {
+			public void updateTotal(TNTInputStream<?, ?> stream, long bytes, int activities) {
 			}
 		});
 
