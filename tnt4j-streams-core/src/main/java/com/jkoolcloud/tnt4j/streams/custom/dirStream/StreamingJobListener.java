@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.custom.dirStream;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.inputs.StreamingStatus;
+import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStreamStatistics;
 
 /**
@@ -39,26 +40,32 @@ public interface StreamingJobListener {
 	 *
 	 * @param job
 	 *            job sending notification
+	 * @param stream
+	 *            stream sending notification
 	 * @param current
 	 *            index of currently streamed activity item
 	 * @param total
 	 *            total number of activity items to stream
 	 */
-	void onProgressUpdate(StreamingJob job, int current, int total);
+	void onProgressUpdate(StreamingJob job, TNTInputStream<?, ?> stream, int current, int total);
 
 	/**
 	 * This method gets called when streaming job has completed successfully.
 	 *
 	 * @param job
 	 *            job sending notification
+	 * @param stream
+	 *            stream sending notification
 	 */
-	void onSuccess(StreamingJob job);
+	void onSuccess(StreamingJob job, TNTInputStream<?, ?> stream);
 
 	/**
 	 * This method gets called when streaming job process has failed.
 	 *
 	 * @param job
 	 *            job sending notification
+	 * @param stream
+	 *            stream sending notification
 	 * @param msg
 	 *            text message describing failure
 	 * @param exc
@@ -66,33 +73,39 @@ public interface StreamingJobListener {
 	 * @param code
 	 *            failure code
 	 */
-	void onFailure(StreamingJob job, String msg, Throwable exc, String code);
+	void onFailure(StreamingJob job, TNTInputStream<?, ?> stream, String msg, Throwable exc, String code);
 
 	/**
 	 * This method gets called when streaming job status has changed.
 	 *
 	 * @param job
 	 *            job sending notification
+	 * @param stream
+	 *            stream sending notification
 	 * @param status
 	 *            new stream job status value
 	 */
-	void onStatusChange(StreamingJob job, StreamingStatus status);
+	void onStatusChange(StreamingJob job, TNTInputStream<?, ?> stream, StreamingStatus status);
 
 	/**
 	 * This method gets called when streaming job has finished independent of completion state.
 	 *
 	 * @param job
 	 *            job sending notification
+	 * @param stream
+	 *            stream sending notification
 	 * @param stats
 	 *            stream statistics
 	 */
-	void onFinish(StreamingJob job, TNTInputStreamStatistics stats);
+	void onFinish(StreamingJob job, TNTInputStream<?, ?> stream, TNTInputStreamStatistics stats);
 
 	/**
 	 * This method gets called when streaming job detects some notable event.
 	 *
 	 * @param job
 	 *            job sending notification
+	 * @param stream
+	 *            stream sending notification
 	 * @param level
 	 *            event severity level
 	 * @param message
@@ -100,15 +113,17 @@ public interface StreamingJobListener {
 	 * @param source
 	 *            event source
 	 */
-	void onStreamEvent(StreamingJob job, OpLevel level, String message, Object source);
+	void onStreamEvent(StreamingJob job, TNTInputStream<?, ?> stream, OpLevel level, String message, Object source);
 
 	/**
 	 * This method gets called when streaming job sends activity entity to output.
 	 * 
 	 * @param job
 	 *            job sending notification
+	 * @param stream
+	 *            stream sending notification
 	 * @param ai
 	 *            activity entity to send
 	 */
-	void onSendEvent(StreamingJob job, ActivityInfo ai);
+	void onSendEvent(StreamingJob job, TNTInputStream<?, ?> stream, ActivityInfo ai);
 }

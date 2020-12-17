@@ -21,6 +21,7 @@ import java.io.File;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.inputs.StreamingStatus;
+import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStreamStatistics;
 
 /**
@@ -34,38 +35,39 @@ public class StreamingJobLogger implements StreamingJobListener, JobFilesListene
 	}
 
 	@Override
-	public void onProgressUpdate(StreamingJob job, int current, int total) {
+	public void onProgressUpdate(StreamingJob job, TNTInputStream<?, ?> stream, int current, int total) {
 		System.out.println("Streaming progress update: job=" + job + " progress=" + current + "/" + total); // NON-NLS
 	}
 
 	@Override
-	public void onSuccess(StreamingJob job) {
+	public void onSuccess(StreamingJob job, TNTInputStream<?, ?> stream) {
 		System.out.println("Streaming job success: job=" + job); // NON-NLS
 	}
 
 	@Override
-	public void onFailure(StreamingJob job, String msg, Throwable exc, String code) {
+	public void onFailure(StreamingJob job, TNTInputStream<?, ?> stream, String msg, Throwable exc, String code) {
 		System.out.println("Streaming job error: job=" + job + " msg=" + msg + " code=" + code + " exc=" + exc); // NON-NLS
 	}
 
 	@Override
-	public void onStatusChange(StreamingJob job, StreamingStatus status) {
+	public void onStatusChange(StreamingJob job, TNTInputStream<?, ?> stream, StreamingStatus status) {
 		System.out.println("Streaming job status change: job=" + job + " status=" + status); // NON-NLS
 	}
 
 	@Override
-	public void onFinish(StreamingJob job, TNTInputStreamStatistics stats) {
+	public void onFinish(StreamingJob job, TNTInputStream<?, ?> stream, TNTInputStreamStatistics stats) {
 		System.out.println("Streaming job finished: job=" + job + " stats=" + stats); // NON-NLS
 	}
 
 	@Override
-	public void onStreamEvent(StreamingJob job, OpLevel level, String message, Object source) {
+	public void onStreamEvent(StreamingJob job, TNTInputStream<?, ?> stream, OpLevel level, String message,
+			Object source) {
 		System.out.println("Streaming job event occurred: job=" + job + " level=" + level + " msg=" + message // NON-NLS
 				+ " source=" + source); // NON-NLS
 	}
 
 	@Override
-	public void onSendEvent(StreamingJob job, ActivityInfo ai) {
+	public void onSendEvent(StreamingJob job, TNTInputStream<?, ?> stream, ActivityInfo ai) {
 		System.out.println("Streaming send event occurred: job=" + job + " activity =" + ai); // NON-NLS
 	}
 

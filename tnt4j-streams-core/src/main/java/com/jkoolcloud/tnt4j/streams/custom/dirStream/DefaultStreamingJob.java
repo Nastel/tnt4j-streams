@@ -253,7 +253,7 @@ public class DefaultStreamingJob implements StreamingJob {
 		public void onProgressUpdate(TNTInputStream<?, ?> stream, int current, int total) {
 			if (jobListeners != null) {
 				for (StreamingJobListener l : jobListeners) {
-					l.onProgressUpdate(DefaultStreamingJob.this, current, total);
+					l.onProgressUpdate(DefaultStreamingJob.this, stream, current, total);
 				}
 			}
 		}
@@ -262,7 +262,7 @@ public class DefaultStreamingJob implements StreamingJob {
 		public void onSuccess(TNTInputStream<?, ?> stream) {
 			if (jobListeners != null) {
 				for (StreamingJobListener l : jobListeners) {
-					l.onSuccess(DefaultStreamingJob.this);
+					l.onSuccess(DefaultStreamingJob.this, stream);
 				}
 			}
 		}
@@ -271,7 +271,7 @@ public class DefaultStreamingJob implements StreamingJob {
 		public void onFailure(TNTInputStream<?, ?> stream, String msg, Throwable exc, String code) {
 			if (jobListeners != null) {
 				for (StreamingJobListener l : jobListeners) {
-					l.onFailure(DefaultStreamingJob.this, msg, exc, code);
+					l.onFailure(DefaultStreamingJob.this, stream, msg, exc, code);
 				}
 			}
 		}
@@ -280,7 +280,7 @@ public class DefaultStreamingJob implements StreamingJob {
 		public void onStatusChange(TNTInputStream<?, ?> stream, StreamStatus status) {
 			if (jobListeners != null) {
 				for (StreamingJobListener l : jobListeners) {
-					l.onStatusChange(DefaultStreamingJob.this, status);
+					l.onStatusChange(DefaultStreamingJob.this, stream, status);
 				}
 			}
 		}
@@ -289,7 +289,7 @@ public class DefaultStreamingJob implements StreamingJob {
 		public void onFinish(TNTInputStream<?, ?> stream, TNTInputStreamStatistics stats) {
 			if (jobListeners != null) {
 				for (StreamingJobListener l : jobListeners) {
-					l.onFinish(DefaultStreamingJob.this, stats);
+					l.onFinish(DefaultStreamingJob.this, stream, stats);
 				}
 			}
 
@@ -300,7 +300,7 @@ public class DefaultStreamingJob implements StreamingJob {
 		public void onStreamEvent(TNTInputStream<?, ?> stream, OpLevel level, String message, Object source) {
 			if (jobListeners != null) {
 				for (StreamingJobListener l : jobListeners) {
-					l.onStreamEvent(DefaultStreamingJob.this, level, message, source);
+					l.onStreamEvent(DefaultStreamingJob.this, stream, level, message, source);
 				}
 			}
 		}
@@ -309,7 +309,7 @@ public class DefaultStreamingJob implements StreamingJob {
 		public void onItemLogStart(TNTInputStream<?, ?> stream, Object item) {
 			if (jobListeners != null) {
 				for (StreamingJobListener l : jobListeners) {
-					l.onSendEvent(DefaultStreamingJob.this, (ActivityInfo) item);
+					l.onSendEvent(DefaultStreamingJob.this, stream, (ActivityInfo) item);
 				}
 			}
 		}
@@ -318,7 +318,7 @@ public class DefaultStreamingJob implements StreamingJob {
 		public void onItemLogFinish(Object item) {
 			if (jobListeners != null) {
 				for (StreamingJobListener l : jobListeners) {
-					l.onStreamEvent(DefaultStreamingJob.this, OpLevel.INFO, "Activity item logged", item);
+					l.onStreamEvent(DefaultStreamingJob.this, null, OpLevel.INFO, "Activity item logged", item);
 				}
 			}
 		}
@@ -327,7 +327,8 @@ public class DefaultStreamingJob implements StreamingJob {
 		public void onItemRecorded(Object item, Trackable trackable) {
 			if (jobListeners != null) {
 				for (StreamingJobListener l : jobListeners) {
-					l.onStreamEvent(DefaultStreamingJob.this, OpLevel.INFO, "Activity item entity recorded", item);
+					l.onStreamEvent(DefaultStreamingJob.this, null, OpLevel.INFO, "Activity item entity recorded",
+							item);
 				}
 			}
 		}

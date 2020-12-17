@@ -109,7 +109,7 @@ public class DirStreamingManager {
 	private String fileWildcardName;
 
 	private ThreadPoolExecutor executorService;
-	private List<Runnable> runningJobs = Collections.synchronizedList(new ArrayList<Runnable>());
+	private List<Runnable> runningJobs = Collections.synchronizedList(new ArrayList<> ());
 	private DirWatchdog dirWatchdog;
 
 	private String tnt4jCfgFilePath;
@@ -150,7 +150,7 @@ public class DirStreamingManager {
 
 	private void initialize() {
 		executorService = new ThreadPoolExecutor(CORE_TREAD_POOL_SIZE, MAX_TREAD_POOL_SIZE, KEEP_ALIVE_TIME,
-				TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(MAX_TREAD_POOL_SIZE * 2),
+				TimeUnit.SECONDS, new LinkedBlockingQueue<> (MAX_TREAD_POOL_SIZE * 2),
 				new TNTInputStream.StreamsThreadFactory("DirStreamingManagerExecutorThread-")); // NON-NLS
 
 		executorService.setRejectedExecutionHandler(new RejectedExecutionHandler() {
@@ -478,7 +478,7 @@ public class DirStreamingManager {
 	protected void notifyStreamingJobRejected(Runnable job) {
 		if (streamingJobListeners != null) {
 			for (StreamingJobListener l : streamingJobListeners) {
-				l.onStatusChange((StreamingJob) job, StreamingJobStatus.REJECT);
+				l.onStatusChange((StreamingJob) job, null, StreamingJobStatus.REJECT);
 			}
 		}
 	}
@@ -493,7 +493,7 @@ public class DirStreamingManager {
 	protected void notifyStreamingJobDropOff(Runnable job) {
 		if (streamingJobListeners != null) {
 			for (StreamingJobListener l : streamingJobListeners) {
-				l.onStatusChange((StreamingJob) job, StreamingJobStatus.DROP_OFF);
+				l.onStatusChange((StreamingJob) job, null, StreamingJobStatus.DROP_OFF);
 			}
 		}
 	}
