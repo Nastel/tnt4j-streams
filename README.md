@@ -1158,7 +1158,7 @@ particular cached value.
 ## Samples
 
 ### Running samples
-When release assemblies are built, samples are located in `samples` directory, e.g., `../build/tnt4j-streams/tnt4j-streams-1.12.0-SNAPSHOT/samples`.
+When release assemblies are built, samples are located in `samples` directory, e.g., `../build/tnt4j-streams/tnt4j-streams-1.11.5/samples`.
 To run particular sample:
 * go to sample directory
 * run `run.bat` or `run.sh` depending on your OS
