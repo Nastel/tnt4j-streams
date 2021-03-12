@@ -347,8 +347,8 @@ public final class StreamsScriptingUtils {
 	private static ScriptEngine initGroovyScriptEngine() {
 		ScriptEngineManager factory = new ScriptEngineManager();
 		ScriptEngine engine = factory.getEngineByName(GROOVY_LANG);
-		((GroovyScriptEngineImpl) engine).setClassLoader(new GroovyClassLoader(
-				Thread.currentThread().getContextClassLoader(), getDefaultGroovyCompilerConfig()));
+		((GroovyScriptEngineImpl) engine)
+				.setClassLoader(new GroovyClassLoader(Utils.getClassLoader(), getDefaultGroovyCompilerConfig()));
 
 		return engine;
 	}

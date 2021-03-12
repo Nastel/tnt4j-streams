@@ -1615,7 +1615,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 */
 	public static Properties loadPropertiesResource(String name) throws IOException {
 		Properties rProps = new Properties();
-		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		ClassLoader loader = getClassLoader();
 
 		try (InputStream ins = loader.getResourceAsStream(name)) {
 			rProps.load(ins);
@@ -1639,7 +1639,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	public static Properties loadPropertiesResources(String name) throws IOException {
 		Properties rProps = new Properties();
 
-		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		ClassLoader loader = getClassLoader();
 		Enumeration<URL> rEnum = loader.getResources(name);
 
 		while (rEnum.hasMoreElements()) {
