@@ -171,6 +171,8 @@ public class HdfsFileLineStream extends AbstractFileLineStream<Path> {
 		 */
 		@Override
 		protected void initialize(Object... params) throws Exception {
+			super.initialize(params);
+
 			URI fileUri = new URI(fileName);
 			fs = FileSystem.get(fileUri, new Configuration());
 			Path filePath = new Path(fileUri);
@@ -322,7 +324,7 @@ public class HdfsFileLineStream extends AbstractFileLineStream<Path> {
 		private LineNumberReader rollToCurrentLine(FileSystem fs) throws Exception {
 			LineNumberReader lnr;
 			try {
-				lnr = new LineNumberReader(new InputStreamReader(fs.open(fileToRead)));
+				lnr = new LineNumberReader(new InputStreamReader(fs.open(fileToRead), fileCharset));
 			} catch (Exception exc) {
 				logger().log(OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"FileLineStream.reader.error");

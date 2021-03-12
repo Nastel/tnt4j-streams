@@ -834,6 +834,14 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
+
+            <xs:enumeration value="Charset">
+                <xs:annotation>
+                    <xs:documentation>
+                        Property defines charset name of streamed data. Charset name must comply Java specification to be handled properly.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
         </xs:restriction>
     </xs:simpleType>
 

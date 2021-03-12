@@ -228,4 +228,9 @@ public interface StreamProperties extends OutputProperties {
 	 * Constant for name of built-in {@value} property.
 	 */
 	String PROP_TRUNCATED_FILE_POLICY = "TruncatedFilePolicy"; // NON-NLS
+
+	/**
+	 * Constant for name of built-in {@value} property.
+	 */
+	String PROP_CHARSET = "Charset"; // NON-NLS
 }

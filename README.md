@@ -4534,7 +4534,7 @@ These parameters are applicable to streams which uses parsers to parse incoming 
  * `FullBufferAddPolicy` - defines policy how to perform adding new RAW activity data entry, when buffer queue is full: `WAIT` or `DROP`. 
  Default value - `WAIT. (Optional)
 
-     sample:
+    sample:
  ```xml
      <property name="BufferSize" value="2048"/>
      <property name="BufferDropWhenFull" value="true"/>
@@ -4566,7 +4566,7 @@ Default value - `null`. (Optional)
  * `SendStreamStates` - flag indicating whether to send stream status change messages (`startup`/`shutdown`) to output endpoint e.g. 
  [jKoolCloud](https://www.jkoolcloud.com/). Default value - `true`. (Optional)
 
-     sample:
+    sample:
 ```xml
     <property name="TNT4JConfigFile" value="../../configuration/tnt4j.properties"/>
     <tnt4j-properties>
@@ -4801,7 +4801,7 @@ to test if a file name was found.
 There are many XPath functions that can be used. See section [TNT4J-Streams predefined custom XPath functions](#tnt4j-streams-predefined-custom-xpath-functions) 
 and Oracle's [Using XPath Functions](https://docs.oracle.com/cd/E35413_01/doc.722/e35419/dev_xpath_functions.htm#autoId18) reference.
 
-#### File line stream parameters (also from Hdfs)
+#### File line stream parameters (also applies for Hdfs)
 
  * `FileName` - the system-dependent file name or file name pattern defined using wildcard characters `*` and `?`. (Required)
  * `FilePolling` - flag `true/false` indicating whether files should be polled for changes or not. If not, then files
@@ -4822,6 +4822,9 @@ and Oracle's [Using XPath Functions](https://docs.oracle.com/cd/E35413_01/doc.72
  * `TruncatedFilePolicy` - defines truncated file (when size of the file decreases while it is streamed) access policy. Value can be: 
  `START_FROM_BEGINNING` - read file from beginning, `CONTINUE_FROM_LAST` - continue reading file from last line (skipping all available 
  lines). Default value - `START_FROM_BEGINNING`. (Optional)
+ * `Charset` - charset name used to decode file(s) contained data. Charset name must comply Java specification (be resolvable by 
+ `java.nio.charset.Charset#forName(String)` to be handled properly. Default value - one returned by 
+ `java.nio.charset.Charset#defaultCharset()`. (Optional)
 
     sample:
  ```xml
@@ -4833,6 +4836,8 @@ and Oracle's [Using XPath Functions](https://docs.oracle.com/cd/E35413_01/doc.72
     <property name="RangeToStream" value="12:125"/>
     <property name="ActivityDelim" value="-----"/>
     <property name="KeepLineSeparators" value="true"/>
+    <property name="TruncatedFilePolicy" value="CONTINUE_FROM_LAST"/>
+    <property name="Charset" value="UTF-16LE"/>
  ```
 
 In case using Hdfs file name is defined using URL like `hdfs://[host]:[port]/[path]`. Path may contain wildcards.
@@ -4944,10 +4949,14 @@ Also see [JSR-203 FileSystem streams parameters](#jsr-203-filesystem-streams-par
 #### Standard Java input stream parameters
 
  * `InputCloseable` - flag indicating if stream has to close input when stream is closing. Default value - `true`. (Optional)
+ * `Charset` - charset name used to decode file(s) contained data. Charset name must comply Java specification (be resolvable by 
+ `java.nio.charset.Charset#forName(String)` to be handled properly. Default value - one returned by 
+ `java.nio.charset.Charset#defaultCharset()`. (Optional)
 
     sample:
 ```xml
     <property name="InputCloseable" value="false"/>
+    <property name="Charset" value="UTF-16LE"/>
 ```
 
 Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Parseable streams parameters'](#parseable-streams-parameters).
@@ -5189,11 +5198,15 @@ disable direct cipher suites mapping between client and server side. Also see [I
  and `?`. Definition pattern is `zipFilePath!entryNameWildcard`. E.g.:
  `./tnt4j-streams-core/samples/zip-stream/sample.zip!2/*.txt`. (Required)
  * `ArchType` - defines archive type. Can be one of: `ZIP`, `GZIP`, `JAR`. Default value - `ZIP`. (Optional)
+ * `Charset` - charset name used to decode file(s) contained data. Charset name must comply Java specification (be resolvable by 
+ `java.nio.charset.Charset#forName(String)` to be handled properly. Default value - one returned by 
+ `java.nio.charset.Charset#defaultCharset()`. (Optional)
 
     sample:
 ```xml
     <property name="FileName" value="./tnt4j-streams-core/samples/zip-stream/sample.gz"/>
     <property name="ArchType" value="GZIP"/>
+    <property name="Charset" value="UTF-16LE"/>
 ```
 
 In case using Hdfs file name is defined using URL like `hdfs://[host]:[port]/[path]`. Zip entry name may contain
@@ -5880,8 +5893,8 @@ Also see ['Activity map parser'](#activity-map-parser) and [Generic parser param
  * `TranslateNumValues` - indicates that parser should translate resolved numeric values to corresponding MQ constant names if possible and 
  field/locator data type is `String` (meaning translated value can be assigned to field). If value of particular field should be left as 
  number (e.g., `ReasonCode`), use field/locator attribute `datatype="Number"`. Default value - `true`. (Optional)
- 
-     sample:
+
+    sample:
 ```xml
     <property name="TranslateNumValues" value="false"/> 
 ```

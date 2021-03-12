@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.configure.state;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -78,7 +79,7 @@ public class HdfsFileStreamStateHandler extends AbstractFileStreamStateHandler<P
 
 	@Override
 	Reader openFile(Path file) throws IOException {
-		return new InputStreamReader(fs.open(file));
+		return new InputStreamReader(fs.open(file), Charset.defaultCharset());
 	}
 
 	@Override

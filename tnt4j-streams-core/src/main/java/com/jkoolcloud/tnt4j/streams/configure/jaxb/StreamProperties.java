@@ -435,7 +435,17 @@ public enum StreamProperties {
 	 *
 	 */
 	@XmlEnumValue("StreamReconnectDelay")
-	STREAM_RECONNECT_DELAY("StreamReconnectDelay");
+	STREAM_RECONNECT_DELAY("StreamReconnectDelay"),
+
+	/**
+	 *
+	 * Property defines charset name of streamed data. Charset name must comply Java specification to be handled
+	 * properly.
+	 *
+	 *
+	 */
+	@XmlEnumValue("Charset")
+	CHARSET("Charset");
 
 	private final String value;
 

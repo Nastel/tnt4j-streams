@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -68,6 +69,9 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * policy. Value can be: {@code "START_FROM_BEGINNING"} - read file from beginning, {@code "CONTINUE_FROM_LAST"} -
  * continue reading file from last line (skipping all available lines). Default value - '{@code START_FROM_BEGINNING}'.
  * (Optional)</li>
+ * <li>Charset - charset name used to decode file(s) contained data. Charset name must comply Java specification (be
+ * resolvable by {@link java.nio.charset.Charset#forName(String)} to be handled properly. Default value - one returned
+ * by {@link java.nio.charset.Charset#defaultCharset()}. (Optional)</li>
  * </ul>
  *
  * @version $Revision: 3 $
@@ -78,9 +82,13 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 	private static final long DEFAULT_DELAY_PERIOD = TimeUnit.SECONDS.toMillis(15);
 
 	/**
-	 * Stream attribute defining file name.
+	 * Stream attribute defining file name or file name pattern.
 	 */
 	protected String fileName = null;
+	/**
+	 * Charset of streamed files.
+	 */
+	protected Charset charset = Charset.defaultCharset();
 
 	/**
 	 * Stream attribute defining if streaming should be performed from file position found on stream initialization. If
@@ -105,8 +113,20 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 
 	private String rangeValue = "1:"; // NON-NLS
 	private IntRange lineRange = null;
+
+	/**
+	 * Streamed activity delimiter: {@code "EOL"} (end of line ) or {@code "EOF"} (end of file).
+	 */
 	protected String activityDelimiter = ActivityDelim.EOL.name();
+	/**
+	 * Defines truncated file (when size of the file decreases while it is streamed) access policy. Value can be:
+	 * {@code "START_FROM_BEGINNING"} - read file from beginning, {@code "CONTINUE_FROM_LAST"} - continue reading file
+	 * from last line (skipping all available lines).
+	 */
 	protected String truncatedFilePolicy = FileAccessPolicy.START_FROM_BEGINNING.name();
+	/**
+	 * Flag indicating to keep line separators within streamed data.
+	 */
 	protected boolean keepLineSeparators = false;
 
 	/**
@@ -138,6 +158,8 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 			keepLineSeparators = Utils.toBoolean(value);
 		} else if (StreamProperties.PROP_TRUNCATED_FILE_POLICY.equalsIgnoreCase(name)) {
 			truncatedFilePolicy = value;
+		} else if (StreamProperties.PROP_CHARSET.equalsIgnoreCase(name)) {
+			charset = Charset.forName(value);
 		}
 	}
 
@@ -169,6 +191,9 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 		}
 		if (StreamProperties.PROP_TRUNCATED_FILE_POLICY.equalsIgnoreCase(name)) {
 			return truncatedFilePolicy;
+		}
+		if (StreamProperties.PROP_CHARSET.equalsIgnoreCase(name)) {
+			return charset.name();
 		}
 		return super.getProperty(name);
 	}
@@ -204,7 +229,7 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 		initializeFs();
 
 		fileWatcher = createFileWatcher();
-		fileWatcher.initialize();
+		fileWatcher.initialize(charset);
 	}
 
 	/**
@@ -304,6 +329,7 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 	protected abstract class FileWatcher extends InputProcessor {
 
 		protected T fileToRead = null;
+		protected Charset fileCharset = Charset.defaultCharset();
 
 		protected T[] availableFiles;
 
@@ -338,6 +364,15 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 		 */
 		FileWatcher(String name) {
 			super(name);
+		}
+
+		@Override
+		protected void initialize(Object... params) throws Exception {
+			Charset pCharset = (Charset) params[0];
+
+			if (pCharset != null) {
+				fileCharset = pCharset;
+			}
 		}
 
 		/**

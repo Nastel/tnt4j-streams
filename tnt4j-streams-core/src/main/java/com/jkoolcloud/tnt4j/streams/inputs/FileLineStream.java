@@ -22,7 +22,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.util.Collections;
 
@@ -159,6 +158,8 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 		 */
 		@Override
 		protected void initialize(Object... params) throws Exception {
+			super.initialize(params);
+
 			availableFiles = Utils.listFilesByName(fileName, fs);
 			updateDataTotals(availableFiles);
 
@@ -307,7 +308,7 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 		private LineNumberReader rollToCurrentLine() throws IOException {
 			LineNumberReader lnr;
 			try {
-				lnr = new LineNumberReader(Files.newBufferedReader(fileToRead, Charset.defaultCharset()));
+				lnr = new LineNumberReader(Files.newBufferedReader(fileToRead, fileCharset));
 			} catch (Exception exc) {
 				logger().log(OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"FileLineStream.reader.error");

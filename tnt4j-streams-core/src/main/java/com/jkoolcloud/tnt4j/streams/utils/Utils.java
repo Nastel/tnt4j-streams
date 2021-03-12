@@ -341,32 +341,6 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	/**
 	 * Counts text lines available in input.
 	 *
-	 * @param reader
-	 *            a {@link java.io.Reader} object to provide the underlying input stream
-	 * @return number of lines currently available in input
-	 * @throws java.io.IOException
-	 *             If an I/O error occurs
-	 * @deprecated use {@link #countLines(java.io.InputStream)} instead
-	 */
-	@Deprecated
-	public static int countLines(Reader reader) throws IOException {
-		int lCount = 0;
-		LineNumberReader lineReader = null;
-		try {
-			lineReader = new LineNumberReader(reader);
-			lineReader.skip(Long.MAX_VALUE);
-			// NOTE: Add 1 because line index starts at 0
-			lCount = lineReader.getLineNumber() + 1;
-		} finally {
-			close(lineReader);
-		}
-
-		return lCount;
-	}
-
-	/**
-	 * Counts text lines available in input.
-	 *
 	 * @param is
 	 *            a {@link java.io.InputStream} object to provide the underlying file input stream
 	 * @return number of lines currently available in input
@@ -1682,7 +1656,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @see java.lang.ClassLoader#getResource(String)
 	 */
 	public static URL getResource(String name) {
-		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		ClassLoader loader = getClassLoader();
 		return loader.getResource(name);
 	}
 

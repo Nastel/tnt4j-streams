@@ -19,6 +19,8 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
@@ -57,6 +59,35 @@ public class PipedStream extends JavaInputStream {
 	 */
 	public PipedStream(InputStream stream) {
 		super(stream);
+		inputCloseable = false;
+	}
+
+	/**
+	 * Constructs a new PipedStream to obtain activity data from the specified {@link InputStream}.
+	 *
+	 * @param stream
+	 *            input stream to read data from
+	 * @param charsetName
+	 *            input charset name
+	 * 
+	 * @throws java.io.UnsupportedEncodingException
+	 *             if the named charset is not supported
+	 */
+	public PipedStream(InputStream stream, String charsetName) throws UnsupportedEncodingException {
+		super(stream, charsetName);
+		inputCloseable = false;
+	}
+
+	/**
+	 * Constructs a new PipedStream to obtain activity data from the specified {@link InputStream}.
+	 *
+	 * @param stream
+	 *            input stream to read data from
+	 * @param charset
+	 *            input charset
+	 */
+	public PipedStream(InputStream stream, Charset charset) {
+		super(stream, charset);
 		inputCloseable = false;
 	}
 

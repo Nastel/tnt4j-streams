@@ -17,6 +17,7 @@
 package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.jar.JarInputStream;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -47,6 +48,9 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * '*' and '?'. Definition pattern is "zipFilePath!entryNameWildcard". I.e.:
  * "./tnt4j-streams-core/samples/zip-stream/sample.zip!2/*.txt". (Required)</li>
  * <li>ArchType - defines archive type. Can be one of: ZIP, GZIP, JAR. Default value - ZIP. (Optional)</li>
+ * <li>Charset - charset name used to decode file(s) contained data. Charset name must comply Java specification
+ * (resolvable by {@link java.nio.charset.Charset#forName(String)} to be handled properly. Default value - one returned
+ * by {@link java.nio.charset.Charset#defaultCharset()}. (Optional)</li>
  * </ul>
  *
  * @version $Revision: 1 $
@@ -66,6 +70,7 @@ public class ZipLineStream extends TNTParseableInputStream<String> {
 
 	private LineNumberReader lineReader;
 	private InflaterInputStream zipStream;
+	private Charset charset = Charset.defaultCharset();
 
 	private int lineNumber = 0;
 	private int totalBytesCount = 0;
@@ -107,6 +112,8 @@ public class ZipLineStream extends TNTParseableInputStream<String> {
 			}
 		} else if (StreamProperties.PROP_ARCH_TYPE.equalsIgnoreCase(name)) {
 			archType = value;
+		} else if (StreamProperties.PROP_CHARSET.equalsIgnoreCase(name)) {
+			charset = Charset.forName(value);
 		}
 	}
 
@@ -117,6 +124,9 @@ public class ZipLineStream extends TNTParseableInputStream<String> {
 		}
 		if (StreamProperties.PROP_ARCH_TYPE.equalsIgnoreCase(name)) {
 			return archType;
+		}
+		if (StreamProperties.PROP_CHARSET.equalsIgnoreCase(name)) {
+			return charset.name();
 		}
 		return super.getProperty(name);
 	}
@@ -155,7 +165,7 @@ public class ZipLineStream extends TNTParseableInputStream<String> {
 		}
 
 		if (zipStream instanceof GZIPInputStream) {
-			lineReader = new LineNumberReader(new BufferedReader(new InputStreamReader(zipStream)));
+			lineReader = new LineNumberReader(new BufferedReader(new InputStreamReader(zipStream, charset)));
 		} else {
 			hasNextEntry();
 		}
@@ -243,7 +253,7 @@ public class ZipLineStream extends TNTParseableInputStream<String> {
 
 				if (entry.getSize() != 0 && (zipEntriesMask == null || entryName.matches(zipEntriesMask))) {
 					totalBytesCount += entry.getSize();
-					lineReader = new LineNumberReader(new BufferedReader(new InputStreamReader(zis)));
+					lineReader = new LineNumberReader(new BufferedReader(new InputStreamReader(zis, charset)));
 					lineNumber = 0;
 
 					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),

@@ -17,6 +17,7 @@
 package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.*;
+import java.nio.charset.Charset;
 
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
@@ -36,6 +37,9 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * <ul>
  * <li>InputCloseable - flag indicating if stream has to close input when stream is closing. Default value -
  * {@code true}. (Optional)</li>
+ * <li>Charset - charset name used to decode file(s) contained data. Charset name must comply Java specification
+ * (resolvable by {@link java.nio.charset.Charset#forName(String)} to be handled properly. Default value - one returned
+ * by {@link java.nio.charset.Charset#defaultCharset()}. (Optional)</li>
  * </ul>
  *
  * @version $Revision: 1 $
@@ -47,6 +51,7 @@ public class JavaInputStream extends TNTParseableInputStream<String> {
 
 	private Reader rawReader;
 	private LineNumberReader inputReader;
+	private Charset charset = Charset.defaultCharset();
 
 	private int lineNumber = 0;
 
@@ -69,7 +74,36 @@ public class JavaInputStream extends TNTParseableInputStream<String> {
 	 *            input stream to read data from
 	 */
 	public JavaInputStream(InputStream stream) {
-		this(new InputStreamReader(stream));
+		this(stream, Charset.defaultCharset());
+	}
+
+	/**
+	 * Constructs a new JavaInputStream to obtain activity data from the specified {@link InputStream}.
+	 *
+	 * @param stream
+	 *            input stream to read data from
+	 * @param charsetName
+	 *            input charset name
+	 * 
+	 * @throws java.io.UnsupportedEncodingException
+	 *             if the named charset is not supported
+	 */
+	public JavaInputStream(InputStream stream, String charsetName) throws UnsupportedEncodingException {
+		this(new InputStreamReader(stream, charsetName));
+		this.charset = Charset.forName(charsetName);
+	}
+
+	/**
+	 * Constructs a new JavaInputStream to obtain activity data from the specified {@link InputStream}.
+	 *
+	 * @param stream
+	 *            input stream to read data from
+	 * @param charset
+	 *            input charset
+	 */
+	public JavaInputStream(InputStream stream, Charset charset) {
+		this(new InputStreamReader(stream, charset));
+		this.charset = charset;
 	}
 
 	/**
@@ -94,13 +128,18 @@ public class JavaInputStream extends TNTParseableInputStream<String> {
 
 		if (StreamProperties.PROP_INPUT_CLOSEABLE.equalsIgnoreCase(name)) {
 			inputCloseable = Utils.toBoolean(value);
+		} else if (StreamProperties.PROP_CHARSET.equalsIgnoreCase(name)) {
+			charset = Charset.forName(value);
 		}
 	}
 
 	@Override
 	public Object getProperty(String name) {
-		if (StreamProperties.PROP_INPUT_CLOSEABLE.equals(name)) {
+		if (StreamProperties.PROP_INPUT_CLOSEABLE.equalsIgnoreCase(name)) {
 			return inputCloseable;
+		}
+		if (StreamProperties.PROP_CHARSET.equalsIgnoreCase(name)) {
+			return charset.name();
 		}
 
 		return super.getProperty(name);
@@ -114,7 +153,7 @@ public class JavaInputStream extends TNTParseableInputStream<String> {
 	@Override
 	public void addReference(Object refObject) throws IllegalStateException {
 		if (refObject instanceof InputStream) {
-			setReader(new InputStreamReader((InputStream) refObject));
+			setReader(new InputStreamReader((InputStream) refObject, charset));
 		} else if (refObject instanceof Reader) {
 			setReader((Reader) refObject);
 		}
