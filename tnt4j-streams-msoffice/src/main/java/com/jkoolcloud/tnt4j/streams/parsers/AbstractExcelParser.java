@@ -122,7 +122,7 @@ public abstract class AbstractExcelParser<T> extends GenericActivityParser<T> {
 	}
 
 	private Object getOriginalCellValue(Cell cell) {
-		switch (cell.getCellTypeEnum()) {
+		switch (cell.getCellType()) {
 		case BOOLEAN:
 			return cell.getBooleanCellValue();
 		case NUMERIC:
@@ -169,7 +169,7 @@ public abstract class AbstractExcelParser<T> extends GenericActivityParser<T> {
 			return cell.toString();
 		}
 
-		switch (cellValue.getCellTypeEnum()) {
+		switch (cellValue.getCellType()) {
 		case BOOLEAN:
 			return cellValue.getBooleanValue();
 		case NUMERIC:

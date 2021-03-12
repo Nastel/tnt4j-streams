@@ -103,8 +103,8 @@ public class ExcelSXSSFRowStreamTest {
 			Cell cell = cellIterator.next();
 			System.out.print(cell);
 			System.out.print("(");
-			System.out.print(cell.getCellTypeEnum());
-			if (cell.getCellTypeEnum().equals(CellType.NUMERIC) && DateUtil.isCellDateFormatted(cell)) {
+			System.out.print(cell.getCellType());
+			if (cell.getCellType().equals(CellType.NUMERIC) && DateUtil.isCellDateFormatted(cell)) {
 				System.out.print("Date");
 			}
 			System.out.print(")");

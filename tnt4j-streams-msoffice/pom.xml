@@ -14,7 +14,7 @@
     <artifactId>tnt4j-streams-msoffice</artifactId>
 
     <properties>
-        <org.apache.poi.version>4.1.2</org.apache.poi.version>
+        <org.apache.poi.version>5.0.0</org.apache.poi.version>
     </properties>
 
     <build>
@@ -86,6 +86,18 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${org.apache.poi.version}</version>
+            <exclusions>
+                <!-- We do not deal 2D graphical data anyway -->
+                <exclusion>
+                    <artifactId>graphics2d</artifactId>
+                    <groupId>de.rototor.pdfbox</groupId>
+                </exclusion>
+                <!-- We do not deal SVG graphical data anyway -->
+                <exclusion>
+                    <artifactId>batik-all</artifactId>
+                    <groupId>org.apache.xmlgraphics</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
