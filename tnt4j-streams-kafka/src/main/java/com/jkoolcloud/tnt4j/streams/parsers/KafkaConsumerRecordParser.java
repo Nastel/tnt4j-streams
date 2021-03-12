@@ -100,7 +100,7 @@ public class KafkaConsumerRecordParser extends GenericActivityParser<ConsumerRec
 	 */
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
-		return ConsumerRecord.class.isInstance(data);
+		return data instanceof ConsumerRecord;
 	}
 
 	@Override

@@ -41,7 +41,7 @@ public class RegExMatcher implements Matcher {
 
 	@Override
 	public boolean isDataClassSupported(Object data) {
-		return String.class.isInstance(data);
+		return data instanceof String;
 	}
 
 	/**

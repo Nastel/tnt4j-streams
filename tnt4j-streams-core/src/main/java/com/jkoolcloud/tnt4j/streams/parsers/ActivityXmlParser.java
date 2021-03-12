@@ -226,7 +226,7 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 	 */
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
-		return Node.class.isInstance(data) || super.isDataClassSupportedByParser(data);
+		return data instanceof Node || super.isDataClassSupportedByParser(data);
 	}
 
 	@Override

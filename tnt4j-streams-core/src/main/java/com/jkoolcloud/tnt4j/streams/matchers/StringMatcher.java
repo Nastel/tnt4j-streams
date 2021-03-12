@@ -69,7 +69,7 @@ public class StringMatcher implements Matcher {
 	 */
 	@Override
 	public boolean isDataClassSupported(Object data) {
-		return String.class.isInstance(data);
+		return data instanceof String;
 	}
 
 	/**
@@ -106,13 +106,13 @@ public class StringMatcher implements Matcher {
 		if (method != null) {
 			if (hasNoArguments) {
 				boolean result = returnBoolean(method.invoke(null, String.valueOf(data)));
-				return invert ? !result : result;
+				return invert != result;
 			} else {
 				// Arrays.
 				Object[] predefinedArgs = { String.valueOf(data) };
 				Object[] allArgs = ArrayUtils.addAll(predefinedArgs, convertedArguments);
 				boolean result = returnBoolean(method.invoke(null, allArgs));
-				return invert ? !result : result;
+				return invert != result;
 			}
 		} else {
 			throw new RuntimeException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
@@ -153,10 +153,10 @@ public class StringMatcher implements Matcher {
 	}
 
 	private static boolean returnBoolean(Object result) {
-		if (Integer.class.isInstance(result)) {
+		if (result instanceof Integer) {
 			return new Integer(0).equals(result);
 		}
-		if (Boolean.class.isInstance(result)) {
+		if (result instanceof Boolean) {
 			return (boolean) result;
 		}
 		return false;

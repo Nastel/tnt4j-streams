@@ -62,8 +62,8 @@ public abstract class AbstractPreParser<V, O> implements ActivityDataPreParser<V
 	 */
 	@Override
 	public boolean isDataClassSupported(Object data) {
-		return String.class.isInstance(data) || InputStream.class.isInstance(data) || Reader.class.isInstance(data)
-				|| byte[].class.isInstance(data) || ByteBuffer.class.isInstance(data);
+		return data instanceof String || data instanceof InputStream || data instanceof Reader || data instanceof byte[]
+				|| data instanceof ByteBuffer;
 	}
 
 	/**

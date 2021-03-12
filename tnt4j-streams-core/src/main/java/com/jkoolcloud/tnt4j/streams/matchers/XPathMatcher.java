@@ -64,7 +64,7 @@ public class XPathMatcher implements Matcher {
 
 	@Override
 	public boolean isDataClassSupported(Object data) {
-		return String.class.isInstance(data) || Node.class.isInstance(data);
+		return data instanceof String || data instanceof Node;
 	}
 
 	/**

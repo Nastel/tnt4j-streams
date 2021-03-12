@@ -130,7 +130,7 @@ public class ActivityJavaObjectParser extends GenericActivityParser<Object> {
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
 		if (data == null || CollectionUtils.isEmpty(supportedClasses)) {
-			return Object.class.isInstance(data);
+			return data instanceof Object;
 		} else {
 			return supportedClasses.contains(data.getClass());
 		}

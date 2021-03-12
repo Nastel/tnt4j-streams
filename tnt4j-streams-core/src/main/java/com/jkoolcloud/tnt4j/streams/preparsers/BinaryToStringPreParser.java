@@ -69,7 +69,7 @@ public class BinaryToStringPreParser extends AbstractPreParser<byte[], String> {
 	 */
 	@Override
 	public boolean isDataClassSupported(Object data) {
-		return byte[].class.isInstance(data);
+		return data instanceof byte[];
 	}
 
 	@Override

@@ -124,7 +124,7 @@ public class ActivityJDBCResultSetParser extends GenericActivityParser<ResultSet
 	 */
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
-		return ResultSet.class.isInstance(data);
+		return data instanceof ResultSet;
 	}
 
 	@Override

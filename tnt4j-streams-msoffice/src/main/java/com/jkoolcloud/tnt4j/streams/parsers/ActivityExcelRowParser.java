@@ -71,7 +71,7 @@ public class ActivityExcelRowParser extends AbstractExcelParser<Row> {
 	 */
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
-		return Row.class.isInstance(data);
+		return data instanceof Row;
 	}
 
 	/**

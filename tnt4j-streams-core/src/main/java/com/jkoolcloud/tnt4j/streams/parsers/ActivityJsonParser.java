@@ -128,7 +128,7 @@ public class ActivityJsonParser extends GenericActivityParser<DocumentContext> {
 	 */
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
-		return DocumentContext.class.isInstance(data) || super.isDataClassSupportedByParser(data);
+		return data instanceof DocumentContext || super.isDataClassSupportedByParser(data);
 	}
 
 	@Override

@@ -225,8 +225,8 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	}
 
 	protected static boolean isDataClassSupportedByDefault(Object data) {
-		return String.class.isInstance(data) || byte[].class.isInstance(data) || ByteBuffer.class.isInstance(data)
-				|| Reader.class.isInstance(data) || InputStream.class.isInstance(data);
+		return data instanceof String || data instanceof byte[] || data instanceof ByteBuffer || data instanceof Reader
+				|| data instanceof InputStream;
 	}
 
 	/**

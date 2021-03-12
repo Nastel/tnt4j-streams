@@ -94,7 +94,7 @@ public class KafkaProducerRecordParser extends GenericActivityParser<ProducerRec
 	 */
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
-		return ProducerRecord.class.isInstance(data);
+		return data instanceof ProducerRecord;
 	}
 
 	@Override

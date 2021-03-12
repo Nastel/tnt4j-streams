@@ -36,6 +36,6 @@ public abstract class AbstractMQMessagePreParser<O> extends AbstractPreParser<MQ
 	 */
 	@Override
 	public boolean isDataClassSupported(Object data) {
-		return MQMessage.class.isInstance(data);
+		return data instanceof MQMessage;
 	}
 }

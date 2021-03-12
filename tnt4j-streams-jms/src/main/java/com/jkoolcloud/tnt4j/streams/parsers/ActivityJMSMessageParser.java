@@ -117,7 +117,7 @@ public class ActivityJMSMessageParser extends AbstractActivityMapParser {
 	 */
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
-		return Message.class.isInstance(data);
+		return data instanceof Message;
 	}
 
 	@Override

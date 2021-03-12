@@ -154,7 +154,7 @@ public abstract class AbstractActivityMapParser extends GenericActivityParser<Ma
 	 */
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
-		return Map.class.isInstance(data);
+		return data instanceof Map;
 	}
 
 	@Override

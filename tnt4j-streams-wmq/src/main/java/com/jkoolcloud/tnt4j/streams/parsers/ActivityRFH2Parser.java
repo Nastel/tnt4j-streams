@@ -92,7 +92,7 @@ public class ActivityRFH2Parser extends AbstractActivityMapParser {
 	 */
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
-		return byte[].class.isInstance(data) || ByteBuffer.class.isInstance(data) || InputStream.class.isInstance(data);
+		return data instanceof byte[] || data instanceof ByteBuffer || data instanceof InputStream;
 	}
 
 	@Override

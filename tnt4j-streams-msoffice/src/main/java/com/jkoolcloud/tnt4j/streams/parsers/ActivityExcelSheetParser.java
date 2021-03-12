@@ -73,7 +73,7 @@ public class ActivityExcelSheetParser extends AbstractExcelParser<Sheet> {
 	 */
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
-		return Sheet.class.isInstance(data);
+		return data instanceof Sheet;
 	}
 
 	/**

@@ -151,7 +151,7 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 	 */
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
-		return PCFContent.class.isInstance(data);
+		return data instanceof PCFContent;
 	}
 
 	/**
