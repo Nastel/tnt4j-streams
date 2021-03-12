@@ -70,8 +70,9 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * continue reading file from last line (skipping all available lines). Default value - '{@code START_FROM_BEGINNING}'.
  * (Optional)</li>
  * <li>Charset - charset name used to decode file(s) contained data. Charset name must comply Java specification (be
- * resolvable by {@link java.nio.charset.Charset#forName(String)} to be handled properly. Default value - one returned
- * by {@link java.nio.charset.Charset#defaultCharset()}. (Optional)</li>
+ * resolvable by {@link java.nio.charset.Charset#forName(String)} to be handled properly. {@code "guess"} value
+ * indicates that stream (except HDFS) shall guess charset using some set of first bytes from file. Default value - one
+ * returned by {@link java.nio.charset.Charset#defaultCharset()}. (Optional)</li>
  * </ul>
  *
  * @version $Revision: 3 $
@@ -86,9 +87,9 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 	 */
 	protected String fileName = null;
 	/**
-	 * Charset of streamed files.
+	 * Charset name of streamed files.
 	 */
-	protected Charset charset = Charset.defaultCharset();
+	protected String charsetName = Utils.UTF8;
 
 	/**
 	 * Stream attribute defining if streaming should be performed from file position found on stream initialization. If
@@ -159,7 +160,7 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 		} else if (StreamProperties.PROP_TRUNCATED_FILE_POLICY.equalsIgnoreCase(name)) {
 			truncatedFilePolicy = value;
 		} else if (StreamProperties.PROP_CHARSET.equalsIgnoreCase(name)) {
-			charset = Charset.forName(value);
+			charsetName = value;
 		}
 	}
 
@@ -193,7 +194,7 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 			return truncatedFilePolicy;
 		}
 		if (StreamProperties.PROP_CHARSET.equalsIgnoreCase(name)) {
-			return charset.name();
+			return charsetName;
 		}
 		return super.getProperty(name);
 	}
@@ -229,7 +230,7 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 		initializeFs();
 
 		fileWatcher = createFileWatcher();
-		fileWatcher.initialize(charset);
+		fileWatcher.initialize(charsetName);
 	}
 
 	/**
@@ -368,10 +369,14 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 
 		@Override
 		protected void initialize(Object... params) throws Exception {
-			Charset pCharset = (Charset) params[0];
+			String pCharsetName = (String) params[0];
 
-			if (pCharset != null) {
-				fileCharset = pCharset;
+			if (StringUtils.isNotEmpty(pCharsetName)) {
+				if (pCharsetName.equalsIgnoreCase("guess")) { // NON-NLS
+					fileCharset = null;
+				} else {
+					fileCharset = Charset.forName(pCharsetName);
+				}
 			}
 		}
 

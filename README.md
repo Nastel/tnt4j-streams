@@ -4823,8 +4823,8 @@ and Oracle's [Using XPath Functions](https://docs.oracle.com/cd/E35413_01/doc.72
  `START_FROM_BEGINNING` - read file from beginning, `CONTINUE_FROM_LAST` - continue reading file from last line (skipping all available 
  lines). Default value - `START_FROM_BEGINNING`. (Optional)
  * `Charset` - charset name used to decode file(s) contained data. Charset name must comply Java specification (be resolvable by 
- `java.nio.charset.Charset#forName(String)` to be handled properly. Default value - one returned by 
- `java.nio.charset.Charset#defaultCharset()`. (Optional)
+ `java.nio.charset.Charset#forName(String)` to be handled properly. `guess` value indicates that stream (except HDFS) shall guess charset 
+ using some set of first bytes from file. Default value - one returned by `java.nio.charset.Charset#defaultCharset()`. (Optional)
 
     sample:
  ```xml

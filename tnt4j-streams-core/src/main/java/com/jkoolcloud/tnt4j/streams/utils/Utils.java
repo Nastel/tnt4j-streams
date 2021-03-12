@@ -62,6 +62,8 @@ import com.jkoolcloud.tnt4j.core.OpType;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.NamedObject;
 
+import groovy.util.CharsetToolkit;
+
 /**
  * General utility methods used by TNT4J-Streams.
  *
@@ -2993,5 +2995,38 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 	private enum ObjNameOptions {
 		DEFAULT, BEFORE, AFTER, REPLACE, SECTION, FULL
+	}
+
+	/**
+	 * Tries to guess charset for file provided bytes.
+	 * 
+	 * @param file
+	 *            file to guess charset
+	 * @return charset found to match the file
+	 * 
+	 * @throws IOException
+	 *             if fails to read the file
+	 */
+	public static Charset guessCharset(File file) throws IOException {
+		CharsetToolkit toolkit = new CharsetToolkit(file);
+
+		return toolkit.getCharset();
+	}
+
+	/**
+	 * Returns a {@link java.io.LineNumberReader} for a provided file. File content charset is discovered using some set
+	 * of first bytes from file.
+	 * 
+	 * @param file
+	 *            file to get reader for
+	 * @return instance of file reader using the discovered file charset
+	 * 
+	 * @throws IOException
+	 *             if fails to read the file
+	 */
+	public static LineNumberReader getFileReader(File file) throws IOException {
+		CharsetToolkit toolkit = new CharsetToolkit(file);
+
+		return (LineNumberReader) toolkit.getReader();
 	}
 }

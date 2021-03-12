@@ -308,7 +308,11 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 		private LineNumberReader rollToCurrentLine() throws IOException {
 			LineNumberReader lnr;
 			try {
-				lnr = new LineNumberReader(Files.newBufferedReader(fileToRead, fileCharset));
+				if (fileCharset == null) {
+					lnr = Utils.getFileReader(fileToRead.toFile());
+				} else {
+					lnr = new LineNumberReader(Files.newBufferedReader(fileToRead, fileCharset));
+				}
 			} catch (Exception exc) {
 				logger().log(OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"FileLineStream.reader.error");

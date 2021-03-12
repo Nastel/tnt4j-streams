@@ -19,11 +19,8 @@ package com.jkoolcloud.tnt4j.streams.configure.state;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.LineNumberReader;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.CRC32;
@@ -62,8 +59,7 @@ public class FileStreamStateHandlerTest {
 
 		File testFilesDir = new File(samplesDir, "/multiple-logs/");
 		Path path = Paths.get(testFilesDir.getAbsolutePath());
-		Path[] testFiles = Utils.searchFiles(testFilesDir.getAbsolutePath().toString() + File.separator + "orders*",
-				null); // NON-NLS
+		Path[] testFiles = Utils.searchFiles(path.toString() + File.separator + "orders*", null); // NON-NLS
 		FileAccessState newFAS = new FileAccessState();
 
 		int count = 0;
@@ -72,7 +68,6 @@ public class FileStreamStateHandlerTest {
 		File fileWritten = null;
 		for (Path testFile : testFiles) {
 			count++;
-			BufferedReader in;
 			LineNumberReader reader;
 
 			Long fileCRC = rwd.getFileCrc(testFile);
@@ -81,8 +76,7 @@ public class FileStreamStateHandlerTest {
 				fileToSearchFor = testFile;
 			}
 
-			in = Files.newBufferedReader(testFile, Charset.defaultCharset());
-			reader = new LineNumberReader(in);
+			reader = Utils.getFileReader(testFile.toFile());
 			reader.setLineNumber(0);
 			String line = reader.readLine();
 			int count2 = 0;

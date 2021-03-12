@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -172,6 +173,10 @@ public class HdfsFileLineStream extends AbstractFileLineStream<Path> {
 		@Override
 		protected void initialize(Object... params) throws Exception {
 			super.initialize(params);
+
+			if (fileCharset == null) {
+				fileCharset = Charset.defaultCharset();
+			}
 
 			URI fileUri = new URI(fileName);
 			fs = FileSystem.get(fileUri, new Configuration());
