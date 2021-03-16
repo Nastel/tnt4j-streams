@@ -19,7 +19,9 @@ package com.jkoolcloud.tnt4j.streams.configure;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -27,6 +29,12 @@ import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.SAXException;
 
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+import com.jayway.jsonpath.spi.json.JsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import com.jkoolcloud.tnt4j.streams.configure.sax.StreamsConfigSAXParser;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
@@ -283,5 +291,34 @@ public class StreamsConfigLoader {
 	 */
 	public Map<String, String> getDataSourceProperties() {
 		return streamsCfgData == null ? null : streamsCfgData.getDataSourceProperties();
+	}
+
+	/**
+	 * Configures static APIs to be used by TNT4J-Streams.
+	 */
+	public static void configureStatics() {
+		configureJsonPath();
+	}
+
+	private static void configureJsonPath() {
+		Configuration.setDefaults(new Configuration.Defaults() {
+			private final JsonProvider jsonProvider = new JacksonJsonProvider();
+			private final MappingProvider mappingProvider = new JacksonMappingProvider();
+
+			@Override
+			public JsonProvider jsonProvider() {
+				return jsonProvider;
+			}
+
+			@Override
+			public MappingProvider mappingProvider() {
+				return mappingProvider;
+			}
+
+			@Override
+			public Set<Option> options() {
+				return EnumSet.noneOf(Option.class);
+			}
+		});
 	}
 }

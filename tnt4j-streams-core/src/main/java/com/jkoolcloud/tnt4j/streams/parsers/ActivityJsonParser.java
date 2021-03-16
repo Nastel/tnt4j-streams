@@ -21,16 +21,18 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.JsonPathException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.*;
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.ParserProperties;
@@ -45,7 +47,8 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
  * Implements an activity data parser that assumes each activity data item is an JSON format string. JSON parsing is
- * performed using {@link JsonPath} API. Activity fields locator values are treated as JsonPath expressions.
+ * performed using {@link JsonPath} API over the Jackson deserialization framework under the hood. Activity fields
+ * locator values are treated as JsonPath expressions.
  * <p>
  * See <a href="https://github.com/jayway/JsonPath">JsonPath API</a> for more details.
  * <p>
@@ -54,6 +57,15 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * <ul>
  * <li>ReadLines - indicates that complete JSON data package is single line. Default value - '{@code true}'. (Optional,
  * deprecated - use 'ActivityDelim' instead)</li>
+ * <li>List of DeserializationFeature.[FEATURE_NAME] - defines set of Jackson Object Mapper's deserialization
+ * configuration features. See {@link com.fasterxml.jackson.databind.DeserializationFeature} for more details.
+ * (Optional)</li>
+ * <li>List of MapperFeature.[FEATURE_NAME] - defines set of Jackson Object Mapper's mapping configuration features. See
+ * {@link com.fasterxml.jackson.databind.MapperFeature} for more details. (Optional)</li>
+ * <li>List of JsonParser.[FEATURE_NAME] - defines set of Jackson Object Mapper's parser configuration features. See
+ * {@link JsonParser.Feature} for more details. (Optional)</li>
+ * <li>List of Option.[OPTION_NAME] - defines set of JsonPath configuration options. See
+ * {@link com.jayway.jsonpath.Option} for more details. (Optional)</li>
  * </ul>
  * <p>
  * This activity parser supports those activity field locator types:
@@ -73,6 +85,16 @@ public class ActivityJsonParser extends GenericActivityParser<DocumentContext> {
 	private static final String JSON_PATH_ROOT = "$";// NON-NLS
 	private static final String JSON_PATH_SEPARATOR = StreamsConstants.DEFAULT_PATH_DELIM;
 
+	private static final String DESERIALIZATION_FEATURE = "DeserializationFeature."; // NON-NLS
+	private static final String MAPPER_FEATURE = "MapperFeature."; // NON-NLS
+	private static final String PARSER_FEATURE = "JsonParser."; // NON-NLS
+	private static final String OPTION = "Option."; // NON-NLS
+	private static final String[] PARSER_CFG_TOKENS = new String[] { DESERIALIZATION_FEATURE, MAPPER_FEATURE,
+			PARSER_FEATURE, OPTION };
+
+	private Map<String, String> parseProperties = new LinkedHashMap<>();
+	private Configuration parseConfiguration;
+
 	/**
 	 * Constructs a new ActivityJsonParser.
 	 */
@@ -86,12 +108,53 @@ public class ActivityJsonParser extends GenericActivityParser<DocumentContext> {
 	}
 
 	@Override
+	public void setProperties(Collection<Map.Entry<String, String>> props) {
+		super.setProperties(props);
+
+		if (parseProperties.isEmpty()) {
+			parseConfiguration = Configuration.defaultConfiguration();
+		} else {
+			ObjectMapper mapper = new ObjectMapper();
+			Set<Option> options = EnumSet.noneOf(Option.class);
+
+			for (Map.Entry<String, String> pProp : parseProperties.entrySet()) {
+				if (pProp.getKey().startsWith(DESERIALIZATION_FEATURE)) {
+					DeserializationFeature df = DeserializationFeature
+							.valueOf(pProp.getKey().substring(DESERIALIZATION_FEATURE.length()));
+					mapper.configure(df, Utils.toBoolean(pProp.getValue()));
+				} else if (pProp.getKey().startsWith(MAPPER_FEATURE)) {
+					MapperFeature mf = MapperFeature.valueOf(pProp.getKey().substring(MAPPER_FEATURE.length()));
+					mapper.configure(mf, Utils.toBoolean(pProp.getValue()));
+				} else if (pProp.getKey().startsWith(PARSER_FEATURE)) {
+					JsonParser.Feature pf = JsonParser.Feature
+							.valueOf(pProp.getKey().substring(PARSER_FEATURE.length()));
+					mapper.configure(pf, Utils.toBoolean(pProp.getValue()));
+				} else if (pProp.getKey().startsWith(OPTION)) {
+					Option option = Option.valueOf(pProp.getKey().substring(OPTION.length()));
+					options.add(option);
+				}
+			}
+
+			parseConfiguration = Configuration.builder() //
+					.mappingProvider(new JacksonMappingProvider(mapper)) //
+					.jsonProvider(new JacksonJsonProvider(mapper)) //
+					.options(options) //
+					.build();
+		}
+	}
+
+	@Override
 	@SuppressWarnings("deprecation")
 	public void setProperty(String name, String value) {
 		super.setProperty(name, value);
 
 		if (ParserProperties.PROP_READ_LINES.equalsIgnoreCase(name)) {
 			activityDelim = Utils.toBoolean(value) ? ActivityDelim.EOL.name() : ActivityDelim.EOF.name();
+
+			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+					"ActivityParser.setting", name, value);
+		} else if (StringUtils.startsWithAny(name, PARSER_CFG_TOKENS)) {
+			parseProperties.put(name, value);
 
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityParser.setting", name, value);
@@ -105,7 +168,12 @@ public class ActivityJsonParser extends GenericActivityParser<DocumentContext> {
 			return activityDelim;
 		}
 
-		return super.getProperty(name);
+		Object pValue = super.getProperty(name);
+		if (pValue != null) {
+			return pValue;
+		}
+
+		return parseProperties.get(name);
 	}
 
 	/**
@@ -144,13 +212,13 @@ public class ActivityJsonParser extends GenericActivityParser<DocumentContext> {
 			if (data instanceof DocumentContext) {
 				jsonDoc = (DocumentContext) data;
 			} else if (data instanceof InputStream) {
-				jsonDoc = JsonPath.parse((InputStream) data);
+				jsonDoc = JsonPath.parse((InputStream) data, parseConfiguration);
 			} else {
 				jsonString = getNextActivityString(data);
 				if (StringUtils.isEmpty(jsonString)) {
 					return null;
 				}
-				jsonDoc = JsonPath.parse(jsonString);
+				jsonDoc = JsonPath.parse(jsonString, parseConfiguration);
 			}
 		} catch (Exception e) {
 			ParseException pe = new ParseException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
@@ -226,7 +294,7 @@ public class ActivityJsonParser extends GenericActivityParser<DocumentContext> {
 	 * @param locator
 	 *            activity field locator
 	 * @param cData
-	 *            {@link JsonPath} document context to read
+	 *            {@link com.jayway.jsonpath.JsonPath} document context to read
 	 * @param formattingNeeded
 	 *            flag to set if value formatting is not needed
 	 * @return value formatted based on locator definition or {@code null} if locator is not defined

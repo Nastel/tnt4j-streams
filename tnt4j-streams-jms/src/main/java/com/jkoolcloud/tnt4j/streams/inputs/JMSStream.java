@@ -53,7 +53,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * 'Topic')</li>
  * <li>java.naming.factory.initial - JNDI context factory name. (Required)</li>
  * <li>JMSConnFactory - JMS connection factory name. (Required)</li>
- * <li>list of JNDI context configuration properties supported by JMS server implementation. See
+ * <li>List of JNDI context configuration properties supported by JMS server implementation. See
  * {@link javax.naming.Context} for more details. (Optional)</li>
  * </ul>
  *

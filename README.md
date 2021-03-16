@@ -5827,10 +5827,44 @@ Using `#` locator without any manual map entry mapping is equivalent to `*` loca
 
  * `ReadLines` - indicates that complete JSON data package is single line. Default value - `true`. (Optional, deprecated - use `ActivityDelim`
   of [Generic parser](#generic-parser-parameters) instead)
+ * List of `DeserializationFeature.[FEATURE_NAME]` - defines set of Jackson Object Mapper's deserialization configuration features. See 
+ [DeserializationFeature](https://fasterxml.github.io/jackson-databind/javadoc/2.12/com/fasterxml/jackson/databind/DeserializationFeature.html).
+  (Optional)
+ * List of `MapperFeature.[FEATURE_NAME]` - defines set of Jackson Object Mapper's mapping configuration features. See 
+ [MapperFeature](https://fasterxml.github.io/jackson-databind/javadoc/2.12/com/fasterxml/jackson/databind/MapperFeature.html). (Optional)
+ * List of `JsonParser.[FEATURE_NAME]` - defines set of Jackson Object Mapper's parser configuration features. See 
+ [JsonParser.Feature](https://fasterxml.github.io/jackson-core/javadoc/2.12/com/fasterxml/jackson/core/JsonParser.Feature.html). (Optional)
+ * List of `Option.[OPTION_NAME]` - defines set of JsonPath configuration options. See 
+ [Option](https://javadoc.io/doc/com.jayway.jsonpath/json-path/latest/com/jayway/jsonpath/Option.html). (Optional)
 
     sample:
 ```xml
     <property name="ReadLines" value="false"/>
+    <!-- Jackson Object Mapper's Deserialization features -->
+    <property name="DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS" value="false"/>
+    <property name="DeserializationFeature.USE_BIG_INTEGER_FOR_INTS" value="false"/>
+    <property name="DeserializationFeature.USE_LONG_FOR_INTS" value="false"/>
+    <property name="DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY" value="false"/>
+    <property name="DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES" value="true"/>
+    <...>
+    <!-- Jackson Object Mapper's mapping features -->
+    <property name="MapperFeature.USE_ANNOTATIONS" value="true"/>
+    <property name="MapperFeature.USE_GETTERS_AS_SETTERS" value="true"/>
+    <property name="MapperFeature.PROPAGATE_TRANSIENT_MARKER" value="false"/>
+    <property name="MapperFeature.AUTO_DETECT_CREATORS" value="true"/>
+    <property name="MapperFeature.AUTO_DETECT_FIELDS" value="true"/>
+    <...>
+    <!-- Jackson Object Mapper's parser features -->
+    <property name="JsonParser.AUTO_CLOSE_SOURCE" value="true"/>
+    <property name="JsonParser.ALLOW_COMMENTS" value="false"/>
+    <property name="JsonParser.ALLOW_YAML_COMMENTS" value="false"/>
+    <property name="JsonParser.ALLOW_UNQUOTED_FIELD_NAMES" value="false"/>
+    <...>
+    <!-- JsonPath configuration options -->
+    <property name="Option.DEFAULT_PATH_LEAF_TO_NULL"/>
+    <property name="Option.ALWAYS_RETURN_LIST"/>
+    <property name="Option.AS_PATH_LIST"/>
+    <...>
 ```
 
 Also see [Generic parser parameters](#generic-parser-parameters).

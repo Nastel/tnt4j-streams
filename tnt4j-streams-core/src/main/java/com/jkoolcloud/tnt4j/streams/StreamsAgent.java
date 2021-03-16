@@ -30,6 +30,7 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.DefaultEventSinkFactory;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.OutputProperties;
+import com.jkoolcloud.tnt4j.streams.configure.StreamsConfigLoader;
 import com.jkoolcloud.tnt4j.streams.configure.build.CfgStreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.configure.build.StreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.configure.zookeeper.ZKConfigManager;
@@ -49,6 +50,10 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  */
 public final class StreamsAgent {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(StreamsAgent.class);
+
+	static {
+		StreamsConfigLoader.configureStatics();
+	}
 
 	private static final String PARAM_STREAM_CFG = "-f:"; // NON-NLS
 	private static final String PARAM_ZOOKEEPER_CFG = "-z:"; // NON-NLS
