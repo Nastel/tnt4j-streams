@@ -87,7 +87,8 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 	 */
 	protected String fileName = null;
 	/**
-	 * Charset name of streamed files.
+	 * Charset name of streamed files. {@code "guess"} value indicates to guess charset using some set of first bytes
+	 * from file.
 	 */
 	protected String charsetName = Utils.UTF8;
 
