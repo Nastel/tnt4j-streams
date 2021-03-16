@@ -1326,7 +1326,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		return data;
 	}
 
-	private boolean isLogicalTypeSupported(String logicalType) {
+	protected boolean isLogicalTypeSupported(String logicalType) {
 		return logicalType == null || "OBJECT".equals(logicalType) // NON-NLS
 				|| ArrayUtils.contains(getActivityDataType(), logicalType);
 	}

@@ -16,8 +16,7 @@
 
 package com.jkoolcloud.tnt4j.streams.parsers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.io.*;
 import java.text.ParseException;
@@ -33,6 +32,7 @@ import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.fields.*;
 import com.jkoolcloud.tnt4j.streams.inputs.AbstractBufferedStream;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
+import com.jkoolcloud.tnt4j.streams.preparsers.BinaryToStringPreParser;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
@@ -211,6 +211,17 @@ public class ActivityJsonParserTest {
 		String stringToBeParsed = "Testing"; // NON-NLS
 		InputStream inputStream = new ByteArrayInputStream(stringToBeParsed.getBytes());
 		assertEquals(stringToBeParsed, parser.getNextActivityString(inputStream));
+	}
+
+	@Test
+	public void testPreparserValidity() {
+		ActivityJsonParser parser = new ActivityJsonParser();
+		BinaryToStringPreParser preParser = new BinaryToStringPreParser();
+		parser.addReference(preParser);
+
+		boolean match = parser.isLogicalTypeSupported(preParser.dataTypeReturned());
+
+		assertTrue(match);
 	}
 
 }
