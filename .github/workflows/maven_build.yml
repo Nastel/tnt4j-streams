@@ -1,0 +1,194 @@
+# This workflow will build a Java project with Maven
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - '**/src/**'
+      - '**/pom.xml'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - '**/src/**'
+      - '**/pom.xml'
+
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Run reason'
+        required: true
+        default: 'Simple UI trigger'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        java-version: [ 8, 11, 15 ]
+
+    outputs:
+      pom-version: ${{ steps.get-pom-version.outputs.pom-version }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java-version }}
+      - name: Build with Maven
+        run: mvn -B clean package --file pom.xml --no-transfer-progress
+      - name: Get POM version
+        id: get-pom-version
+        run: |
+          VERSION=$( mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout --file pom.xml --no-transfer-progress )
+          echo "Found project version: $VERSION"
+          echo "::set-output name=pom-version::$VERSION"
+
+  #  cleanup:
+  #    needs: build
+  #    runs-on: ubuntu-latest
+  #    continue-on-error: true
+  #    if: ${{ contains(needs.build.outputs.pom-version, 'SNAPSHOT') }}
+  #
+  #    steps:
+  #      - name: Remove tnt4j-streams package assets
+  #        uses: abrkn/delete-old-github-package-versions@v1
+  #        with:
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          owner: Nastel
+  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams
+  #          minAge: 30s
+  #        continue-on-error: true
+  #      - name: Remove tnt4j-streams-chronicle package assets
+  #        uses: abrkn/delete-old-github-package-versions@v1
+  #        with:
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          owner: Nastel
+  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-chronicle
+  #          minAge: 30s
+  #        continue-on-error: true
+  #      - name: Remove tnt4j-streams-core package assets
+  #        uses: abrkn/delete-old-github-package-versions@v1
+  #        with:
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          owner: Nastel
+  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-core
+  #          minAge: 30s
+  #        continue-on-error: true
+  #      - name: Remove tnt4j-streams-elastic-beats package assets
+  #        uses: abrkn/delete-old-github-package-versions@v1
+  #        with:
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          owner: Nastel
+  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-elastic-beats
+  #          minAge: 30s
+  #        continue-on-error: true
+  #      - name: Remove tnt4j-streams-flume-plugin package assets
+  #        uses: abrkn/delete-old-github-package-versions@v1
+  #        with:
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          owner: Nastel
+  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-flume-plugin
+  #          minAge: 30s
+  #        continue-on-error: true
+  #      - name: Remove tnt4j-streams-fs package assets
+  #        uses: abrkn/delete-old-github-package-versions@v1
+  #        with:
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          owner: Nastel
+  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-fs
+  #          minAge: 30s
+  #        continue-on-error: true
+  #      - name: Remove tnt4j-streams-hdfs package assets
+  #        uses: abrkn/delete-old-github-package-versions@v1
+  #        with:
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          owner: Nastel
+  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-hdfs
+  #          minAge: 30s
+  #        continue-on-error: true
+  #      - name: Remove tnt4j-streams-jms package assets
+  #        uses: abrkn/delete-old-github-package-versions@v1
+  #        with:
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          owner: Nastel
+  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-jms
+  #          minAge: 30s
+  #        continue-on-error: true
+  #      - name: Remove tnt4j-streams-kafka package assets
+  #        uses: abrkn/delete-old-github-package-versions@v1
+  #        with:
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          owner: Nastel
+  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-kafka
+  #          minAge: 30s
+  #        continue-on-error: true
+  #      - name: Remove tnt4j-streams-mqtt package assets
+  #        uses: abrkn/delete-old-github-package-versions@v1
+  #        with:
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          owner: Nastel
+  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-mqtt
+  #          minAge: 30s
+  #        continue-on-error: true
+  #      - name: Remove tnt4j-streams-msoffice package assets
+  #        uses: abrkn/delete-old-github-package-versions@v1
+  #        with:
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          owner: Nastel
+  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-msoffice
+  #          minAge: 30s
+  #        continue-on-error: true
+  #      - name: Remove tnt4j-streams-samples package assets
+  #        uses: abrkn/delete-old-github-package-versions@v1
+  #        with:
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          owner: Nastel
+  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-samples
+  #          minAge: 30s
+  #        continue-on-error: true
+  #      - name: Remove tnt4j-streams-wmq package assets
+  #        uses: abrkn/delete-old-github-package-versions@v1
+  #        with:
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          owner: Nastel
+  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-wmq
+  #          minAge: 30s
+  #        continue-on-error: true
+  #      - name: Remove tnt4j-streams-ws package assets
+  #        uses: abrkn/delete-old-github-package-versions@v1
+  #        with:
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          owner: Nastel
+  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-ws
+  #          minAge: 30s
+  #        continue-on-error: true
+
+  publish-snapshot:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ contains(needs.build.outputs.pom-version, 'SNAPSHOT') }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up settings.xml for OSS
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+          server-id: oss.sonatype.org
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Publish SNAPSHOT version to OSS
+        run: mvn -B clean deploy --no-transfer-progress -DskipTests=true --file pom.xml
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USER }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASS }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
