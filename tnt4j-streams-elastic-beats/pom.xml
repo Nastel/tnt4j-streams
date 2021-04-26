@@ -20,7 +20,7 @@
         <java.target.version>${module.java.version}</java.target.version>
         <java.compiler.version>${module.java.version}</java.compiler.version>
 
-        <logstash.input.beats.version>6.0.13</logstash.input.beats.version> <!-- new available: 5.0.16, 5.1.9, 6.0.13 -->
+        <logstash.input.beats.version>6.1.1</logstash.input.beats.version> <!-- new available: 5.0.16, 5.1.9, 6.0.14, 6.1.1 -->
     </properties>
 
     <build>
