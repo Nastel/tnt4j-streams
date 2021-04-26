@@ -297,18 +297,18 @@
 
     <modules>
         <module>tnt4j-streams-core</module>
-        <!--<module>tnt4j-streams-fs</module>-->
-        <!--<module>tnt4j-streams-hdfs</module>-->
-        <!--<module>tnt4j-streams-jms</module>-->
-        <!--<module>tnt4j-streams-kafka</module>-->
-        <!--<module>tnt4j-streams-mqtt</module>-->
+        <module>tnt4j-streams-fs</module>
+        <module>tnt4j-streams-hdfs</module>
+        <module>tnt4j-streams-jms</module>
+        <module>tnt4j-streams-kafka</module>
+        <module>tnt4j-streams-mqtt</module>
         <module>tnt4j-streams-msoffice</module>
-        <!--<module>tnt4j-streams-wmq</module>-->
-        <!--<module>tnt4j-streams-ws</module>-->
-        <!--<module>tnt4j-streams-chronicle</module>-->
-        <!--<module>tnt4j-streams-flume-plugin</module>-->
-        <!--<module>tnt4j-streams-elastic-beats</module>-->
-        <!--<module>tnt4j-streams-samples</module>-->
+        <module>tnt4j-streams-wmq</module>
+        <module>tnt4j-streams-ws</module>
+        <module>tnt4j-streams-chronicle</module>
+        <module>tnt4j-streams-flume-plugin</module>
+        <module>tnt4j-streams-elastic-beats</module>
+        <module>tnt4j-streams-samples</module>
         <module>tnt4j-streams--distribution</module>
     </modules>
 </project>
