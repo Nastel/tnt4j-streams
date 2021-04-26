@@ -1158,7 +1158,7 @@ particular cached value.
 ## Samples
 
 ### Running samples
-When release assemblies are built, samples are located in `samples` directory, e.g., `../build/tnt4j-streams/tnt4j-streams-1.12.0-SNAPSHOT/samples`.
+When release assemblies are built, samples are located in `samples` directory, e.g., `build/tnt4j-streams-1.12.0-SNAPSHOT/samples`.
 To run particular sample:
 * go to sample directory
 * run `run.bat` or `run.sh` depending on your OS
@@ -6524,7 +6524,7 @@ Modules list:
 All optional modules (extensions) depends to `core` module and can't be build and run without it.
 
 **NOTE:** `Samples` module provides no additional features to TNT4J streaming framework. It contains only streams API use samples.
-**NOTE:** `Distribution` module performs `maven post build` release assemblies delivery to `../build/tnt4j-streams` directory.
+**NOTE:** `Distribution` module performs Maven post-build release assemblies delivery to `build/` directory.
 
 ## Requirements
 * JDK 1.8+
@@ -6532,20 +6532,20 @@ All optional modules (extensions) depends to `core` module and can't be build an
 * [TNT4J](https://github.com/Nastel/TNT4J)
 * [JESL](https://github.com/Nastel/JESL)
 
-All other required dependencies are defined in project modules `pom.xml` files. If maven is running online mode it should download these 
+All other required dependencies are defined in project modules `pom.xml` files. If Maven is running online mode it should download these 
 defined dependencies automatically.
 
 ### Manually installed dependencies
 Some of required and optional dependencies may be not available in public [Maven Repository](http://repo.maven.apache.org/maven2/). In this 
-case we would recommend to download those dependencies manually into module's `lib` directory and install into local maven repository by 
-running maven script `lib/pom.xml` with `install` goal. For example see [`tnt4j-streams/tnt4j-streams-elastic-beats/lib/pom.xml`](tnt4j-streams-elastic-beats/lib/pom.xml) 
+case we would recommend to download those dependencies manually into module's `lib` directory and install into local Maven repository by 
+running Maven script `lib/pom.xml` with `install` goal. For example see [`tnt4j-streams/tnt4j-streams-elastic-beats/lib/pom.xml`](tnt4j-streams-elastic-beats/lib/pom.xml) 
 how to do this.
 
 #### `Elastic-Beats` module
 
 **NOTE:** Because this module requires manually downloaded libraries, it is commented out in main project pom file `tnt4j-streams/pom.xml` 
 by default. If you want to use it uncomment line `<module>tnt4j-streams-elastic-beats</module>` of `pom.xml` file. But `Elastic-Beats` 
-module will be ready to build only when manually downloaded libraries will be installed to local maven repository.
+module will be ready to build only when manually downloaded libraries will be installed to local Maven repository.
 
 What to download manually or copy from your existing IBM MQ installation:
 * Logstash Beats Input Plugin 5.0.13
@@ -6558,15 +6558,15 @@ Download the above libraries and place into the `tnt4j-streams/tnt4j-streams-ela
 (O) marked libraries are optional
 
 ## Building
-* To build the project, run maven goals `clean package`
-* To build the project and install to local repo, run maven goals `clean install`
+* To build the project, run Maven goals `clean package`
+* To build the project and install to local repo, run Maven goals `clean install`
 * To make distributable release assemblies use one of profiles: `pack-bin` or `pack-all`:
     * containing only binary distribution: run `mvn -P pack-bin`
     * containing binary, source and javadoc distribution: run `mvn -P pack-all`
 
-By default maven will build all modules defined in `tnt4j-streams/pom.xml` file.
+By default Maven will build all modules defined in `tnt4j-streams/pom.xml` file.
 
-If you do not want to build some of optional modules, comment those out like `WMQ` module is. Or you can define maven to build your 
+If you do not want to build some of optional modules, comment those out like `WMQ` module is. Or you can define Maven to build your 
 preferred set of modules using `-pl, --projects` argument (comma separated modules list) together with `-am, --also-make` argument, e.g.:
 
 ```cmd
@@ -6579,12 +6579,12 @@ mvn --projects tnt4j-streams-core,tnt4j-streams-samples,tnt4j-streams--distribut
 
 **NOTE:** modules list should be without spaces after comma!
 
-Issuing these commands, maven will build only `tnt4j-streams-core`, `tnt4j-streams-samples` and `tnt4j-streams--distribution` modules.
+Issuing these commands, Maven will build only `tnt4j-streams-core`, `tnt4j-streams-samples` and `tnt4j-streams--distribution` modules.
 
-Release assemblies are built to `../build/tnt4j-streams` directory.
+Release assemblies are built to `build/` directory.
 
-**NOTE:** sometimes maven fails to correctly handle dependencies. If dependency configuration looks fine, but maven still complains about 
-missing dependencies try to delete local maven repository by hand: e.g., on MS Windows delete contents of `c:\Users\[username]\.m2\repository` 
+**NOTE:** sometimes Maven fails to correctly handle dependencies. If dependency configuration looks fine, but Maven still complains about 
+missing dependencies try to delete local Maven repository by hand: e.g., on MS Windows delete contents of `c:\Users\[username]\.m2\repository` 
 directory.
 
 **NOTE:** in case you are using Java 9 as your compiler and getting `java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException`, add 
@@ -6601,7 +6601,7 @@ Testing of TNT4J-Streams
 * [JUnit 4](http://junit.org/)
 * [Mockito](http://mockito.org/)
 
-## Testing using maven
+## Testing using Maven
 Maven tests run is disabled by default. To enable Maven to run tests set Maven command line argument 
 `-DskipTests=false`.
 
