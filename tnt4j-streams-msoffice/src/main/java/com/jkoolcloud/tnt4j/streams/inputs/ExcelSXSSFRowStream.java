@@ -487,7 +487,7 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 		 *            the record to be processed
 		 */
 		@Override
-		public void processRecord(Record record) {
+		public void processRecord(org.apache.poi.hssf.record.Record record) {
 			boolean currentSheetMatches = currentSheet == null || stream.sheetNameMatcher == null
 					|| stream.sheetNameMatcher.matcher(currentSheet).matches();
 
