@@ -16,7 +16,31 @@
     <properties>
         <quartz.version>2.3.2</quartz.version>
         <hikaricp.version>4.0.3</hikaricp.version>
+
+        <jaxws.version>2.3.3</jaxws.version>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>java9-plus</id>
+            <activation>
+                <jdk>[9.0,)</jdk>
+            </activation>
+            <dependencies>
+                <!-- JAX-WS dependencies for Java9+ -->
+                <dependency>
+                    <groupId>jakarta.xml.ws</groupId>
+                    <artifactId>jakarta.xml.ws-api</artifactId>
+                    <version>${jaxws.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.xml.ws</groupId>
+                    <artifactId>jaxws-rt</artifactId>
+                    <version>${jaxws.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <build>
         <resources>
@@ -76,6 +100,29 @@
             </plugin>
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>terracotta-snapshots</id>
+            <url>http://www.terracotta.org/download/reflector/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>terracotta-releases</id>
+            <url>http://www.terracotta.org/download/reflector/releases</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
