@@ -81,6 +81,14 @@ Running TNT4J-Streams
      **NOTE:** in case you are using Java 9 as your runtime JVM and getting `java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException`, 
      add `java` command parameter `--add-modules java.xml.bind` to add JAXB classes to java classpath.
 * As API integrated into your product
+    * Use Maven dependency:
+      ```xml
+          <dependency>
+              <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+              <artifactId>tnt4j-streams-core</artifactId>
+              <version>1.11.6</version>
+          </dependency>
+      ```
     * Write streams configuration file. See ['Streams configuration'](#streams-configuration) chapter for more details
     * use `StreamsAgent.runFromAPI(new CfgStreamsBuilder().setConfig(configFileName))` in your code
 * As system daemon service. See ['TNT4J-Streams as System Service configuration'](./bin/service/readmeServices.md) for details how to run 
@@ -6506,19 +6514,123 @@ How to Build TNT4J-Streams
 
 Modules list:
    * `Core` (M) - major module implementing data streaming (collection and transformation) features.
+     Maven dependency:
+     ```xml
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-core</artifactId>
+            <version>1.11.6</version>
+        </dependency>
+     ```
    * `Elastic-Beats` (O) - Elastic Beats provided data streaming module.
+     Maven dependency:
+     ```xml
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-elastic-beats</artifactId>
+            <version>1.11.6</version>
+        </dependency>
+     ```   
    * `Flume-Plugin` (O) - Apache Flume provided data streaming module.
+     Maven dependency:
+     ```xml
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-flume-plugin</artifactId>
+            <version>1.11.6</version>
+        </dependency>
+     ```   
    * `Fs` (O) - JSR-203 compliant [FileSystem](https://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html) provided files data 
-   streaming module. 
-   * `Hdfs` (O) - HDFS (Apache Hadoop) provided data streaming module. 
+   streaming module.
+     Maven dependency:
+     ```xml
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-fs</artifactId>
+            <version>1.11.6</version>
+        </dependency>
+     ```    
+   * `Hdfs` (O) - HDFS (Apache Hadoop) provided data streaming module.
+     Maven dependency:
+     ```xml
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-hdfs</artifactId>
+            <version>1.11.6</version>
+        </dependency>
+     ```    
    * `JMS` (O) - JMS (Java Message Service) provided data streaming module.
+     Maven dependency:
+     ```xml
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-jms</artifactId>
+            <version>1.11.6</version>
+        </dependency>
+     ```   
    * `Kafka` (O) - Apache Kafka provided data streaming module.
+     Maven dependency:
+     ```xml
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-kafka</artifactId>
+            <version>1.11.6</version>
+        </dependency>
+     ```   
    * `Mqtt` (O) - MQTT provided data streaming module.
+     Maven dependency:
+     ```xml
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-mqtt</artifactId>
+            <version>1.11.6</version>
+        </dependency>
+     ```   
    * `MsOffice` (O) - MS Office Excel provided data streaming module.
+     Maven dependency:
+     ```xml
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-msoffice</artifactId>
+            <version>1.11.6</version>
+        </dependency>
+     ```   
    * `WMQ` (O) - IBM MQ provided data streaming module.
+     Maven dependency:
+     ```xml
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-wmq</artifactId>
+            <version>1.11.6</version>
+        </dependency>
+     ```   
    * `WS` (O) - web-service (or OS command) provided data streaming module.
+     Maven dependency:
+     ```xml
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-ws</artifactId>
+            <version>1.11.6</version>
+        </dependency>
+     ```   
    * `Chronicle` (O) - [Chronicle Queue](https://chronicle.software/products/queue/) provided data streaming module.
+     Maven dependency:
+     ```xml
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-chronicle</artifactId>
+            <version>1.11.6</version>
+        </dependency>
+     ```   
    * `Samples` (O) - integration into custom API sample module.
+     Maven dependency:
+     ```xml
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-samples</artifactId>
+            <version>1.11.6</version>
+        </dependency>
+     ```   
    * `Distribution` (OU) - distributable package build module.
 
 All optional modules (extensions) depends to `core` module and can't be build and run without it.
@@ -6561,8 +6673,10 @@ Download the above libraries and place into the `tnt4j-streams/tnt4j-streams-ela
 * To build the project, run Maven goals `clean package`
 * To build the project and install to local repo, run Maven goals `clean install`
 * To make distributable release assemblies use one of profiles: `pack-bin` or `pack-all`:
-    * containing only binary distribution: run `mvn -P pack-bin`
-    * containing binary, source and javadoc distribution: run `mvn -P pack-all`
+    * containing only binary (including `test` package) distribution: run `mvn -P pack-bin`
+    * containing binary (including `test` package), `source` and `javadoc` distribution: run `mvn -P pack-all`
+* To make maven required `source` and `javadoc` packages, use profile `pack-maven`
+* To make maven central compliant release having `source`, `javadoc` and all signed packages, use `maven-release` profile
 
 By default Maven will build all modules defined in `tnt4j-streams/pom.xml` file.
 
