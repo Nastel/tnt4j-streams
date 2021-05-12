@@ -41,10 +41,9 @@
             ]]></field-transform>
         </field>
 
-        <!-- un-comment if your Kafka version >= 0.11-->
-        <!--embedded-activity name="Headers" locator="headers.headers" locator-type="Label">
+        <embedded-activity name="Headers" locator="headers.headers" locator-type="Label">
             <parser-ref name="HeadersParser"/>
-        </embedded-activity-->
+        </embedded-activity>
     </parser>
 
     <parser name="RecordMetadataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
@@ -54,8 +53,9 @@
         <field name="EventName" value="Kafka_Producer_Acknowledge"/>
         <field name="Checksum" locator="checksum" locator-type="Label" datatype="Number"/>
 
-        <field name="Topic" locator="topic" locator-type="Label"/>
-        <field name="Partition" locator="partition" locator-type="Label" datatype="Number"/>
+        <field name="TopicPartition" locator="topicPartition" locator-type="Label" transparent="true">
+            <parser-ref name="TopicPartitionParser" aggregation="Merge"/>
+        </field>
         <field name="Offset" locator="offset" locator-type="Label" datatype="Number"/>
 
         <field name="StreamTime" locator="DateTime" locator-type="StreamProp" datatype="DateTime" units="Milliseconds" transparent="true"/>
@@ -105,6 +105,8 @@
         <field name="serializedKeySize" locator="serializedKeySize" locator-type="Label"/>
         <field name="serializedValueSize" locator="serializedValueSize" locator-type="Label"/>
 
+        <field name="leaderEpoch" locator="leaderEpoch.value" locator-type="Label"/>
+
         <field name="MsgLength" value="" datatype="Number">
             <field-transform lang="groovy"><![CDATA[
                (${serializedKeySize} >= 0
@@ -123,10 +125,9 @@
             ]]></field-transform>
         </field>
 
-        <!-- un-comment if your Kafka version >= 0.11-->
-        <!--embedded-activity name="Headers" locator="headers.headers" locator-type="Label">
+        <embedded-activity name="Headers" locator="headers.headers" locator-type="Label">
             <parser-ref name="HeadersParser"/>
-        </embedded-activity-->
+        </embedded-activity>
     </parser>
 
     <parser name="OffsetAndMetadataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
@@ -138,6 +139,7 @@
         <field name="Metadata" locator="metadata" locator-type="Label"/>
         <field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="DateTime" units="Milliseconds"/>
         <field name="EndTime" locator="StartTime" locator-type="Activity"/>
+        <field name="leaderEpoch" locator="leaderEpoch.value" locator-type="Label"/>
     </parser>
 
     <parser name="TopicPartitionParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
