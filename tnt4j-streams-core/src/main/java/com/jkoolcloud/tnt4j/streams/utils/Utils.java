@@ -2656,18 +2656,28 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 		try {
 			Object fVal = null;
+			NoSuchFieldException fExc = null;
 			try {
 				Field f = dataObj.getClass().getDeclaredField(path[i]);
 				f.setAccessible(true);
 				fVal = f.get(dataObj);
 			} catch (NoSuchFieldException nfe) {
+				fExc = nfe;
+			}
+
+			NoSuchMethodException mExc = null;
+			if (fVal == null) {
 				try {
 					Method m = dataObj.getClass().getDeclaredMethod(path[i]);
 					m.setAccessible(true);
 					fVal = m.invoke(dataObj);
 				} catch (NoSuchMethodException nme) {
-					throw nfe;
+					mExc = nme;
 				}
+			}
+
+			if (fExc != null && mExc != null) {
+				throw fExc;
 			}
 
 			return getFieldValue(path, fVal, i + 1);
