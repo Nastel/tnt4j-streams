@@ -5930,6 +5930,38 @@ Additional JMS message fields and mappings are supported by these locators for t
 
 Also see ['Activity map parser'](#activity-map-parser) and [Generic parser parameters](#generic-parser-parameters).
 
+#### Kafka Consumer Record parser
+
+See [Generic parser parameters](#generic-parser-parameters) for general parser configuration. This parser does not have any additional 
+configuration properties.
+
+List of predefined locators for this parser:
+* `topic` - topic this record is received from
+* `partition` - partition from which this record is received
+* `offset` - position of this record in the corresponding Kafka partition
+* `timestamp` - timestamp of this record
+* `timestampType` - timestamp type of this record
+* `checksum` - checksum (CRC32) of the record
+* `serializedKeySize` - size of the serialized, uncompressed key in bytes
+* `serializedValueSize` - size of the serialized, uncompressed value in bytes
+* `key` - record key
+* `value` - record data
+* `headers` - record headers map
+* `leaderEpoch` - record leader epoch
+
+#### Kafka Producer Record parser
+
+See [Generic parser parameters](#generic-parser-parameters) for general parser configuration. This parser does not have any additional 
+configuration properties.
+
+List of predefined locators for this parser:
+* `topic` - topic name record is being sent to
+* `partition` - partition identifier to which the record will be sent
+* `timestamp` - record timestamp value
+* `key` - record key
+* `value` - record data
+* `headers` - record headers map
+
 #### Activity PCF parser
 
  * `TranslateNumValues` - indicates that parser should translate resolved numeric values to corresponding MQ constant names if possible and 
@@ -6530,7 +6562,7 @@ Modules list:
             <artifactId>tnt4j-streams-elastic-beats</artifactId>
             <version>1.11.6</version>
         </dependency>
-     ```   
+     ```
    * `Flume-Plugin` (O) - Apache Flume provided data streaming module.
      Maven dependency:
      ```xml
@@ -6539,7 +6571,7 @@ Modules list:
             <artifactId>tnt4j-streams-flume-plugin</artifactId>
             <version>1.11.6</version>
         </dependency>
-     ```   
+     ```
    * `Fs` (O) - JSR-203 compliant [FileSystem](https://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html) provided files data 
    streaming module.
      Maven dependency:
@@ -6549,7 +6581,7 @@ Modules list:
             <artifactId>tnt4j-streams-fs</artifactId>
             <version>1.11.6</version>
         </dependency>
-     ```    
+     ```
    * `Hdfs` (O) - HDFS (Apache Hadoop) provided data streaming module.
      Maven dependency:
      ```xml
@@ -6558,7 +6590,7 @@ Modules list:
             <artifactId>tnt4j-streams-hdfs</artifactId>
             <version>1.11.6</version>
         </dependency>
-     ```    
+     ```
    * `JMS` (O) - JMS (Java Message Service) provided data streaming module.
      Maven dependency:
      ```xml
@@ -6567,7 +6599,7 @@ Modules list:
             <artifactId>tnt4j-streams-jms</artifactId>
             <version>1.11.6</version>
         </dependency>
-     ```   
+     ```
    * `Kafka` (O) - Apache Kafka provided data streaming module.
      Maven dependency:
      ```xml
@@ -6576,7 +6608,7 @@ Modules list:
             <artifactId>tnt4j-streams-kafka</artifactId>
             <version>1.11.6</version>
         </dependency>
-     ```   
+     ```
    * `Mqtt` (O) - MQTT provided data streaming module.
      Maven dependency:
      ```xml
@@ -6585,7 +6617,7 @@ Modules list:
             <artifactId>tnt4j-streams-mqtt</artifactId>
             <version>1.11.6</version>
         </dependency>
-     ```   
+     ```
    * `MsOffice` (O) - MS Office Excel provided data streaming module.
      Maven dependency:
      ```xml
@@ -6594,7 +6626,7 @@ Modules list:
             <artifactId>tnt4j-streams-msoffice</artifactId>
             <version>1.11.6</version>
         </dependency>
-     ```   
+     ```
    * `WMQ` (O) - IBM MQ provided data streaming module.
      Maven dependency:
      ```xml
@@ -6603,7 +6635,7 @@ Modules list:
             <artifactId>tnt4j-streams-wmq</artifactId>
             <version>1.11.6</version>
         </dependency>
-     ```   
+     ```
    * `WS` (O) - web-service (or OS command) provided data streaming module.
      Maven dependency:
      ```xml
@@ -6612,7 +6644,7 @@ Modules list:
             <artifactId>tnt4j-streams-ws</artifactId>
             <version>1.11.6</version>
         </dependency>
-     ```   
+     ```
    * `Chronicle` (O) - [Chronicle Queue](https://chronicle.software/products/queue/) provided data streaming module.
      Maven dependency:
      ```xml
@@ -6621,7 +6653,7 @@ Modules list:
             <artifactId>tnt4j-streams-chronicle</artifactId>
             <version>1.11.6</version>
         </dependency>
-     ```   
+     ```
    * `Samples` (O) - integration into custom API sample module.
      Maven dependency:
      ```xml
@@ -6630,7 +6662,7 @@ Modules list:
             <artifactId>tnt4j-streams-samples</artifactId>
             <version>1.11.6</version>
         </dependency>
-     ```   
+     ```
    * `Distribution` (OU) - distributable package build module.
 
 All optional modules (extensions) depends to `core` module and can't be build and run without it.
@@ -6650,24 +6682,7 @@ defined dependencies automatically.
 ### Manually installed dependencies
 Some of required and optional dependencies may be not available in public [Maven Repository](http://repo.maven.apache.org/maven2/). In this 
 case we would recommend to download those dependencies manually into module's `lib` directory and install into local Maven repository by 
-running Maven script `lib/pom.xml` with `install` goal. For example see [`tnt4j-streams/tnt4j-streams-elastic-beats/lib/pom.xml`](tnt4j-streams-elastic-beats/lib/pom.xml) 
-how to do this.
-
-#### `Elastic-Beats` module
-
-**NOTE:** Because this module requires manually downloaded libraries, it is commented out in main project pom file `tnt4j-streams/pom.xml` 
-by default. If you want to use it uncomment line `<module>tnt4j-streams-elastic-beats</module>` of `pom.xml` file. But `Elastic-Beats` 
-module will be ready to build only when manually downloaded libraries will be installed to local Maven repository.
-
-What to download manually or copy from your existing IBM MQ installation:
-* Logstash Beats Input Plugin 5.0.13
-
-Download the above libraries and place into the `tnt4j-streams/tnt4j-streams-elastic-beats/lib` directory like this:
-```
-    lib
-     |- logstash-input-beats-5.0.13.jar
-```
-(O) marked libraries are optional
+running Maven script `lib/pom.xml` with `install` goal.
 
 ## Building
 * To build the project, run Maven goals `clean package`

@@ -47,7 +47,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>serializedValueSize - size of the serialized, uncompressed value in bytes</li>
  * <li>key - record key</li>
  * <li>value - record data</li>
- * <li>headers - record headers</li>
+ * <li>headers - record headers map</li>
  * <li>leaderEpoch - record leader epoch</li>
  * </ul>
  * <p>

@@ -42,7 +42,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>timestamp - record timestamp value</li>
  * <li>key - record key</li>
  * <li>value - record data</li>
- * <li>headers - record headers</li>
+ * <li>headers - record headers map</li>
  * </ul>
  * <p>
  * If {@code key} or {@code value} contains complex data, use stacked parsers to parse that data. Or if it can be
