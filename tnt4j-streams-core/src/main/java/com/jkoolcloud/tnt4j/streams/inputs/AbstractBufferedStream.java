@@ -494,7 +494,7 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 				return;
 			}
 
-			halt(true);
+			halt(false);
 			try {
 				close();
 			} catch (Exception exc) {
@@ -502,6 +502,7 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"AbstractBufferedStream.input.close.error", exc);
 			}
+			halt(true);
 		}
 
 		/**
