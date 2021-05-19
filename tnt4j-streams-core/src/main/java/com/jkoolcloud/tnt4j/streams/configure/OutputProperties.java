@@ -76,6 +76,11 @@ public interface OutputProperties {
 	String PROP_RETRY_PERIOD = "RetryPeriod"; // NON-NLS
 
 	/**
+	 * Constant for name of built-in {@value} property. Alias for {@link #PROP_RETRY_PERIOD}.
+	 */
+	String PROP_RETRY_INTERVAL = "RetryInterval"; // NON-NLS
+
+	/**
 	 * Constant for name of built-in {@value} property.
 	 */
 	String PROP_SEND_STREAM_STATES = "SendStreamStates"; // NON-NLS

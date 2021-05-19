@@ -4562,6 +4562,7 @@ Default value - `null`. (Optional)
  repeats until success (may repeat infinite number of times). Default value - `false` or `1`. (Optional)
  * `RetryPeriod` - period in seconds to wait before next issue of state check or activity recording operation after failure. Default 
  value - `10sec.`. (Optional)
+ * `RetryInterval` - alias for `RetryPeriod`. (Optional)
  * `ResolveServerFromDNS` - flag indicating whether to resolve activity entity host name/IP from DNS server. Default value - `false`. (Optional)
  * `SplitRelatives` - flag indicating whether to send activity entity child entities independently merging data from both parent and child 
  entity fields into produced entity. Default value - `false`. (Optional). **NOTE**: This value has alias `TurnOutActivityChildren` left for 

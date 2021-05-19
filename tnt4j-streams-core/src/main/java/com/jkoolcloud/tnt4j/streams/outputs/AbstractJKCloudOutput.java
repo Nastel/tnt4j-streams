@@ -65,6 +65,7 @@ import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
  * times). Default value - {@code false} or {@code 1}. (Optional)</li>
  * <li>RetryPeriod - period in seconds to wait before next issue of state check or activity recording operation after
  * failure. Default value - '10sec.'. (Optional)</li>
+ * <li>RetryInterval - alias for RetryPeriod. (Optional)</li>
  * <li>SendStreamStates - flag indicating whether to send stream status change messages (`startup`/`shutdown`) to output
  * endpoint e.g. 'jKoolCloud'. Default value - {@code true}. (Optional)</li>
  * </ul>
@@ -279,7 +280,8 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 					getStream().removeStreamListener(jKoolNotificationListener);
 				}
 			}
-		} else if (OutputProperties.PROP_RETRY_PERIOD.equalsIgnoreCase(name)) {
+		} else if (StringUtils.equalsAnyIgnoreCase(name, OutputProperties.PROP_RETRY_PERIOD,
+				OutputProperties.PROP_RETRY_INTERVAL)) {
 			int retryPeriodSec = Integer.parseInt((String) value);
 			retryPeriod = TimeUnit.SECONDS.toMillis(retryPeriodSec);
 		}
