@@ -4,7 +4,6 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
     <!-- START of metrics parsing -->
-
     <parser name="MetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="All" locator="*" locator-type="Label"/>
     </parser>
@@ -34,6 +33,8 @@
 
         <field name="Offset" locator="$.Offset.offset" locator-type="Label"/>
         <field name="Timestamp" locator="$.Offset.p_timestamp" locator-type="Label"/>
+
+        <field name="Correlator" locator="$.Correlator" locator-type="Label"/>
     </parser>
 
     <parser name="AckMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser" default-data-type="AsInput"
@@ -81,6 +82,8 @@
                         : ${LastOffsetTime})
             ]]></field-transform>
         </field>
+
+        <field name="Correlator" locator="$.Correlator" locator-type="Label"/>
     </parser>
 
     <parser name="ConsumeMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser"
@@ -145,6 +148,8 @@
                     : 0
 		    ]]></field-transform>
         </field>
+
+        <field name="Correlator" locator="$.Correlator" locator-type="Label"/>
     </parser>
 
     <parser name="CommitMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser" default-data-type="AsInput"
@@ -172,6 +177,8 @@
 
         <field name="Offset" locator="$.Offset.offset" locator-type="Label"/>
         <field name="Timestamp" locator="$.Offset.c_timestamp" locator-type="Label"/>
+
+        <field name="Correlator" locator="$.Correlator" locator-type="Label"/>
     </parser>
 
     <parser name="KafkaInterceptMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser" default-data-type="AsInput">
@@ -193,17 +200,18 @@
     <!-- END of metrics parsing -->
 
     <!-- START of JMX metrics parsing -->
-
     <parser name="SnapshotParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser" default-data-type="AsInput">
         <field name="EventName" locator="properties.ObjectName" locator-type="Label"/>
         <field name="EventType" value="SNAPSHOT"/>
-        <field name="EElse" locator="properties.*" locator-type="Label"/>
+        <field name="JMXMetrics" locator="properties.*" locator-type="Label"/>
+        <field name="Category" value="Kafka JMX metrics snapshot"/>
     </parser>
 
     <parser name="TNTJSONParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser" default-data-type="AsInput">
         <property name="ActivityDelim" value="EOF"/>
         <field name="EventType" value="Activity"/>
         <field name="EventName" locator="$.operation" locator-type="Label"/>
+        <field name="Correlator" locator="$.corrid" locator-type="Label"/>
 
         <embedded-activity name="Snapshots" locator="$.snapshots.[*]" locator-type="Label">
             <parser-ref name="SnapshotParser" aggregation="Relate"/>
@@ -222,9 +230,9 @@
             </parser-ref>
         </field>
     </parser>
+    <!-- END of JMX metrics parsing -->
 
     <!--cache def -->
-
     <cache>
         <property name="MaxSize" value="100"/>
         <property name="ExpireDuration" value="55"/>
@@ -239,8 +247,6 @@
             <value>${LatestPTimestamp}</value>
         </entry>
     </cache>
-
-    <!-- END of JMX metrics parsing -->
 
     <stream name="KafkaMetricsStream" class="com.jkoolcloud.tnt4j.streams.inputs.KafkaConsumerStream">
         <property name="HaltIfNoParser" value="false"/>
