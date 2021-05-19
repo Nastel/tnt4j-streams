@@ -11,6 +11,13 @@
         </field>
     </parser>
 
+    <parser name="TopicPartitionParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
+        <property name="supportedClass" value="org.apache.kafka.common.TopicPartition"/>
+
+        <field name="Topic" locator="topic" locator-type="Label"/>
+        <field name="Partition" locator="partition" locator-type="Label" datatype="Number"/>
+    </parser>
+
     <!-- PRODUCER parsers start -->
     <parser name="ProducerRecordParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
         <property name="SupportedClass" value="org.apache.kafka.clients.producer.ProducerRecord"/>
@@ -140,13 +147,6 @@
         <field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="DateTime" units="Milliseconds"/>
         <field name="EndTime" locator="StartTime" locator-type="Activity"/>
         <field name="leaderEpoch" locator="leaderEpoch.value" locator-type="Label"/>
-    </parser>
-
-    <parser name="TopicPartitionParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
-        <property name="supportedClass" value="org.apache.kafka.common.TopicPartition"/>
-
-        <field name="Topic" locator="topic" locator-type="Label"/>
-        <field name="Partition" locator="partition" locator-type="Label" datatype="Number"/>
     </parser>
     <!-- CONSUMER parsers end -->
 
