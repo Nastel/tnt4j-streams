@@ -27,4 +27,9 @@ public interface KafkaStreamProperties extends StreamProperties {
 	 * Constant for name of built-in {@value} property.
 	 */
 	String PROP_OFFSET = "Offset"; // NON-NLS
+
+	/**
+	 * Constant for name of built-in {@value} property.
+	 */
+	String PROP_TOPIC_PATTERN = "TopicPattern"; // NON-NLS
 }

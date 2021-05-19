@@ -52,8 +52,8 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * This activity stream supports the following configuration properties (in addition to those supported by
  * {@link TNTInputStream}):
  * <ul>
- * <li>FileName - the system-dependent file name. (Required - just one 'FileName' or 'Port')</li>
- * <li>Port - port number to accept character stream over TCP/IP. (Required - just one 'FileName' or 'Port')</li>
+ * <li>FileName - the system-dependent file name. (Required - just one of: 'FileName' or 'Port')</li>
+ * <li>Port - port number to accept character stream over TCP/IP. (Required - just one of: 'FileName' or 'Port')</li>
  * <li>RestartOnInputClose - flag indicating to restart {@link ServerSocket} (open new {@link ServerSocket} instance) if
  * listened server socked gets closed or fails to accept connection. (Optional)</li>
  * <li>BufferSize - maximal buffer queue capacity. Default value - {@code 1024}. (Optional)</li>

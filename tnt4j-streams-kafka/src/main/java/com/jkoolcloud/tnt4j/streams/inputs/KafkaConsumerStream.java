@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -43,7 +44,9 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * This activity stream supports the following configuration properties (in addition to those supported by
  * {@link AbstractBufferedStream}):
  * <ul>
- * <li>Topic - defines set of topic names (delimited using '|' character) to listen. (Required)</li>
+ * <li>Topic - defines set of topic names (delimited using '|' character) to listen. (Required - just one of: 'Topic' or
+ * 'TopicPattern')</li>
+ * <li>TopicPattern - defines topic name RegEx pattern. (Required - just one of: 'Topic' or 'TopicPattern')</li>
  * <li>Offset - defines list of topic offsets (delimited using '|' character) to start consuming messages. Single value
  * applies to all topics. Default value - {@code -1 (from latest)}. (Optional)</li>
  * <li>FileName - Kafka Consumer configuration file ({@code "consumer.properties"}) path. (Optional)</li>
@@ -74,6 +77,7 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 
 	private String topicName;
 	private Set<String> topicNames;
+	private Pattern topicPattern;
 	private String offset;
 	private List<Integer> offsets;
 	private String cfgFileName;
@@ -112,6 +116,12 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 					}
 				}
 			}
+		} else if (KafkaStreamProperties.PROP_TOPIC_PATTERN.equalsIgnoreCase(name)) {
+			topicName = value;
+
+			if (StringUtils.isNotEmpty(value)) {
+				topicPattern = Pattern.compile(value);
+			}
 		} else if (StreamProperties.PROP_FILENAME.equalsIgnoreCase(name)) {
 			cfgFileName = value;
 		} else if (KafkaStreamProperties.PROP_OFFSET.equalsIgnoreCase(name)) {
@@ -134,6 +144,9 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 	@Override
 	public Object getProperty(String name) {
 		if (StreamProperties.PROP_TOPIC_NAME.equalsIgnoreCase(name)) {
+			return topicName;
+		}
+		if (KafkaStreamProperties.PROP_TOPIC_PATTERN.equalsIgnoreCase(name)) {
 			return topicName;
 		}
 		if (KafkaStreamProperties.PROP_OFFSET.equalsIgnoreCase(name)) {
@@ -253,14 +266,18 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 	protected void applyProperties() throws Exception {
 		super.applyProperties();
 
-		if (CollectionUtils.isEmpty(topicNames)) {
+		if (StringUtils.isEmpty(topicName)) {
 			throw new IllegalStateException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
-					"TNTInputStream.property.undefined", StreamProperties.PROP_TOPIC_NAME));
+					"TNTInputStream.property.undefined.one.of", StreamProperties.PROP_TOPIC_NAME,
+					KafkaStreamProperties.PROP_TOPIC_PATTERN));
 		}
 
-		if (CollectionUtils.isNotEmpty(offsets) && offsets.size() > 1 && offsets.size() != topicNames.size()) {
-			throw new IllegalStateException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
-					"KafkaConsumerStream.offsets.mismatch", offsets.size(), topicNames.size()));
+		if (CollectionUtils.isNotEmpty(topicNames)) {
+			if (topicPattern != null) {
+				throw new IllegalArgumentException(StreamsResources.getStringFormatted(
+						StreamsResources.RESOURCE_BUNDLE_NAME, "TNTInputStream.cannot.set.both",
+						StreamProperties.PROP_TOPIC_NAME, KafkaStreamProperties.PROP_TOPIC_PATTERN));
+			}
 		}
 
 		if (StringUtils.isNotEmpty(cfgFileName)) {
@@ -285,7 +302,7 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 				"KafkaConsumerStream.consumer.starting");
 
 		kafkaDataReceiver = new KafkaDataReceiver();
-		kafkaDataReceiver.initialize(getScopeProps(PROP_SCOPE_CONSUMER), topicNames, offsets);
+		kafkaDataReceiver.initialize(getScopeProps(PROP_SCOPE_CONSUMER), topicNames, topicPattern, offsets);
 	}
 
 	@Override
@@ -323,7 +340,8 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 
 		private Consumer<?, ?> consumer;
 		private Set<String> topics;
-		private List<Integer> offsets;
+		private Pattern topicNamePattern;
+		private List<Integer> topicOffsets;
 		private boolean autoCommit = true;
 
 		private final Object closeLock = new Object();
@@ -346,7 +364,8 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 		protected void initialize(Object... params) throws Exception {
 			Properties cProperties = (Properties) params[0];
 			topics = (Set<String>) params[1];
-			offsets = (List<Integer>) params[2];
+			topicNamePattern = (Pattern) params[2];
+			topicOffsets = (List<Integer>) params[3];
 
 			autoCommit = Utils.getBoolean(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, cProperties, true);
 			consumer = new KafkaConsumer<>(cProperties);
@@ -359,21 +378,25 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 		public void run() {
 			if (consumer != null) {
 				try {
-					consumer.subscribe(topics);
-					if (CollectionUtils.isNotEmpty(offsets)) {
-						if (offsets.size() == 1) {
-							if (offsets.get(0) >= 0) {
-								for (String topic : topics) {
-									consumer.seek(new TopicPartition(topic, 0), offsets.get(0));
-								}
-							}
-						} else {
-							int idx = 0;
-							for (String topic : topics) {
-								int offset = offsets.get(idx++);
-								if (offset >= 0) {
-									consumer.seek(new TopicPartition(topic, 0), offset);
-								}
+					if (topicNamePattern != null) {
+						consumer.subscribe(topicNamePattern);
+						topics = consumer.subscription();
+					} else {
+						consumer.subscribe(topics);
+					}
+
+					if (CollectionUtils.isNotEmpty(topicOffsets)) {
+						if (topicOffsets.size() > 1 && topicOffsets.size() != topics.size()) {
+							throw new IllegalStateException(StreamsResources.getStringFormatted(
+									StreamsResources.RESOURCE_BUNDLE_NAME, "KafkaConsumerStream.offsets.mismatch",
+									topicOffsets.size(), topics.size()));
+						}
+
+						int idx = 0;
+						for (String topic : topics) {
+							int tOffset = topicOffsets.size() == 1 ? topicOffsets.get(idx) : topicOffsets.get(idx++);
+							if (tOffset >= 0) {
+								consumer.seek(new TopicPartition(topic, 0), tOffset);
 							}
 						}
 					}

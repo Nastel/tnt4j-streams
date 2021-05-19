@@ -4855,8 +4855,8 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 
 #### Characters/Bytes feed stream parameters
 
- * `FileName` - the system-dependent file name. (Required - just one `FileName` or `Port`)
- * `Port` - port number to accept character stream over TCP/IP. (Required - just one `FileName` or `Port`)
+ * `FileName` - the system-dependent file name. (Required - just one of: `FileName` or `Port`)
+ * `Port` - port number to accept character stream over TCP/IP. (Required - just one of: `FileName` or `Port`)
  * `RestartOnInputClose` - flag indicating to restart stream if input socked gets closed. Default value - `false`. (Optional)
 
     sample:
@@ -5036,7 +5036,8 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 
 #### Kafka consumer stream parameters
 
- * `Topic` - defines set of topic names (delimited using `|` character) to listen. (Required)
+ * `Topic` - defines set of topic names (delimited using `|` character) to listen. (Required - just one of: `Topic` or `TopicPattern`)
+ * `TopicPattern` - defines topic name RegEx pattern. (Required - just one of: `Topic` or `TopicPattern`)
  * `Offset` - defines list of topic offsets (delimited using `|` character) to start consuming messages. Value `-1` or `||` (for tokenized 
  definitions) means `use latest topic offset`. Number of offset tokens must match number of defined topics. Single value applies to all 
  topics. Default value - `-1`. (Optional)
@@ -5059,6 +5060,8 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 
     <property name="Topic" value="TNT4JKafkaTestTopic|TNT4JKafkaProductionTopic|TNT4JKafkaRnDTopic"/>
     <property name="Offset" value="5"/>
+
+    <property name="TopicPattern" value="tnt4j-.*"/>
 
     <property name="FileName" value="./config/consumer.properties"/>
 
@@ -5473,8 +5476,8 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 
 #### Redirect TNT4J Stream parameters
 
- * `FileName` - the system-dependent file name. (Required - just one `FileName` or `Port`)
- * `Port` - port number to accept character stream over TCP/IP. (Required - just one `FileName` or `Port`)
+ * `FileName` - the system-dependent file name. (Required - just one of: `FileName` or `Port`)
+ * `Port` - port number to accept character stream over TCP/IP. (Required - just one of: `FileName` or `Port`)
  * `RestartOnInputClose` - flag indicating to restart Server Socket (open new instance) if listened one gets closed or fails to accept 
  connection. (Optional)
  * `BufferSize` - maximal buffer queue capacity. Default value - `1024`. (Optional)

@@ -57,8 +57,8 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * {@link TNTParseableInputStream}):
  * <ul>
  * <li>FileName - the system-dependent file name or file name pattern defined using wildcard characters '*' and '?'.
- * (Required - just one 'FileName' or 'Port')</li>
- * <li>Port - port number to accept character stream over TCP/IP. (Required - just one 'FileName' or 'Port')</li>
+ * (Required - just one of: 'FileName' or 'Port')</li>
+ * <li>Port - port number to accept character stream over TCP/IP. (Required - just one of: 'FileName' or 'Port')</li>
  * <li>RestartOnInputClose - flag indicating to restart stream if input socked gets closed. (Optional)</li>
  * </ul>
  *
