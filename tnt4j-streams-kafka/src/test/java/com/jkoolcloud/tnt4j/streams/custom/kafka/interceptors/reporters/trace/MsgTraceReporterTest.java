@@ -66,7 +66,7 @@ public class MsgTraceReporterTest {
 
 		for (int i = 0; i < 10; i++) {
 			HashMap<String, TraceCommandDeserializer.TopicTraceCommand> traceConfig = new HashMap<>();
-			reporter.pollConfigQueue(config, MsgTraceReporter.TNT_TRACE_CONFIG_TOPIC, traceConfig);
+			reporter.pollConfigQueue(config, MsgTraceReporter.TRACE_CONFIG_TOPIC, traceConfig);
 			System.out.println("Control records for " + traceConfig.size());
 			TimeUnit.SECONDS.sleep(3);
 		}
@@ -88,7 +88,7 @@ public class MsgTraceReporterTest {
 
 		consumer = new KafkaConsumer<>(props);
 		try {
-			TopicPartition topicPartition = new TopicPartition(MsgTraceReporter.TNT_TRACE_CONFIG_TOPIC, 0);
+			TopicPartition topicPartition = new TopicPartition(MsgTraceReporter.TRACE_CONFIG_TOPIC, 0);
 			consumer.assign(Arrays.asList(topicPartition));
 
 			while (true) {

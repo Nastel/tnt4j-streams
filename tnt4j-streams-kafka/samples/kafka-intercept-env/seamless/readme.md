@@ -44,7 +44,7 @@ absolute path. Check and change it accordingly.
     * *nix: [nix/run-cons_prod.sh](./nix/run-cons_prod.sh)
     * Windows: [windows/run-cons_prod.bat](./windows/run-cons_prod.bat)
 
-1. (Optional) To configure Kafka messages trace interceptions at interceptors runtime, run configuration topic `TNT_TRACE_CONFIG_TOPIC` 
+1. (Optional) To configure Kafka messages trace interceptions at interceptors runtime, run configuration topic `tnt4j-trace-config-topic` 
 producer:
     * *nix: [nix/run-cmd-prod.sh](./nix/run-cmd-prod.sh)
     * Windows: [windows/run-cmd-prod.bat](./windows/run-cmd-prod.bat)

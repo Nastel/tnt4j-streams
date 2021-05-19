@@ -136,7 +136,7 @@ append it with this one:
 
     	#### Kafka event sink factory configuration ####
     	event.sink.factory: com.jkoolcloud.tnt4j.sink.impl.kafka.KafkaEventSinkFactory
-    	event.sink.factory.topic: tnt4j_kafka_interceptor_metrics
+    	event.sink.factory.topic: tnt4j-kafka-interceptor-metrics
     	## You can configure sink used Kafka Producer by providing external configuration file path
     	# event.sink.factory.propFile: ../config/tnt4j-kafka.properties
     	## Or right there within sink factory configuration
@@ -154,7 +154,7 @@ append it with this one:
     	#event.formatter.Newline: true
     	; Configures special numeric values handling. Can be one of: SUPPRESS, ENQUOTE, MAINTAIN. Default value: SUPPRESS
     	event.formatter.SpecNumbersHandling: SUPPRESS
-    	event.formatter.Level: 1
+    	event.formatter.Level: 2
     	event.formatter.KeyReplacements: ","->";" "."->"_" "\\"->"_"
 
     	tracking.selector: com.jkoolcloud.tnt4j.selector.DefaultTrackingSelector
@@ -181,7 +181,7 @@ append it with this one:
     messages.tracer.stream.RetryStateCheck=3
     messages.tracer.stream.RetryInterval=5
     ## Trace configuration topic consumer properties
-    messages.tracer.cfg.topic=TNT_TRACE_CONFIG_TOPIC
+    messages.tracer.cfg.topic=tnt4j-trace-config-topic
     messages.tracer.kafka.bootstrap.servers=localhost:9092
     messages.tracer.kafka.group.id=kafka-x-ray-trace-config-consumers
     messages.tracer.kafka.client.id=kafka-x-ray-trace-config-listener-c
@@ -208,7 +208,7 @@ append it with this one:
     messages.tracer.stream.RetryStateCheck=3
     messages.tracer.stream.RetryInterval=5
     ## Trace configuration topic consumer properties
-    messages.tracer.cfg.topic=TNT_TRACE_CONFIG_TOPIC
+    messages.tracer.cfg.topic=tnt4j-trace-config-topic
     messages.tracer.kafka.bootstrap.servers=localhost:9092
     messages.tracer.kafka.group.id=kafka-x-ray-trace-config-consumers
     messages.tracer.kafka.client.id=kafka-x-ray-trace-config-listener-p
@@ -237,15 +237,15 @@ copy [Kafka trace messages parser](../../kafka-intercept/tnt-data-source_kafka_m
     start kafka-console-producer --producer.config ../../config/producer.properties --broker-list localhost:9092 --topic 
     ```
     **NOTE:** as an example you may refer script [file](./additions/windows/start-cons_prod.bat).
-1. (Optional) To configure Kafka messages trace interceptions at interceptors runtime, run configuration topic `TNT_TRACE_CONFIG_TOPIC` 
+1. (Optional) To configure Kafka messages trace interceptions at interceptors runtime, run configuration topic `tnt4j-trace-config-topic` 
 producer:
     * *NIX:
     ```bash
-    exec kafka-console-producer.sh --producer.config ../config/producer.properties --broker-list localhost:9092 --topic TNT_TRACE_CONFIG_TOPIC
+    exec kafka-console-producer.sh --producer.config ../config/producer.properties --broker-list localhost:9092 --topic tnt4j-trace-config-topic
     ```
     * Windows:
     ```cmd
-    start kafka-console-producer --producer.config ../../config/producer.properties --broker-list localhost:9092 --topic TNT_TRACE_CONFIG_TOPIC
+    start kafka-console-producer --producer.config ../../config/producer.properties --broker-list localhost:9092 --topic tnt4j-trace-config-topic
     ```
     **NOTE:** as an example you may refer script [file](./additions/windows/start-cmd-prod.bat).
 

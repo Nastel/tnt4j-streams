@@ -92,7 +92,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	/**
 	 * Constant defining tracing configuration dedicated topic name.
 	 */
-	public static final String TNT_TRACE_CONFIG_TOPIC = "TNT_TRACE_CONFIG_TOPIC"; // NON-NLS
+	public static final String TRACE_CONFIG_TOPIC = "tnt4j-trace-config-topic"; // NON-NLS
 	/**
 	 * Constant defining message trace reporter stream configuration properties prefix.
 	 */
@@ -115,7 +115,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 
 	private KafkaMsgTraceStream<ActivityInfo> stream;
 	private final Map<String, TraceCommandDeserializer.TopicTraceCommand> traceConfig = new HashMap<>();
-	private String cfgTopic = TNT_TRACE_CONFIG_TOPIC;
+	private String cfgTopic = TRACE_CONFIG_TOPIC;
 	private Set<String> traceOptions;
 
 	private KafkaConsumer<String, TraceCommandDeserializer.TopicTraceCommand> consumer;
@@ -323,9 +323,8 @@ public class MsgTraceReporter implements InterceptionsReporter {
 			clintId = "kafka-x-ray-trace-config-listener"; // NON-NLS
 		}
 		consumerConfig.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, clintId + "_" + Utils.getVMPID()); // NON-NLS
-		if (!consumerConfig.contains(ConsumerConfig.GROUP_ID_CONFIG)) {
-			consumerConfig.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "kafka-x-ray-trace-config-consumers"); // NON-NLS
-		}
+		Utils.setPropertyIfAbsent(consumerConfig, ConsumerConfig.GROUP_ID_CONFIG, "kafka-x-ray-trace-config-consumers"); // NON-NLS
+
 		consumerConfig.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true"); // NON-NLS
 		consumerConfig.remove(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG);
 

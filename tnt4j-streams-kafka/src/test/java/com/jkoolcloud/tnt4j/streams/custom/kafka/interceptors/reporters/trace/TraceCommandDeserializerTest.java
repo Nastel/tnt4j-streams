@@ -100,7 +100,7 @@ public class TraceCommandDeserializerTest {
 
 		consumer = new KafkaConsumer<>(props);
 		try {
-			consumer.subscribe(Collections.singletonList(MsgTraceReporter.TNT_TRACE_CONFIG_TOPIC));
+			consumer.subscribe(Collections.singletonList(MsgTraceReporter.TRACE_CONFIG_TOPIC));
 
 			while (true) {
 				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(500));

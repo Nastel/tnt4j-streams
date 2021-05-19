@@ -41,12 +41,12 @@ reported to dedicated Kafka topic):
     ```properties
       source: com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics
     ```
-* Set TNT4J to use `KafkaSink` to send interceptors collected statistics to dedicated Kafka topic (e.g. `tnt4j_kafka_interceptor_metrics`):
+* Set TNT4J to use `KafkaSink` to send interceptors collected statistics to dedicated Kafka topic (e.g. `tnt4j-kafka-interceptor-metrics`):
     * referring Kafka producer configuration file
     ```properties
       #### Kafka event sink factory configuration ####
       event.sink.factory: com.jkoolcloud.tnt4j.sink.impl.kafka.KafkaEventSinkFactory
-      event.sink.factory.topic: tnt4j_kafka_interceptor_metrics
+      event.sink.factory.topic: tnt4j-kafka-interceptor-metrics
       event.sink.factory.propFile: ../config/tnt4j-kafka.properties
       #### Kafka event sink factory configuration end ####
     ```
@@ -54,7 +54,7 @@ reported to dedicated Kafka topic):
     ```properties
       #### Kafka event sink factory configuration ####
       event.sink.factory: com.jkoolcloud.tnt4j.sink.impl.kafka.KafkaEventSinkFactory
-      event.sink.factory.topic: tnt4j_kafka_interceptor_metrics
+      event.sink.factory.topic: tnt4j-kafka-interceptor-metrics
       event.sink.factory.bootstrap.servers: localhost:9092
       event.sink.factory.acks: all
       event.sink.factory.retries: 0
@@ -98,18 +98,18 @@ intercepted operations:
 messages.tracer.stream.RetryStateCheck=3
 messages.tracer.stream.RetryInterval=5
 ```
-* `messages.tracer.cfg.topic` - tracer configuration topic name. Default value - `TNT_TRACE_CONFIG_TOPIC`. (Optional)
+* `messages.tracer.cfg.topic` - tracer configuration topic name. Default value - `tnt4j-trace-config-topic`. (Optional)
 
 ##### Kafka messages trace configuration over file
 
 When message tracing enabled, it generates quite noticeable overhead, and you're able to control tracing process using topic: 
-`TNT_TRACE_CONFIG_TOPIC`. To read (poll) messages tracing handling commands from topic `TNT_TRACE_CONFIG_TOPIC`, set consumer configuration 
-properties in `interceptor.properties` file.
+`tnt4j-trace-config-topic`. To read (poll) messages tracing handling commands from topic `tnt4j-trace-config-topic`, set consumer 
+configuration properties in `interceptor.properties` file.
 
 Use standard Kafka consumer keys with prefix `messages.tracer.kafka.`, e.g:
 ```properties
 ## Trace configuration topic consumer properties
-messages.tracer.cfg.topic=TNT_TRACE_CONFIG_TOPIC
+messages.tracer.cfg.topic=tnt4j-trace-config-topic
 messages.tracer.kafka.bootstrap.servers=localhost:9092
 messages.tracer.kafka.group.id=kafka-x-ray-trace-config-consumers
 messages.tracer.kafka.client.id=kafka-x-ray-trace-config-listener
@@ -141,10 +141,10 @@ messages.tracer.trace=send, ack, consume, commit
 
 ##### Kafka trace control topic commands
 
-To control tracing you should send English-like command to control topic `TNT_TRACE_CONFIG_TOPIC`. 
+To control tracing you should send English-like command to control topic `tnt4j-trace-config-topic`. 
 E.g. if you wish to use `kafka-console-producer` provided with Apache Kafka, run command:
 ```cmd
-kafka-console-producer --broker-list localhost:9092,localhost:9093 --topic TNT_TRACE_CONFIG_TOPIC
+kafka-console-producer --broker-list localhost:9092,localhost:9093 --topic tnt4j-trace-config-topic
 ```
 
 * `trace on` - will enable trace
