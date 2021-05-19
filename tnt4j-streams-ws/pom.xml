@@ -101,29 +101,6 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>terracotta-snapshots</id>
-            <url>http://www.terracotta.org/download/reflector/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>terracotta-releases</id>
-            <url>http://www.terracotta.org/download/reflector/releases</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>com.jkoolcloud.tnt4j.streams</groupId>
