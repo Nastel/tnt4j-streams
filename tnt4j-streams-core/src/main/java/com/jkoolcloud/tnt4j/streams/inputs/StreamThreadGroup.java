@@ -72,7 +72,7 @@ public class StreamThreadGroup extends ThreadGroup {
 		enumerate(atl, false);
 
 		for (Thread t : atl) {
-			if (!isStreamThread(t)) {
+			if (!isStreamThread(t) && !isShutdownHookThread(t)) {
 				Thread tTerminator = new Thread(new ThreadTerminator(t));
 				tTerminator.start();
 			}
@@ -81,6 +81,10 @@ public class StreamThreadGroup extends ThreadGroup {
 
 	private static boolean isStreamThread(Thread t) {
 		return t instanceof StreamThread;
+	}
+
+	private static boolean isShutdownHookThread(Thread t) {
+		return t != null && t.getName().contains("ShutdownHookThread"); // NON-NLS
 	}
 
 	/**
