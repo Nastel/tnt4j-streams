@@ -14,7 +14,8 @@
     <artifactId>tnt4j-streams-kafka</artifactId>
 
     <properties>
-        <kafka.clients.version>2.7.0</kafka.clients.version>
+        <kafka.clients.version>2.8.0</kafka.clients.version>
+        <kafka.sink.version>2.15-SNAPSHOT</kafka.sink.version>
     </properties>
 
     <build>
@@ -165,6 +166,9 @@
     <!--<repository>-->
     <!--<id>confluent</id>-->
     <!--<url>http://packages.confluent.io/maven/</url>-->
+    <!--<snapshots>-->
+    <!--<enabled>false</enabled>-->
+    <!--</snapshots>-->
     <!--</repository>-->
     <!--</repositories>-->
 
@@ -184,6 +188,12 @@
                     <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jkoolcloud</groupId>
+            <artifactId>tnt4j-kafka-sink</artifactId>
+            <version>${kafka.sink.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <!--<dependency>-->
         <!--<groupId>io.confluent</groupId>-->
