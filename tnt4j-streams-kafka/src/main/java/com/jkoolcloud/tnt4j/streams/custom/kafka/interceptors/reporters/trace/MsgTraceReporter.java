@@ -119,6 +119,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	private Set<String> traceOptions;
 
 	private KafkaConsumer<String, TraceCommandDeserializer.TopicTraceCommand> consumer;
+	private final Object closeLock = new Object();
 
 	/**
 	 * Constructs a new MsgTraceReporter.
@@ -349,6 +350,9 @@ public class MsgTraceReporter implements InterceptionsReporter {
 		}
 
 		consumer.close();
+		synchronized (closeLock) {
+			closeLock.notifyAll();
+		}
 	}
 
 	private static KafkaConsumer<String, TraceCommandDeserializer.TopicTraceCommand> createKafkaConsumer(
@@ -551,6 +555,12 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	public void shutdown() {
 		if (consumer != null) {
 			consumer.wakeup();
+			synchronized (closeLock) {
+				try {
+					closeLock.wait();
+				} catch (InterruptedException exc) {
+				}
+			}
 		}
 
 		if (stream != null) {

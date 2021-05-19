@@ -112,7 +112,17 @@ public class InterceptorsTest {
 		pt.start();
 		pt.join();
 		consumer.wakeup();
+		waitForClose(consumer);
 		ct.join();
+	}
+
+	private static void waitForClose(Consumer<?, ?> consumer) {
+		synchronized (consumer) {
+			try {
+				consumer.wait();
+			} catch (InterruptedException exc) {
+			}
+		}
 	}
 
 	/**
@@ -143,6 +153,7 @@ public class InterceptorsTest {
 		ct.start();
 		TimeUnit.SECONDS.sleep(2);
 		consumer.wakeup();
+		waitForClose(consumer);
 		ct.join();
 	}
 
@@ -221,5 +232,8 @@ public class InterceptorsTest {
 		}
 
 		consumer.close();
+		synchronized (consumer) {
+			consumer.notifyAll();
+		}
 	}
 }
