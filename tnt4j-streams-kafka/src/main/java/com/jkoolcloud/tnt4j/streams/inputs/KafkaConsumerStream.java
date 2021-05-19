@@ -326,6 +326,8 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 		private List<Integer> offsets;
 		private boolean autoCommit = true;
 
+		private final Object closeLock = new Object();
+
 		private KafkaDataReceiver() {
 			super("KafkaConsumerStream.KafkaDataReceiver"); // NON-NLS
 		}
@@ -396,6 +398,9 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 				} catch (WakeupException exc) {
 				} finally {
 					consumer.close();
+					synchronized (closeLock) {
+						closeLock.notifyAll();
+					}
 				}
 			}
 		}
@@ -425,6 +430,12 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 		void closeInternals() {
 			if (consumer != null) {
 				consumer.wakeup();
+				synchronized (closeLock) {
+					try {
+						closeLock.wait();
+					} catch (InterruptedException e) {
+					}
+				}
 			}
 		}
 	}
