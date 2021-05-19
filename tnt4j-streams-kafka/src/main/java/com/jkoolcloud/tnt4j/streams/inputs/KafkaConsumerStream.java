@@ -105,7 +105,7 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 				String[] topics = Utils.splitValue(topicName);
 				topicNames = new LinkedHashSet<>(topics.length);
 
-				for (String topic : topicNames) {
+				for (String topic : topics) {
 					String tTopic = topic.trim();
 					if (!tTopic.isEmpty()) {
 						topicNames.add(tTopic);
