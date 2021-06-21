@@ -2313,7 +2313,9 @@ Sample stream configuration:
        <!--<property name="java.naming.security.principal" value="[YOUR_PRINCIPAL]"/>-->
        <!--<property name="java.naming.security.credentials" value="[YOUR_PASSWORD]"/>-->
        <!--<property name="Queue" value="queue.SampleJMSQueue"/>-->
+       <!--<property name="Queue" value="dynamicQueues/queue.SampleJMSQueue"/>-->
        <property name="Topic" value="TestTopic"/>
+       <!--<property name="Topic" value="dynamicTopics/TestTopic"/>-->
        <property name="JMSConnFactory" value="/jms/cf/another"/>
 
        <parser-ref name="SampleJMSParser"/>
@@ -2408,7 +2410,9 @@ Sample stream configuration:
         <!--<property name="java.naming.security.principal" value="[YOUR_PRINCIPAL]"/>-->
         <!--<property name="java.naming.security.credentials" value="[YOUR_PASSWORD]"/>-->
         <!--<property name="Queue" value="queue.SampleJMSQueue"/>-->
+        <!--<property name="Queue" value="dynamicQueues/queue.SampleJMSQueue"/>-->
         <property name="Topic" value="TestTopic"/>
+        <!--<property name="Topic" value="dynamicTopics/TestTopic"/>-->
         <property name="JMSConnFactory" value="/jms/cf/another"/>
 
         <parser-ref name="SampleJMSParser"/>
@@ -2503,7 +2507,9 @@ Sample stream configuration:
         <!--<property name="java.naming.security.principal" value="[YOUR_PRINCIPAL]"/>-->
         <!--<property name="java.naming.security.credentials" value="[YOUR_PASSWORD]"/>-->
         <!--<property name="Queue" value="queue.SampleJMSQueue"/>-->
+        <!--<property name="Queue" value="dynamicQueues/queue.SampleJMSQueue"/>-->
         <property name="Topic" value="TestTopic"/>
+        <!--<property name="Topic" value="dynamicTopics/TestTopic"/>-->
         <property name="JMSConnFactory" value="/jms/cf/another"/>
 
         <parser-ref name="SampleJMSParser"/>
