@@ -154,8 +154,8 @@ public class JMSStream extends AbstractBufferedStream<Message> {
 				String tDestName = destName.trim();
 				if (StringUtils.isNotEmpty(tDestName)) {
 					jmsDataReceiver = new JMSDataReceiver();
-					jmsDataReceiver.initialize(ic, tDestName, jmsConnFactory);
 					jmsDataReceivers.add(jmsDataReceiver);
+					jmsDataReceiver.initialize(ic, tDestName, jmsConnFactory);
 				}
 			}
 		}
