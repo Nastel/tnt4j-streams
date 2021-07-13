@@ -75,6 +75,7 @@ public class KafkaTraceEventData {
 	private String signature;
 	private String appInfo;
 	private String parentId;
+	private long msgAgeMs = 0;
 	/////////////////////////////////////
 
 	/**
@@ -89,7 +90,7 @@ public class KafkaTraceEventData {
 	 */
 	public KafkaTraceEventData(ProducerRecord<?, ?> producerRecord, ClusterResource clusterResource, String clientID) {
 		this.type = SEND;
-
+		
 		this.producerRecord = producerRecord;
 		this.clusterResource = clusterResource;
 		this.appInfo = clientID;
@@ -127,12 +128,13 @@ public class KafkaTraceEventData {
 	 * @param clientID
 	 *            client identifier
 	 */
-	public KafkaTraceEventData(ConsumerRecord<?, ?> consumerRecords, ClusterResource clusterResource, String clientID) {
+	public KafkaTraceEventData(ConsumerRecord<?, ?> consumerRecord, ClusterResource clusterResource, String clientID) {
 		this.type = CONSUME;
 
-		this.consumerRecord = consumerRecords;
+		this.consumerRecord = consumerRecord;
 		this.clusterResource = clusterResource;
 		this.appInfo = clientID;
+		this.msgAgeMs = System.currentTimeMillis() - consumerRecord.timestamp();
 	}
 
 	/**
@@ -249,6 +251,15 @@ public class KafkaTraceEventData {
 	 */
 	public ConsumerRecord<?, ?> getConsumerRecord() {
 		return consumerRecord;
+	}
+
+	/**
+	 * Returns Kafka consumer record message age {@code "consume"}.
+	 *
+	 * @return message age in milliseconds
+	 */
+	public long getConsumerMsgAge() {
+		return msgAgeMs;
 	}
 
 	/**
