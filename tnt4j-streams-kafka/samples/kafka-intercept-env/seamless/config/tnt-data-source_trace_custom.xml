@@ -194,6 +194,7 @@
             ]]></field-transform>
         </field>
         <field name="ParentID" locator="parentId" locator-type="Label"/>
+        <field name="MessageAge" locator="msgAgeMs" locator-type="Label"/>
 
         <field name="ResourceName" formattingPattern="QUEUE={0}">
             <field-locator locator="Topic" locator-type="Activity"/>

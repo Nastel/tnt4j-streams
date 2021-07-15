@@ -90,7 +90,7 @@ public class KafkaTraceEventData {
 	 */
 	public KafkaTraceEventData(ProducerRecord<?, ?> producerRecord, ClusterResource clusterResource, String clientID) {
 		this.type = SEND;
-		
+
 		this.producerRecord = producerRecord;
 		this.clusterResource = clusterResource;
 		this.appInfo = clientID;
@@ -121,8 +121,8 @@ public class KafkaTraceEventData {
 	/**
 	 * Constructs a new KafkaTraceEventData for Kafka consumer {@code "consume"} event.
 	 *
-	 * @param consumerRecords
-	 *            consumer records
+	 * @param consumerRecord
+	 *            consumer record
 	 * @param clusterResource
 	 *            cluster resource descriptor
 	 * @param clientID
@@ -254,7 +254,7 @@ public class KafkaTraceEventData {
 	}
 
 	/**
-	 * Returns Kafka consumer record message age {@code "consume"}.
+	 * Returns Kafka consumer record message age at {@code "consume"} event.
 	 *
 	 * @return message age in milliseconds
 	 */
