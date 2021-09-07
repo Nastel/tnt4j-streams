@@ -6325,7 +6325,11 @@ Sample shows how stream data source configuration imports (over `resource-ref` t
 * `type` - defines type of imported resource. Required. Supported values are:
     * `ValuesMap` - resource file defines source-target values mapping.
     * `Parser` - resource file defines external parser configuration to be injected into current `tnt-data-source` configuration.
-* `uri` - defines absolute URL or relative file path of referenced resource. Required. See [Referenced resource formats](#referenced-resource-formats).
+
+  See [Referenced resource formats](#referenced-resource-formats).
+* `uri` - defines absolute URL or relative file path of referenced resource. Required. **Note:** to access resource file from classpath 
+  (e.g. when streams config is packed into `jar`, `war` or any other Java supported package), use URL protocol handler `classpath`, e.g.: 
+  `classpath:parsers.xml`, `classpath:res/streams/MsgParsers.xml` or `classpath:StateCodesMap.json`.
 * `separator` - defines source and target values delimiter and is applicable to `CSV` and `Properties` formatted resources. Optional.
 
 #### Referenced resource formats
