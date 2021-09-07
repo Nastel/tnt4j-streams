@@ -947,6 +947,10 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 			for (int tfi = 0; tfi < tFieldsList.size(); tfi++) {
 				tField = tFieldsList.get(tfi);
 				fValue = fValues[tfi];
+				boolean filteredOut = tField.filterValue(fValue, null);
+				if (filteredOut) {
+					fValue = null;
+				}
 				super.applyFieldValue(tField, Utils.simplifyValue(fValue), cData);
 			}
 		} catch (Exception e) {
