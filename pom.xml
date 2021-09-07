@@ -238,6 +238,9 @@
                 <configuration>
                     <serverId>oss.sonatype.org</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
+                    <stagingProgressTimeoutMinutes>10</stagingProgressTimeoutMinutes>
+                    <!--<skipStagingRepositoryClose>true</skipStagingRepositoryClose>-->
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
                 <executions>
