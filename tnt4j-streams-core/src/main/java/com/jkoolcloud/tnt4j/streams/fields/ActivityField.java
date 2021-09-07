@@ -401,7 +401,7 @@ public class ActivityField extends AbstractFieldEntity {
 	}
 
 	/**
-	 * Checks whether provided {@code strings} array shall be formatted by this filed using attributes {@code separator}
+	 * Checks whether provided {@code strings} array shall be formatted by this field using attributes {@code separator}
 	 * or {@code formattingPattern} defined defined values.
 	 * 
 	 * @param strings
@@ -683,6 +683,7 @@ public class ActivityField extends AbstractFieldEntity {
 		tField.transparent = transparent;
 		tField.parser = parser;
 		tField.transformations = transformations;
+		tField.filter = filter;
 
 		return tField;
 	}
@@ -885,7 +886,7 @@ public class ActivityField extends AbstractFieldEntity {
 	}
 
 	/**
-	 * Applies filed defined filtering rules and marks this activity as filtered out or sets field value to {@code
+	 * Applies field defined filtering rules and marks this activity as filtered out or sets field value to {@code
 	 * null}, if field is set as "optional" using attribute {@code required=false}.
 	 *
 	 * @param value
