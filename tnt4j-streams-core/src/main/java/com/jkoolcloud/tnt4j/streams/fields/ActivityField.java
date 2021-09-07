@@ -799,7 +799,7 @@ public class ActivityField extends AbstractFieldEntity {
 	 *         field has flag {@code emptyAsNull} set to {@code true}
 	 * @throws ParseException
 	 *             if an error parsing the specified value based on the field definition (e.g. does not match defined
-	 *             format, etc.)
+	 *             format, missing value when required, etc.)
 	 *
 	 * @see #transform(Object, ActivityInfo)
 	 * @see #filterFieldValue(Object, ActivityInfo)
@@ -854,6 +854,11 @@ public class ActivityField extends AbstractFieldEntity {
 						"ActivityField.field.empty.as.null", this, Utils.toStringDump(fieldValue));
 				fieldValue = null;
 			}
+		}
+
+		if (fieldValue == null && isRequired()) {
+			throw new ParseException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+					"ActivityField.required.but.null", this), 0);
 		}
 
 		return fieldValue;
