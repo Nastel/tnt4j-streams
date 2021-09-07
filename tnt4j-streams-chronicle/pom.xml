@@ -15,7 +15,7 @@
 
     <properties>
         <!-- module dependencies versions-->
-        <chronicle.version>5.20.123</chronicle.version>
+        <chronicle.version>5.21.89</chronicle.version>
     </properties>
 
     <build>
