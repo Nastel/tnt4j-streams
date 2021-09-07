@@ -1045,6 +1045,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *
 	 * @see #makeArray(Object[], Class)
 	 * @see #makeArray(java.util.Collection, Class)
+	 * @see #primitiveArrayToObject(Object)
 	 */
 	public static Object[] makeArray(Object obj, Class<?> cls) {
 		if (obj == null) {
@@ -1053,6 +1054,9 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 		if (isObjArray(obj)) {
 			return makeArray((Object[]) obj, cls);
+		}
+		if (isPrimitiveArray(obj)) {
+			return primitiveArrayToObject(obj);
 		}
 		if (obj instanceof Collection) {
 			return makeArray((Collection<?>) obj, cls);
@@ -1139,6 +1143,42 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		System.arraycopy(array, 0, cArray, 0, array.length);
 
 		return cArray;
+	}
+
+	/**
+	 * Converts primitives array to boxed counterpart objects array.
+	 * 
+	 * @param obj
+	 *            an array of primitives
+	 * @return an array of boxed objects
+	 */
+	public static Object[] primitiveArrayToObject(Object obj) {
+		if (obj instanceof int[]) {
+			return ArrayUtils.toObject((int[]) obj);
+		}
+		if (obj instanceof byte[]) {
+			return ArrayUtils.toObject((byte[]) obj);
+		}
+		if (obj instanceof long[]) {
+			return ArrayUtils.toObject((long[]) obj);
+		}
+		if (obj instanceof double[]) {
+			return ArrayUtils.toObject((double[]) obj);
+		}
+		if (obj instanceof float[]) {
+			return ArrayUtils.toObject((float[]) obj);
+		}
+		if (obj instanceof char[]) {
+			return ArrayUtils.toObject((char[]) obj);
+		}
+		if (obj instanceof short[]) {
+			return ArrayUtils.toObject((short[]) obj);
+		}
+		if (obj instanceof boolean[]) {
+			return ArrayUtils.toObject((boolean[]) obj);
+		}
+
+		return null;
 	}
 
 	/**
@@ -1478,6 +1518,17 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
+	 * Checks if provided object is an array of primitives.
+	 * 
+	 * @param obj
+	 *            object to check
+	 * @return {@code true} if obj is an array of primitives, {@code false} - otherwise
+	 */
+	public static boolean isPrimitiveArray(Object obj) {
+		return obj != null && obj.getClass().isArray();
+	}
+
+	/**
 	 * Checks if provided object is an array - of primitives or objects.
 	 *
 	 * @param obj
@@ -1485,9 +1536,10 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @return {@code true} if obj is an array, {@code false} - otherwise
 	 *
 	 * @see #isObjArray(Object)
+	 * @see #isPrimitiveArray(Object)
 	 */
 	public static boolean isArray(Object obj) {
-		return isObjArray(obj) || (obj != null && obj.getClass().isArray());
+		return isObjArray(obj) || isPrimitiveArray(obj);
 	}
 
 	/**
