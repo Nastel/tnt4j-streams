@@ -72,7 +72,6 @@ public class KafkaTraceEventData {
 
 	/////// METADATA ////////////////////
 	private String type;
-	private String signature;
 	private String appInfo;
 	private String parentId;
 	private long msgAgeMs = 0;
@@ -176,25 +175,6 @@ public class KafkaTraceEventData {
 	 */
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	/**
-	 * Returns event signature string.
-	 *
-	 * @return event signature string
-	 */
-	public String signature() {
-		return signature;
-	}
-
-	/**
-	 * Sets event signature string.
-	 * 
-	 * @param signature
-	 *            event signature string
-	 */
-	public void setSignature(String signature) {
-		this.signature = signature;
 	}
 
 	/**
