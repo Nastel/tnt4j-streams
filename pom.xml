@@ -6,7 +6,7 @@
 
     <groupId>com.jkoolcloud.tnt4j.streams</groupId>
     <artifactId>tnt4j-streams</artifactId>
-    <version>1.11.8</version>
+    <version>1.12.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>tnt4j-streams</name>
@@ -240,7 +240,6 @@
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
                     <stagingProgressTimeoutMinutes>10</stagingProgressTimeoutMinutes>
-                    <!--<skipStagingRepositoryClose>true</skipStagingRepositoryClose>-->
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
                 <executions>
