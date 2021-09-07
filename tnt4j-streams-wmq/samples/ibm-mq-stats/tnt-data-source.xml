@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-wmq/config/tnt-data-source-wmq_pcf.xsd">
+
+    <!-- Include the MQ full MQI statistics parser, which includes most MQ data elements  -->
+    <resource-ref id="MQCommon" type="Parser" uri="MQ_full_stats_parser.xml"/>
+
+    <!-- this section specifies the connection to the queue manager. It can be repeated for multiple queue managers. -->
+
+    <!-- This example uses the default System Queue for activity events processing a subset of MQ operations -->
+
+    <stream name="WmqStatisticsStream" class="com.jkoolcloud.tnt4j.streams.inputs.WmqStreamPCF">
+        <property name="StripHeaders" value="false"/>
+        <property name="RetryStateCheck" value="true"/>
+        <property name="SplitRelatives" value="true"/>
+
+        <!-- Queue Manager name to which to connect -->
+        <property name="QueueManager" value="[QMGR]"/>
+
+        <!-- using default queue or could be alternate queue -->
+        <property name="Queue" value="SYSTEM.ADMIN.STATISTICS.QUEUE"/>
+
+        <!-- these are required if connecting remote or removed for local connection -->
+        <property name="Channel" value="[CHANNEL]"/>
+        <property name="Host" value="[HOST]"/>
+        <property name="Port" value="1414"/>
+
+        <!-- user and password as required by the MQ Queue Manager -->
+        <!--<property name="UserName" value="[USER_NAME]"/>-->
+        <!--<property name="Password" value="[USER_PASS]"/>-->
+
+        <!-- In case of SSL Connection: cipher suite value must match one defined for server connection channel -->
+        <!--<property name="CMQC.SSL_CIPHER_SUITE_PROPERTY" value="TLS_RSA_WITH_AES_128_CBC_SHA256"/>-->
+        <!-- Also dont forget to configure Java Key/Trust stores over system properties: -->
+        <!--                             -Djavax.net.ssl.trustStore=[sysPath]/client.jks -->
+        <!--                             -Djavax.net.ssl.trustStorePassword=clientpass -->
+        <!--                             -Djavax.net.ssl.keyStore=[sysPath]/client.jks -->
+        <!--                             -Djavax.net.ssl.keyStorePassword=clientpass -->
+        <!-- and if you are using non IBM java on client side add sys property: -->
+        <!--                             -Dcom.ibm.mq.cfg.useIBMCipherMappings=false -->
+
+        <parser-ref name="MQStatisticsParser"/>
+    </stream>
+</tnt-data-source>
