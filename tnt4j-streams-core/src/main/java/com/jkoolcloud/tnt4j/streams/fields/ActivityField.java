@@ -893,6 +893,7 @@ public class ActivityField extends AbstractFieldEntity {
 	 *            value to apply filters @param ai activity info instance to alter "filtered out" flag @return value
 	 *            after filtering applied: {@code null} if value gets filtered out and field is optional, or same as
 	 *            passed over parameters - otherwise
+	 * @return value filters were applied on, or {@code null} if filters gets field value "filtered out"
 	 *
 	 * @see #filterValue(Object, ActivityInfo)
 	 */
@@ -901,20 +902,15 @@ public class ActivityField extends AbstractFieldEntity {
 			boolean filteredOut = filterValue(value, ai);
 
 			if (filteredOut) {
-				if (isOptional()) {
-					return null;
-				} else {
-					ai.setFiltered(true);
-				}
+				return null;
 			}
-
-			return value;
 		} catch (Exception exc) {
 			Utils.logThrowable(LOGGER, OpLevel.WARNING,
 					StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "ActivityField.filtering.failed",
 					fieldTypeName, Utils.toString(value), exc);
-			return value;
 		}
+
+		return value;
 	}
 
 	/**

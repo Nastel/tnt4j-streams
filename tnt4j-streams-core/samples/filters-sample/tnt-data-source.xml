@@ -9,29 +9,29 @@
         <field name="EventType" value="EVENT"/>
 
         <field name="EventName" locator="$.event" locator-type="Label"/>
-        <field name="StartTime" locator="$.timestamp"  locator-type="Label" datatype="Timestamp" units="Miliseconds"/>
+        <field name="StartTime" locator="$.timestamp" locator-type="Label" datatype="Timestamp" units="Miliseconds"/>
         <field name="Resource" locator="$.detail" locator-type="Label"/>
-		<field name="Correlator">
-		  <field-locator locator="Resource" locator-type="Activity">
-				<filter name="Filter">
+        <field name="Correlator">
+            <field-locator locator="Resource" locator-type="Activity">
+                <filter name="Filter">
                     <value handle="exclude" format="string">W entrance</value>
                     <value handle="exclude" format="string">SW entrance</value>
                 </filter>
-				<!-- The filter above will filter out values containing "W entrance" and "SW entrance" adding to correlator-->			
-		  </field-locator>
-		  <field-locator locator="EventName" locator-type="Activity">
-		  </field-locator>
-		 		  
-		</field>
-		
-		<field name="Weekday" locator="$.weekday" locator-type="Label">
-				<filter name="Filter">
-                    <value handle="exclude" evaluation="regex" format="string">Mo.</value>
-                </filter>
-		</field>
-		<!-- The filter above will filter out whoole activity containing regex "Mo." (Mo(any character))-->			
-		
-		
+                <!-- The filter above will filter out values containing "W entrance" and "SW entrance" adding to correlator -->
+            </field-locator>
+            <field-locator locator="EventName" locator-type="Activity">
+            </field-locator>
+
+        </field>
+        <field name="Weekday" locator="$.weekday" locator-type="Label"/>
+
+        <filter name="WeekDayFilter">
+            <expression handle="exclude" lang="groovy"><![CDATA[
+                ${Weekday} != null && ${Weekday}.startsWith("Mo")
+            ]]></expression>
+        </filter>
+        <!-- The filter above will filter out whole activity containing weekday starting "Mo" -->
+
     </parser>
 
     <stream name="MultipleEvents" class="com.jkoolcloud.tnt4j.streams.inputs.CharacterStream">
