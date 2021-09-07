@@ -110,9 +110,10 @@ public class ScriptExpressionFilter extends AbstractExpressionFilter<Object> {
 	}
 
 	@Override
-	public boolean doFilter(Object value, ActivityInfo ai) throws FilterException {
+	public boolean doFilter(Object value, ActivityInfo ai, String fName) throws FilterException {
 		Bindings bindings = new SimpleBindings();
 		bindings.put(StreamsScriptingUtils.FIELD_VALUE_VARIABLE_EXPR, value);
+		bindings.put(StreamsScriptingUtils.FIELD_NAME_VARIABLE_EXPR, fName);
 
 		if (ai != null && CollectionUtils.isNotEmpty(exprVars)) {
 			for (String eVar : exprVars) {

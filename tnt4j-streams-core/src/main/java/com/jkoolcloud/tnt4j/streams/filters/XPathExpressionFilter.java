@@ -89,10 +89,10 @@ public class XPathExpressionFilter extends AbstractExpressionFilter<Object> {
 	}
 
 	@Override
-	public boolean doFilter(Object value, ActivityInfo ai) throws FilterException {
+	public boolean doFilter(Object value, ActivityInfo ai, String fName) throws FilterException {
 		Map<String, Object> valuesMap = new HashMap<>();
 		valuesMap.put(OWN_FIELD_VALUE_KEY, value);
-		valuesMap.put(OWN_FIELD_NAME_KEY, null);
+		valuesMap.put(OWN_FIELD_NAME_KEY, fName);
 
 		if (ai != null && CollectionUtils.isNotEmpty(exprVars)) {
 			for (String eVar : exprVars) {

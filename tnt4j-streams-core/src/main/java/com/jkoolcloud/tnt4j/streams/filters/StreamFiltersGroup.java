@@ -91,12 +91,12 @@ public class StreamFiltersGroup<T> implements StreamEntityFilter<T> {
 	}
 
 	@Override
-	public boolean doFilter(T value, ActivityInfo ai) throws FilterException {
+	public boolean doFilter(T value, ActivityInfo ai, String fName) throws FilterException {
 		if (CollectionUtils.isNotEmpty(activityFilters)) {
 			for (AbstractEntityFilter<T> aFilter : activityFilters) {
 				boolean filtered;
 				try {
-					filtered = aFilter.doFilter(value, ai);
+					filtered = aFilter.doFilter(value, ai, fName);
 				} catch (Throwable e) {
 					filtered = filteredByDefault;
 				}

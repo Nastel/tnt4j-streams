@@ -42,8 +42,29 @@ public interface StreamEntityFilter<T> {
 	 * 
 	 * @throws com.jkoolcloud.tnt4j.streams.filters.FilterException
 	 *             if evaluation of filter fails
+	 * 
+	 * @see #doFilter(Object, com.jkoolcloud.tnt4j.streams.fields.ActivityInfo, String)
 	 */
-	boolean doFilter(T value, ActivityInfo ai) throws FilterException;
+	default boolean doFilter(T value, ActivityInfo ai) throws FilterException {
+		return doFilter(value, ai, null);
+	}
+
+	/**
+	 * Applies filtering operation for a provided data value and returns flag indicating whether it should be excluded
+	 * from streaming.
+	 * 
+	 * @param value
+	 *            data value to apply filter
+	 * @param ai
+	 *            activity entity instance
+	 * @param fieldName
+	 *            name of field performing transformation
+	 * @return {@code true} if filter matching value should be excluded from streaming, {@code false} - otherwise
+	 * 
+	 * @throws com.jkoolcloud.tnt4j.streams.filters.FilterException
+	 *             if evaluation of filter fails
+	 */
+	boolean doFilter(T value, ActivityInfo ai, String fieldName) throws FilterException;
 
 	/**
 	 * Applies filtering operation for a provided data values map and returns flag indicating whether it should be

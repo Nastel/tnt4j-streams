@@ -114,7 +114,7 @@ public class DefaultValueFilter extends AbstractEntityFilter<Object> {
 	}
 
 	@Override
-	public boolean doFilter(Object value, ActivityInfo ai) {
+	public boolean doFilter(Object value, ActivityInfo ai, String fName) {
 		boolean match = false;
 
 		if (matchPattern != null) {
