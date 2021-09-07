@@ -39,7 +39,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * and MQ activity trace entries (as {@link MQCFGR}). Same PCF message will be returned as next item until all trace
  * entries are processed (message gets 'consumed') and only then new PCF message is retrieved from MQ server. Stream
  * 'marks' PCF message contained trace entry as 'processed' by setting custom PCF parameter
- * {@link WmqStreamConstants#TRACE_MARKER}. Using this PCF parameter parser "knows" which trace entry to process.
+ * {@link WmqStreamConstants#GROUP_MARKER}. Using this PCF parameter parser "knows" which trace entry to process.
  * <p>
  * Stream also performs traced operations filtering using 'TraceOperations' and 'ExcludedRC' properties:
  * <ul>
@@ -165,7 +165,7 @@ public class WmqTraceStream extends WmqStreamPCF {
 					}
 				}
 
-				return strip(pcfMessage);
+				return flatten(pcfMessage);
 			} finally {
 				msgAccessLock.unlock();
 			}
@@ -179,8 +179,8 @@ public class WmqTraceStream extends WmqStreamPCF {
 			return true;
 		}
 
-		int tc = getIntParam(pcfMsg, WmqStreamConstants.TRACES_COUNT);
-		MQCFIN tmp = (MQCFIN) pcfMsg.getParameter(WmqStreamConstants.TRACE_MARKER);
+		int tc = getIntParam(pcfMsg, WmqStreamConstants.GROUPS_COUNT);
+		MQCFIN tmp = (MQCFIN) pcfMsg.getParameter(WmqStreamConstants.GROUP_MARKER);
 		int ti = tmp == null ? 0 : tmp.getIntValue();
 
 		logger().log(OpLevel.TRACE, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -230,8 +230,8 @@ public class WmqTraceStream extends WmqStreamPCF {
 		}
 
 		if (opFound) {
-			pcfMsg.addParameter(WmqStreamConstants.TRACES_COUNT, trC);
-			pcfMsg.addParameter(WmqStreamConstants.TRACE_MARKER, trM);
+			pcfMsg.addParameter(WmqStreamConstants.GROUPS_COUNT, trC);
+			pcfMsg.addParameter(WmqStreamConstants.GROUP_MARKER, trM);
 
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
 					"WmqTraceStream.trace.init.marker", trM, trC);
@@ -333,27 +333,27 @@ public class WmqTraceStream extends WmqStreamPCF {
 	}
 
 	/**
-	 * Strips off PCF message MQ activity trace parameters leaving only one - corresponding trace marker value.
+	 * Flattens PCF message MQ activity trace parameters leaving single one - pointed by group marker value.
 	 *
 	 * @param pcfContent
 	 *            PCF message containing MQ activity traces
-	 * @return PCF message copy containing only one MQ activity trace marked by trace marker
+	 * @return PCF message copy containing single MQ activity trace parameter
 	 */
-	private static PCFContent strip(PCFContent pcfContent) {
+	private static PCFContent flatten(PCFContent pcfContent) {
 		if (pcfContent instanceof PCFMessage) {
 			PCFMessage pcfMsg = (PCFMessage) pcfContent;
 			PCFMessage msgCpy = new PCFMessage(pcfMsg.getType(), pcfMsg.getCommand(), pcfMsg.getMsgSeqNumber(),
 					pcfMsg.getControl() == 1);
 
-			int traceMarker = getIntParam(pcfContent, WmqStreamConstants.TRACE_MARKER);
+			int traceMarker = getIntParam(pcfContent, WmqStreamConstants.GROUP_MARKER);
 
 			Enumeration<?> params = pcfContent.getParameters();
 			int trI = 0;
 			while (params.hasMoreElements()) {
 				PCFParameter param = (PCFParameter) params.nextElement();
 
-				if (param.getParameter() == WmqStreamConstants.TRACE_MARKER
-						|| param.getParameter() == WmqStreamConstants.TRACES_COUNT) {
+				if (param.getParameter() == WmqStreamConstants.GROUP_MARKER
+						|| param.getParameter() == WmqStreamConstants.GROUPS_COUNT) {
 					continue;
 				}
 

@@ -22,10 +22,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -64,27 +61,27 @@ public class WmqUtils {
 	// continue shifting 1<<1, 1<<2, 1<<3....
 
 	// ---- R&D UTILITY CODE ---
-	// private static Map<String, Set<String>> tracesMap = new HashMap<String, Set<String>>();
+	// private static Map<String, Set<String>> groupAttrsMap = new HashMap<String, Set<String>>();
 	//
-	// public static void collectAttrs(MQCFGR trace) {
+	// public static void collectAttrs(MQCFGR group) {
 	// boolean changed = false;
-	// String opKey = getOpName(trace);
+	// String opKey = getOpName(group);
 	//
-	// Set<String> opParamSet = tracesMap.get(opKey);
+	// Set<String> opParamSet = groupAttrsMap.get(opKey);
 	// if (opParamSet == null) {
 	// opParamSet = new HashSet<String>();
-	// tracesMap.put(opKey, opParamSet);
+	// groupAttrsMap.put(opKey, opParamSet);
 	// changed = true;
 	// }
 	//
-	// Set<String> allOpsSet = tracesMap.get("ALL_OPERATIONS_SET");
+	// Set<String> allOpsSet = groupAttrsMap.get("ALL_OPERATIONS_SET");
 	// if (allOpsSet == null) {
 	// allOpsSet = new HashSet<String>();
-	// tracesMap.put("ALL_OPERATIONS_SET", allOpsSet);
+	// groupAttrsMap.put("ALL_OPERATIONS_SET", allOpsSet);
 	// changed = true;
 	// }
 	//
-	// Enumeration<?> prams = trace.getParameters();
+	// Enumeration<?> prams = group.getParameters();
 	// while (prams.hasMoreElements()) {
 	// PCFParameter param = (PCFParameter) prams.nextElement();
 	// String pString = PCFConstants.lookupParameter(param.getParameter());
@@ -101,7 +98,7 @@ public class WmqUtils {
 	// }
 	//
 	// if (changed) {
-	// write(tracesMap);
+	// write(groupAttrsMap);
 	// }
 	// }
 	//
@@ -115,7 +112,7 @@ public class WmqUtils {
 	// }
 	// }
 	//
-	// File f = new File("TRACES_MAP1.log");
+	// File f = new File("GROUP_MAP1.log");
 	// try {
 	// FileUtils.write(f, str, Utils.UTF8);
 	// } catch (Exception exc) {
@@ -137,18 +134,18 @@ public class WmqUtils {
 	}
 
 	/**
-	 * Resolves operation id parameter {@link MQConstants#MQIACF_OPERATION_ID} value from WMQ activity trace PCF data
-	 * object and translates it to WMQ operation name constant {@code "MQXF_"}.
+	 * Resolves operation id parameter {@link MQConstants#MQIACF_OPERATION_ID} value from WMQ activity PCF data object
+	 * and translates it to WMQ operation name constant {@code "MQXF_"}.
 	 *
-	 * @param trace
-	 *            wmq activity trace PCF data
+	 * @param pcf
+	 *            wmq activity PCF data
 	 * @return resolved operation name, or {@code null} if no operation id parameter found in PCF content
 	 *
 	 * @see MQConstants#lookup(int, String)
 	 */
-	public static String getOpName(PCFContent trace) {
+	public static String getOpName(PCFContent pcf) {
 		String opName = null;
-		PCFParameter op = trace.getParameter(MQConstants.MQIACF_OPERATION_ID);
+		PCFParameter op = pcf.getParameter(MQConstants.MQIACF_OPERATION_ID);
 		if (op != null) {
 			opName = MQConstants.lookup(((MQCFIN) op).getIntValue(), "MQXF_.*"); // NON-NLS
 		}
@@ -157,21 +154,46 @@ public class WmqUtils {
 	}
 
 	/**
-	 * Resolves reason code parameter {@link MQConstants#MQIACF_REASON_CODE} value from WMQ activity trace PCF data
-	 * object.
+	 * Resolves reason code parameter {@link MQConstants#MQIACF_REASON_CODE} value from WMQ activity PCF data object.
 	 * 
-	 * @param trace
-	 *            wmq activity trace PCF data
+	 * @param pcf
+	 *            wmq activity PCF data
 	 * @return resolved reason code, or {@code null} if no reason code parameter found in PCF content
 	 */
-	public static Integer getRC(PCFContent trace) {
-		Integer traceRC = null;
-		PCFParameter rc = trace.getParameter(MQConstants.MQIACF_REASON_CODE);
+	public static Integer getRC(PCFContent pcf) {
+		Integer mqRC = null;
+		PCFParameter rc = pcf.getParameter(MQConstants.MQIACF_REASON_CODE);
 		if (rc != null) {
-			traceRC = ((MQCFIN) rc).getIntValue();
+			mqRC = ((MQCFIN) rc).getIntValue();
 		}
 
-		return traceRC;
+		return mqRC;
+	}
+
+	/**
+	 * Resolves all PCF parameters matching provided parameter id from provided PCF data. In most cases returned array
+	 * will contain single item. Empty array is returned when no matching parameters available. Multiple items usually
+	 * returned for {@link com.ibm.mq.headers.pcf.MQCFGR} parameters, e.g. traces, statistics, etc.
+	 * 
+	 * @param pcf
+	 *            wmq activity PCF data
+	 * @param paramId
+	 *            PCF parameter identifier
+	 * @return PCF parameters array: empty when go matching parameters available, multiple items usually returned for
+	 *         {@link com.ibm.mq.headers.pcf.MQCFGR} type parameters
+	 */
+	public static PCFParameter[] getParameters(PCFContent pcf, int paramId) {
+		List<PCFParameter> paramsList = new ArrayList<>();
+		Enumeration<?> params = pcf.getParameters();
+		while (params.hasMoreElements()) {
+			PCFParameter param = (PCFParameter) params.nextElement();
+
+			if (param.getParameter() == paramId) {
+				paramsList.add(param);
+			}
+		}
+
+		return paramsList.toArray(new PCFParameter[0]);
 	}
 
 	private static Map<String, Integer> PCF_PARAMS_CACHE = new HashMap<>();
@@ -270,7 +292,7 @@ public class WmqUtils {
 	 * @param sigDelim
 	 *            signature delimiter
 	 * @param logger
-	 *            logger to log result trace messages
+	 *            logger to log signature calculation messages
 	 * @return unique message signature, or {@code null} if {@code value} contained signature calculation items are
 	 *         empty
 	 *

@@ -247,20 +247,27 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 		} else {
 			try {
 				Integer paramId = WmqUtils.getParamId(paramStr);
-				PCFParameter param = pcfContent.getParameter(paramId);
+				PCFParameter[] params = WmqUtils.getParameters(pcfContent, paramId);
 
-				if (!isLastPathToken(path, i)) {
-					if (param instanceof MQCFGR) {
-						val = getParamValue(locator, path, (MQCFGR) param, ++i, cData);
-					} else if (isMqiStructParam(paramStr)) {
-						val = resolveMqiStructValue(locator, param, path, i, pcfContent, cData);
+				if (params.length == 0) {
+					val = null;
+				} else if (params.length == 1) {
+					PCFParameter param = params.length > 0 ? params[0] : null;
+					if (!isLastPathToken(path, i)) {
+						if (param instanceof MQCFGR) {
+							val = getParamValue(locator, path, (MQCFGR) param, ++i, cData);
+						} else if (isMqiStructParam(paramStr)) {
+							val = resolveMqiStructValue(locator, param, path, i, pcfContent, cData);
+						}
+					} else {
+						if (param instanceof MQCFGR && isDataSupportedByStackedParser(cData.getField(), param)) {
+							val = param;
+						} else {
+							val = resolvePCFParamValue(locator, param);
+						}
 					}
 				} else {
-					if (param instanceof MQCFGR && isDataSupportedByStackedParser(cData.getField(), param)) {
-						val = param;
-					} else {
-						val = resolvePCFParamValue(locator, param);
-					}
+					val = params;
 				}
 			} catch (NoSuchElementException exc) {
 				throw new ParseException(StreamsResources.getStringFormatted(WmqStreamConstants.RESOURCE_BUNDLE_NAME,
@@ -295,29 +302,41 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 		Integer val = null;
 		Object mappedValue = null;
 		if ("command".equals(hAttrName.toLowerCase())) { // NON-NLS
-			val = pcfMsg.getCommand();
+			val = pcfMsg.getHeader().getCommand();
 			if (isValueTranslatable(locator.getDataType())) {
 				mappedValue = MQConstants.lookup(val, "MQCMD_.*"); // NON-NLS
 			}
 		} else if ("msgseqnumber".equals(hAttrName.toLowerCase())) { // NON-NLS
-			val = pcfMsg.getMsgSeqNumber();
+			val = pcfMsg.getHeader().getMsgSeqNumber();
 		} else if ("control".equals(hAttrName.toLowerCase())) { // NON-NLS
-			val = pcfMsg.getControl();
+			val = pcfMsg.getHeader().getControl();
 			if (isValueTranslatable(locator.getDataType())) {
 				mappedValue = MQConstants.lookup(val, "MQCFC_.*"); // NON-NLS
 			}
 		} else if ("compcode".equals(hAttrName.toLowerCase())) { // NON-NLS
-			val = pcfMsg.getCompCode();
+			val = pcfMsg.getHeader().getCompCode();
 			if (isValueTranslatable(locator.getDataType())) {
 				mappedValue = MQConstants.lookupCompCode(val);
 			}
 		} else if ("reason".equals(hAttrName.toLowerCase())) { // NON-NLS
-			val = pcfMsg.getReason();
+			val = pcfMsg.getHeader().getReason();
 			if (isValueTranslatable(locator.getDataType())) {
 				mappedValue = MQConstants.lookupReasonCode(val);
 			}
 		} else if ("parametercount".equals(hAttrName.toLowerCase())) { // NON-NLS
-			val = pcfMsg.getParameterCount();
+			val = pcfMsg.getHeader().getParameterCount();
+		} else if ("type".equals(hAttrName.toLowerCase())) { // NON-NLS
+			val = pcfMsg.getHeader().getType();
+			if (isValueTranslatable(locator.getDataType())) {
+				mappedValue = MQConstants.lookup(val, "MQCFT_.*"); // NON-NLS
+			}
+		} else if ("version".equals(hAttrName.toLowerCase())) { // NON-NLS
+			val = pcfMsg.getHeader().getVersion();
+			// if (isValueTranslatable(locator.getDataType())) {
+			// mappedValue = MQConstants.lookup(val, "MQCFH_VERSION_.*"); // NON-NLS
+			// }
+		} else if ("struclength".equals(hAttrName.toLowerCase())) { // NON-NLS
+			val = pcfMsg.getHeader().getStrucLength();
 		}
 
 		return mappedValue != null ? mappedValue : val;
