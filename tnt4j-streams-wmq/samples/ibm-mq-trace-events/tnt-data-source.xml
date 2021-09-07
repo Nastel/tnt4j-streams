@@ -115,6 +115,14 @@
         <!-- and if you are using non IBM java on client side add sys property: -->
         <!--                             -Dcom.ibm.mq.cfg.useIBMCipherMappings=false -->
 
+        <property name="ExcludedRC" value="2033|2080|30737"/>
+
+        <!-- Use the following to control which operations are being analyzed.
+            As defined, only operations which process messages are passed. Browse
+            operations are excluded. -->
+        <property name="TraceOperations" value="MQXF_(PUT|PUT1|GET|CALLBACK)"/>
+        <property name="SuppressBrowseGets" value="true"/>
+
         <parser-ref name="TraceEventsParser"/>
     </stream>
 </tnt-data-source>
