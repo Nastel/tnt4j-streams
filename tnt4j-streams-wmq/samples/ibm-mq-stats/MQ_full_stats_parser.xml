@@ -10,42 +10,42 @@
         <!-- Name classifiers for array fields -->
         <field name="DiscCountTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "NORMAL", "IMPLICIT", "Q_MGR" };
+                return new String[] { "Normal", "Implicit", "QMgr" };
             ]]></field-transform>
         </field>
         <field name="ObjectTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { null, "QUEUE", "NAMELIST", "PROCESS", null, "Q_MGR", "CHANNEL", "AUTH_INFO", "TOPIC", null, null, null, null };
+                return new String[] { null, "Queue", "Namelist", "Process", null, "QMgr", "Channel", "AuthInfo", "Topic", null, null, null, null };
             ]]></field-transform>
         </field>
         <field name="PersistenceTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "NON_PERSISTENT", "PERSISTENT" };
+                return new String[] { "NonPersist", "Persist" };
             ]]></field-transform>
         </field>
         <field name="SubscrTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "CREATED", "ALTERED", "RESUMED" };
+                return new String[] { "Created", "Altered", "Resumed" };
             ]]></field-transform>
         </field>
         <field name="UnSubscrTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "NOT_REMOVED", "REMOVED" };
+                return new String[] { "Not_Removed", "Removed" };
             ]]></field-transform>
         </field>
         <field name="WaterMarkTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "ALL", "API", "ADMIN", "PROXY" };
+                return new String[] { "All", "Api", "Admin", "Proxy" };
             ]]></field-transform>
         </field>
         <field name="CallbackTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "CREATED_ALTERED", "REMOVED", "RESUMED", "SUSPENDED" };
+                return new String[] { "CreatedAltered", "Removed", "Resumed", "Suspended" };
             ]]></field-transform>
         </field>
         <field name="CtlTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "STARTED", "STOPPED", "RESUMED", "SUSPENDED" };
+                return new String[] { "Started", "Stopped", "Resumed", "Suspended" };
             ]]></field-transform>
         </field>
 
@@ -56,7 +56,7 @@
         <field name="DiscCount_${DT}" locator="MQIAMO_DISCS" locator-type="Label" split="true">
             <field-locator id="DT" locator="DiscCountTypes" locator-type="Activity"/>
         </field>
-        <field name="OpenCount_${OT}" locator="MQIAMO_OPENS" locator-type="Label" split="true">
+        <field name="${OT}_OpenCount" locator="MQIAMO_OPENS" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -64,7 +64,7 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="OpenFailCount_${OT}" locator="MQIAMO_OPENS_FAILED" locator-type="Label" split="true">
+        <field name="${OT}_OpenFailCount" locator="MQIAMO_OPENS_FAILED" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -72,7 +72,7 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="CloseCount_${OT}" locator="MQIAMO_CLOSES" locator-type="Label" split="true">
+        <field name="${OT}_CloseCount" locator="MQIAMO_CLOSES" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -80,7 +80,7 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="CloseFailCount_${OT}" locator="MQIAMO_CLOSES_FAILED" locator-type="Label" split="true">
+        <field name="${OT}_CloseFailCount" locator="MQIAMO_CLOSES_FAILED" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -88,7 +88,7 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="InqCount_${OT}" locator="MQIAMO_INQS" locator-type="Label" split="true">
+        <field name="${OT}_InqCount" locator="MQIAMO_INQS" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -96,7 +96,7 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="InqFailCount_${OT}" locator="MQIAMO_INQS_FAILED" locator-type="Label" split="true">
+        <field name="${OT}_InqFailCount" locator="MQIAMO_INQS_FAILED" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -104,7 +104,7 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="SetCount_${OT}" locator="MQIAMO_SETS" locator-type="Label" split="true">
+        <field name="${OT}_SetCount" locator="MQIAMO_SETS" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -112,7 +112,7 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="SetFailCount_${OT}" locator="MQIAMO_SETS_FAILED" locator-type="Label" split="true">
+        <field name="${OT}_SetFailCount" locator="MQIAMO_SETS_FAILED" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -215,7 +215,7 @@
         <!-- Name classifiers for array fields -->
         <field name="PersistenceTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "NON_PERSISTENT", "PERSISTENT" };
+                return new String[] { "NonPersist", "Persist" };
             ]]></field-transform>
         </field>
 
@@ -356,11 +356,17 @@
 
         <!-- common message fields -->
         <field name="QMgrName" locator="MQCA_Q_MGR_NAME" locator-type="Label"/>
-        <field name="StartTime" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
+        <!--<field name="StartTime" locator="MQMD.MQIAMO64_HIGHRES_TIME" locator-type="Label" datatype="Timestamp" units="Milliseconds"/>-->
+        <field name="StartTime" separator=" " datatype="DateTime" format="yyyyMMdd HHmmssSS">
+            <field-locator locator="MQMD.MQCACF_PUT_DATE" locator-type="Label"/>
+            <field-locator locator="MQMD.MQCACF_PUT_TIME" locator-type="Label"/>
+        </field>
+        <field name="EndTime" locator="StartTime" locator-type="Activity"/>
+        <field name="IntervalStartTime" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
             <field-locator locator="MQCAMO_START_DATE" locator-type="Label"/>
             <field-locator locator="MQCAMO_START_TIME" locator-type="Label"/>
         </field>
-        <field name="EndTime" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
+        <field name="IntervalEndTime" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
             <field-locator locator="MQCAMO_END_DATE" locator-type="Label"/>
             <field-locator locator="MQCAMO_END_TIME" locator-type="Label"/>
         </field>
