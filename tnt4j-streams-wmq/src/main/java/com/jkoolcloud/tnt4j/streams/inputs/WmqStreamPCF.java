@@ -99,6 +99,8 @@ public class WmqStreamPCF extends AbstractWmqStream<PCFContent> {
 		addMQMDParameterToPCFMessage(msgData, MQConstants.MQIACF_ORIGINAL_LENGTH, mqMsg.originalLength);
 
 		if (mqMsg.putDateTime != null) {
+			addMQMDParameterToPCFMessage(msgData, MQConstants.MQIAMO64_HIGHRES_TIME,
+					mqMsg.putDateTime.getTimeInMillis());
 			String putDTString = DateFormatUtils.format(mqMsg.putDateTime, WmqStreamConstants.PUT_DATE_TIME_PATTERN);
 			String[] putDTTokens = putDTString.split(" "); // NON-NLS
 
