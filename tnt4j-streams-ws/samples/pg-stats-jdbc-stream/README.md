@@ -1,6 +1,8 @@
 # PostgreSQL (PG) statistics streaming sample
 
-This sample executes SQL query to select PG tables statistics from PG statistics tables `pg_stat_all_tables` and `pg_statio_all_tables`. 
+This sample executes SQL query (every 5 minutes) to select PG schemas defined tables statistics from PG statistics views 
+`pg_stat_all_tables` and `pg_statio_all_tables`. 
+
 Communication with database if performed using PG JDBC driver. 
 
 ## Pre-requisites
