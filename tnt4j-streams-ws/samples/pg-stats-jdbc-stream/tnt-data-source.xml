@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-ws/config/tnt-data-source-ws.xsd">
+
+    <resource-ref id="JDBCParsers" type="Parser" uri="jdbc-parsers.xml"/>
+
+    <stream name="PGStatsJDBCStream" class="com.jkoolcloud.tnt4j.streams.inputs.JDBCStream">
+        <property name="HaltIfNoParser" value="false"/>
+        <property name="BuildSourceFQNFromStreamedData" value="true"/>
+        <!-- DB data source configuration using HikariCP supported configuration properties-->
+        <property name="autoCommit" value="false"/>
+        <property name="readOnly" value="true"/>
+        <property name="maximumPoolSize" value="5"/>
+        <property name="maxLifetime" value="720000"/> <!-- 12 minutes -->
+        <property name="idleTimeout" value="600000"/> <!-- 10 minutes -->
+        <property name="connectionTimeout" value="30000"/> <!-- 30 seconds -->
+        <!-- Query returned ResultSet configuration -->
+        <property name="QueryFetchRows" value="500"/>
+        <!--<property name="QueryMaxRows" value="10000"/>-->
+
+        <!--<property name="UseExecutors" value="true"/>-->
+        <!--<property name="ExecutorThreadsQuantity" value="5"/>-->
+        <!--<property name="ExecutorsTerminationTimeout" value="20"/>-->
+        <!--<property name="ExecutorsBoundedModel" value="false"/>-->
+        <!--<property name="ExecutorRejectedTaskOfferTimeout" value="20"/>-->
+
+        <scenario name="PG Statistics reporting scenario"
+                  url="jdbc:postgresql://[PG_HOST]:5432/postgres"
+                  username="postgres"
+                  password="[PG_USER_PASS]">
+            <step name="Stats collection queries">
+                <property name="Enabled" value="true"/>
+                <property name="SynchronizeRequests" value="true"/>
+
+                <schedule-simple interval="5" units="Minutes" repeatCount="-1"/>
+
+                <request id="PGTableStatisticsQuery">
+                    <![CDATA[
+                        SELECT sat.relid
+                            , sat.schemaname
+                            , sat.relname
+                            , sat.seq_scan
+                            , sat.seq_tup_read
+                            , sat.idx_scan
+                            , sat.idx_tup_fetch
+                            , sat.n_tup_ins
+                            , sat.n_tup_upd
+                            , sat.n_tup_del
+                            , sat.n_tup_hot_upd
+                            , sat.n_live_tup
+                            , sat.n_dead_tup
+                            , sat.n_mod_since_analyze
+                            --, sat.n_ins_since_vacuum
+                            , sat.last_vacuum
+                            , sat.last_autovacuum
+                            , sat.last_analyze
+                            , sat.last_autoanalyze
+                            , sat.vacuum_count
+                            , sat.autovacuum_count
+                            , sat.analyze_count
+                            , sat.autoanalyze_count
+                            , sioat.heap_blks_read
+                            , sioat.heap_blks_hit
+                            , sioat.idx_blks_read
+                            , sioat.idx_blks_hit
+                            , sioat.toast_blks_read
+                            , sioat.toast_blks_hit
+                            , sioat.tidx_blks_read
+                            , sioat.tidx_blks_hit
+                        FROM pg_stat_all_tables AS sat
+                             LEFT OUTER JOIN pg_statio_all_tables AS sioat ON sat.relid = sioat.relid
+                    ]]>
+
+                    <parser-ref name="PGTablesStatsParser"/>
+                </request>
+            </step>
+        </scenario>
+    </stream>
+</tnt-data-source>

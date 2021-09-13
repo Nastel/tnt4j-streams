@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-ws/config/tnt-data-source-ws.xsd">
+
+    <parser name="PGTablesStatsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJDBCResultSetParser">
+        <field name="EventType" value="EVENT"/>
+        <field name="EventName" value="TABLE_STATISTICS"/>
+
+        <field name="Guid" formattingPattern="TableStats_{0,number,######0}">
+            <field-locator locator="TableId" locator-type="Activity" datatype="AsInput"/>
+        </field>
+        <field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
+        <field name="EndTime" locator="StartTime" locator-type="Activity"/>
+        <field name="TableId" locator="relid" locator-type="Label" datatype="Number" format="long"/>
+        <field name="SchemaName" locator="schemaname" locator-type="Label" datatype="String"/>
+        <field name="TableName" locator="relname" locator-type="Label" datatype="String"/>
+        <field name="SequentialScansCount" locator="seq_scan" locator-type="Label" datatype="Number" format="long"/>
+        <field name="LiveRowsFetchedBySequentialScansCount" locator="seq_tup_read" locator-type="Label" datatype="Number" format="long"/>
+        <field name="IndexScansCount" locator="idx_scan" locator-type="Label" datatype="Number" format="long"/>
+        <field name="LiveRowsFetchedIndexScansCount" locator="idx_tup_fetch" locator-type="Label" datatype="Number" format="long"/>
+        <field name="RowsInsertedCount" locator="n_tup_ins" locator-type="Label" datatype="Number" format="long"/>
+        <field name="RowsUpdatedCount" locator="n_tup_upd" locator-type="Label" datatype="Number" format="long"/>
+        <field name="RowsDeletedCount" locator="n_tup_del" locator-type="Label" datatype="Number" format="long"/>
+        <field name="RowsHotUpdatedCount" locator="n_tup_hot_upd" locator-type="Label" datatype="Number" format="long"/>
+        <field name="LiveRowsEstCount" locator="n_live_tup" locator-type="Label" datatype="Number" format="long"/>
+        <field name="DeadRowsEstCount" locator="n_dead_tup" locator-type="Label" datatype="Number" format="long"/>
+        <field name="RowsModifiedSinceLastAnalyzedEstCount" locator="n_mod_since_analyze" locator-type="Label" datatype="Number"
+               format="long"/>
+        <!--<field name="RowsInsertedSinceLastVacuumedEstCount" locator="n_ins_since_vacuum" locator-type="Label" datatype="Number"-->
+        <!--format="long"/>-->
+        <field name="LastVacuum" locator="last_vacuum" locator-type="Label" datatype="Timestamp" timezone="UTC"/>
+        <field name="LastAutoVacuum" locator="last_autovacuum" locator-type="Label" datatype="Timestamp" timezone="UTC"/>
+        <field name="LastAnalyze" locator="last_analyze" locator-type="Label" datatype="Timestamp" timezone="UTC"/>
+        <field name="LastAutoAnalyze" locator="last_autoanalyze" locator-type="Label" datatype="Timestamp" timezone="UTC"/>
+        <field name="VacuumCount" locator="vacuum_count" locator-type="Label" datatype="Number" format="long"/>
+        <field name="AutoVacuumCount" locator="autovacuum_count" locator-type="Label" datatype="Number" format="long"/>
+        <field name="AnalyzeCount" locator="analyze_count" locator-type="Label" datatype="Number" format="long"/>
+        <field name="AutoAnalyzeCount" locator="autoanalyze_count" locator-type="Label" datatype="Number" format="long"/>
+        <field name="DiskBloksReadCount" locator="heap_blks_read" locator-type="Label" datatype="Number" format="long"/>
+        <field name="BufferHitsCount" locator="heap_blks_hit" locator-type="Label" datatype="Number" format="long"/>
+        <field name="DiskBlocksAllIndexesReadCount" locator="idx_blks_read" locator-type="Label" datatype="Number" format="long"/>
+        <field name="BufferAllIndexesHitsCount" locator="idx_blks_hit" locator-type="Label" datatype="Number" format="long"/>
+        <field name="DiskBlocksTOASTReadCount" locator="toast_blks_read" locator-type="Label" datatype="Number" format="long"/>
+        <field name="BufferTOASTHitsCount" locator="toast_blks_hit" locator-type="Label" datatype="Number" format="long"/>
+        <field name="DiskBlocksTOASTIdxReadCount" locator="tidx_blks_read" locator-type="Label" datatype="Number" format="long"/>
+        <field name="BufferTOASTIdxHitsCount" locator="tidx_blks_hit" locator-type="Label" datatype="Number" format="long"/>
+    </parser>
+</tnt-data-source>
