@@ -55,6 +55,10 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>AutoArrangeFields - flag indicating parser fields shall be automatically ordered by parser to ensure references
  * sequence. When {@code false}, fields shall maintain user parser configuration defined order. NOTE: it is alias for
  * parser configuration attribute {@code "manualFieldsOrder"}. Default value - {@code true}. (Optional)</li>
+ * <li>Set of user defined parser context properties. To define parser context property add
+ * {@value CustomProperties#CONTEXT_PROPERTY_PREFIX} prefix to property name. These properties are not used directly by
+ * parser itself, but can be used in parser configuration over dynamic locators or variable expressions to enrich
+ * parsing context. (Optional)</li>
  * </ul>
  *
  * @param <T>
@@ -119,6 +123,8 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	private boolean autoArrangeFields = true;
 	private ActivityField parentIdField;
 
+	private CustomProperties<String> customProperties = new CustomProperties<>(5);
+
 	/**
 	 * Constructs a new GenericActivityParser.
 	 */
@@ -168,6 +174,8 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"ActivityParser.setting", name, value);
 			}
+		} else if (customProperties.isPropertyNameForThisMap(name)) {
+			customProperties.setProperty(name, value);
 		}
 	}
 
@@ -187,6 +195,11 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		}
 		if (ParserProperties.PROP_AUTO_ARRANGE_FIELDS.equalsIgnoreCase(name)) {
 			return autoArrangeFields;
+		}
+
+		String cPropertyValue = customProperties.getProperty(name);
+		if (cPropertyValue != null) {
+			return cPropertyValue;
 		}
 
 		return null;
@@ -1104,6 +1117,12 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 				} else if (locStr.startsWith(LOC_FOR_COMPLETE_ACTIVITY_METADATA)) {
 					val = Utils.getMapValueByPath(locStr.substring(LOC_FOR_COMPLETE_ACTIVITY_METADATA.length() + 1),
 							cData.getMetadata());
+				} else if (locator.getBuiltInType() == ActivityFieldLocatorType.ParserProp) {
+					val = getProperty(locStr);
+				} else if (locator.getBuiltInType() == ActivityFieldLocatorType.SystemProp) {
+					val = System.getProperty(locStr);
+				} else if (locator.getBuiltInType() == ActivityFieldLocatorType.EnvVariable) {
+					val = System.getenv(locStr);
 				} else {
 					val = resolveLocatorValue(locator, cData, formattingNeeded);
 				}

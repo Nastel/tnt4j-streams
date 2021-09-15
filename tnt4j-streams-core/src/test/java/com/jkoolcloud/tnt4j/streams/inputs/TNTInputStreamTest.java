@@ -28,7 +28,6 @@ import java.util.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
@@ -39,6 +38,7 @@ import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
 import com.jkoolcloud.tnt4j.streams.parsers.data.ActivityData;
 import com.jkoolcloud.tnt4j.streams.reference.ParserReference;
+import com.jkoolcloud.tnt4j.streams.utils.CustomProperties;
 import com.jkoolcloud.tnt4j.tracker.Tracker;
 
 /**
@@ -89,9 +89,9 @@ public class TNTInputStreamTest {
 
 	@Test
 	public void setPropertiesIfNullTest() {
-		TNTInputStream<?, ?> my = Mockito.mock(TestUtils.SimpleTestStream.class, Mockito.CALLS_REAL_METHODS);
-		my.setProperties(null);
-		assertNull(my.getProperty("PROP_EXECUTORS_BOUNDED")); // NON-NLS
+		TNTInputStream<?, ?> myStream = new TestUtils.SimpleTestStream();
+		myStream.setProperties(null);
+		assertNull(myStream.getProperty("PROP_EXECUTORS_BOUNDED")); // NON-NLS
 	}
 
 	@Test
@@ -276,6 +276,31 @@ public class TNTInputStreamTest {
 		List<Runnable> list = Collections.singletonList(runnable);
 		ts.notifyStreamTasksDropOff(list);
 		verify(streamTaskListenerMock).onDropOff(ts, list);
+
+	}
+
+	@Test
+	public void customPropertiesTest() {
+		TNTInputStream<?, ?> myStream = new TestUtils.SimpleTestStream();
+		myStream.setProperty(StreamProperties.PROP_EXECUTOR_THREADS_QTY, "6");
+		myStream.setProperty(CustomProperties.CONTEXT_PROPERTY_PREFIX + "property1", "value1");
+		myStream.setProperty(CustomProperties.CONTEXT_PROPERTY_PREFIX.toUpperCase() + "PROPERTY2", "value2");
+		myStream.setProperty(CustomProperties.CONTEXT_PROPERTY_PREFIX + StreamProperties.PROP_EXECUTOR_THREADS_QTY,
+				"value3");
+
+		Object pValue = myStream.getProperty(StreamProperties.PROP_EXECUTOR_THREADS_QTY);
+		assertEquals(6, pValue);
+		pValue = myStream.getProperty("property1");
+		assertEquals("value1", pValue);
+		pValue = myStream.getProperty("property2");
+		assertEquals("value2", pValue);
+		pValue = myStream.getProperty(CustomProperties.CONTEXT_PROPERTY_PREFIX + "property1");
+		assertEquals("value1", pValue);
+		pValue = myStream.getProperty(CustomProperties.CONTEXT_PROPERTY_PREFIX + "property2");
+		assertEquals("value2", pValue);
+		pValue = myStream
+				.getProperty(CustomProperties.CONTEXT_PROPERTY_PREFIX + StreamProperties.PROP_EXECUTOR_THREADS_QTY);
+		assertEquals("value3", pValue);
 
 	}
 

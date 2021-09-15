@@ -54,6 +54,10 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * {@code PingLogActivityDelay})</li>
  * <li>PingLogActivityDelay - defines repetitive interval in seconds between "ping" log entries with stream statistics.
  * Default value - {@code -1} meaning "NEVER". (Optional, can be OR'ed with {@code PingLogActivityCount})</li>
+ * <li>Set of user defined stream context properties. To define stream context property add
+ * {@value CustomProperties#CONTEXT_PROPERTY_PREFIX} prefix to property name. These properties are not used directly by
+ * stream itself, but can be used in stream bound parsers configuration over dynamic locators or variable expressions to
+ * enrich parsing context. (Optional)</li>
  * </ul>
  *
  * @param <T>
@@ -105,6 +109,8 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 	private int pingLogActivitiesCount = -1;
 	private int pingLogActivitiesDelay = -1;
+
+	private CustomProperties<String> customProperties = new CustomProperties<>(5);
 
 	private Thread sh;
 
@@ -233,6 +239,8 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 			pingLogActivitiesCount = Integer.parseInt(value);
 		} else if (StreamProperties.PROP_PING_LOG_ACTIVITY_DELAY.equalsIgnoreCase(name)) {
 			pingLogActivitiesDelay = Integer.parseInt(value);
+		} else if (customProperties.isPropertyNameForThisMap(name)) {
+			customProperties.setProperty(name, value);
 		}
 
 		output().setProperty(name, value);
@@ -261,32 +269,37 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * @see #setProperty(String, String)
 	 */
 	public Object getProperty(String name) {
-		if (StreamProperties.PROP_DATETIME.equals(name)) {
+		if (StreamProperties.PROP_DATETIME.equalsIgnoreCase(name)) {
 			return getDate();
 		}
-		if (StreamProperties.PROP_USE_EXECUTOR_SERVICE.equals(name)) {
+		if (StreamProperties.PROP_USE_EXECUTOR_SERVICE.equalsIgnoreCase(name)) {
 			return useExecutorService;
 		}
-		if (StreamProperties.PROP_EXECUTOR_THREADS_QTY.equals(name)) {
+		if (StreamProperties.PROP_EXECUTOR_THREADS_QTY.equalsIgnoreCase(name)) {
 			return executorThreadsQty;
 		}
-		if (StreamProperties.PROP_EXECUTOR_REJECTED_TASK_OFFER_TIMEOUT.equals(name)) {
+		if (StreamProperties.PROP_EXECUTOR_REJECTED_TASK_OFFER_TIMEOUT.equalsIgnoreCase(name)) {
 			return executorRejectedTaskOfferTimeout;
 		}
-		if (StreamProperties.PROP_EXECUTORS_TERMINATION_TIMEOUT.equals(name)) {
+		if (StreamProperties.PROP_EXECUTORS_TERMINATION_TIMEOUT.equalsIgnoreCase(name)) {
 			return executorsTerminationTimeout;
 		}
-		if (StreamProperties.PROP_EXECUTORS_BOUNDED.equals(name)) {
+		if (StreamProperties.PROP_EXECUTORS_BOUNDED.equalsIgnoreCase(name)) {
 			return boundedExecutorModel;
 		}
-		if (StreamProperties.PROP_STREAM_NAME.equals(name)) {
+		if (StreamProperties.PROP_STREAM_NAME.equalsIgnoreCase(name)) {
 			return this.name;
 		}
-		if (StreamProperties.PROP_PING_LOG_ACTIVITY_COUNT.equals(name)) {
-			return this.pingLogActivitiesCount;
+		if (StreamProperties.PROP_PING_LOG_ACTIVITY_COUNT.equalsIgnoreCase(name)) {
+			return pingLogActivitiesCount;
 		}
-		if (StreamProperties.PROP_PING_LOG_ACTIVITY_DELAY.equals(name)) {
-			return this.pingLogActivitiesDelay;
+		if (StreamProperties.PROP_PING_LOG_ACTIVITY_DELAY.equalsIgnoreCase(name)) {
+			return pingLogActivitiesDelay;
+		}
+
+		String cPropertyValue = customProperties.getProperty(name);
+		if (cPropertyValue != null) {
+			return cPropertyValue;
 		}
 
 		return null;

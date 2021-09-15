@@ -98,7 +98,7 @@ public class ChronicleQueueStream extends TNTParseableInputStream<Object> {
 
 	@Override
 	public Object getProperty(String name) {
-		if (StreamProperties.PROP_FILENAME.equals(name)) {
+		if (StreamProperties.PROP_FILENAME.equalsIgnoreCase(name)) {
 			return queuePath;
 		}
 		if (ChronicleQueueProperties.PROP_MARSHALL_CLASS.equalsIgnoreCase(name)) {

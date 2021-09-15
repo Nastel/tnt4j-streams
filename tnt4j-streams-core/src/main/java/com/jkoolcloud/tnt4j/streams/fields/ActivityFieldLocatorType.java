@@ -75,7 +75,22 @@ public enum ActivityFieldLocatorType {
 	/**
 	 * Indicates that data value shall be evaluated by using provided expression for parser context data.
 	 */
-	Expression(String.class);
+	Expression(String.class),
+
+	/**
+	 * Indicates that raw data value is the value of a named property of the current parser.
+	 */
+	ParserProp(String.class),
+
+	/**
+	 * Indicates that raw data value is the value of a named JVM System property.
+	 */
+	SystemProp(String.class),
+
+	/**
+	 * Indicates that raw data value is the value of a named OS Environment variable.
+	 */
+	EnvVariable(String.class);
 
 	private final Class<?> dataType;
 

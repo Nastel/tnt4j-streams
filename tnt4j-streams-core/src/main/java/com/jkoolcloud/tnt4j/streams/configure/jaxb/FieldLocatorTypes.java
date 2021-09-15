@@ -37,6 +37,10 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="Range"/>
  *     &lt;enumeration value="Cache"/>
  *     &lt;enumeration value="Activity"/>
+ *     &lt;enumeration value="Expression"/>
+ *     &lt;enumeration value="ParserProp"/>
+ *     &lt;enumeration value="SystemProp"/>
+ *     &lt;enumeration value="EnvVariable"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
@@ -120,7 +124,34 @@ public enum FieldLocatorTypes {
 	 * 
 	 */
 	@XmlEnumValue("Expression")
-	EXPRESSION("Expression");
+	EXPRESSION("Expression"),
+
+	/**
+	 * 
+	 * Locator value is the value for the specified parser property.
+	 * 
+	 * 
+	 */
+	@XmlEnumValue("ParserProp")
+	PARSER_PROP("ParserProp"),
+
+	/**
+	 * 
+	 * Locator value is the value for the specified Java System property.
+	 * 
+	 * 
+	 */
+	@XmlEnumValue("SystemProp")
+	SYSTEM_PROP("SystemProp"),
+
+	/**
+	 * 
+	 * Locator value is the value for the specified OS environment variable.
+	 * 
+	 * 
+	 */
+	@XmlEnumValue("EnvVariable")
+	ENV_VARIABLE("EnvVariable");
 
 	private final String value;
 

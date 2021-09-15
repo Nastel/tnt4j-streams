@@ -438,7 +438,6 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
-
             <xs:enumeration value="Index">
                 <xs:annotation>
                     <xs:documentation>
@@ -446,7 +445,6 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
-
             <xs:enumeration value="Label">
                 <xs:annotation>
                     <xs:documentation>
@@ -455,7 +453,6 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
-
             <xs:enumeration value="REMatchId">
                 <xs:annotation>
                     <xs:documentation>
@@ -472,7 +469,6 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
-
             <xs:enumeration value="Cache">
                 <xs:annotation>
                     <xs:documentation>
@@ -480,7 +476,6 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
-
             <xs:enumeration value="Activity">
                 <xs:annotation>
                     <xs:documentation>
@@ -488,11 +483,31 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
-
             <xs:enumeration value="Expression">
                 <xs:annotation>
                     <xs:documentation>
                         Locator value is the expression applicable for parser context, e.g. regex.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ParserProp">
+                <xs:annotation>
+                    <xs:documentation>
+                        Locator value is the value for the specified parser property.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SystemProp">
+                <xs:annotation>
+                    <xs:documentation>
+                        Locator value is the value for the specified Java System property.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="EnvVariable">
+                <xs:annotation>
+                    <xs:documentation>
+                        Locator value is the value for the specified OS environment variable.
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>

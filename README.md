@@ -122,6 +122,10 @@ Mapping of streamed data to activity event fields are performed by parser. To ma
         * `Range` 
         * `Cache` 
         * `Activity`
+        * `Expression`
+        * `ParserProp`
+        * `SystemProp`
+        * `EnvVariable`
     * `format` - defines format type or representation that value is expected to be in (e.g. binary, date/time string, decimal format, etc.).
     Set of supported values:
         * `base64Binary`
@@ -420,7 +424,22 @@ sample:
     /**
      * Indicates that data value shall be evaluated by using provided expression for parser context data.
      */
-    Expression(String.class);
+    Expression(String.class),
+
+    /**
+     * Indicates that raw data value is the value of a named property of the current parser.
+     */
+    ParserProp(String.class),
+
+    /**
+     * Indicates that raw data value is the value of a named JVM System property.
+     */
+    SystemProp(String.class),
+
+    /**
+     * Indicates that raw data value is the value of a named OS Environment variable.
+     */
+    EnvVariable(String.class);
 ```
 
 **NOTE:** `Index` is default value and may be suppressed in field/locator definition:
@@ -4495,6 +4514,9 @@ These parameters are applicable to all types of streams.
 value - `-1` meaning `NEVER`. (Optional, can be OR'ed with `PingLogActivityDelay`.
 * `PingLogActivityDelay` - defines repetitive interval in seconds between "ping" log entries with stream statistics. Default value - `-1` 
 meaning `NEVER`. (Optional, can be OR'ed with `PingLogActivityCount`.
+* Set of user defined stream context properties. To define stream context property add `ctx:` prefix to property name. These properties are 
+not used directly by stream itself, but can be used in stream bound parsers configuration over dynamic locators or variable expressions to 
+enrich parsing context. (Optional)
 
     sample:
 ```xml
@@ -5578,6 +5600,9 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
  * `AutoArrangeFields` - flag indicating parser fields shall be automatically ordered by parser to ensure references sequence. When `false`, 
  fields shall maintain user parser configuration defined order. **NOTE:** it is alias for parser configuration attribute 
  `manualFieldsOrder`. Default value - `true`. (Optional)
+ * Set of user defined parser context properties. To define parser context property add `ctx:` prefix to property name. These properties are 
+ not used directly by parser itself, but can be used in parser configuration over dynamic locators or variable expressions to enrich parsing 
+ context. (Optional)
 
     sample:
 ```xml

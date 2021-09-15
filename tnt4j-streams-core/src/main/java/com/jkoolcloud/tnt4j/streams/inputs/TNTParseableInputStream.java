@@ -87,7 +87,7 @@ public abstract class TNTParseableInputStream<T> extends TNTInputStream<T, Activ
 
 	@Override
 	public Object getProperty(String name) {
-		if (StreamProperties.PROP_HALT_ON_PARSER.equals(name)) {
+		if (StreamProperties.PROP_HALT_ON_PARSER.equalsIgnoreCase(name)) {
 			return haltIfNoParser;
 		}
 		if (StreamProperties.PROP_GROUPING_ACTIVITY_NAME.equalsIgnoreCase(name)) {
