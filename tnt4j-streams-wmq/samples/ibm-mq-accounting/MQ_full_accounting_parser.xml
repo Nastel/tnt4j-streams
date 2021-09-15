@@ -62,7 +62,7 @@
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
-                    $fieldName.matches(".+_null\\d*\$")
+                    $fieldName.matches("null_.+\\d*\$")
                 ]]></expression>
             </filter>
         </field>
@@ -70,7 +70,7 @@
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
-                    $fieldName.matches(".+_null\\d*\$")
+                    $fieldName.matches("null_.+\\d*\$")
                 ]]></expression>
             </filter>
         </field>
@@ -78,7 +78,7 @@
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
-                    $fieldName.matches(".+_null\\d*\$")
+                    $fieldName.matches("null_.+\\d*\$")
                 ]]></expression>
             </filter>
         </field>
@@ -86,7 +86,7 @@
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
-                    $fieldName.matches(".+_null\\d*\$")
+                    $fieldName.matches("null_.+\\d*\$")
                 ]]></expression>
             </filter>
         </field>
@@ -94,7 +94,7 @@
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
-                    $fieldName.matches(".+_null\\d*\$")
+                    $fieldName.matches("null_.+\\d*\$")
                 ]]></expression>
             </filter>
         </field>
@@ -102,7 +102,7 @@
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
-                    $fieldName.matches(".+_null\\d*\$")
+                    $fieldName.matches("null_.+\\d*\$")
                 ]]></expression>
             </filter>
         </field>
@@ -110,7 +110,7 @@
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
-                    $fieldName.matches(".+_null\\d*\$")
+                    $fieldName.matches("null_.+\\d*\$")
                 ]]></expression>
             </filter>
         </field>
@@ -118,7 +118,7 @@
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
-                    $fieldName.matches(".+_null\\d*\$")
+                    $fieldName.matches("null_.+\\d*\$")
                 ]]></expression>
             </filter>
         </field>
