@@ -64,7 +64,7 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="${OT}_OpenFailCount" locator="MQIAMO_OPENS_FAILED" locator-type="Label" split="true">
+        <field name="${OT}_OPEN_FAIL_COUNT" locator="MQIAMO_OPENS_FAILED" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -72,7 +72,7 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="${OT}_CloseCount" locator="MQIAMO_CLOSES" locator-type="Label" split="true">
+        <field name="${OT}_CLOSE_COUNT" locator="MQIAMO_CLOSES" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -80,7 +80,7 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="${OT}_CloseFailCount" locator="MQIAMO_CLOSES_FAILED" locator-type="Label" split="true">
+        <field name="${OT}_CLOSE_FAIL_COUNT" locator="MQIAMO_CLOSES_FAILED" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -88,7 +88,7 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="${OT}_InqCount" locator="MQIAMO_INQS" locator-type="Label" split="true">
+        <field name="${OT}_INQ_COUNT" locator="MQIAMO_INQS" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -96,7 +96,7 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="${OT}_InqFailCount" locator="MQIAMO_INQS_FAILED" locator-type="Label" split="true">
+        <field name="${OT}_INQ_FAIL_COUNT" locator="MQIAMO_INQS_FAILED" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -104,7 +104,7 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="${OT}_SetCount" locator="MQIAMO_SETS" locator-type="Label" split="true">
+        <field name="${OT}_SET_COUNT" locator="MQIAMO_SETS" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -112,7 +112,7 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="${OT}_SetFailCount" locator="MQIAMO_SETS_FAILED" locator-type="Label" split="true">
+        <field name="${OT}_SET_FAIL_COUNT" locator="MQIAMO_SETS_FAILED" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
@@ -120,90 +120,90 @@
                 ]]></expression>
             </filter>
         </field>
-        <field name="PutCount_${PT}" locator="MQIAMO_PUTS" locator-type="Label" split="true">
+        <field name="${PT}_PUT_COUNT" locator="MQIAMO_PUTS" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="PutFailCount" locator="MQIAMO_PUTS_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="Put1Count_${PT}" locator="MQIAMO_PUT1S" locator-type="Label" split="true">
+        <field name="PUT_FAIL_COUNT" locator="MQIAMO_PUTS_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="${PT}_PUT1_COUNT" locator="MQIAMO_PUT1S" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="Put1FailCount" locator="MQIAMO_PUT1S_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="PUT1_FAIL_COUNT" locator="MQIAMO_PUT1S_FAILED" locator-type="Label" datatype="Number" format="int"/>
         <!-- TODO: doc states it is array, but MQ returns int -->
-        <field name="PutBytes_${PT}" locator="MQIAMO64_PUT_BYTES" locator-type="Label" split="true">
+        <field name="${PT}_PUT_BYTES" locator="MQIAMO64_PUT_BYTES" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="GetCount_${PT}" locator="MQIAMO_GETS" locator-type="Label" split="true">
+        <field name="${PT}_GET_COUNT" locator="MQIAMO_GETS" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="GetFailCount" locator="MQIAMO_GETS_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="GetBytes_${PT}" locator="MQIAMO64_GET_BYTES" locator-type="Label" split="true">
+        <field name="GET_FAIL_COUNT" locator="MQIAMO_GETS_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="${PT}_GET_BYTES" locator="MQIAMO64_GET_BYTES" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="BrowseCount_${PT}" locator="MQIAMO_BROWSES" locator-type="Label" split="true">
+        <field name="${PT}_BROWSE_COUNT" locator="MQIAMO_BROWSES" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="BrowseFailCount" locator="MQIAMO_BROWSES_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="BrowseBytes_${PT}" locator="MQIAMO64_BROWSE_BYTES" locator-type="Label" split="true">
+        <field name="BROWSE_FAIL_COUNT" locator="MQIAMO_BROWSES_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="${PT}_BROWSE_BYTES" locator="MQIAMO64_BROWSE_BYTES" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="CommitCount" locator="MQIAMO_COMMITS" locator-type="Label" datatype="Number" format="int"/>
-        <field name="CommitFailCount" locator="MQIAMO_COMMITS_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="BackCount" locator="MQIAMO_BACKOUTS" locator-type="Label" datatype="Number" format="int"/>
-        <field name="ExpiredMsgCount" locator="MQIAMO_MSGS_EXPIRED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="PurgeCount" locator="MQIAMO_MSGS_PURGED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="SubCountDur_${ST}" locator="MQIAMO_SUBS_DUR" locator-type="Label" split="true">
+        <field name="COMMIT_COUNT" locator="MQIAMO_COMMITS" locator-type="Label" datatype="Number" format="int"/>
+        <field name="COMMIT_FAIL_COUNT" locator="MQIAMO_COMMITS_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="BACKOUT_COUNT" locator="MQIAMO_BACKOUTS" locator-type="Label" datatype="Number" format="int"/>
+        <field name="EXPIRED_MSG_COUNT" locator="MQIAMO_MSGS_EXPIRED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="PURGE_MESSAGE_COUNT" locator="MQIAMO_MSGS_PURGED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="SUB_DUR_${ST}_COUNT" locator="MQIAMO_SUBS_DUR" locator-type="Label" split="true">
             <field-locator id="ST" locator="SubscrTypes" locator-type="Activity"/>
         </field>
-        <field name="SubCountNDur_${ST}" locator="MQIAMO_SUBS_NDUR" locator-type="Label" split="true">
+        <field name="SUB_NDUR_${ST}_COUNT" locator="MQIAMO_SUBS_NDUR" locator-type="Label" split="true">
             <field-locator id="ST" locator="SubscrTypes" locator-type="Activity"/>
         </field>
-        <field name="SubFailCount" locator="MQIAMO_SUBS_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="UnsubCountDur_${UST}" locator="MQIAMO_UNSUBS_DUR" locator-type="Label" split="true">
+        <field name="SUB_FAIL_COUNT" locator="MQIAMO_SUBS_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="UNSUB_DUR_${UST}_COUNT" locator="MQIAMO_UNSUBS_DUR" locator-type="Label" split="true">
             <field-locator id="UST" locator="UnSubscrTypes" locator-type="Activity"/>
         </field>
-        <field name="UnsubCountNDur_${UST}" locator="MQIAMO_UNSUBS_NDUR" locator-type="Label" split="true">
+        <field name="UNSUB_NDUR_${UST}_COUNT" locator="MQIAMO_UNSUBS_NDUR" locator-type="Label" split="true">
             <field-locator id="UST" locator="UnSubscrTypes" locator-type="Activity"/>
         </field>
-        <field name="UnsubFailCount" locator="MQIAMO_UNSUBS_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="SubRqCount" locator="MQIAMO_SUBRQS" locator-type="Label" datatype="Number" format="int"/>
-        <field name="SubRqFailCount" locator="MQIAMO_SUBRQS_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="CBCount_${CBT}" locator="MQIAMO_CBS" locator-type="Label" split="true">
+        <field name="UNSUB_FAIL_COUNT" locator="MQIAMO_UNSUBS_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="SUB_RQ_COUNT" locator="MQIAMO_SUBRQS" locator-type="Label" datatype="Number" format="int"/>
+        <field name="SUB_RQ_FAIL_COUNT" locator="MQIAMO_SUBRQS_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="CB_${CBT}_COUNT" locator="MQIAMO_CBS" locator-type="Label" split="true">
             <field-locator id="CBT" locator="CallbackTypes" locator-type="Activity"/>
         </field>
-        <field name="CBFailCount" locator="MQIAMO_CBS_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="CtlCount_${CTLT}" locator="MQIAMO_CTLS" locator-type="Label" split="true">
+        <field name="CB_FAIL_COUNT" locator="MQIAMO_CBS_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="CTL_${CTLT}_COUNT" locator="MQIAMO_CTLS" locator-type="Label" split="true">
             <field-locator id="CTLT" locator="CtlTypes" locator-type="Activity"/>
         </field>
-        <field name="CtlFailCount" locator="MQIAMO_CTLS_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="StatCount" locator="MQIAMO_STATS" locator-type="Label" datatype="Number" format="int"/>
-        <field name="StatFailCount" locator="MQIAMO_STATS_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="SubCountDurHighWater_${WMT}" locator="MQIAMO_SUB_DUR_HIGHWATER" locator-type="Label" split="true">
+        <field name="CTL_FAIL_COUNT" locator="MQIAMO_CTLS_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="MQSTAT_COUNT" locator="MQIAMO_STATS" locator-type="Label" datatype="Number" format="int"/>
+        <field name="MQSTAT_FAIL_COUNT" locator="MQIAMO_STATS_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="SUB_HW_${WMT}_DUR_COUNT" locator="MQIAMO_SUB_DUR_HIGHWATER" locator-type="Label" split="true">
             <field-locator id="WMT" locator="WaterMarkTypes" locator-type="Activity"/>
         </field>
-        <field name="SubCountDurLowWater_${WMT}" locator="MQIAMO_SUB_DUR_LOWWATER" locator-type="Label" split="true">
+        <field name="SUB_LW_${WMT}_DUR_COUNT" locator="MQIAMO_SUB_DUR_LOWWATER" locator-type="Label" split="true">
             <field-locator id="WMT" locator="WaterMarkTypes" locator-type="Activity"/>
         </field>
-        <field name="SubCountNDurHighWater_${WMT}" locator="MQIAMO_SUB_NDUR_HIGHWATER" locator-type="Label" split="true">
+        <field name="SUB_HW_${WMT}_NDUR_COUNT" locator="MQIAMO_SUB_NDUR_HIGHWATER" locator-type="Label" split="true">
             <field-locator id="WMT" locator="WaterMarkTypes" locator-type="Activity"/>
         </field>
-        <field name="SubCountNDurLowWater_${WMT}" locator="MQIAMO_SUB_NDUR_LOWWATER" locator-type="Label" split="true">
+        <field name="SUB_LW_${WMT}_NDUR_COUNT" locator="MQIAMO_SUB_NDUR_LOWWATER" locator-type="Label" split="true">
             <field-locator id="WMT" locator="WaterMarkTypes" locator-type="Activity"/>
         </field>
-        <field name="PutTopicCount_${PT}" locator="MQIAMO_TOPIC_PUTS" locator-type="Label" split="true">
+        <field name="TOPIC_PUT_${PT}_COUNT" locator="MQIAMO_TOPIC_PUTS" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="PutTopicFailCount" locator="MQIAMO_TOPIC_PUTS_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="Put1TopicCount_${PT}" locator="MQIAMO_TOPIC_PUT1S" locator-type="Label" split="true">
+        <field name="TOPIC_PUT_FAIL_COUNT" locator="MQIAMO_TOPIC_PUTS_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="TOPIC_PUT1_${PT}_COUNT" locator="MQIAMO_TOPIC_PUT1S" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="Put1TopicFailCount" locator="MQIAMO_TOPIC_PUT1S_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="PutTopicBytes_${PT}" locator="MQIAMO64_TOPIC_PUT_BYTES" locator-type="Label" split="true">
+        <field name="TOPIC_PUT1_FAIL_COUNT" locator="MQIAMO_TOPIC_PUT1S_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="TOPIC_PUT_${PT}_BYTES" locator="MQIAMO64_TOPIC_PUT_BYTES" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="PublishMsgCount_${PT}" locator="MQIAMO_PUBLISH_MSG_COUNT" locator-type="Label" split="true">
+        <field name="PUB_MSG_${PT}_COUNT" locator="MQIAMO_PUBLISH_MSG_COUNT" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="PublishMsgBytes_${PT}" locator="MQIAMO64_PUBLISH_MSG_BYTES" locator-type="Label" split="true">
+        <field name="PUB_MSG_BYTES_${PT}_COUNT" locator="MQIAMO64_PUBLISH_MSG_BYTES" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
     </parser>
@@ -215,16 +215,16 @@
         <!-- Name classifiers for array fields -->
         <field name="PersistenceTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "NonPersist", "Persist" };
+                return new String[] { "NONPERS", "PERS" };
             ]]></field-transform>
         </field>
 
-        <field name="QName" locator="MQCA_Q_NAME" locator-type="Label"/>
-        <field name="CreateTime" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
+        <field name="QUEUE_NAME" locator="MQCA_Q_NAME" locator-type="Label"/>
+        <field name="CREATION_DATE_TIME" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
             <field-locator locator="MQCA_CREATION_DATE" locator-type="Label"/>
             <field-locator locator="MQCA_CREATION_TIME" locator-type="Label"/>
         </field>
-        <field name="QType">
+        <field name="QUEUE_TYPE">
             <field-locator locator="MQIA_Q_TYPE" locator-type="Label" datatype="Number" format="int"/>
             <field-transform lang="groovy" phase="formatted"><![CDATA[
                 $fieldValue instanceof Number
@@ -232,7 +232,7 @@
                     : $fieldValue
             ]]></field-transform>
         </field>
-        <field name="QDefinitionType">
+        <field name="Q_DEFINITION_TYPE">
             <field-locator locator="MQIA_DEFINITION_TYPE" locator-type="Label" datatype="Number" format="int"/>
             <field-transform lang="groovy" phase="formatted"><![CDATA[
                 $fieldValue instanceof Number
@@ -240,39 +240,39 @@
                     : $fieldValue
             ]]></field-transform>
         </field>
-        <field name="QMinDepth" locator="MQIAMO_Q_MIN_DEPTH" locator-type="Label" datatype="Number" format="int"/>
-        <field name="QMaxDepth" locator="MQIAMO_Q_MAX_DEPTH" locator-type="Label" datatype="Number" format="int"/>
-        <field name="AvgTimeOnQ_${PT}" locator="MQIAMO64_AVG_Q_TIME" locator-type="Label" split="true">
+        <field name="MIN_DEPTH" locator="MQIAMO_Q_MIN_DEPTH" locator-type="Label" datatype="Number" format="int"/>
+        <field name="MAX_DEPTH" locator="MQIAMO_Q_MAX_DEPTH" locator-type="Label" datatype="Number" format="int"/>
+        <field name="${PT}_TIME_ON_Q_AVG" locator="MQIAMO64_AVG_Q_TIME" locator-type="Label" units="Microseconds" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="PutCount_${PT}" locator="MQIAMO_PUTS" locator-type="Label" split="true">
+        <field name="${PT}_PUT_COUNT" locator="MQIAMO_PUTS" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="PutFailCount" locator="MQIAMO_PUTS_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="Put1Count_${PT}" locator="MQIAMO_PUT1S" locator-type="Label" split="true">
+        <field name="PUT_FAIL_COUNT" locator="MQIAMO_PUTS_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="${PT}_PUT1_COUNT" locator="MQIAMO_PUT1S" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="Put1FailCount" locator="MQIAMO_PUT1S_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="PutBytes_${PT}" locator="MQIAMO64_PUT_BYTES" locator-type="Label" split="true">
+        <field name="PUT1_FAIL_COUNT" locator="MQIAMO_PUT1S_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="${PT}_PUT_BYTES" locator="MQIAMO64_PUT_BYTES" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="GetCount_${PT}" locator="MQIAMO_GETS" locator-type="Label" split="true">
+        <field name="${PT}_GET_COUNT" locator="MQIAMO_GETS" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="GetBytes_${PT}" locator="MQIAMO64_GET_BYTES" locator-type="Label" split="true">
+        <field name="${PT}_GET_BYTES" locator="MQIAMO64_GET_BYTES" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="GetFailCount" locator="MQIAMO_GETS_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="BrowseCount_${PT}" locator="MQIAMO_BROWSES" locator-type="Label" split="true">
+        <field name="GET_FAIL_COUNT" locator="MQIAMO_GETS_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="${PT}_BROWSE_COUNT " locator="MQIAMO_BROWSES" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="BrowseBytes_${PT}" locator="MQIAMO64_BROWSE_BYTES" locator-type="Label" split="true">
+        <field name="${PT}_BROWSE_BYTES" locator="MQIAMO64_BROWSE_BYTES" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
         </field>
-        <field name="BrowseFailCount" locator="MQIAMO_BROWSES_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="NonQueuedMsgCount" locator="MQIAMO_MSGS_NOT_QUEUED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="ExpiredMsgCount" locator="MQIAMO_MSGS_EXPIRED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="PurgeCount" locator="MQIAMO_MSGS_PURGED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="BROWSE_FAIL_COUNT" locator="MQIAMO_BROWSES_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="NOT_QUEUED_MSG_COUNT" locator="MQIAMO_MSGS_NOT_QUEUED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="EXPIRED_MSG_COUNT" locator="MQIAMO_MSGS_EXPIRED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="PURGED_MSG_COUNT" locator="MQIAMO_MSGS_PURGED" locator-type="Label" datatype="Number" format="int"/>
     </parser>
 
     <parser name="QueueStatisticsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityPCFParser">
@@ -280,7 +280,7 @@
         <property name="UseActivityDataAsMessageForUnset" value="true"/>
 
         <!-- message fields -->
-        <field name="ObjectCount" locator="MQIAMO_OBJECT_COUNT" locator-type="Label" datatype="Number" format="int"/>
+        <field name="QUEUE_STAT_COUNT" locator="MQIAMO_OBJECT_COUNT" locator-type="Label" datatype="Number" format="int"/>
         <embedded-activity name="QueueStatsData" locator="MQGACF_Q_STATISTICS_DATA" locator-type="Label">
             <parser-ref name="QueueStatsDataParser" aggregation="Relate"/>
         </embedded-activity>
@@ -290,8 +290,8 @@
         <property name="TranslateNumValues" value="true"/>
         <property name="UseActivityDataAsMessageForUnset" value="true"/>
 
-        <field name="ChannelName" locator="MQCACH_CHANNEL_NAME" locator-type="Label"/>
-        <field name="ChannelType">
+        <field name="CHANNEL_NAME" locator="MQCACH_CHANNEL_NAME" locator-type="Label"/>
+        <field name="CHANNEL_TYPE">
             <field-locator locator="MQIACH_CHANNEL_TYPE" locator-type="Label" datatype="Number" format="int"/>
             <field-transform lang="groovy" phase="formatted"><![CDATA[
                 $fieldValue instanceof Number
@@ -299,20 +299,20 @@
                     : $fieldValue
             ]]></field-transform>
         </field>
-        <field name="RemoteQmgr" locator="MQCA_REMOTE_Q_MGR_NAME" locator-type="Label"/>
-        <field name="ConnectionName" locator="MQCACH_CONNECTION_NAME" locator-type="Label"/>
-        <field name="MsgCount" locator="MQIAMO_MSGS" locator-type="Label" datatype="Number" format="int"/>
-        <field name="TotalBytes" locator="MQIAMO64_BYTES" locator-type="Label" datatype="Number" format="long"/>
-        <field name="NetTimeMin" locator="MQIAMO_NET_TIME_MIN" locator-type="Label" datatype="Number" format="int"/>
-        <field name="NetTimeAvg" locator="MQIAMO_NET_TIME_AVG" locator-type="Label" datatype="Number" format="int"/>
-        <field name="NetTimeMax" locator="MQIAMO_NET_TIME_MAX" locator-type="Label" datatype="Number" format="int"/>
-        <field name="ExitTimeMin" locator="MQIAMO_EXIT_TIME_MIN" locator-type="Label" datatype="Number" format="int"/>
-        <field name="ExitTimeAvg" locator="MQIAMO_EXIT_TIME_AVG" locator-type="Label" datatype="Number" format="int"/>
-        <field name="ExitTimeMax" locator="MQIAMO_EXIT_TIME_MAX" locator-type="Label" datatype="Number" format="int"/>
-        <field name="FullBatchCount" locator="MQIAMO_FULL_BATCHES" locator-type="Label" datatype="Number" format="int"/>
-        <field name="IncmplBatchCount" locator="MQIAMO_INCOMPLETE_BATCHES" locator-type="Label" datatype="Number" format="int"/>
-        <field name="AverageBatchSize" locator="MQIAMO_AVG_BATCH_SIZE" locator-type="Label" datatype="Number" format="int"/>
-        <field name="PutRetryCount" locator="MQIAMO_PUT_RETRIES" locator-type="Label" datatype="Number" format="int"/>
+        <field name="REMOTE_QMGR_NAME" locator="MQCA_REMOTE_Q_MGR_NAME" locator-type="Label"/>
+        <field name="CONNECTION_NAME" locator="MQCACH_CONNECTION_NAME" locator-type="Label"/>
+        <field name="CHL_MSG_COUNT" locator="MQIAMO_MSGS" locator-type="Label" datatype="Number" format="int"/>
+        <field name="CHL_MSG_BYTES" locator="MQIAMO64_BYTES" locator-type="Label" datatype="Number" format="long"/>
+        <field name="NET_TIME_MIN" locator="MQIAMO_NET_TIME_MIN" locator-type="Label" datatype="Number" format="int"/>
+        <field name="NET_TIME_AVG" locator="MQIAMO_NET_TIME_AVG" locator-type="Label" datatype="Number" format="int"/>
+        <field name="NET_TIME_MAX" locator="MQIAMO_NET_TIME_MAX" locator-type="Label" datatype="Number" format="int"/>
+        <field name="EXIT_TIME_MIN" locator="MQIAMO_EXIT_TIME_MIN" locator-type="Label" datatype="Number" format="int"/>
+        <field name="EXIT_TIME_AVG" locator="MQIAMO_EXIT_TIME_AVG" locator-type="Label" datatype="Number" format="int"/>
+        <field name="EXIT_TIME_MAX" locator="MQIAMO_EXIT_TIME_MAX" locator-type="Label" datatype="Number" format="int"/>
+        <field name="FULL_BATCH_COUNT" locator="MQIAMO_FULL_BATCHES" locator-type="Label" datatype="Number" format="int"/>
+        <field name="INCOMPLETE_BATCH_COUNT" locator="MQIAMO_INCOMPLETE_BATCHES" locator-type="Label" datatype="Number" format="int"/>
+        <field name="PUT_RETRY_COUNT" locator="MQIAMO_AVG_BATCH_SIZE" locator-type="Label" datatype="Number" format="int"/>
+        <field name="BATCH_SIZE_AVG" locator="MQIAMO_PUT_RETRIES" locator-type="Label" datatype="Number" format="int"/>
     </parser>
 
     <parser name="ChannelStatisticsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityPCFParser">
@@ -320,7 +320,7 @@
         <property name="UseActivityDataAsMessageForUnset" value="true"/>
 
         <!-- message fields -->
-        <field name="ObjectCount" locator="MQIAMO_OBJECT_COUNT" locator-type="Label" datatype="Number" format="int"/>
+        <field name="CHANNEL_STAT_COUNT" locator="MQIAMO_OBJECT_COUNT" locator-type="Label" datatype="Number" format="int"/>
         <embedded-activity name="ChannelStatsData" locator="MQGACF_CHL_STATISTICS_DATA" locator-type="Label">
             <parser-ref name="ChannelStatsDataParser" aggregation="Relate"/>
         </embedded-activity>
@@ -355,22 +355,30 @@
         <!--<field name="MQMD_XXXX" locator="MQMD.fieldName" locator-type="Label"/>-->
 
         <!-- common message fields -->
-        <field name="QMgrName" locator="MQCA_Q_MGR_NAME" locator-type="Label"/>
-        <!--<field name="StartTime" locator="MQMD.MQIAMO64_HIGHRES_TIME" locator-type="Label" datatype="Timestamp" units="Milliseconds"/>-->
-        <field name="StartTime" separator=" " datatype="DateTime" format="yyyyMMdd HHmmssSS">
+        <field name="MQMGR_NAME" locator="MQCA_Q_MGR_NAME" locator-type="Label"/>
+		<!-- using time record was put as end time which is generally going to be correct -->
+        <field name="EndTime" locator="MQMD.MQIAMO64_HIGHRES_TIME" locator-type="Label" datatype="Timestamp" units="Milliseconds"/>-->
+        <!--field name="StartTime" separator=" " datatype="DateTime" format="yyyyMMdd HHmmssSS">
             <field-locator locator="MQMD.MQCACF_PUT_DATE" locator-type="Label"/>
             <field-locator locator="MQMD.MQCACF_PUT_TIME" locator-type="Label"/>
-        </field>
-        <field name="EndTime" locator="StartTime" locator-type="Activity"/>
-        <field name="IntervalStartTime" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
+        </field> -->
+        
+        <field name="INTERVAL_START_DATE_TIME" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
             <field-locator locator="MQCAMO_START_DATE" locator-type="Label"/>
             <field-locator locator="MQCAMO_START_TIME" locator-type="Label"/>
         </field>
-        <field name="IntervalEndTime" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
+        <field name="INTERVAL_END_DATE_TIME" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
             <field-locator locator="MQCAMO_END_DATE" locator-type="Label"/>
             <field-locator locator="MQCAMO_END_TIME" locator-type="Label"/>
         </field>
-        <field name="CommandLevel" locator="MQIA_COMMAND_LEVEL" locator-type="Label"/>
+		
+		<field name="ElapsedTime" value="0" datatype="Number" units="Microseconds">
+			<field-transform name="EtTransform" lang="groovy"><![CDATA[
+				${INTERVAL_END_DATE_TIME} != null ? ${INTERVAL_END_DATE_TIME} - ${INTERVAL_START_DATE_TIME} : 0
+			]]></field-transform>
+		</field>
+		
+        <field name="COMMAND_LEVEL" locator="MQIA_COMMAND_LEVEL" locator-type="Label"/>
 
         <embedded-activity name="MQStatisticsData" locator="$DATA$" locator-type="Label">
             <parser-ref name="MQIStatisticsParser" aggregation="Merge">
