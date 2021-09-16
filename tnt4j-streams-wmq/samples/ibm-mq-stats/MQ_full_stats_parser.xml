@@ -10,53 +10,53 @@
         <!-- Name classifiers for array fields -->
         <field name="DiscCountTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "Normal", "Implicit", "QMgr" };
+                return new String[] { "NORMAL", "IMPLICIT", "QMGR" };
             ]]></field-transform>
         </field>
         <field name="ObjectTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { null, "Queue", "Namelist", "Process", null, "QMgr", "Channel", "AuthInfo", "Topic", null, null, null, null };
+                return new String[] { null, "QUEUE", "NLIST", "PROC", null, "QMGR", "CHL", "AUTHINFO", "TOPIC", null, null, null, null };
             ]]></field-transform>
         </field>
         <field name="PersistenceTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "NonPersist", "Persist" };
+                return new String[] { "NONPERS", "PERS" };
             ]]></field-transform>
         </field>
         <field name="SubscrTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "Created", "Altered", "Resumed" };
+                return new String[] { "CREATE", "ALTER", "RESUME" };
             ]]></field-transform>
         </field>
         <field name="UnSubscrTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "Not_Removed", "Removed" };
+                return new String[] { "NOT_REM", "REM" };
             ]]></field-transform>
         </field>
         <field name="WaterMarkTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "All", "Api", "Admin", "Proxy" };
+                return new String[] { "ALL", "APP", "ADMIN", "PROXY" };
             ]]></field-transform>
         </field>
         <field name="CallbackTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "CreatedAltered", "Removed", "Resumed", "Suspended" };
+                return new String[] { "CRT_ALT", "REMOVE", "RESUME", "SUSPEND" };
             ]]></field-transform>
         </field>
         <field name="CtlTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                return new String[] { "Started", "Stopped", "Resumed", "Suspended" };
+                return new String[] { "START", "STOP", "RESUME", "SUSPEND" };
             ]]></field-transform>
         </field>
 
         <!-- message fields -->
-        <field name="ConnCount" locator="MQIAMO_CONNS" locator-type="Label" datatype="Number" format="int"/>
-        <field name="ConnFailCount" locator="MQIAMO_CONNS_FAILED" locator-type="Label" datatype="Number" format="int"/>
-        <field name="ConnsMax" locator="MQIAMO_CONNS_MAX" locator-type="Label" datatype="Number" format="int"/>
-        <field name="DiscCount_${DT}" locator="MQIAMO_DISCS" locator-type="Label" split="true">
+        <field name="CONNECT_COUNT" locator="MQIAMO_CONNS" locator-type="Label" datatype="Number" format="int"/>
+        <field name="CONNECT_FAIL_COUNT" locator="MQIAMO_CONNS_FAILED" locator-type="Label" datatype="Number" format="int"/>
+        <field name="MAX_CONNECTIONS" locator="MQIAMO_CONNS_MAX" locator-type="Label" datatype="Number" format="int"/>
+        <field name="${DT}_DISC_COUNT" locator="MQIAMO_DISCS" locator-type="Label" split="true">
             <field-locator id="DT" locator="DiscCountTypes" locator-type="Activity"/>
         </field>
-        <field name="${OT}_OpenCount" locator="MQIAMO_OPENS" locator-type="Label" split="true">
+        <field name="${OT}_OPEN_COUNT" locator="MQIAMO_OPENS" locator-type="Label" split="true">
             <field-locator id="OT" locator="ObjectTypes" locator-type="Activity"/>
             <filter name="NameFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
