@@ -311,8 +311,8 @@
         <field name="EXIT_TIME_MAX" locator="MQIAMO_EXIT_TIME_MAX" locator-type="Label" datatype="Number" format="int"/>
         <field name="FULL_BATCH_COUNT" locator="MQIAMO_FULL_BATCHES" locator-type="Label" datatype="Number" format="int"/>
         <field name="INCOMPLETE_BATCH_COUNT" locator="MQIAMO_INCOMPLETE_BATCHES" locator-type="Label" datatype="Number" format="int"/>
-        <field name="PUT_RETRY_COUNT" locator="MQIAMO_AVG_BATCH_SIZE" locator-type="Label" datatype="Number" format="int"/>
-        <field name="BATCH_SIZE_AVG" locator="MQIAMO_PUT_RETRIES" locator-type="Label" datatype="Number" format="int"/>
+        <field name="BATCH_SIZE_AVG" locator="MQIAMO_AVG_BATCH_SIZE" locator-type="Label" datatype="Number" format="int"/>
+        <field name="PUT_RETRY_COUNT" locator="MQIAMO_PUT_RETRIES" locator-type="Label" datatype="Number" format="int"/>
     </parser>
 
     <parser name="ChannelStatisticsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityPCFParser">
