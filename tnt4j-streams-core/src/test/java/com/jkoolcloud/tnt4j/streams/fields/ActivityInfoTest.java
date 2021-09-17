@@ -549,7 +549,7 @@ public class ActivityInfoTest {
 				ActivityInfo.getParentFieldValue("^.child[G1.0]." + f1.getFieldTypeName(), null, ai2, pai));
 		assertEquals(null, ActivityInfo.getParentFieldValue("^.child[G1.0]." + f2.getFieldTypeName(), null, ai2, pai));
 		// 11. Another child (by group and index auto-mapping) entity field value get over static call - same group
-		// shall not auto-map
+		// shall not auto-map since ai2 ordinal is incremented
 		assertEquals(null, ActivityInfo.getParentFieldValue("^.child[G1]." + en.getFieldTypeName(), null, ai2, pai));
 		assertEquals(null, ActivityInfo.getParentFieldValue("^.child[G1]." + f1.getFieldTypeName(), null, ai2, pai));
 		assertEquals(null, ActivityInfo.getParentFieldValue("^.child[G1]." + f2.getFieldTypeName(), null, ai2, pai));
@@ -570,7 +570,8 @@ public class ActivityInfoTest {
 		assertEquals("f1Value1",
 				ActivityInfo.getFieldValue("^.child[G1.0]." + f1.getFieldTypeName(), (String) null, ai2));
 		assertEquals(null, ActivityInfo.getFieldValue("^.child[G1.0]." + f2.getFieldTypeName(), (String) null, ai2));
-		// 15. Another child (by group and index auto-mapping) entity field value get over instance call
+		// 15. Another child (by group and index auto-mapping) entity field value get over instance call - same group
+		// shall not auto-map since ai2 ordinal is incremented
 		assertEquals("Free Activity",
 				ActivityInfo.getFieldValue("^.child[G1]." + en.getFieldTypeName(), (String) null, ai2));
 		assertEquals("f1Value1",
@@ -630,10 +631,21 @@ public class ActivityInfoTest {
 		ai4.setFieldValue(f1, "f4Value1");
 		ai4.setFieldValue(f2, "f4Value2");
 
+		// 23. Children resolution line one passed from parsing context
 		assertEquals("Yet Another Free Activity",
 				ActivityInfo.getParentFieldValue(en.getFieldTypeName(), null, ai4, ai3));
 		assertEquals("f3Value1", ActivityInfo.getParentFieldValue(f1.getFieldTypeName(), null, ai4, ai3));
 		assertEquals("f3Value2", ActivityInfo.getParentFieldValue(f2.getFieldTypeName(), null, ai4, ai3));
 
+		// 24. Child value resolution from different branch children auto-mapping by index
+		assertEquals("Free Activity",
+				ActivityInfo.getFieldValue("^.child[G1]." + en.getFieldTypeName(), "G2", ai2, pai));
+		assertEquals("f1Value1", ActivityInfo.getFieldValue("^.child[G1]." + f1.getFieldTypeName(), "G2", ai2, pai));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[G1]." + f2.getFieldTypeName(), "G2", ai2, pai));
+		// 25. Child value resolution from different branch children auto-mapping by index - shall not auto-map since
+		// ai3 ordinal is 2 while G1 has only 1 item
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[G1]." + en.getFieldTypeName(), "G2", ai3, pai));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[G1]." + f1.getFieldTypeName(), "G2", ai3, pai));
+		assertEquals(null, ActivityInfo.getFieldValue("^.child[G1]." + f2.getFieldTypeName(), "G2", ai3, pai));
 	}
 }

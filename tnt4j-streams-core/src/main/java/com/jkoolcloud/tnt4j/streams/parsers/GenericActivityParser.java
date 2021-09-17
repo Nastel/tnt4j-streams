@@ -1200,20 +1200,63 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 * 
 	 * @throws java.text.ParseException
 	 *             if there are any errors while aggregating field value
+	 * 
+	 * @see com.jkoolcloud.tnt4j.streams.fields.ActivityInfo#getFieldValue(String, String,
+	 *      com.jkoolcloud.tnt4j.streams.fields.ActivityInfo...)
 	 */
 	protected Object resolveActivityValue(ActivityFieldLocator locator, ActivityContext cData) throws ParseException {
 		Object value = null;
 		String locStr = locator.getLocator();
 		if (StringUtils.isNotEmpty(locStr)) {
 			if (StreamsConstants.isParentEntityRef(locStr)) {
-				value = ActivityInfo.getParentFieldValue(locStr, getName(), cData.getActivity(),
-						cData.getParentActivity());
+				value = ActivityInfo.getFieldValue(locStr, getName(), getParentActivities(cData));
 			} else {
 				value = ActivityInfo.getFieldValue(locStr, getName(), cData.getActivity());
 			}
 		}
 
 		return value;
+	}
+
+	/**
+	 * Collects activity data parsing context contained activity entities. Array contains activity entities produced by
+	 * parsers stating context referenced one and up to top most (root) parent parser.
+	 * 
+	 * @param cData
+	 *            activity data parsing context
+	 * @return activity entities array
+	 * 
+	 * @see #collectParentActivities(com.jkoolcloud.tnt4j.streams.parsers.GenericActivityParser.ActivityContext,
+	 *      java.util.List)
+	 */
+	protected ActivityInfo[] getParentActivities(ActivityContext cData) {
+		List<ActivityInfo> activities = new ArrayList<>(5);
+
+		collectParentActivities(cData, activities);
+
+		return activities.toArray(new ActivityInfo[0]);
+	}
+
+	/**
+	 * Collects activity data parsing context contained activity entities. This method recursively iterates over parent
+	 * contexts of provided {@code cData} context until it gets {@code null} (no more parent context). Activity entities
+	 * of every parent context is added to provided list. That way list contains activity entities produced by parsers
+	 * stating context referenced one and up to top most (root) parent parser.
+	 * 
+	 * @param cData
+	 *            activity data parsing context
+	 * @param activities
+	 *            activity entities list
+	 */
+	@SuppressWarnings("unchecked")
+	protected void collectParentActivities(ActivityContext cData, List<ActivityInfo> activities) {
+		if (cData == null) {
+			return;
+		}
+
+		activities.add(cData.getActivity());
+
+		collectParentActivities((ActivityContext) cData.getParentContext(), activities);
 	}
 
 	/**

@@ -2157,7 +2157,7 @@ public class ActivityInfo {
 	}
 
 	/**
-	 * Returns activity field value.
+	 * Returns this activity field value.
 	 * <p>
 	 * {@code fieldName} can also be as some expression variable having {@code "${FIELD_NAME}"} format.
 	 *
@@ -2205,14 +2205,13 @@ public class ActivityInfo {
 	 * 
 	 * @see #getParentFieldValue(String, String, ActivityInfo...)
 	 * @see #getChildFieldValue(java.util.regex.Matcher, String, String, ActivityInfo...)
+	 * @see #getWildcardFieldValue(String, ActivityInfo)
 	 */
 	public static Object getFieldValue(String fieldName, String groupName, ActivityInfo... ais)
 			throws IllegalArgumentException {
 		if (ArrayUtils.isEmpty(ais)) {
 			return null;
 		}
-
-		ActivityInfo ai = last(ais);
 
 		if (StreamsConstants.isParentEntityRef(fieldName)) {
 			return getParentFieldValue(fieldName, groupName, ais);
@@ -2222,6 +2221,8 @@ public class ActivityInfo {
 		if (fnMatcher.matches()) {
 			return getChildFieldValue(fnMatcher, fieldName, groupName, ais);
 		}
+
+		ActivityInfo ai = ais[0];
 
 		if (StreamsConstants.CHILD_ORDINAL_INDEX.equals(fieldName)) {
 			return ai.ordinalIdx;
@@ -2330,14 +2331,25 @@ public class ActivityInfo {
 
 		if (ais.length == 1) {
 			// no parent entity to refer
-			if (ais[0].parent == null) {
+			ActivityInfo pActivity = ais[0].parent;
+			if (pActivity == null) {
 				return null;
 			}
 
-			ais = addParent(ais);
+			ais = ArrayUtils.add(ais, pActivity);
 		}
 
-		return getFieldValue(StreamsConstants.getParentFieldName(fieldName), groupName, ais);
+		ActivityInfo[] pais = Utils.endArray(ais, 1);
+		String pFieldName = StreamsConstants.getParentFieldName(fieldName);
+
+		Matcher cFnMatcher = CHILD_FIELD_PATTERN.matcher(pFieldName);
+		Object value = getFieldValue(pFieldName, groupName, cFnMatcher.matches() ? ais : pais);
+
+		if (value == null) {
+			return getParentFieldValue(fieldName, groupName, pais);
+		}
+
+		return value;
 	}
 
 	/**
@@ -2356,7 +2368,7 @@ public class ActivityInfo {
 	 * {@code 'fieldName'} is child entity field name</li>
 	 * <li>{@code 'child[groupName.matchExpression].fieldName'} - where {@code 'child'} is predefined value to resolve
 	 * child entity, {@code 'groupName'} is activity children group name, {@code 'matchExpression'} is child match
-	 * expression in that group (e.g.:fieldName=value) p, {@code 'fieldName'} is child entity field name</li></li>
+	 * expression in that group (e.g.:fieldName=value) p, {@code 'fieldName'} is child entity field name</li>
 	 * </ul>
 	 *
 	 * @param fnMatcher
@@ -2416,7 +2428,7 @@ public class ActivityInfo {
 					fieldName));
 		}
 
-		ActivityInfo ai = last(ais);
+		ActivityInfo ai = ais.length > 1 ? ais[1] : null;
 
 		if (ai == null) {
 			LOGGER.log(OpLevel.TRACE, StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
@@ -2452,31 +2464,6 @@ public class ActivityInfo {
 		}
 
 		return child == null ? null : child.getFieldValue(fName);
-	}
-
-	private static ActivityInfo[] addParent(ActivityInfo[] ais) {
-		if (ArrayUtils.isEmpty(ais)) {
-			return ais;
-		}
-
-		ActivityInfo pai = last(ais).parent;
-
-		if (pai == null) {
-			return ais;
-		}
-
-		ActivityInfo[] aisp = new ActivityInfo[ais.length + 1];
-
-		System.arraycopy(ais, 0, aisp, 0, ais.length);
-		aisp[aisp.length - 1] = pai;
-
-		return aisp;
-
-		// return ArrayUtils.add(ais, last(ais).parent);
-	}
-
-	private static <T> T last(T[] a) {
-		return a[a.length - 1];
 	}
 
 	/**
