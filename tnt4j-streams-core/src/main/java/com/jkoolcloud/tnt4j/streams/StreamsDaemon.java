@@ -145,7 +145,7 @@ public class StreamsDaemon implements Daemon {
 			if (args.length > 0) {
 				LOGGER.log(OpLevel.INFO, StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
 						"StreamsDaemon.processing.args"), Arrays.toString(args));
-				StreamsAgent.processArgs(Arrays.copyOfRange(args, 1, args.length));
+				StreamsAgent.processArgs(Utils.endArray(args, 1));
 				cmd = args[0];
 			}
 

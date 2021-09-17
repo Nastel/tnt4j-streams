@@ -402,7 +402,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 		if (ArrayUtils.isNotEmpty(files)) {
 			boolean changeDir = (Files.getLastModifiedTime(files[0], LinkOption.NOFOLLOW_LINKS)
-					.compareTo(Files.getLastModifiedTime(files[files.length - 1], LinkOption.NOFOLLOW_LINKS)) < 0);
+					.compareTo(Files.getLastModifiedTime(lastOf(files), LinkOption.NOFOLLOW_LINKS)) < 0);
 
 			for (int i = changeDir ? files.length - 1 : 0; changeDir ? i >= 0
 					: i < files.length; i = changeDir ? i - 1 : i + 1) {
@@ -2233,7 +2233,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			if (dataSet instanceof Map) {
 				Map<String, ?> dataMap = (Map<String, ?>) dataSet;
 				if (StreamsConstants.MAP_UNMAPPED_TOKEN.equals(path[level])) {
-					return getUnaccessedMapEntries(Arrays.copyOfRange(path, 0, level), accessedPaths, dataMap);
+					return getUnaccessedMapEntries(frontArray(path, level), accessedPaths, dataMap);
 				} else {
 					val = dataMap.get(path[level]);
 
@@ -2338,7 +2338,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			}
 		}
 
-		return Arrays.copyOfRange(fullPath, prefix.length, fullPath.length);
+		return endArray(fullPath, prefix.length);
 	}
 
 	/**
@@ -2360,7 +2360,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		}
 
 		Object val = null;
-		String lastLevel = path[path.length - 1];
+		String lastLevel = lastOf(path);
 		String[] pathMinusOne = Arrays.copyOf(path, path.length - 1);
 
 		Object valueBeforeLast;
@@ -3090,5 +3090,80 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		CharsetToolkit toolkit = new CharsetToolkit(file);
 
 		return (LineNumberReader) toolkit.getReader();
+	}
+
+	/**
+	 * Returns the last provided {@code array} element.
+	 * 
+	 * @param array
+	 *            the array instance to get last element
+	 * @param <T>
+	 *            type of array elements
+	 * @return the last array element
+	 */
+	public static <T> T lastOf(T[] array) {
+		return array[array.length - 1];
+	}
+
+	/**
+	 * Copies the specified ending range of the specified array into a new array.
+	 * 
+	 * @param array
+	 *            the array from which a ending range is to be copied
+	 * @param startIdx
+	 *            the initial index of the range to be copied, inclusive
+	 * @param <T>
+	 *            the class of the objects in the array
+	 * @return a new array containing the specified range from the end of original array, truncated to obtain the
+	 *         required length
+	 * 
+	 * @see #subArray(Object[], int, int)
+	 */
+	public static <T> T[] endArray(T[] array, int startIdx) {
+		return subArray(array, startIdx, array.length);
+	}
+
+	/**
+	 * Copies the specified beginning range of the specified array into a new array.
+	 * 
+	 * @param array
+	 *            the array from which a beginning range is to be copied
+	 * @param endIdx
+	 *            the final index of the range to be copied, exclusive (this index may lie outside the array)
+	 * @param <T>
+	 *            the class of the objects in the array
+	 * @return a new array containing the specified range from the front of original array, truncated or padded with
+	 *         nulls to obtain the required length
+	 * 
+	 * @see #subArray(Object[], int, int)
+	 */
+	public static <T> T[] frontArray(T[] array, int endIdx) {
+		return subArray(array, 0, endIdx);
+	}
+
+	/**
+	 * Copies the specified range of the specified array into a new array.
+	 * 
+	 * @param array
+	 *            the array from which a range is to be copied
+	 * @param startIdx
+	 *            the initial index of the range to be copied, inclusive
+	 * @param endIdx
+	 *            the final index of the range to be copied, exclusive (this index may lie outside the array)
+	 * @param <T>
+	 *            the class of the objects in the array
+	 * @return a new array containing the specified range from the original array, truncated or padded with nulls to
+	 *         obtain the required length
+	 *
+	 * @throws ArrayIndexOutOfBoundsException
+	 *             if {@code from < 0} or {@code from > original.length}
+	 * @throws IllegalArgumentException
+	 *             if {@code from > to}
+	 * @throws NullPointerException
+	 *             if {@code original} is null
+	 */
+	public static <T> T[] subArray(T[] array, int startIdx, int endIdx) {
+		return Arrays.copyOfRange(array, startIdx, endIdx);
+		// return ArrayUtils.subarray (array, startIdx, endIdx);
 	}
 }

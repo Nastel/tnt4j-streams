@@ -175,7 +175,7 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 				lastReadTime = stateHandler.getReadTime();
 			} else {
 				file = ArrayUtils.isEmpty(availableFiles) ? null
-						: startFromLatestActivity ? availableFiles[availableFiles.length - 1] : availableFiles[0];
+						: startFromLatestActivity ? Utils.lastOf(availableFiles) : availableFiles[0];
 				lineNumber = 0;
 			}
 

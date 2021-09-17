@@ -201,7 +201,7 @@ public class HdfsFileLineStream extends AbstractFileLineStream<Path> {
 				lastReadTime = stateHandler.getReadTime();
 			} else {
 				filePath = ArrayUtils.isEmpty(availableFiles) ? null
-						: startFromLatestActivity ? availableFiles[availableFiles.length - 1] : availableFiles[0];
+						: startFromLatestActivity ? Utils.lastOf(availableFiles) : availableFiles[0];
 				lineNumber = 0;
 			}
 
@@ -457,7 +457,7 @@ public class HdfsFileLineStream extends AbstractFileLineStream<Path> {
 
 			if (ArrayUtils.isNotEmpty(files)) {
 				boolean changeDir = (getModificationTime(files[0], fs)
-						- getModificationTime(files[files.length - 1], fs)) < 0;
+						- getModificationTime(Utils.lastOf(files), fs)) < 0;
 
 				for (int i = changeDir ? files.length - 1 : 0; changeDir ? i >= 0
 						: i < files.length; i = changeDir ? i - 1 : i + 1) {

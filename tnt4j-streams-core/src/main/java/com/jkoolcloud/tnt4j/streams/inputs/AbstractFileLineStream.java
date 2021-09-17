@@ -413,7 +413,7 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 
 		private boolean isReadingLatestFile() {
 			return fileToRead == null || ArrayUtils.isEmpty(availableFiles) ? true
-					: fileToRead.equals(availableFiles[availableFiles.length - 1]);
+					: fileToRead.equals(Utils.lastOf(availableFiles));
 		}
 
 		/**
