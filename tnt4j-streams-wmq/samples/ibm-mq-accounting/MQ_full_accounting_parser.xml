@@ -5,10 +5,9 @@
 
     <parser name="MQIAccountingParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityPCFParser">
         <property name="TranslateNumValues" value="true"/>
-        <property name="UseActivityDataAsMessageForUnset" value="true"/>
 
         <!-- Name classifiers for array fields -->
-         <field name="ObjectTypes" value="" transparent="true">
+        <field name="ObjectTypes" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
                 return new String[] { null, "QUEUE", "NLIST", "PROC", null, "QMGR", "CHL", "AUTHINFO", "TOPIC", null, null, null, null };
             ]]></field-transform>
@@ -191,7 +190,6 @@
 
     <parser name="QueueAccountingDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityPCFParser">
         <property name="TranslateNumValues" value="true"/>
-        <property name="UseActivityDataAsMessageForUnset" value="true"/>
 
         <!-- Name classifiers for array fields -->
         <field name="PersistenceTypes" value="" transparent="true">
@@ -297,7 +295,6 @@
 
     <parser name="QueueAccountingParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityPCFParser">
         <property name="TranslateNumValues" value="true"/>
-        <property name="UseActivityDataAsMessageForUnset" value="true"/>
 
         <!-- message fields -->
         <field name="QUEUE_ACCT_COUNT" locator="MQIAMO_OBJECT_COUNT" locator-type="Label" datatype="Number" format="int"/>
@@ -349,11 +346,11 @@
             <field-locator locator="MQCAMO_END_DATE" locator-type="Label"/>
             <field-locator locator="MQCAMO_END_TIME" locator-type="Label"/>
         </field>
-		<field name="ElapsedTime" value="0" datatype="Number" units="Microseconds">
-			<field-transform name="EtTransform" lang="groovy"><![CDATA[
-				${EndTime} != null ? ${INTERVAL_END_DATE_TIME} - ${INTERVAL_START_DATE_TIME} : 0
-			]]></field-transform>
-		</field>
+        <field name="ElapsedTime" value="0" datatype="Number" units="Microseconds">
+            <field-transform name="EtTransform" lang="groovy"><![CDATA[
+                ${EndTime} != null ? ${INTERVAL_END_DATE_TIME} - ${INTERVAL_START_DATE_TIME} : 0
+            ]]></field-transform>
+        </field>
         <field name="COMMAND_LEVEL" locator="MQIA_COMMAND_LEVEL" locator-type="Label"/>
         <field name="CONNECTION_ID" locator="MQBACF_CONNECTION_ID" locator-type="Label" datatype="Binary"/>
         <field name="SEQUENCE_NUMBER" locator="MQIACF_SEQUENCE_NUMBER" locator-type="Label" datatype="Number" format="int"/>

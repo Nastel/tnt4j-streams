@@ -5,7 +5,6 @@
 
     <parser name="MQIStatisticsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityPCFParser">
         <property name="TranslateNumValues" value="true"/>
-        <property name="UseActivityDataAsMessageForUnset" value="true"/>
 
         <!-- Name classifiers for array fields -->
         <field name="DiscCountTypes" value="" transparent="true">
@@ -210,7 +209,6 @@
 
     <parser name="QueueStatsDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityPCFParser">
         <property name="TranslateNumValues" value="true"/>
-        <property name="UseActivityDataAsMessageForUnset" value="true"/>
 
         <!-- Name classifiers for array fields -->
         <field name="PersistenceTypes" value="" transparent="true">
@@ -277,7 +275,6 @@
 
     <parser name="QueueStatisticsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityPCFParser">
         <property name="TranslateNumValues" value="true"/>
-        <property name="UseActivityDataAsMessageForUnset" value="true"/>
 
         <!-- message fields -->
         <field name="QUEUE_STAT_COUNT" locator="MQIAMO_OBJECT_COUNT" locator-type="Label" datatype="Number" format="int"/>
@@ -288,7 +285,6 @@
 
     <parser name="ChannelStatsDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityPCFParser">
         <property name="TranslateNumValues" value="true"/>
-        <property name="UseActivityDataAsMessageForUnset" value="true"/>
 
         <field name="CHANNEL_NAME" locator="MQCACH_CHANNEL_NAME" locator-type="Label"/>
         <field name="CHANNEL_TYPE">
@@ -317,7 +313,6 @@
 
     <parser name="ChannelStatisticsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityPCFParser">
         <property name="TranslateNumValues" value="true"/>
-        <property name="UseActivityDataAsMessageForUnset" value="true"/>
 
         <!-- message fields -->
         <field name="CHANNEL_STAT_COUNT" locator="MQIAMO_OBJECT_COUNT" locator-type="Label" datatype="Number" format="int"/>
@@ -356,13 +351,12 @@
 
         <!-- common message fields -->
         <field name="MQMGR_NAME" locator="MQCA_Q_MGR_NAME" locator-type="Label"/>
-		<!-- using time record was put as end time which is generally going to be correct -->
+        <!-- using time record was put as end time which is generally going to be correct -->
         <field name="EndTime" locator="MQMD.MQIAMO64_HIGHRES_TIME" locator-type="Label" datatype="Timestamp" units="Milliseconds"/>-->
         <!--field name="StartTime" separator=" " datatype="DateTime" format="yyyyMMdd HHmmssSS">
             <field-locator locator="MQMD.MQCACF_PUT_DATE" locator-type="Label"/>
             <field-locator locator="MQMD.MQCACF_PUT_TIME" locator-type="Label"/>
         </field> -->
-        
         <field name="INTERVAL_START_DATE_TIME" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
             <field-locator locator="MQCAMO_START_DATE" locator-type="Label"/>
             <field-locator locator="MQCAMO_START_TIME" locator-type="Label"/>
@@ -371,13 +365,11 @@
             <field-locator locator="MQCAMO_END_DATE" locator-type="Label"/>
             <field-locator locator="MQCAMO_END_TIME" locator-type="Label"/>
         </field>
-		
-		<field name="ElapsedTime" value="0" datatype="Number" units="Microseconds">
-			<field-transform name="EtTransform" lang="groovy"><![CDATA[
-				${INTERVAL_END_DATE_TIME} != null ? ${INTERVAL_END_DATE_TIME} - ${INTERVAL_START_DATE_TIME} : 0
-			]]></field-transform>
-		</field>
-		
+        <field name="ElapsedTime" value="0" datatype="Number" units="Microseconds">
+            <field-transform name="EtTransform" lang="groovy"><![CDATA[
+                ${INTERVAL_END_DATE_TIME} != null ? ${INTERVAL_END_DATE_TIME} - ${INTERVAL_START_DATE_TIME} : 0
+            ]]></field-transform>
+        </field>
         <field name="COMMAND_LEVEL" locator="MQIA_COMMAND_LEVEL" locator-type="Label"/>
 
         <embedded-activity name="MQStatisticsData" locator="$DATA$" locator-type="Label">
