@@ -333,6 +333,7 @@
 
         <!-- common message fields -->
         <field name="MQMGR_NAME" locator="MQCA_Q_MGR_NAME" locator-type="Label"/>
+        <!-- using time record was put as end time which is generally going to be correct -->
         <field name="EndTime" locator="MQMD.MQIAMO64_HIGHRES_TIME" locator-type="Label" datatype="Timestamp" units="Milliseconds"/>
         <!--field name="StartTime" separator=" " datatype="DateTime" format="yyyyMMdd HHmmssSS">
             <field-locator locator="MQMD.MQCACF_PUT_DATE" locator-type="Label"/>
@@ -348,7 +349,7 @@
         </field>
         <field name="ElapsedTime" value="0" datatype="Number" units="Microseconds">
             <field-transform name="EtTransform" lang="groovy"><![CDATA[
-                ${EndTime} != null ? ${INTERVAL_END_DATE_TIME} - ${INTERVAL_START_DATE_TIME} : 0
+                ${INTERVAL_END_DATE_TIME} != null ? ${INTERVAL_END_DATE_TIME} - ${INTERVAL_START_DATE_TIME} : 0
             ]]></field-transform>
         </field>
         <field name="COMMAND_LEVEL" locator="MQIA_COMMAND_LEVEL" locator-type="Label"/>
