@@ -2150,8 +2150,8 @@ public class ConfigParserHandler extends DefaultHandler {
 		}
 
 		List<String> dynamicLocators = new ArrayList<>();
-		Utils.resolveCfgVariables(dynamicLocators, aFieldData.field.getFieldTypeName(),
-				aFieldData.field.getValueType());
+		Utils.resolveCfgVariables(dynamicLocators, aFieldData.field.getFieldTypeName(), aFieldData.field.getValueType(),
+				aFieldData.field.getSeparator(), aFieldData.field.getFormattingPattern());
 
 		for (String dLoc : dynamicLocators) {
 			if (!aFieldData.field.hasDynamicLocator(dLoc)) {

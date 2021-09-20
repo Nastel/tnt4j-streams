@@ -87,6 +87,11 @@ public final class StreamsConstants {
 	 */
 	public static final String CHILD_ORDINAL_INDEX = "$indexOf$"; // NON-NLS
 
+	/**
+	 * The constant defining value placeholder to set value ordinal index within fields locators resolved values array.
+	 */
+	public static final String VALUE_ORDINAL_INDEX = "$index"; // NON-NLS
+
 	private StreamsConstants() {
 	}
 

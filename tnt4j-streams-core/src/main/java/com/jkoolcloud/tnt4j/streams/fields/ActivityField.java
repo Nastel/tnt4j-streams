@@ -35,10 +35,7 @@ import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
 import com.jkoolcloud.tnt4j.streams.reference.MatchingParserReference;
 import com.jkoolcloud.tnt4j.streams.transform.AbstractScriptTransformation;
 import com.jkoolcloud.tnt4j.streams.transform.ValueTransformation;
-import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
-import com.jkoolcloud.tnt4j.streams.utils.TimestampFormatter;
-import com.jkoolcloud.tnt4j.streams.utils.Utils;
+import com.jkoolcloud.tnt4j.streams.utils.*;
 
 /**
  * Represents a specific activity field, containing the necessary information on how to extract its value from the raw
@@ -53,6 +50,11 @@ public class ActivityField extends AbstractFieldEntity {
 	 * Constant for default delimiter symbol used to delimit multiple field values.
 	 */
 	public static final String DEFAULT_FIELD_VALUES_DELIM = ","; // NON-NLS
+
+	/**
+	 * Constant defining entry key for dynamic locators resolved values map to store processed value index.
+	 */
+	public static final String VALUE_INDEX_ENTRY_KEY = "$ValueIndex$"; // NON-NLS
 
 	private String fieldTypeName;
 	private List<ActivityFieldLocator> locators = null;
@@ -203,7 +205,8 @@ public class ActivityField extends AbstractFieldEntity {
 			if (StringUtils.isNotEmpty(locator.getId())) {
 				String did = Utils.makeExpVariable(locator.getId());
 
-				if (fieldTypeName.contains(did) || (valueType != null && valueType.contains(did))) {
+				if (fieldTypeName.contains(did) || StringUtils.contains(valueType, did)
+						|| StringUtils.contains(separator, did) || StringUtils.contains(formattingPattern, did)) {
 					addDynamicLocator(did, locator);
 					dynamic = true;
 				}
@@ -609,12 +612,13 @@ public class ActivityField extends AbstractFieldEntity {
 	}
 
 	/**
-	 * Checks if field attributes {@link #fieldTypeName} and {@link #valueType} values contains variable expressions.
+	 * Checks if field attributes {@link #fieldTypeName}, {@link #valueType}, {@link #separator} and
+	 * {@link #formattingPattern} values contains variable expressions.
 	 *
 	 * @return {@code true} if field attribute values contains variable expressions, {@code false} - otherwise
 	 */
 	public boolean hasDynamicAttrs() {
-		return hasDynamicAttrs(fieldTypeName, valueType);
+		return hasDynamicAttrs(fieldTypeName, valueType, separator, formattingPattern);
 	}
 
 	/**
@@ -668,19 +672,19 @@ public class ActivityField extends AbstractFieldEntity {
 	 *
 	 * @param dValues
 	 *            dynamic locators resolved values map
-	 * @param valueIndex
-	 *            index of value in collection
 	 *
 	 * @return temporary field instance
 	 */
-	public ActivityField createTempField(Map<String, Object> dValues, int valueIndex) {
-		ActivityField tField = new ActivityField(fillDynamicAttr(fieldTypeName, dValues, valueIndex));
-		tField.locators = getTempFieldLocators(locators, valueIndex);
-		tField.separator = separator;
+	public ActivityField createTempField(Map<String, Object> dValues) {
+		ActivityField tField = new ActivityField(fillDynamicAttr(fieldTypeName, dValues));
+		tField.locators = getTempFieldLocators(locators, (int) dValues.get(VALUE_INDEX_ENTRY_KEY));
+		tField.separator = fillDynamicAttr(separator, dValues);
+		tField.formattingPattern = fillDynamicAttr(formattingPattern, dValues);
 		tField.requiredVal = requiredVal;
 		tField.stackedParsers = stackedParsers;
-		tField.valueType = fillDynamicAttr(valueType, dValues, valueIndex);
+		tField.valueType = fillDynamicAttr(valueType, dValues);
 		tField.transparent = transparent;
+		tField.splitCollection = splitCollection;
 		tField.parser = parser;
 		tField.transformations = transformations;
 		tField.filter = filter;
@@ -688,11 +692,12 @@ public class ActivityField extends AbstractFieldEntity {
 		return tField;
 	}
 
-	private static String fillDynamicAttr(String dAttr, Map<String, Object> dValMap, int valueIndex) {
+	private static String fillDynamicAttr(String dAttr, Map<String, Object> dValMap) {
 		String tAttr = dAttr;
 
 		if (isDynamicAttr(dAttr) && MapUtils.isNotEmpty(dValMap)) {
-			tAttr = dAttr = dAttr.replace("$index", String.valueOf(valueIndex));
+			int valueIndex = (int) dValMap.get(VALUE_INDEX_ENTRY_KEY);
+			tAttr = dAttr = dAttr.replace(StreamsConstants.VALUE_ORDINAL_INDEX, String.valueOf(valueIndex));
 			List<String> vars = new ArrayList<>();
 			Utils.resolveCfgVariables(vars, dAttr);
 

@@ -943,12 +943,12 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 */
 	protected void applyDynamicValue(ActivityContext cData, ActivityField field, Object value) throws ParseException {
 		Map<String, Object> dValMap = parseDynamicValues(cData, field.getDynamicLocators());
-
 		Object[] fValues = value == null ? new Object[] { null } : Utils.makeArray(value);
 
 		List<ActivityField> tFieldsList = new ArrayList<>(fValues.length);
 		for (int vi = 0; vi < fValues.length; vi++) {
-			ActivityField tField = field.createTempField(dValMap, vi);
+			dValMap.put(ActivityField.VALUE_INDEX_ENTRY_KEY, vi);
+			ActivityField tField = field.createTempField(dValMap);
 			tFieldsList.add(tField);
 		}
 
