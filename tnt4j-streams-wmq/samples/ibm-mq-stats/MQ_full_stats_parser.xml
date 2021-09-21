@@ -221,6 +221,11 @@
         <field name="CREATION_DATE_TIME" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
             <field-locator locator="MQCA_CREATION_DATE" locator-type="Label"/>
             <field-locator locator="MQCA_CREATION_TIME" locator-type="Label"/>
+            <filter name="IncompleteDateFilter">
+                <expression handle="exclude" lang="groovy"><![CDATA[
+                    ArrayUtils.isEmpty($fieldValue) || StringUtils.isEmpty($fieldValue[0])
+                ]]></expression>
+            </filter>
         </field>
         <field name="QUEUE_TYPE">
             <field-locator locator="MQIA_Q_TYPE" locator-type="Label" datatype="Number" format="int"/>

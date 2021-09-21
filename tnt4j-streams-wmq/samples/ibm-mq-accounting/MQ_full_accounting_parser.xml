@@ -42,12 +42,22 @@
         <field name="CONNECTION_DATE_TIME" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
             <field-locator locator="MQCAMO_CONN_DATE" locator-type="Label"/>
             <field-locator locator="MQCAMO_CONN_TIME" locator-type="Label"/>
+            <filter name="IncompleteDateFilter">
+                <expression handle="exclude" lang="groovy"><![CDATA[
+                    ArrayUtils.isEmpty($fieldValue) || StringUtils.isEmpty($fieldValue[0])
+                ]]></expression>
+            </filter>
         </field>
         <field name="CONNECTION_NAME" locator="MQCACH_CONNECTION_NAME" locator-type="Label"/>
         <field name="CHANNEL_NAME" locator="MQCACH_CHANNEL_NAME" locator-type="Label"/>
         <field name="DISCONNECT_DATE_TIME" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
             <field-locator locator="MQCAMO_DISC_DATE" locator-type="Label"/>
             <field-locator locator="MQCAMO_DISC_TIME" locator-type="Label"/>
+            <filter name="IncompleteDateFilter">
+                <expression handle="exclude" lang="groovy"><![CDATA[
+                    ArrayUtils.isEmpty($fieldValue) || StringUtils.isEmpty($fieldValue[0])
+                ]]></expression>
+            </filter>
         </field>
         <field name="DISCONNECT_TYPE">
             <field-locator locator="MQIAMO_DISC_TYPE" locator-type="Label" datatype="Number" format="int"/>
@@ -207,6 +217,11 @@
         <field name="CREATION_DATE_TIME" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
             <field-locator locator="MQCA_CREATION_DATE" locator-type="Label"/>
             <field-locator locator="MQCA_CREATION_TIME" locator-type="Label"/>
+            <filter name="IncompleteDateFilter">
+                <expression handle="exclude" lang="groovy"><![CDATA[
+                    ArrayUtils.isEmpty($fieldValue) || StringUtils.isEmpty($fieldValue[0])
+                ]]></expression>
+            </filter>
         </field>
         <field name="QUEUE_TYPE">
             <field-locator locator="MQIA_Q_TYPE" locator-type="Label" datatype="Number" format="int"/>
@@ -228,11 +243,21 @@
         <field name="OPEN_TIME" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
             <field-locator locator="MQCAMO_OPEN_DATE" locator-type="Label"/>
             <field-locator locator="MQCAMO_OPEN_TIME" locator-type="Label"/>
+            <filter name="IncompleteDateFilter">
+                <expression handle="exclude" lang="groovy"><![CDATA[
+                    ArrayUtils.isEmpty($fieldValue) || StringUtils.isEmpty($fieldValue[0])
+                ]]></expression>
+            </filter>
         </field>
         <field name="CLOSE_COUNT" locator="MQIAMO_CLOSES" locator-type="Label" datatype="Number" format="int"/>
         <field name="CLOSE_DATE_TIME" separator=" " datatype="DateTime" format="yyyy-MM-dd HH.mm.ss">
             <field-locator locator="MQCAMO_CLOSE_DATE" locator-type="Label"/>
             <field-locator locator="MQCAMO_CLOSE_TIME" locator-type="Label"/>
+            <filter name="IncompleteDateFilter">
+                <expression handle="exclude" lang="groovy"><![CDATA[
+                    ArrayUtils.isEmpty($fieldValue) || StringUtils.isEmpty($fieldValue[0])
+                ]]></expression>
+            </filter>
         </field>
         <field name="${PT}_PUT_COUNT" locator="MQIAMO_PUTS" locator-type="Label" split="true">
             <field-locator id="PT" locator="PersistenceTypes" locator-type="Activity"/>
