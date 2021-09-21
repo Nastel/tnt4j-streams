@@ -155,4 +155,142 @@ public class Duration {
 	public static String durationHMS(long startTime) {
 		return DurationFormatUtils.formatDurationHMS(duration(startTime));
 	}
+
+	/**
+	 * Finds time zone complying RFC 822 standard from provided reference and shift times provided in milliseconds. To
+	 * comply all standard timezones, time rounding is set to {@code 15} minutes.
+	 * 
+	 * @param refTme
+	 *            reference time
+	 * @param shiftTime
+	 *            shift time
+	 * @return RFC 822 time zone
+	 * 
+	 * @throws java.lang.NullPointerException
+	 *             if {@code refTime} or {@code shiftTime} is null
+	 * 
+	 * @see #getTimeZoneRFC822(Number, Number, int)
+	 */
+	public static String getTimeZoneRFC822(Number refTme, Number shiftTime) throws NullPointerException {
+		return getTimeZoneRFC822(refTme, shiftTime, 15);
+	}
+
+	/**
+	 * Finds time zone complying RFC 822 standard from provided reference and shift times provided in milliseconds.
+	 * 
+	 * @param refTme
+	 *            reference time
+	 * @param shiftTime
+	 *            shift time
+	 * @param roundMin
+	 *            time round to nearest amount of minutes
+	 * @return RFC 822 time zone
+	 * 
+	 * @throws java.lang.NullPointerException
+	 *             if {@code refTime} or {@code shiftTime} is null
+	 * 
+	 * @see #getTimeZoneRFC822(long, long, java.util.concurrent.TimeUnit, int)
+	 */
+	public static String getTimeZoneRFC822(Number refTme, Number shiftTime, int roundMin) throws NullPointerException {
+		return getTimeZoneRFC822(refTme, shiftTime, TimeUnit.MILLISECONDS, roundMin);
+	}
+
+	/**
+	 * Finds time zone complying RFC 822 standard from provided reference and shift times provided in microseconds. To
+	 * comply all standard timezones, time rounding is set to {@code 15} minutes.
+	 * 
+	 * @param refTme
+	 *            reference time
+	 * @param shiftTime
+	 *            shift time
+	 * @return RFC 822 time zone
+	 * 
+	 * @throws java.lang.NullPointerException
+	 *             if {@code refTime} or {@code shiftTime} is null
+	 * 
+	 * @see #getTimeZoneRFC822Usec(Number, Number, int)
+	 */
+	public static String getTimeZoneRFC822Usec(Number refTme, Number shiftTime) throws NullPointerException {
+		return getTimeZoneRFC822Usec(refTme, shiftTime, 15);
+	}
+
+	/**
+	 * Finds time zone complying RFC 822 standard from provided reference and shift times provided in microseconds.
+	 * 
+	 * @param refTme
+	 *            reference time
+	 * @param shiftTime
+	 *            shift time
+	 * @param roundMin
+	 *            time round to nearest amount of minutes
+	 * @return RFC 822 time zone
+	 * 
+	 * @throws java.lang.NullPointerException
+	 *             if {@code refTime} or {@code shiftTime} is null
+	 * 
+	 * @see #getTimeZoneRFC822(Number, Number, java.util.concurrent.TimeUnit, int)
+	 */
+	public static String getTimeZoneRFC822Usec(Number refTme, Number shiftTime, int roundMin)
+			throws NullPointerException {
+		return getTimeZoneRFC822(refTme, shiftTime, TimeUnit.MICROSECONDS, roundMin);
+	}
+
+	/**
+	 * Finds time zone complying RFC 822 standard from provided reference and shift times.
+	 * 
+	 * @param refTme
+	 *            reference time
+	 * @param shiftTime
+	 *            shift time
+	 * @param tUnit
+	 *            reference and shift time units
+	 * @param roundMin
+	 *            time round to nearest amount of minutes
+	 * @return RFC 822 time zone
+	 * 
+	 * @throws java.lang.NullPointerException
+	 *             if {@code refTime} or {@code shiftTime} is null
+	 * 
+	 * @see #getTimeZoneRFC822(long, long, java.util.concurrent.TimeUnit, int)
+	 */
+	public static String getTimeZoneRFC822(Number refTme, Number shiftTime, TimeUnit tUnit, int roundMin)
+			throws NullPointerException {
+		return getTimeZoneRFC822(refTme.longValue(), shiftTime.longValue(), tUnit, roundMin);
+	}
+
+	/**
+	 * Finds time zone complying RFC 822 standard from provided reference and shift times.
+	 * 
+	 * @param refTme
+	 *            reference time
+	 * @param shiftTime
+	 *            shift time
+	 * @param tUnit
+	 *            reference and shift time units
+	 * @param roundMin
+	 *            time round to nearest amount of minutes
+	 * @return RFC 822 time zone
+	 */
+	public static String getTimeZoneRFC822(long refTme, long shiftTime, TimeUnit tUnit, int roundMin) {
+		long roundDiff = roundDuration(refTme, shiftTime, tUnit, roundMin);
+
+		String offset = DurationFormatUtils.formatDuration(Math.abs(roundDiff), "HHmm"); // NON-NLS
+		return (roundDiff < 0 ? "-" : "+") + offset; // NON-NLS
+	}
+
+	private static long roundDuration(long refTme, long shiftTime, TimeUnit tUnit, int roundMin) {
+		long roundMinMsec = TimeUnit.MINUTES.toMillis(roundMin);
+		int upMin = (roundMin / 2) + 1;
+
+		long timeDiff = shiftTime - refTme;
+		long timeDiffMsec = (tUnit == null ? TimeUnit.MILLISECONDS : tUnit).toMillis(timeDiff);
+		long timeDiffMsecAbs = Math.abs(timeDiffMsec);
+		long round = timeDiffMsecAbs % roundMinMsec;
+		timeDiffMsecAbs -= round;
+		if (TimeUnit.MILLISECONDS.toMinutes(round) >= upMin) {
+			timeDiffMsecAbs += roundMinMsec;
+		}
+
+		return timeDiffMsec < 0 ? -timeDiffMsecAbs : timeDiffMsecAbs;
+	}
 }
