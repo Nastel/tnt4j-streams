@@ -262,14 +262,24 @@
     <field name="HighresTime" locator="MQGACF_ACTIVITY_TRACE.MQIAMO64_HIGHRES_TIME" locator-type="Label" datatype="Timestamp"
            units="Microseconds"/>
 
-    <field name="OperationTime" formattingPattern="{0} {1}" format="yyyy-MM-dd HH:mm:ss" datatype="DateTime" timezone="GMT">
+    <field name="OperationTime" separator=" " format="yyyy-MM-dd HH:mm:ss" datatype="DateTime" timezone="GMT">
         <field-locator locator="MQGACF_ACTIVITY_TRACE.MQCACF_OPERATION_DATE" locator-type="Label" required="false"/>
         <field-locator locator="MQGACF_ACTIVITY_TRACE.MQCACF_OPERATION_TIME" locator-type="Label" required="false"/>
+        <filter name="IncompleteDateFilter">
+            <expression handle="exclude" lang="groovy"><![CDATA[
+                ArrayUtils.isEmpty($fieldValue) || StringUtils.isEmpty($fieldValue[0])
+            ]]></expression>
+        </filter>
     </field>
 
-    <field name="PutTime" formattingPattern="{0} {1}" format="yyyyMMdd HHmmssSS" datatype="DateTime" timezone="GMT">
+    <field name="PutTime" separator=" " format="yyyyMMdd HHmmssSS" datatype="DateTime" timezone="GMT">
         <field-locator locator="MQGACF_ACTIVITY_TRACE.MQCACF_PUT_DATE" locator-type="Label" required="false"/>
         <field-locator locator="MQGACF_ACTIVITY_TRACE.MQCACF_PUT_TIME" locator-type="Label" required="false"/>
+        <filter name="IncompleteDateFilter">
+            <expression handle="exclude" lang="groovy"><![CDATA[
+                ArrayUtils.isEmpty($fieldValue) || StringUtils.isEmpty($fieldValue[0])
+            ]]></expression>
+        </filter>
     </field>
 
     <!-- compute age of message based on time from put to time when delivered adjusting for difference in precision -->
