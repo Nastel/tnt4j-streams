@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
+
+    <parser name="TokenParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityTokenParser">
+        <property name="FieldDelim" value="|"/>
+
+        <field name="StartTime" locator="1" format="dd MMM yyyy HH:mm:ss" locale="en-US"/>
+        <field name="ServerIp" locator="2"/>
+        <field name="ApplName" value="orders"/>
+        <field name="Correlator" locator="3"/>
+        <field name="BuyerName" locator="4"/>
+        <field name="UserName" locator="5"/>
+        <field name="EventName" locator="6"/>
+        <field name="EventType" locator="6">
+            <field-map source="Order Placed" target="START"/>
+            <field-map source="Order Received" target="RECEIVE"/>
+            <field-map source="Order Processing" target="OPEN"/>
+            <field-map source="Order Processed" target="SEND"/>
+            <field-map source="Order Shipped" target="END"/>
+        </field>
+        <field name="MsgValue" locator="8"/>
+    </parser>
+
+    <stream name="FileStream" class="com.jkoolcloud.tnt4j.streams.inputs.FileLineStream">
+        <property name="FileName" value="./tnt4j-streams-core/samples/single-log-utf16/orders.log"/>
+        <property name="RestoreState" value="false"/>
+        <property name="Charset" value="UTF-16"/>
+        <!--property name="Charset" value="guess"/-->
+        <!--<property name="StartFromLatest" value="false"/>-->
+        <!--<property name="RangeToStream" value="1:"/>-->
+        <property name="SendStreamStates" value="true"/>
+
+        <parser-ref name="TokenParser"/>
+    </stream>
+</tnt-data-source>
