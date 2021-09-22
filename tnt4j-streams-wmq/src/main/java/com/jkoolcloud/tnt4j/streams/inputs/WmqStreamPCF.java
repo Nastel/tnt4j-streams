@@ -16,6 +16,8 @@
 
 package com.jkoolcloud.tnt4j.streams.inputs;
 
+import java.util.TimeZone;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
@@ -101,7 +103,8 @@ public class WmqStreamPCF extends AbstractWmqStream<PCFContent> {
 		if (mqMsg.putDateTime != null) {
 			addMQMDParameterToPCFMessage(msgData, MQConstants.MQIAMO64_HIGHRES_TIME,
 					mqMsg.putDateTime.getTimeInMillis());
-			String putDTString = DateFormatUtils.format(mqMsg.putDateTime, WmqStreamConstants.PUT_DATE_TIME_PATTERN);
+			String putDTString = DateFormatUtils.format(mqMsg.putDateTime.getTime(),
+					WmqStreamConstants.PUT_DATE_TIME_PATTERN, TimeZone.getTimeZone("GMT"));
 			String[] putDTTokens = putDTString.split(" "); // NON-NLS
 
 			if (putDTTokens.length > 0 && StringUtils.isNotEmpty(putDTTokens[0])) {

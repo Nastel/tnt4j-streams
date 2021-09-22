@@ -360,7 +360,7 @@
         <field name="MQMGR_NAME" locator="MQCA_Q_MGR_NAME" locator-type="Label"/>
         <!-- using time record was put as end time which is generally going to be correct -->
         <field name="EndTime" locator="MQMD.MQIAMO64_HIGHRES_TIME" locator-type="Label" datatype="Timestamp" units="Milliseconds"/>
-        <!--field name="StartTime" separator=" " datatype="DateTime" format="yyyyMMdd HHmmssSS">
+        <!--field name="StartTime" separator=" " datatype="DateTime" format="yyyyMMdd HHmmssSS" timezone="GMT">
             <field-locator locator="MQMD.MQCACF_PUT_DATE" locator-type="Label"/>
             <field-locator locator="MQMD.MQCACF_PUT_TIME" locator-type="Label"/>
         </field-->
