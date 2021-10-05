@@ -384,6 +384,8 @@
         <field name="APPLICATION_PID" locator="MQIACF_PROCESS_ID" locator-type="Label" datatype="Number" format="int"/>
         <field name="APPLICATION_TID" locator="MQIACF_THREAD_ID" locator-type="Label" datatype="Number" format="int"/>
         <field name="USER_ID" locator="MQCACF_USER_IDENTIFIER" locator-type="Label"/>
+		<field name="REMOTE_PRODUCT" locator="MQCACH_REMOTE_PRODUCT" locator-type="Label"/>
+        <field name="REMOTE_VERSION" locator="MQCACH_REMOTE_VERSION" locator-type="Label"/>
 
         <embedded-activity name="MQAccountingData" locator="$DATA$" locator-type="Label">
             <parser-ref name="MQIAccountingParser" aggregation="Merge">
