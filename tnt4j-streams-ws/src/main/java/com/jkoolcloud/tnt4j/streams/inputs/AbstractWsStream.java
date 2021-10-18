@@ -23,6 +23,9 @@ import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import javax.script.CompiledScript;
+import javax.script.ScriptException;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
@@ -30,6 +33,8 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.AbstractTrigger;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.core.UsecTimestamp;
 import com.jkoolcloud.tnt4j.streams.configure.WsStreamProperties;
@@ -37,10 +42,7 @@ import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.matchers.Matchers;
 import com.jkoolcloud.tnt4j.streams.parsers.data.CommonActivityData;
 import com.jkoolcloud.tnt4j.streams.scenario.*;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsCache;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
-import com.jkoolcloud.tnt4j.streams.utils.Utils;
-import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
+import com.jkoolcloud.tnt4j.streams.utils.*;
 
 /**
  * Base class for scheduled service or system command request/call/query produced activity stream, where each
@@ -88,6 +90,11 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	protected static final String JOB_PROP_SEMAPHORE = "semaphoreObj"; // NON-NLS
 
 	private static final String OBJECT_TYPE = "OBJECT";// NON-NLS
+
+	// private static final Pattern GROOVY_EXP_PATTERN = Pattern.compile("\\s*use\\s*\\(.+\\)\\s*\\{(?s).+\\}");
+
+	private final Cache<String, CompiledScript> scriptsCache = CacheBuilder.newBuilder().maximumSize(100)
+			.expireAfterAccess(30, TimeUnit.MINUTES).build();
 
 	/**
 	 * Semaphore for synchronizing stream requests.
@@ -336,6 +343,8 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 		synchronized (parsedRequests) {
 			parsedRequests.clear();
 		}
+
+		scriptsCache.invalidateAll();
 
 		super.cleanup();
 	}
@@ -638,6 +647,10 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 * <li>stream configuration properties - {@link #getProperty(String)}</li>
 	 * <li>{@code context} parameter passed entries. Value resolution from context provided entries is stream
 	 * dependent.</li>
+	 * <li>groovy expression evaluated value - see
+	 * <a href="https://docs.groovy-lang.org/latest/html/api/groovy/time/TimeCategory.html">Groovy API TimeCategory</a>
+	 * for details. See {@link #getScript(String)} for supported groovy script additions. NOTE: expressions shall not
+	 * contain any whitespace symbols!</li>
 	 * </ul>
 	 * 
 	 * @param varName
@@ -645,6 +658,11 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 * @param context
 	 *            variable value resolution context to use
 	 * @return variable resolved value
+	 *
+	 * @see com.jkoolcloud.tnt4j.streams.inputs.AbstractWsStream.DataFillContext#getReqParameter(String)
+	 * @see com.jkoolcloud.tnt4j.streams.utils.StreamsCache#getValue(String)
+	 * @see #getProperty(String)
+	 * @see #evaluateExpr(String)
 	 */
 	protected Object getVariableValue(String varName, DataFillContext context) {
 		Object rValue = context.getReqParameter(varName);
@@ -654,8 +672,102 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 		if (rValue == null) {
 			rValue = getProperty(varName);
 		}
+		if (rValue == null) {
+			try {
+				rValue = evaluateExpr(varName);
+			} catch (ScriptException e) {
+				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+						"AbstractWsStream.expr.evaluation.failed", varName, e.getMessage());
+			}
+		}
 
 		return rValue;
+	}
+
+	/**
+	 * Evaluates groovy script defined variable expression.
+	 * 
+	 * @param varExpr
+	 *            variable expression to evaluate
+	 * @return groovy script evaluated expression value
+	 * 
+	 * @throws ScriptException
+	 *             if can't compose valid or compile groovy script
+	 * 
+	 * @see #getScript(String)
+	 */
+	protected Object evaluateExpr(String varExpr) throws ScriptException {
+		String[] vet = varExpr.split(":"); // NON-NLS
+		if (vet.length == 1 || !vet[0].equalsIgnoreCase("groovy")) { // NON-NLS
+			return null;
+		}
+
+		String scriptStr = vet[1];
+		CompiledScript compiledScript = scriptsCache.getIfPresent(scriptStr);
+		try {
+			if (compiledScript == null) {
+				String script = getScript(scriptStr);
+				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+						"AbstractWsStream.expr.script", scriptStr, script);
+				if (script == null) {
+					throw new ScriptException(StreamsResources.getStringFormatted(
+							WsStreamConstants.RESOURCE_BUNDLE_NAME, "AbstractWsStream.expr.compose.failed", scriptStr));
+				}
+
+				compiledScript = StreamsScriptingUtils.compileGroovyScript(script);
+				scriptsCache.put(scriptStr, compiledScript);
+			}
+
+			return compiledScript.eval();
+		} catch (ScriptException se) {
+			throw se;
+		}
+	}
+
+	/**
+	 * Prepares groovy script for provided variable expression.
+	 * <p>
+	 * Supports these expression keywords:
+	 * <ul>
+	 * <li>HOUR_BEGIN - to pick 00:00 minute and second of the evaluated hour value</li>
+	 * <li>HOUR_END - to pick 59:59 minute and second of the evaluated hour value</li>
+	 * </ul>
+	 * 
+	 * @param varExpr
+	 *            variable expression to use for groovy script
+	 * @return expression groovy script
+	 */
+	protected String getScript(String varExpr) {
+		String scriptStr = StringUtils.trim(varExpr);
+		if (StringUtils.isEmpty(scriptStr)) {
+			return null;
+		}
+
+		// if (GROOVY_EXP_PATTERN.matcher(scriptStr).matches()) {
+		// return scriptStr;
+		// }
+
+		String gScript = null;
+		switch (scriptStr.substring(0, 8)) {
+		case "HOUR_BEG": // NOTE: full value is HOUR_BEGIN
+			String dateVariable = scriptStr.substring(11);
+			gScript = " def vDate = " + dateVariable + ";";
+			gScript += "    vDate.putAt('minutes',0);";
+			gScript += "    vDate.putAt('seconds',0);";
+			gScript += "return vDate;";
+			break;
+		case "HOUR_END":
+			dateVariable = scriptStr.substring(9);
+			gScript = " def vDate = " + dateVariable + ";";
+			gScript += "    vDate.putAt('minutes',59);";
+			gScript += "    vDate.putAt('seconds',59);";
+			gScript += "return vDate;";
+			break;
+		default:
+			gScript = scriptStr;
+		}
+
+		return "use( groovy.time.TimeCategory ) { " + gScript + " }"; // NON-NLS
 	}
 
 	/**
