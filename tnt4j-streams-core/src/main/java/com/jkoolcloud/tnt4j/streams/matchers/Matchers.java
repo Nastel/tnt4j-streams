@@ -44,7 +44,7 @@ public class Matchers {
 	/**
 	 * Match expression definition pattern.
 	 */
-	protected static final Pattern EVAL_EXP_PATTERN = Pattern.compile("((?<type>[a-zA-Z]*):)?(?<evalExp>.+)"); // NON-NLS
+	protected static final Pattern EVAL_EXP_PATTERN = Pattern.compile("((?<type>[a-zA-Z]*):)?(?<evalExp>(?s).+)"); // NON-NLS
 
 	private static Map<String, StreamEntityFilter<Object>> langEvaluatorsCache = new HashMap<>(5);
 

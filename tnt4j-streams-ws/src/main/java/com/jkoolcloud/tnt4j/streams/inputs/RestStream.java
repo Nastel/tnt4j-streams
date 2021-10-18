@@ -310,7 +310,7 @@ public class RestStream extends AbstractHttpStream {
 			}
 
 			entity = response.getEntity();
-			return EntityUtils.toString(entity, StandardCharsets.UTF_8);
+			return entity == null ? null : EntityUtils.toString(entity, StandardCharsets.UTF_8);
 		} finally {
 			EntityUtils.consumeQuietly(entity);
 		}
