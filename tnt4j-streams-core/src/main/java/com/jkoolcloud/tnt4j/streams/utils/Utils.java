@@ -86,7 +86,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 */
 	public static final String VAR_EXP_START_TOKEN = "${"; // NON-NLS
 	private static final String VAR_EXP_END_TOKEN = "}"; // NON-NLS
-	private static final Pattern CFG_VAR_PATTERN = Pattern.compile("\\$\\{[\\w\\^\\[\\]\\=\\:.]+\\}"); // NON-NLS
+	private static final Pattern CFG_VAR_PATTERN = Pattern.compile("\\$\\{[\\w\\^\\[\\]=:.\\-+*/]+\\}"); // NON-NLS
 	private static final Pattern EXPR_VAR_PATTERN = CFG_VAR_PATTERN;
 	private static final int STACK_TRACE_ENTRIES_TO_LOG = Utils.getInt(
 			"com.jkoolcloud.tnt4j.streams.log.stack.trace.depth", // NON-NLS
