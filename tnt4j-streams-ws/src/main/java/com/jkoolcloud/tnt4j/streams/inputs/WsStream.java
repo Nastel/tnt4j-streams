@@ -147,7 +147,7 @@ public class WsStream extends AbstractHttpStream {
 		RequestDataAndHeaders requestDataAndHeaders = new RequestDataAndHeaders().resolve(soapRequestData);
 		soapRequestData = requestDataAndHeaders.getRequest();
 
-		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"WsStream.invoking.request.prep", url, soapRequestData);
 
 		// Create SOAP message and set request XML as body
@@ -158,7 +158,7 @@ public class WsStream extends AbstractHttpStream {
 		SOAPMessage soapResponse = soapConnection.call(soapRequestMessage, url);
 		String respXML = toXMLString(soapResponse);
 
-		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+		LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 				"WsStream.received.response", url, respXML);
 
 		if (soapResponse.getSOAPBody().hasFault()) {
