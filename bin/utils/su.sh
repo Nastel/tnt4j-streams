@@ -8,10 +8,12 @@ fi
 LIBPATH="$LIBPATH:$SCRIPTPATH/../../*:$SCRIPTPATH/../../lib/*"
 MAINCLASS="com.jkoolcloud.tnt4j.streams.utils.SecurityUtils"
 
-if [ "$JAVA_HOME" == "" ]; then
+JAVA_EXEC="java"
+if [[ "$JAVA_HOME" == "" ]]; then
   echo '"JAVA_HOME" env. variable is not defined!..'
 else
-  echo 'Will use java from: "$JAVA_HOME"'
+  echo 'Will use java from:' "$JAVA_HOME"
+  JAVA_EXEC="$JAVA_HOME/bin/java"
 fi
 
-"$JAVA_HOME/bin/java" -classpath "$LIBPATH" $MAINCLASS $*
+$JAVA_EXEC -classpath "$LIBPATH" $MAINCLASS $*

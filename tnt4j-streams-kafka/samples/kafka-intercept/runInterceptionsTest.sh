@@ -13,12 +13,14 @@ CONSUMER_CONFIG="-Dconsumer.config=$SCRIPTPATH/../../config/intercept/consumer.p
 INTERCEPT_CONFIG="-Dinterceptors.config=$SCRIPTPATH/../../config/intercept/interceptorsC.properties"
 STREAMSOPTS="$LOG4JOPTS $TNT4JOPTS $PRODUCER_CONFIG $CONSUMER_CONFIG $INTERCEPT_CONFIG -Dfile.encoding=UTF-8"
 
-if [ "$JAVA_HOME" == "" ]; then
+JAVA_EXEC="java"
+if [[ "$JAVA_HOME" == "" ]]; then
   echo '"JAVA_HOME" env. variable is not defined!..'
 else
-  echo 'Will use java from: "$JAVA_HOME"'
+  echo 'Will use java from:' "$JAVA_HOME"
+  JAVA_EXEC="$JAVA_HOME/bin/java"
 fi
 
-"$JAVA_HOME/bin/java" $STREAMSOPTS -classpath "$LIBPATH" com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.InterceptorsTest
+$JAVA_EXEC $STREAMSOPTS -classpath "$LIBPATH" com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.InterceptorsTest
 
 read -p "Press [Enter] key to exit..."

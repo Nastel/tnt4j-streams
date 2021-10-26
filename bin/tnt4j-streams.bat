@@ -16,11 +16,13 @@ IF ["%MAINCLASS%"] EQU [""] (
   set MAINCLASS=com.jkoolcloud.tnt4j.streams.StreamsAgent
 )
 
+set JAVA_EXEC="java"
 IF ["%JAVA_HOME%"] EQU [""] (
   echo "JAVA_HOME" env. variable is not defined!..
 ) else (
   echo Will use java from: "%JAVA_HOME%"
+  set JAVA_EXEC="%JAVA_HOME%\bin\java"
 )
 
 @echo on
-"%JAVA_HOME%\bin\java" %STREAMSOPTS% -classpath "%LIBPATH%" %MAINCLASS% %*
+%JAVA_EXEC% %STREAMSOPTS% -classpath "%LIBPATH%" %MAINCLASS% %*
