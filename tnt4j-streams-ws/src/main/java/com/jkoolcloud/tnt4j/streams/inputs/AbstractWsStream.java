@@ -364,7 +364,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 				logger().log(OpLevel.WARNING, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 						"AbstractWsStream.response.consumption.drop", item.getOriginalRequest().fqn());
 				inputBuffer.remove(recurringItem);
-				closeResponse(recurringItem.getData());
+				cleanupItem(recurringItem);
 			}
 		}
 
@@ -379,6 +379,9 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 * @return {@code true} if response is consumed, {@code false} - otherwise
 	 */
 	protected boolean isResponseConsumed(WsResponse<RQ, RS> item) {
+		cleanupItem(item);
+		postParse(item);
+
 		return true;
 	}
 
@@ -393,8 +396,10 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 
 	@Override
 	protected void cleanupItem(WsResponse<RQ, RS> item) {
-		if (item != null && item.getData() != null) {
-			closeResponse(item.getData());
+		if (item != null) {
+			if (item.getData() != null) {
+				closeResponse(item.getData());
+			}
 			responseConsumed(item);
 		}
 	}
@@ -524,13 +529,6 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 		}
 
 		return super.applyParsers(data, tags);
-	}
-
-	@Override
-	protected Object getItemFromBuffer() throws InterruptedException {
-		postParse(getCurrentItem());
-
-		return super.getItemFromBuffer();
 	}
 
 	/**
@@ -839,6 +837,8 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 
 			fReq.setId((String) fillInRequestData(ctx.setData(fReq.getId()).reset()));
 			fReq.setData((String) fillInRequestData(ctx.setData(fReq.getData())));
+
+			// checkConditions(fReq, ctx); // TODO: make conditions check after request fill-in
 		}
 
 		return fReq;
