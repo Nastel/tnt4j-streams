@@ -201,8 +201,6 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 		ResultSet rs = item.getData();
 		try {
 			if (rs.isClosed() || !rs.next()) {
-				cleanupItem(item);
-
 				logger().log(OpLevel.INFO, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 						"JDBCStream.rs.consumption.done", item.getOriginalRequest().getId(),
 						item.getParameterValue(ROW_PROP));
@@ -226,8 +224,6 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 			Utils.logThrowable(logger(), OpLevel.WARNING,
 					StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 					"JDBCStream.rs.consumption.exception", item.getOriginalRequest().getId(), exc);
-
-			cleanupItem(item);
 
 			return true;
 		}
