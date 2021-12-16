@@ -1,5 +1,10 @@
 # TNT4J-Streams
 
+-----------------------
+**NOTE:** `TNT4J-Streams` version `1.13.0` migrated logger to `log4j2`. In case you have changed default `TNT4J-Streams` logger
+configuration using previous `TNT4J-Streams` versions, please check new logger configuration file [log4j2.xml](./config/log4j2.xml).
+-----------------------
+
 TNT4J Streams allows data streaming, parsing from various data sources into TNT4J event sinks.
 
 Why TNT4J-Streams
