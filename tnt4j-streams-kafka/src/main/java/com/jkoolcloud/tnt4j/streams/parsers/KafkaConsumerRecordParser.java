@@ -42,7 +42,6 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>offset - position of this record in the corresponding Kafka partition</li>
  * <li>timestamp - timestamp of this record</li>
  * <li>timestampType - timestamp type of this record</li>
- * <li>checksum - checksum (CRC32) of the record</li>
  * <li>serializedKeySize - size of the serialized, uncompressed key in bytes</li>
  * <li>serializedValueSize - size of the serialized, uncompressed value in bytes</li>
  * <li>key - record key</li>
@@ -178,8 +177,6 @@ public class KafkaConsumerRecordParser extends GenericActivityParser<ConsumerRec
 			val = cRecord.timestamp();
 		} else if ("timestampType".equalsIgnoreCase(propStr)) { // NON-NLS
 			val = cRecord.timestampType();
-		} else if ("checksum".equalsIgnoreCase(propStr)) { // NON-NLS
-			val = cRecord.checksum();
 		} else if ("serializedKeySize".equalsIgnoreCase(propStr)) { // NON-NLS
 			val = cRecord.serializedKeySize();
 		} else if ("serializedValueSize".equalsIgnoreCase(propStr)) { // NON-NLS

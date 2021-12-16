@@ -58,7 +58,6 @@
 
         <field name="EventType" value="EVENT"/>
         <field name="EventName" value="Kafka_Producer_Acknowledge"/>
-        <field name="Checksum" locator="checksum" locator-type="Label" datatype="Number"/>
 
         <field name="TopicPartition" locator="topicPartition" locator-type="Label" transparent="true">
             <parser-ref name="TopicPartitionParser" aggregation="Merge"/>
@@ -107,7 +106,6 @@
         <field name="Key" locator="key" locator-type="Label"/>
         <field name="Value" locator="value" locator-type="Label" datatype="AsInput"/>
         <field name="Message" locator="value" locator-type="Label" datatype="String"/>
-        <field name="Checksum" locator="checksum" locator-type="Label" datatype="Number"/>
 
         <field name="serializedKeySize" locator="serializedKeySize" locator-type="Label"/>
         <field name="serializedValueSize" locator="serializedValueSize" locator-type="Label"/>

@@ -2592,7 +2592,6 @@ Sample stream configuration:
         <field name="Offset" locator="offset" locator-type="Label" datatype="Number"/>
         <field name="Timestamp" locator="timestamp" locator-type="Label" datatype="Timestamp"/>
         <field name="TimestampType" locator="timestampType" locator-type="Label"/>
-        <field name="Checksum" locator="checksum" locator-type="Label"/>
         <field name="KeySize" locator="serializedKeySize" locator-type="Label" datatype="Number"/>
         <field name="ValueSize" locator="serializedValueSize" locator-type="Label" datatype="Number"/>
         <field name="Key" locator="key" locator-type="Label"/>
@@ -5976,7 +5975,6 @@ List of predefined locators for this parser:
 * `offset` - position of this record in the corresponding Kafka partition
 * `timestamp` - timestamp of this record
 * `timestampType` - timestamp type of this record
-* `checksum` - checksum (CRC32) of the record
 * `serializedKeySize` - size of the serialized, uncompressed key in bytes
 * `serializedValueSize` - size of the serialized, uncompressed value in bytes
 * `key` - record key

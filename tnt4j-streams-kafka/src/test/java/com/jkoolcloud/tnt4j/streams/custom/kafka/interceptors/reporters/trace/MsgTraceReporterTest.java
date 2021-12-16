@@ -18,6 +18,7 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.ClusterResource;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
+import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.apache.kafka.common.record.TimestampType;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.Ignore;
@@ -45,7 +46,7 @@ public class MsgTraceReporterTest {
 	public static final String MESSAGE = "TestMessage";
 	public static final long TIMESTAMP = System.currentTimeMillis();
 	public static final long OFFSET = 123;
-	public static final long CHECKSUM = -1L;
+	public static final int BATCH_INDEX = 1;
 	public TestActivityInfoConsumer test;
 	private Consumer<String, String> consumer;
 
@@ -321,13 +322,12 @@ public class MsgTraceReporterTest {
 		assertEquals(activityInfo.getFieldValue("Key"), consumerRecords.iterator().next().key()); // NON-NLS
 		assertEquals(activityInfo.getFieldValue(StreamFieldType.Message.name()),
 				consumerRecords.iterator().next().value());
-		assertEquals(activityInfo.getFieldValue("Checksum"), consumerRecords.iterator().next().checksum()); // NON-NLS
-
 	}
 
 	private ConsumerRecords<Object, Object> getConsumerRecords() {
 		ConsumerRecord<Object, Object> cr = new ConsumerRecord<>(TOPIC, PARTITION, OFFSET, TIMESTAMP,
-				TimestampType.CREATE_TIME, CHECKSUM, KEY.length(), MESSAGE.length(), KEY, MESSAGE);
+				TimestampType.CREATE_TIME, KEY.length(), MESSAGE.length(), KEY, MESSAGE, new RecordHeaders(),
+				Optional.empty());
 		Map<TopicPartition, List<ConsumerRecord<Object, Object>>> map = Collections.singletonMap(getTopicPartition(),
 				Collections.singletonList(cr));
 
@@ -376,7 +376,7 @@ public class MsgTraceReporterTest {
 
 	@Test
 	public void testRecordMetadata() throws Exception {
-		RecordMetadata rm = new RecordMetadata(getTopicPartition(), OFFSET, OFFSET, TIMESTAMP, CHECKSUM, KEY.length(),
+		RecordMetadata rm = new RecordMetadata(getTopicPartition(), OFFSET, BATCH_INDEX, TIMESTAMP, KEY.length(),
 				MESSAGE.length());
 		ActivityParser producerActivityParser = getActivityParser("RecordMetadataParser");
 		if (producerActivityParser.isDataClassSupported(rm)) {

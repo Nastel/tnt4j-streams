@@ -28,7 +28,6 @@
         <field name="Offset" locator="offset" locator-type="Label" datatype="Number"/>
         <field name="Timestamp" locator="timestamp" locator-type="Label" datatype="Timestamp"/>
         <field name="TimestampType" locator="timestampType" locator-type="Label"/>
-        <field name="Checksum" locator="checksum" locator-type="Label"/>
         <field name="KeySize" locator="serializedKeySize" locator-type="Label" datatype="Number"/>
         <field name="ValueSize" locator="serializedValueSize" locator-type="Label" datatype="Number"/>
         <field name="Key" locator="key" locator-type="Label"/>
