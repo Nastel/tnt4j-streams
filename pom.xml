@@ -194,8 +194,8 @@
                             <value>../config/tnt4j.properties</value>
                         </property>
                         <property>
-                            <name>log4j.configuration</name>
-                            <value>file:../config/log4j.properties</value>
+                            <name>log4j2.configurationFile</name>
+                            <value>file:../config/log4j2.xml</value>
                         </property>
                     </systemProperties>
                 </configuration>

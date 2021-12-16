@@ -27,7 +27,7 @@ public class ChronicleQueueStreamTest {
 
 	@Test
 	public void testStartFromEnd() throws IOException, InterruptedException {
-		System.setProperty("log4j.configuration", "file:../config/log4j.properties");
+		System.setProperty("log4j2.configurationFile", "file:../config/log4j2.xml");
 		ChronicleQueueStream stream = new ChronicleQueueStream() {
 			@Override
 			public Object getNextItem() throws Exception {

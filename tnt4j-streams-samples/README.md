@@ -32,7 +32,7 @@ or
 
  * set this IDE `run configuration`:
     * Main class: `com.jkoolcloud.tnt4j.streams.sample.builder.SampleStreamingApp`
-    * VM Options: `-Dtnt4j.config="./config/tnt4j.properties" -Dlog4j.configuration="file:./config/log4j.properties"`
+    * VM Options: `-Dtnt4j.config="./config/tnt4j.properties" -Dlog4j2.configurationFile="file:./config/log4j2.xml"`
     * Program arguments: `./tnt4j-streams-samples/samples/stream-builder/orders.log`
     * Working directory: `[YOUR_TNT4J_STREAMS_ROOT_DIR]`, e.g., `C:\PROJECTS\Nastel\tnt4j-streams`
     * Class path: `tnt4j-streams-samples` module

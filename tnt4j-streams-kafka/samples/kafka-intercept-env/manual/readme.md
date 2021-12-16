@@ -1,11 +1,11 @@
 ### How to manually integrate Kafka-X-Ray into your Kafka environment
 
-1. Install Kafka (if not yet), but **NOTE** this guide written to perform actions on a clean instance of Kafka installation - if you 
-already made any changes to your Kafka environment, it **may require some improvisation**. 
+1. Install Kafka (if not yet), but **NOTE** this guide written to perform actions on a clean instance of Kafka installation - if you already
+   made any changes to your Kafka environment, it **may require some improvisation**.
 1. Add `tnt4j-streams-kafka-[VERSION]-all.jar` to Kafka class-path:
-    1. If you can put files into `<KAFKA_INSTALL_DIR>/libs` dir, then just copy it there. 
-    1. If you wish to have streams lib isolated, then put jar to dedicated directory (e.g. `<KAFKA_INSTALL_DIR>/libs/tnt4j`). Then alter 
-    `<KAFKA_INSTALL_DIR>/bin/kafka-run-class` script file: 
+    1. If you can put files into `<KAFKA_INSTALL_DIR>/libs` dir, then just copy it there.
+    1. If you wish to have streams lib isolated, then put jar to dedicated directory (e.g. `<KAFKA_INSTALL_DIR>/libs/tnt4j`). Then alter
+       `<KAFKA_INSTALL_DIR>/bin/kafka-run-class` script file:
         * *NIX: `<KAFKA_INSTALL_DIR>/bin/kafka-run-class.sh` by adding section after `# classpath addition for release` section:
         ```bash
         # classpath addition for tnt4j
@@ -16,17 +16,17 @@ already made any changes to your Kafka environment, it **may require some improv
           fi
         done
         ```
-        * Windows: `<KAFKA_INSTALL_DIR>/bin/windows/kafka-run-class.bat` by adding section after `rem Classpath addition for release` 
-        section:
+        * Windows: `<KAFKA_INSTALL_DIR>/bin/windows/kafka-run-class.bat` by adding section after `rem Classpath addition for release`
+          section:
         ```cmd
         rem Classpath addition for tnt4j
         for %%i in ("%BASE_DIR%\libs\tnt4j\*") do (
             call :concat "%%i"
         )
         ```
-1. Alter consumer runner script file (`<KAFKA_INSTALL_DIR>/bin/kafka-console-consumer`) by adding/amending `KAFKA_OPTS` environment variable 
-defining JVM system properties, referring TNT4J, interceptors and optionally LOG4J configuration files, e.g. (**NOTE**: add `KAFKA_OPTS` 
-right after line defining environment variable `KAFKA_HEAP_OPTS`): 
+1. Alter consumer runner script file (`<KAFKA_INSTALL_DIR>/bin/kafka-console-consumer`) by adding/amending `KAFKA_OPTS` environment variable
+   defining JVM system properties, referring TNT4J, interceptors and optionally LOG4J configuration files, e.g. (**NOTE**: add `KAFKA_OPTS`
+   right after line defining environment variable `KAFKA_HEAP_OPTS`):
     * *NIX:
     ```bash
     export KAFKA_OPTS="-Dtnt4j.config=../config/tnt4j.properties -Dinterceptors.config=../config/interceptorsC.properties"
@@ -35,18 +35,18 @@ right after line defining environment variable `KAFKA_HEAP_OPTS`):
     ```cmd
     set KAFKA_OPTS=-Dtnt4j.config="../../config/tnt4j.properties" -Dinterceptors.config="../../config/interceptorsC.properties"
     ```
-    or optionally with custom LOG4J configuration:
+   or optionally with custom LOG4J configuration:
     * *NIX:
     ```bash
-    export KAFKA_OPTS="-Dtnt4j.config=../config/tnt4j.properties -Dinterceptors.config=../config/interceptorsC.properties -Dlog4j.configuration=file:../config/my_log4j.properties"
+    export KAFKA_OPTS="-Dtnt4j.config=../config/tnt4j.properties -Dinterceptors.config=../config/interceptorsC.properties -Dlog4j2.configurationFile=file:../config/my_log4j2.xml"
     ```
     * Windows:
     ```cmd
-    set KAFKA_OPTS=-Dtnt4j.config="../../config/tnt4j.properties" -Dinterceptors.config="../../config/interceptorsC.properties" -Dlog4j.configuration="file:../../config/my_log4j.properties"
+    set KAFKA_OPTS=-Dtnt4j.config="../../config/tnt4j.properties" -Dinterceptors.config="../../config/interceptorsC.properties" -Dlog4j2.configurationFile="file:../../config/my_log4j2.xml"
     ```
-1. Alter producer runner script file (`<KAFKA_INSTALL_DIR>/bin/kafka-console-producer`) by adding/amending `KAFKA_OPTS` environment variable 
-defining JVM system properties, referring TNT4J, interceptors and optionally LOG4J configuration files, e.g. (**NOTE**: add `KAFKA_OPTS` 
-right after line defining environment variable `KAFKA_HEAP_OPTS`):
+1. Alter producer runner script file (`<KAFKA_INSTALL_DIR>/bin/kafka-console-producer`) by adding/amending `KAFKA_OPTS` environment variable
+   defining JVM system properties, referring TNT4J, interceptors and optionally LOG4J configuration files, e.g. (**NOTE**: add `KAFKA_OPTS`
+   right after line defining environment variable `KAFKA_HEAP_OPTS`):
     * *NIX:
     ```bash
     export KAFKA_OPTS="-Dtnt4j.config=../config/tnt4j.properties -Dinterceptors.config=../config/interceptorsP.properties"
@@ -55,14 +55,14 @@ right after line defining environment variable `KAFKA_HEAP_OPTS`):
     ```cmd
     set KAFKA_OPTS=-Dtnt4j.config="../../config/tnt4j.properties" -Dinterceptors.config="../../config/interceptorsP.properties"
     ```
-    or optionally with custom LOG4J configuration:
+   or optionally with custom LOG4J configuration:
     * *NIX:
     ```bash
-    export KAFKA_OPTS="-Dtnt4j.config=../config/tnt4j.properties -Dinterceptors.config=../config/interceptorsP.properties -Dlog4j.configuration=file:../config/my_log4j.properties"
+    export KAFKA_OPTS="-Dtnt4j.config=../config/tnt4j.properties -Dinterceptors.config=../config/interceptorsP.properties -Dlog4j2.configurationFile=file:../config/my_log4j2.xml"
     ```
     * Windows:
     ```cmd
-    set KAFKA_OPTS=-Dtnt4j.config="../../config/tnt4j.properties" -Dinterceptors.config="../../config/interceptorsP.properties" -Dlog4j.configuration="file:../../config/my_log4j.properties"
+    set KAFKA_OPTS=-Dtnt4j.config="../../config/tnt4j.properties" -Dinterceptors.config="../../config/interceptorsP.properties" -Dlog4j2.configurationFile="file:../../config/my_log4j2.xml"
     ```
 1. Alter `<KAFKA_INSTALL_DIR>/config/consumer.properties` by adding:
     ```properties
@@ -97,23 +97,20 @@ right after line defining environment variable `KAFKA_HEAP_OPTS`):
 
     log4j.logger.com.jkoolcloud.tnt4j.streams=DEBUG, tnt4jAppender
     #log4j.logger.com.jkoolcloud.tnt4j.streams=OFF
-    #### tnt4j API logger ####
-    #log4j.logger.com.jkoolcloud.tnt4j=DEBUG
-    #### tnt4j API logger ####
-    #log4j.logger.com.jkoolcloud.jesl=DEBUG
     ### if streams are not subject to be added to main kafka log, streams will be logged to dedicated log only ###
     log4j.additivity.com.jkoolcloud.tnt4j.streams=false
     #### tnt4j API logger ####
     #log4j.logger.com.jkoolcloud.tnt4j=DEBUG
-    #### tnt4j API logger ####
+    #### jesl API logger ####
     #log4j.logger.com.jkoolcloud.jesl=DEBUG
     ### Streamed activity entities logger ###
     log4j.logger.com.jkoolcloud.tnt4j.streams.activities_log=INFO, activities_log
     log4j.additivity.com.jkoolcloud.tnt4j.streams.activities_log=false
     ```
-1. Copy your `tnt4j.properties` file (one having your JKool token defined) into `<KAFKA_INSTALL_DIR>/config` directory. Also, check if your 
-`tnt4j.properties` file contains stanza for source `com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics`. If not - 
-append it with this one:
+   In case Kafka switched to `log4j2` see [tools-log4j2.xml](./../seamless/config/tools-log4j2.xml) as a sample configuration.
+1. Copy your `tnt4j.properties` file (one having your JKool token defined) into `<KAFKA_INSTALL_DIR>/config` directory. Also, check if your
+   `tnt4j.properties` file contains stanza for source `com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics`. If not -
+   append it with this one:
     ```properties
     # Stanza used for TNT4J-Streams-Kafka interceptors reporters sources
     {
@@ -186,8 +183,8 @@ append it with this one:
     messages.tracer.kafka.group.id=kafka-x-ray-trace-config-consumers
     messages.tracer.kafka.client.id=kafka-x-ray-trace-config-listener-c
     ```
-    **NOTE:** see [Interceptors configuration section](../../kafka-intercept/readme.md#interceptors-configuration) for more details about 
-    interceptors configuration. 
+   **NOTE:** see [Interceptors configuration section](../../kafka-intercept/readme.md#interceptors-configuration) for more details about
+   interceptors configuration.
 1. Create file `<KAFKA_INSTALL_DIR>/config/interceptorsP.properties` and fill it with these properties:
     ```properties
     ### Kafka metrics reporting configuration
@@ -213,14 +210,15 @@ append it with this one:
     messages.tracer.kafka.group.id=kafka-x-ray-trace-config-consumers
     messages.tracer.kafka.client.id=kafka-x-ray-trace-config-listener-p
     ```
-    **NOTE:** see [Interceptors configuration section](../../kafka-intercept/readme.md#interceptors-configuration) for more details about 
-    interceptors configuration.
-1. (Optional) In case you may want to change Kafka messages trace parser configuration (fields naming/mapping), we would recommend you to 
-copy [Kafka trace messages parser](../../kafka-intercept/tnt-data-source_kafka_msg_trace.xml) as 
-`<KAFKA_INSTALL_DIR>/config/tnt-data-source_kafka_msg_trace_custom.xml` to have it easily accessible and editable in your Kafka environment.
+   **NOTE:** see [Interceptors configuration section](../../kafka-intercept/readme.md#interceptors-configuration) for more details about
+   interceptors configuration.
+1. (Optional) In case you may want to change Kafka messages trace parser configuration (fields naming/mapping), we would recommend you to
+   copy [Kafka trace messages parser](../../kafka-intercept/tnt-data-source_kafka_msg_trace.xml) as
+   `<KAFKA_INSTALL_DIR>/config/tnt-data-source_kafka_msg_trace_custom.xml` to have it easily accessible and editable in your Kafka
+   environment.
 
-    By default this file resides inside `tnt4j-streams-kafka-[VERSION]-all.jar` and is used for traces messages parsing if interceptors 
-    configuration does not define any other parser reference.
+   By default this file resides inside `tnt4j-streams-kafka-[VERSION]-all.jar` and is used for traces messages parsing if interceptors
+   configuration does not define any other parser reference.
 1. Run Kafka provided console producer/consumer:
     * *UIX:
     ```bash
@@ -236,9 +234,9 @@ copy [Kafka trace messages parser](../../kafka-intercept/tnt-data-source_kafka_m
     ```cmd
     start kafka-console-producer --producer.config ../../config/producer.properties --broker-list localhost:9092 --topic 
     ```
-    **NOTE:** as an example you may refer script [file](./additions/windows/start-cons_prod.bat).
-1. (Optional) To configure Kafka messages trace interceptions at interceptors runtime, run configuration topic `tnt4j-trace-config-topic` 
-producer:
+   **NOTE:** as an example you may refer script [file](./additions/windows/start-cons_prod.bat).
+1. (Optional) To configure Kafka messages trace interceptions at interceptors runtime, run configuration topic `tnt4j-trace-config-topic`
+   producer:
     * *NIX:
     ```bash
     exec kafka-console-producer.sh --producer.config ../config/producer.properties --broker-list localhost:9092 --topic tnt4j-trace-config-topic
@@ -247,10 +245,10 @@ producer:
     ```cmd
     start kafka-console-producer --producer.config ../../config/producer.properties --broker-list localhost:9092 --topic tnt4j-trace-config-topic
     ```
-    **NOTE:** as an example you may refer script [file](./additions/windows/start-cmd-prod.bat).
+   **NOTE:** as an example you may refer script [file](./additions/windows/start-cmd-prod.bat).
 
-    **NOTE:** see [Kafka trace control topic commands section](../../kafka-intercept/readme.md#kafka-trace-control-topic-commands) for more 
-    details on trace configuration commands.
+   **NOTE:** see [Kafka trace control topic commands section](../../kafka-intercept/readme.md#kafka-trace-control-topic-commands) for more
+   details on trace configuration commands.
 1. Run `Kafka-X-Ray` produced metrics consumer stream by executing:
     * *NIX: [../../kafka-intercept/runMetricsStreaming.sh](../../kafka-intercept/runMetricsStreaming.sh)
     * Windows: [../../kafka-intercept/runMetricsStreaming.bat](../../kafka-intercept/runMetricsStreaming.bat)

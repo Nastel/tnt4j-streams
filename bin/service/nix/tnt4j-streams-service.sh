@@ -53,11 +53,11 @@ LIBPATH="$LIBPATH:$FILE_PATH/*:$FILE_PATH/lib/*"
 TNT4J_PROPERTIES="$FILE_PATH/config/tnt4j.properties"
 
 #Logger configuration
-LOG4J_PROPERTIES="$FILE_PATH/config/log4j.properties"
+LOG4J_PROPERTIES="$FILE_PATH/config/log4j2.xml"
 
 
 TNT4JOPTS="-Dtnt4j.config=$TNT4J_PROPERTIES"
-LOG4JOPTS="-Dlog4j.configuration=file:$LOG4J_PROPERTIES"
+LOG4JOPTS="-Dlog4j2.configurationFile=file:$LOG4J_PROPERTIES"
 STREAMSOPTS="$STREAMSOPTS $LOG4JOPTS $TNT4JOPTS"
 
 jsvc_exec()

@@ -15,10 +15,10 @@ TNT4JOPTS="-Dtnt4j.config=$TNT4J_PROPERTIES"
 
 # log4j file override
 if [[ -z "$LOG4J_PROPERTIES" ]]; then
-  LOG4J_PROPERTIES="$SCRIPTPATH/../config/log4j.properties"
+  LOG4J_PROPERTIES="$SCRIPTPATH/../config/log4j2.xml"
 fi
-LOG4JOPTS="-Dlog4j.configuration=file:$LOG4J_PROPERTIES"
-#LOG4JOPTS=${LOG4JOPTS:-"-Dlog4j.configuration=file:$SCRIPTPATH/../config/log4j.properties"}
+LOG4JOPTS="-Dlog4j2.configurationFile=file:$LOG4J_PROPERTIES"
+#LOG4JOPTS=${LOG4JOPTS:-"-Dlog4j2.configurationFile=file:$SCRIPTPATH/../config/log4j2.xml"}
 
 #LOGBACKOPTS="-Dlogback.configurationFile=file:$SCRIPTPATH/../config/logback.xml"
 STREAMSOPTS="$STREAMSOPTS $LOG4JOPTS $TNT4JOPTS -Dfile.encoding=UTF-8"

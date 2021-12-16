@@ -34,7 +34,7 @@ rem ### Use stream configuration from default config dir or define custom one
 set /p PARSER_CONFIG=Enter parser configuration file path ([%FILE_PATH%\config\tnt-data-source.xml]): 
 IF ["%PARSER_CONFIG%"] EQU [""] set PARSER_CONFIG="%FILE_PATH%\config\tnt-data-source.xml"
 set TNT4J_CONFIG="%FILE_PATH%\config\tnt4j.properties"
-set LOG4J_CONFIG="%FILE_PATH%\config\log4j.properties"
+set LOG4J_CONFIG="%FILE_PATH%\config\log4j2.xml"
 set SERVICE_PROVIDER=%RUNDIR%%OS_ARC%\prunsrv.exe
 
 echo Description            %DESCRIPTION%  
@@ -45,7 +45,7 @@ echo Classpath              %FILE_PATH%\*;%FILE_PATH%\lib\*
 echo Jvm                    %JVM_DLL_PATH%\jvm.dll     
 echo StartPath              %FILE_PATH% 
 echo StartParams            start;-f:%PARSER_CONFIG%
-echo JvmOptions             -Dlog4j.configuration=file:%LOG4J_CONFIG%;-Dtnt4j.config=%TNT4J_CONFIG% 
+echo JvmOptions             -Dlog4j2.configurationFile=file:%LOG4J_CONFIG%;-Dtnt4j.config=%TNT4J_CONFIG%
 
 SET /P AREYOUSURE=Are you sure (Y/[N])?
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO END
@@ -68,7 +68,7 @@ rem #### installing service ####
  --StopClass com.jkoolcloud.tnt4j.streams.StreamsDaemon      ^
  --StopParams "stop"  ^
  --StartParams "start;-f:%PARSER_CONFIG%"      ^
- --JvmOptions "-Dlog4j.configuration=file:%LOG4J_CONFIG%;-Dtnt4j.config=%TNT4J_CONFIG%"  ^
+ --JvmOptions "-Dlog4j2.configurationFile=file:%LOG4J_CONFIG%;-Dtnt4j.config=%TNT4J_CONFIG%"  ^
  --JvmMs 128      ^
  --JvmMx 512
 

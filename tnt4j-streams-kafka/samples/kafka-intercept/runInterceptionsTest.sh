@@ -7,7 +7,7 @@ fi
 
 LIBPATH="$SCRIPTPATH/../../*:$SCRIPTPATH/../../lib/*"
 TNT4JOPTS="-Dtnt4j.config=$SCRIPTPATH/../../config/tnt4j.properties"
-LOG4JOPTS="-Dlog4j.configuration=file:$SCRIPTPATH/../../config/log4j.properties"
+LOG4JOPTS="-Dlog4j2.configurationFile=file:$SCRIPTPATH/../../config/log4j2.xml"
 PRODUCER_CONFIG="-Dproducer.config=$SCRIPTPATH/../../config/intercept/producer.properties"
 CONSUMER_CONFIG="-Dconsumer.config=$SCRIPTPATH/../../config/intercept/consumer.properties"
 INTERCEPT_CONFIG="-Dinterceptors.config=$SCRIPTPATH/../../config/intercept/interceptorsC.properties"

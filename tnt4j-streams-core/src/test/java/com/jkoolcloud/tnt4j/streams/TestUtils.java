@@ -67,13 +67,13 @@ public final class TestUtils {
 	}
 
 	public static void configureConsoleLogger() {
-		configureConsoleLogger("..\\config\\log4j.properties");
+		configureConsoleLogger("../config/log4j2.xml");
 	}
 
 	public static void configureConsoleLogger(String logPath) {
 		File log4jConfig = new File(logPath);
 		if (log4jConfig.exists()) {
-			System.setProperty("log4j.configuration", "file:///../config/log4j.properties");
+			System.setProperty("log4j2.configurationFile", "file:./../config/log4j2.xml");
 			return;
 		}
 

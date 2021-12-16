@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2014-2021 JKOOL, LLC.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<Configuration strict="true"
+               xmlns="http://logging.apache.org/log4j/2.0/config"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://logging.apache.org/log4j/2.0/config
+           https://raw.githubusercontent.com/apache/logging-log4j2/master/log4j-core/src/main/resources/Log4j-config.xsd">
+    <Properties>
+        <Property name="tnt4j.streams.log.filename">logs/tnt4j-streams.log</Property>
+        <Property name="tnt4j.activities.prod.log.filename">logs/tnt4j-streams-prod-activities.log</Property>
+        <Property name="tnt4j.activities.qa.log.filename">logs/tnt4j-streams-qa-activities.log</Property>
+    </Properties>
+    <Appenders>
+        <!-- ### direct log messages to console ### -->
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout>
+                <Pattern>%d{ISO8601} %-5p [%t!%c{1}] - %m%n</Pattern>
+            </PatternLayout>
+        </Console>
+        <!-- ### direct log messages to file rolling on startup and size based ### -->
+        <RollingFile name="file"
+                     fileName="${tnt4j.streams.log.filename}"
+                     filePattern="${tnt4j.streams.log.filename}.%i.gz"
+                     ignoreExceptions="false">
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30" fileIndex="min">
+                <Delete basePath="${baseDir}" maxDepth="1">
+                    <IfFileName glob="${tnt4j.streams.log.filename}.*.gz"/>
+                    <IfLastModified age="30d"/>
+                    <!--IfAccumulatedFileCount exceeds="30"/-->
+                </Delete>
+            </DefaultRolloverStrategy>
+            <PatternLayout>
+                <Pattern>%d{ISO8601} %-5p [%t!%c{1}] - %m%n</Pattern>
+            </PatternLayout>
+        </RollingFile>
+        <!--  ### branch for sink written 'prod' activity entities logger ### -->
+        <RollingFile name="activities_prod_log"
+                     fileName="${tnt4j.activities.prod.log.filename}"
+                     filePattern="${tnt4j.activities.prod.log.filename}.%i.gz"
+                     ignoreExceptions="false" createOnDemand="true">
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30" fileIndex="min">
+                <Delete basePath="${baseDir}" maxDepth="1">
+                    <IfFileName glob="${tnt4j.activities.prod.log.filename}.*.gz"/>
+                    <IfLastModified age="30d"/>
+                    <!--IfAccumulatedFileCount exceeds="30"/-->
+                </Delete>
+            </DefaultRolloverStrategy>
+            <PatternLayout>
+                <Pattern>%m%n</Pattern>
+            </PatternLayout>
+        </RollingFile>
+        <!--  ### branch for sink written 'qa' activity entities logger ### -->
+        <RollingFile name="activities_qa_log"
+                     fileName="${tnt4j.activities.qa.log.filename}"
+                     filePattern="${tnt4j.activities.qa.log.filename}.%i.gz"
+                     ignoreExceptions="false" createOnDemand="true">
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10" fileIndex="min">
+                <Delete basePath="${baseDir}" maxDepth="1">
+                    <IfFileName glob="${tnt4j.activities.qa.log.filename}.*.gz"/>
+                    <IfLastModified age="30d"/>
+                    <!--IfAccumulatedFileCount exceeds="30"/-->
+                </Delete>
+            </DefaultRolloverStrategy>
+            <PatternLayout>
+                <Pattern>%m%n</Pattern>
+            </PatternLayout>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <!-- ### jKool LLC TNT4J Streams log level and appenders used -->
+        <asyncRoot level="INFO">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="file"/>
+        </asyncRoot>
+        <!-- ### streams API logger -->
+        <asyncLogger name="com.jkoolcloud.tnt4j.streams" level="DEBUG"/>
+        <!-- ### tnt4j API logger -->
+        <!-- <asyncLogger name="com.jkoolcloud.tnt4j" level="DEBUG"/> -->
+        <!-- ### jesl API logger -->
+        <!-- <asyncLogger name="com.jkoolcloud.jesl" level="DEBUG"/> -->
+        <!-- #### streamed activity entities logger #### -->
+        <asyncLogger name="com.jkoolcloud.tnt4j.streams.activities_prod_log" level="INFO" additivity="false">
+            <AppenderRef ref="activities_prod_log"/>
+        </asyncLogger>
+        <asyncLogger name="com.jkoolcloud.tnt4j.streams.activities_qa_log" level="INFO" additivity="false">
+            <AppenderRef ref="activities_qa_log"/>
+        </asyncLogger>
+    </Loggers>
+</Configuration>

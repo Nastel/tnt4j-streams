@@ -7,8 +7,8 @@ rem tnt4j property override
 IF ["%TNT4J_PROPERTIES%"] EQU [""] set TNT4J_PROPERTIES=%RUNDIR%..\config\tnt4j.properties
 set TNT4JOPTS=-Dtnt4j.config="%TNT4J_PROPERTIES%"
 rem log4j property override
-IF ["%LOG4J_PROPERTIES%"] EQU [""] set LOG4J_PROPERTIES=%RUNDIR%..\config\log4j.properties
-set LOG4JOPTS=-Dlog4j.configuration="file:%LOG4J_PROPERTIES%"
+IF ["%LOG4J_PROPERTIES%"] EQU [""] set LOG4J_PROPERTIES=%RUNDIR%..\config\log4j2.xml
+set LOG4JOPTS=-Dlog4j2.configurationFile="file:%LOG4J_PROPERTIES%"
 REM set LOGBACKOPTS=-Dlogback.configurationFile="file:%RUNDIR%..\config\logback.xml"
 set STREAMSOPTS=%STREAMSOPTS% %LOG4JOPTS% %TNT4JOPTS% -Dfile.encoding=UTF-8
 

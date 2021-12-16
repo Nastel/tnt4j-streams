@@ -37,6 +37,7 @@ public class LoggerUtils {
 	private static final int LOG4J = 1 << 0;
 	private static final int LOGBACK = 1 << 1;
 	private static final int JUL = 1 << 2;
+	private static final int LOG4J2 = 1 << 3;
 	private static final int SLF4J = 1 << 10; // NOTE: SLF4J may be as a logger (SLF4JSimple) or as wrapper.
 
 	/**
@@ -56,6 +57,14 @@ public class LoggerUtils {
 	public static int detectLogger(EventSink logger) {
 		int loggerMask = 0;
 
+		if (!logger.isOpen()) {
+			try {
+				logger.open();
+			} catch (Exception exc) {
+				return loggerMask;
+			}
+		}
+
 		Class<?> shc = logger.getSinkHandle().getClass();
 		if (shc.getName().startsWith("org.apache.log4j.")) { // NON-NLS
 			loggerMask |= LOG4J;
@@ -63,6 +72,9 @@ public class LoggerUtils {
 			loggerMask |= LOGBACK;
 		} else if (shc.getName().startsWith("java.util.logging.")) { // NON-NLS
 			loggerMask |= JUL;
+		} else if (shc.getName().startsWith("org.apache.logging.log4j.")
+				|| shc.getName().startsWith("org.apache.logging.slf4j.")) { // NON-NLS
+			loggerMask |= LOG4J2;
 		} else if (shc.getName().startsWith("org.slf4j.")) { // NON-NLS
 			loggerMask |= SLF4J;
 
@@ -95,6 +107,8 @@ public class LoggerUtils {
 			setLogbackConfig(cfgData, logger);
 		} else if (Utils.matchMask(lUsed, JUL)) {
 			setJULConfig(cfgData, logger);
+		} else if (Utils.matchMask(lUsed, LOG4J2)) {
+			setLog4j2Config(cfgData, logger);
 		} else {
 			logger.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"LoggerUtils.unknown.logger");
@@ -103,14 +117,11 @@ public class LoggerUtils {
 
 	private static void setLog4jConfig(byte[] data, EventSink logger) {
 		Properties loggerProps = new Properties();
-		InputStream is = new ByteArrayInputStream(data);
-		try {
+		try (InputStream is = new ByteArrayInputStream(data)) {
 			loggerProps.load(is);
 		} catch (Exception exc) {
 			Utils.logThrowable(logger, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"LoggerUtils.log4j.load.error", exc);
-		} finally {
-			Utils.close(is);
 		}
 
 		if (MapUtils.isEmpty(loggerProps)) {
@@ -135,17 +146,41 @@ public class LoggerUtils {
 		}
 	}
 
+	private static void setLog4j2Config(byte[] data, EventSink logger) {
+		try (InputStream is = new ByteArrayInputStream(data)) {
+			logger.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+					"LoggerUtils.log4j2.reconfiguring");
+			// org.apache.logging.log4j.core.config.ConfigurationSource source =
+			// new org.apache.logging.log4j.core.config.ConfigurationSource (is);
+			Object source = Utils.createInstance("org.apache.logging.log4j.core.config.ConfigurationSource",
+					new Object[] { is }, InputStream.class); // NON-NLS
+			// org.apache.logging.log4j.core.LoggerContext ctx = (org.apache.logging.log4j.core.LoggerContext)
+			// LogManager.getContext(false);
+			Object ctx = invoke("org.apache.logging.log4j.LogManager", "getContext", new Class[] { boolean.class },
+					false); // NON-NLS
+			// Configuration cfg = new XmlConfiguration((LoggerContext) ctx, (ConfigurationSource) source);
+			Object cfg = Utils.createInstance("org.apache.logging.log4j.core.config.xml.XmlConfiguration",
+					new Object[] { ctx, source }, ctx.getClass(), source.getClass()); // NON-NLS
+			// ctx.reconfigure(cfg);
+			invoke(ctx, "reconfigure",
+					new Class[] { Class.forName("org.apache.logging.log4j.core.config.Configuration") }, cfg); // NON-NLS
+		} catch (Exception exc) {
+			Utils.logThrowable(logger, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+					"LoggerUtils.log4j2.reconfiguring.fail", exc);
+		}
+
+		logger.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+				"LoggerUtils.log4j2.reconfiguring.end");
+	}
+
 	private static void setJULConfig(byte[] data, EventSink logger) {
-		InputStream is = new ByteArrayInputStream(data);
-		try {
+		try (InputStream is = new ByteArrayInputStream(data)) {
 			logger.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"LoggerUtils.jul.reconfiguring");
 			java.util.logging.LogManager.getLogManager().readConfiguration(is);
 		} catch (Exception exc) {
 			Utils.logThrowable(logger, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"LoggerUtils.jul.reconfiguring.fail", exc);
-		} finally {
-			Utils.close(is);
 		}
 
 		logger.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
@@ -153,8 +188,7 @@ public class LoggerUtils {
 	}
 
 	private static void setLogbackConfig(byte[] data, EventSink logger) {
-		InputStream is = new ByteArrayInputStream(data);
-		try {
+		try (InputStream is = new ByteArrayInputStream(data)) {
 			logger.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"LoggerUtils.logback.reconfiguring");
 			// ch.qos.logback.classic.LoggerContext context = (ch.qos.logback.classic.LoggerContext)
@@ -172,8 +206,6 @@ public class LoggerUtils {
 		} catch (Exception exc) {
 			Utils.logThrowable(logger, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"LoggerUtils.logback.reconfiguring.fail", exc);
-		} finally {
-			Utils.close(is);
 		}
 
 		logger.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),

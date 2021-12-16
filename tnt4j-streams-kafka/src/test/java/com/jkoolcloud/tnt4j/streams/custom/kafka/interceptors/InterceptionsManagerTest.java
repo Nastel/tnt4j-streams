@@ -33,11 +33,11 @@ import com.jkoolcloud.tnt4j.config.TrackerConfigStore;
 public class InterceptionsManagerTest {
 
 	static {
-		System.setProperty(TrackerConfigStore.TNT4J_PROPERTIES_KEY, "./config/intercept/tnt4j_kafka.properties");
+		System.setProperty(TrackerConfigStore.TNT4J_PROPERTIES_KEY, "./config/intercept/tnt4j_kafka_dev.properties");
 		System.setProperty("producer.config", "./config/intercept/producer.properties");
 		System.setProperty("consumer.config", "./config/intercept/consumer.properties");
 		System.setProperty("interceptors.config", "./config/intercept/interceptorsC.properties");
-		System.setProperty("log4j.configuration", "file:../config/log4j.properties");
+		System.setProperty("log4j2.configurationFile", "file:../config/log4j2.xml");
 	}
 
 	@Test
