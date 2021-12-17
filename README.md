@@ -3292,10 +3292,15 @@ definition contains SOAP request header `SOAPAction` and SOAP request body data
 This sample shows how to stream responses from JAX-RS as JSON data.
 
 Sample files can be found in `samples/restful-stream-json` directory. See
-the [`readme.md`](./tnt4j-streams-ws/samples/restful-stream-json/readme.md) file in that directory for information on usage and modifying the
-parser for your use.
+the [`readme.md`](./tnt4j-streams-ws/samples/restful-stream-json/readme.md) file in that directory for information on usage and modifying
+the parser for your use.
 
 Sample stream configuration:
+
+**NOTE:** To use this weather forecast sample, you will have to sign up for a free subscription to one of the weather services at
+[OpenWeatherMap](https://openweathermap.org/api) (for example, Current Weather Data or 5 Day Forecast) and get an API key (APPID), which
+must be substituted (replace placeholder `<YOUR_APP_TOKEN>`) in the URL line of streams config.
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <tnt-data-source
@@ -3322,17 +3327,17 @@ Sample stream configuration:
 
         <scenario name="Sample REST stream scenario">
             <step name="Step Kaunas"
-                  url="http://api.openweathermap.org/data/2.5/weather?q=Kaunas&amp;APPID=fa1fede9cbd6e26efdea1cdcbc714069&amp;units=metric"
+                  url="http://api.openweathermap.org/data/2.5/weather?q=Kaunas&amp;APPID=<YOUR_APP_TOKEN>&amp;units=metric"
                   method="GET">
                 <schedule-cron expression="0/15 * * * * ? *"/>
             </step>
             <step name="Step Vilnius"
-                  url="http://api.openweathermap.org/data/2.5/weather?q=Vilnius&amp;APPID=fa1fede9cbd6e26efdea1cdcbc714069&amp;units=metric"
+                  url="http://api.openweathermap.org/data/2.5/weather?q=Vilnius&amp;APPID=<YOUR_APP_TOKEN>&amp;units=metric"
                   method="GET">
                 <schedule-cron expression="0/30 * * * * ? *"/>
             </step>
             <step name="Step Klaipeda"
-                  url="http://api.openweathermap.org/data/2.5/weather?q=Klaipeda&amp;APPID=fa1fede9cbd6e26efdea1cdcbc714069&amp;units=metric"
+                  url="http://api.openweathermap.org/data/2.5/weather?q=Klaipeda&amp;APPID=<YOUR_APP_TOKEN>&amp;units=metric"
                   method="GET">
                 <schedule-simple interval="45" units="Seconds" repeatCount="10"/>
             </step>
@@ -3365,6 +3370,11 @@ the [`readme.md`](./tnt4j-streams-ws/samples/restful-stream-xml/readme.md) file 
 parser for your use.
 
 Sample stream configuration:
+
+**NOTE:** To use this weather forecast sample, you will have to sign up for a free subscription to one of the weather services at
+[OpenWeatherMap](https://openweathermap.org/api) (for example, Current Weather Data or 5 Day Forecast) and get an API key (APPID), which
+must be substituted (replace placeholder `<YOUR_APP_TOKEN>`) in the URL line of streams config.
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <tnt-data-source
@@ -3389,17 +3399,17 @@ Sample stream configuration:
 
         <scenario name="Sample REST stream scenario">
             <step name="Step Kaunas"
-                  url="http://api.openweathermap.org/data/2.5/weather?q=Kaunas&amp;APPID=fa1fede9cbd6e26efdea1cdcbc714069&amp;units=metric&amp;mode=xml"
+                  url="http://api.openweathermap.org/data/2.5/weather?q=Kaunas&amp;APPID=<YOUR_APP_TOKEN>&amp;units=metric&amp;mode=xml"
                   method="GET">
                 <schedule-cron expression="0/15 * * * * ? *"/>
             </step>
             <step name="Step Vilnius"
-                  url="http://api.openweathermap.org/data/2.5/weather?q=Vilnius&amp;APPID=fa1fede9cbd6e26efdea1cdcbc714069&amp;units=metric&amp;mode=xml"
+                  url="http://api.openweathermap.org/data/2.5/weather?q=Vilnius&amp;APPID=<YOUR_APP_TOKEN>&amp;units=metric&amp;mode=xml"
                   method="GET">
                 <schedule-cron expression="0/30 * * * * ? *"/>
             </step>
             <step name="Step Klaipeda"
-                  url="http://api.openweathermap.org/data/2.5/weather?q=Klaipeda&amp;APPID=fa1fede9cbd6e26efdea1cdcbc714069&amp;units=metric&amp;mode=xml"
+                  url="http://api.openweathermap.org/data/2.5/weather?q=Klaipeda&amp;APPID=<YOUR_APP_TOKEN>&amp;units=metric&amp;mode=xml"
                   method="GET">
                 <schedule-simple interval="45" units="Seconds" repeatCount="10"/>
             </step>
@@ -3416,9 +3426,9 @@ passes it to parser.
 `HaltIfNoParser` property indicates that stream should skip unparseable entries.
 
 Streaming scenario consists of three steps defining service request URL's, request methods (all `GET`) and scheduler definitions. 
-Step named `Step Kaunas` defines Cron scheduler expression stating: `invoke every 15 seconds`.
-Step named `Step Vilnius` defines Cron scheduler expression stating: `invoke every 30 seconds`.
-Step named `Step Klaipeda` defines simple scheduler expression stating: `10 times with 45 seconds interval`.
+* Step named `Step Kaunas` defines Cron scheduler expression stating: `invoke every 15 seconds`.
+* Step named `Step Vilnius` defines Cron scheduler expression stating: `invoke every 30 seconds`.
+* Step named `Step Klaipeda` defines simple scheduler expression stating: `10 times with 45 seconds interval`.
 
 `RESTResponseParser` maps XML data values to activity event fields `Location`, `GeoLocation`, `Temperature`, `Humidity`
 and `Wind Speed`.
@@ -3820,8 +3830,8 @@ This sample shows how to stream Nagios monitoring reports data as activity event
 Sample files can be found in `samples/nagios-nagios2json` directory (`tnt4j-streams-ws` module).
 
 **NOTE:** to use this sample Nagios should be running extension `nagios2json`.
-See [Sample README](tnt4j-streams-ws/samples/nagios-nagios2json/readme.md) for details. `nagios2json` extension works as `CGI` script, but can
-be handled as simple RESTful service.
+See [Sample README](tnt4j-streams-ws/samples/nagios-nagios2json/readme.md) for details. `nagios2json` extension works as `CGI` script, but
+can be handled as simple RESTful service.
 
 Sample report data is available in `report.json` file.
 
@@ -4526,11 +4536,11 @@ To define dynamic property value resolution define property using pattern:
 where `env.property.name` is property name from one of defined sources set, e.g.:
 ```xml
     <!-- Java system properties -->
-<property name="UsedJava" value="${java.version}"/>
-        <!-- OS environment variables -->
-<property name="JavaHome" value="${JAVA_HOME}"/>
-        <!-- TNT4J properties -->
-<property name="SinkLogFile" value="${event.sink.factory.Filename}"/>
+    <property name="UsedJava" value="${java.version}"/>
+    <!-- OS environment variables -->
+    <property name="JavaHome" value="${JAVA_HOME}"/>
+    <!-- TNT4J properties -->
+    <property name="SinkLogFile" value="${event.sink.factory.Filename}"/>
 ```
 
 It is also possible to use dynamic property value resolution for a fragment of property value:
@@ -4571,7 +4581,7 @@ These parameters are applicable to all types of streams.
 <property name="ExecutorsTerminationTimeout" value="20"/>
 <property name="ExecutorsBoundedModel" value="true"/>
 <property name="ExecutorRejectedTaskOfferTimeout" value="20"/>
-        <!-- to define "ping" log entry on every 200th streamed activity entity, or if 30sec. elapsed since last "ping" entry -->
+<!-- to define "ping" log entry on every 200th streamed activity entity, or if 30sec. elapsed since last "ping" entry -->
 <property name="PingLogActivityCount" value="200"/>
 <property name="PingLogActivityDelay" value="30"/>
 ```
@@ -5233,7 +5243,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 <property name="CMQC.USE_MQCSP_AUTHENTICATION_PROPERTY" value="true"/>
 <property name="CMQC.THREAD_AFFINITY_PROPERTY" value="false"/>
 <.../>
-        <!-- MULTIPLE INSTANCES (MI) host configurations -->
+<!-- MULTIPLE INSTANCES (MI) host configurations -->
 <property name="Host" value="wmq.sample1.com(1420),wmq.sample2.com(1421)"/>
 <property name="Host" value="wmq.sample1.com:1420,wmq.sample2.com:1421"/>
 <property name="Host" value="wmq.sample1.com,wmq.sample2.com"/>
@@ -5360,89 +5370,89 @@ request/invocation/execution parameters and scheduler. Steps are invoked/execute
 
   sample:
 ```xml
-    <!-- Sample scenario for RESTful services request -->
+<!-- Sample scenario for RESTful services request -->
 <scenario name="Sample REST stream scenario">
     <step name="Step Kaunas"
-          url="http://api.openweathermap.org/data/2.5/weather?q=Kaunas&amp;APPID=fa1fede9cbd6e26efdea1cdcbc714069&amp;units=metric"
+          url="http://api.openweathermap.org/data/2.5/weather?q=Kaunas&amp;APPID=<YOUR_APP_TOKEN>&amp;units=metric"
           method="GET">
         <schedule-cron expression="0/15 * * * * ? *"/>
     </step>
     <.../>
     <step name="Step Klaipeda"
-          url="http://api.openweathermap.org/data/2.5/weather?q=Klaipeda&amp;APPID=fa1fede9cbd6e26efdea1cdcbc714069&amp;units=metric"
+          url="http://api.openweathermap.org/data/2.5/weather?q=Klaipeda&amp;APPID=<YOUR_APP_TOKEN>&amp;units=metric"
           method="GET">
         <schedule-simple interval="45" units="Seconds" repeatCount="10"/>
     </step>
 </scenario>
-        <!-- Sample scenario for SOAP services request -->
+<!-- Sample scenario for SOAP services request -->
 <scenario name="Sample WS stream scenario">
-<step name="Step 1"
-      url="http://wsdot.wa.gov/traffic/api/WeatherInformation/WeatherInformation.svc">
-    <schedule-simple interval="35" units="Seconds" repeatCount="10"/>
-    <request>
-        <![CDATA[
-            SOAPAction:http://tempuri.org/IWeatherInformation/GetCurrentWeatherInformationByStationID
-            <tem:GetCurrentWeatherInformationByStationID xmlns:tem="http://tempuri.org/">
-                <tem:AccessCode>aeb652b7-f6f5-49e6-9bdb-e2b737ebd507</tem:AccessCode>
-                <tem:StationID>1909</tem:StationID>
-            </tem:GetCurrentWeatherInformationByStationID>
-        ]]>
-    </request>
-</step>
+	<step name="Step 1"
+	      url="http://wsdot.wa.gov/traffic/api/WeatherInformation/WeatherInformation.svc">
+	    <schedule-simple interval="35" units="Seconds" repeatCount="10"/>
+	    <request>
+	        <![CDATA[
+	                SOAPAction:http://tempuri.org/IWeatherInformation/GetCurrentWeatherInformationByStationID
+	                <tem:GetCurrentWeatherInformationByStationID xmlns:tem="http://tempuri.org/">
+	                    <tem:AccessCode>aeb652b7-f6f5-49e6-9bdb-e2b737ebd507</tem:AccessCode>
+	                    <tem:StationID>1909</tem:StationID>
+	                </tem:GetCurrentWeatherInformationByStationID>
+	            ]]>
+	    </request>
+	</step>
 </scenario>
-        <!-- Sample scenario for System Cmd invocation -->
+<!-- Sample scenario for System Cmd invocation -->
 <scenario name="Sample CMD stream scenario">
-<step name="Step Windows">
-    <request>typeperf "\Processor(_Total)\% Processor Time" -sc 1</request>
-    <schedule-simple interval="25" units="Seconds" repeatCount="-1"/>
-</step>
+	<step name="Step Windows">
+	    <request>typeperf "\Processor(_Total)\% Processor Time" -sc 1</request>
+	    <schedule-simple interval="25" units="Seconds" repeatCount="-1"/>
+	</step>
 </scenario>
-        <!-- Sample of request and parser mapping -->
+<!-- Sample of request and parser mapping -->
 <scenario name="RabbitMQ Sampling scenario">
-<step name="All RabbitMQ metrics">
-    <schedule-simple interval="30" units="Seconds" repeatCount="-1"/>
+	<step name="All RabbitMQ metrics">
+	    <schedule-simple interval="30" units="Seconds" repeatCount="-1"/>
 
-    <request>
-        python rabbitmqadmin -f raw_json list users
+	    <request>
+	        python rabbitmqadmin -f raw_json list users
 
-        <parser-ref name="UsersRespParser"/>
-    </request>
-    <request>
-        python rabbitmqadmin -f raw_json list vhosts
+	        <parser-ref name="UsersRespParser"/>
+	    </request>
+	    <request>
+	        python rabbitmqadmin -f raw_json list vhosts
 
-        <parser-ref name="HostsRespParser"/>
-    </request>
-    <request>
-        python rabbitmqadmin -f raw_json list overview
+	        <parser-ref name="HostsRespParser"/>
+	    </request>
+	    <request>
+	        python rabbitmqadmin -f raw_json list overview
 
-        <parser-ref name="OverviewRespParser"/>
-    </request>
-</step>
+	        <parser-ref name="OverviewRespParser"/>
+	    </request>
+	</step>
 </scenario>
-        <!-- Sample scenario for JDBC query invocation -->
+<!-- Sample scenario for JDBC query invocation -->
 <scenario name="Sample DB2-JDBC stream scenario">
-<step name="Step Query1" url="jdbc:db2://[HOST]:50000/SB2BIDB" username="[USER_NAME]" password="[USER_PASS]">
-    <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="3" startDelayUnits="Minutes"/>
+	<step name="Step Query1" url="jdbc:db2://[HOST]:50000/SB2BIDB" username="[USER_NAME]" password="[USER_PASS]">
+	    <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="3" startDelayUnits="Minutes"/>
 
-    <request>
-        <![CDATA[
-            SELECT *
-            FROM TRANS_DATA
-            WHERE CREATION_DATE > ?
-            ORDER by CREATION_DATE DESC
-            FETCH FIRST 100 ROWS ONLY
-        ]]>
-        <req-param id="1" value="${LastRecordCDate}" type="TIMESTAMP"/>
+	    <request>
+	        <![CDATA[
+	            SELECT *
+	            FROM TRANS_DATA
+	            WHERE CREATION_DATE > ?
+	            ORDER by CREATION_DATE DESC
+	            FETCH FIRST 100 ROWS ONLY
+	        ]]>
+	        <req-param id="1" value="${LastRecordCDate}" type="TIMESTAMP"/>
 
-        <condition id="When to stop stream" resolution="STOP">
-            <matchExp><![CDATA[
-                {LastRecordIndex} > 2000
-            ]]></matchExp>
-        </condition>
+	        <condition id="When to stop stream" resolution="STOP">
+	            <matchExp><![CDATA[
+	                {LastRecordIndex} > 2000
+	            ]]></matchExp>
+	        </condition>
 
-        <parser-ref name="SampleResultSetParser"/>
-    </request>
-</step>
+	        <parser-ref name="SampleResultSetParser"/>
+	    </request>
+	</step>
 </scenario>
 ```
 
@@ -5460,7 +5470,7 @@ Generic configuration properties:
 ```xml
 <property name="SynchronizeRequests" value="true"/>
 <property name="DropRecurrentRequests" value="false"/>
-        <!-- Quartz configuration -->
+<!-- Quartz configuration -->
 <property name="org.quartz.scheduler.instanceName" value="MyStreamScheduler"/>
 <property name="org.quartz.threadPool.threadCount" value="5"/>
 <.../>
@@ -5476,7 +5486,7 @@ Generic configuration properties:
   sample:
 ```xml
 <property name="DisableSSL" value="true"/>
-        <!-- Custom WS request properties -->
+<!-- Custom WS request properties -->
 <property name="WsEndpoint" value="https://192.168.3.3/ws"/>
 <.../>
 ```
@@ -5542,14 +5552,14 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
  ```xml
 <property name="QueryFetchRows" value="500"/>
 <property name="QueryMaxRows" value="50000"/>
-        <!-- HikariCP configuration properties -->
+<!-- HikariCP configuration properties -->
 <property name="autoCommit" value="false"/>
 <property name="readOnly" value="true"/>
 <property name="maximumPoolSize" value="5"/>
 <property name="maxLifetime" value="1680000"/> <!-- 28 minutes -->
 <property name="idleTimeout" value="600000"/> <!-- 10 minutes -->
 <property name="connectionTimeout" value="30000"/> <!-- 30 seconds -->
-        <!-- Oracle JDBC data source configuration properties -->
+<!-- Oracle JDBC data source configuration properties -->
 <property name="jdbc.v$session.program" value="B2Bi-JDBC-Stream"/>
  ```
 
@@ -5944,20 +5954,20 @@ Using `#` locator without any manual map entry mapping is equivalent to `*` loca
 <property name="DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY" value="false"/>
 <property name="DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES" value="true"/>
 <.../>
-        <!-- Jackson Object Mapper's mapping features -->
+<!-- Jackson Object Mapper's mapping features -->
 <property name="MapperFeature.USE_ANNOTATIONS" value="true"/>
 <property name="MapperFeature.USE_GETTERS_AS_SETTERS" value="true"/>
 <property name="MapperFeature.PROPAGATE_TRANSIENT_MARKER" value="false"/>
 <property name="MapperFeature.AUTO_DETECT_CREATORS" value="true"/>
 <property name="MapperFeature.AUTO_DETECT_FIELDS" value="true"/>
 <.../>
-        <!-- Jackson Object Mapper's parser features -->
+<!-- Jackson Object Mapper's parser features -->
 <property name="JsonParser.AUTO_CLOSE_SOURCE" value="true"/>
 <property name="JsonParser.ALLOW_COMMENTS" value="false"/>
 <property name="JsonParser.ALLOW_YAML_COMMENTS" value="false"/>
 <property name="JsonParser.ALLOW_UNQUOTED_FIELD_NAMES" value="false"/>
 <.../>
-        <!-- JsonPath configuration options -->
+<!-- JsonPath configuration options -->
 <property name="Option.DEFAULT_PATH_LEAF_TO_NULL"/>
 <property name="Option.ALWAYS_RETURN_LIST"/>
 <property name="Option.AS_PATH_LIST"/>
@@ -6015,7 +6025,7 @@ Additional JMS message fields and mappings are supported by these locators for t
       ```
       this will add all manually unmapped `MsgMetadata` map entries as JKool activity entity fields/properties, taking field/property name
       from map entry name and value from map entry value. **NOTE:** Using `#` locator without any manual map entry mapping is equivalent to
-  `*` locator.
+      `*` locator.
 
 Also see ['Activity map parser'](#activity-map-parser) and [Generic parser parameters](#generic-parser-parameters).
 

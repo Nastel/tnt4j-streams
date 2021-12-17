@@ -25,17 +25,17 @@
 
         <scenario name="Sample REST stream scenario">
             <step name="Step Kaunas"
-                  url="http://api.openweathermap.org/data/2.5/weather?q=Kaunas&amp;APPID=fa1fede9cbd6e26efdea1cdcbc714069&amp;units=metric"
+                  url="http://api.openweathermap.org/data/2.5/weather?q=Kaunas&amp;APPID=<YOUR_APP_TOKEN>&amp;units=metric"
                   method="GET">
                 <schedule-cron expression="0/15 * * * * ? *"/>
             </step>
             <step name="Step Vilnius"
-                  url="http://api.openweathermap.org/data/2.5/weather?q=Vilnius&amp;APPID=fa1fede9cbd6e26efdea1cdcbc714069&amp;units=metric"
+                  url="http://api.openweathermap.org/data/2.5/weather?q=Vilnius&amp;APPID=<YOUR_APP_TOKEN>&amp;units=metric"
                   method="GET">
                 <schedule-cron expression="0/30 * * * * ? *"/>
             </step>
             <step name="Step Klaipeda"
-                  url="http://api.openweathermap.org/data/2.5/weather?q=Klaipeda&amp;APPID=fa1fede9cbd6e26efdea1cdcbc714069&amp;units=metric"
+                  url="http://api.openweathermap.org/data/2.5/weather?q=Klaipeda&amp;APPID=<YOUR_APP_TOKEN>&amp;units=metric"
                   method="GET">
                 <schedule-simple interval="45" units="Seconds" repeatCount="10"/>
             </step>
