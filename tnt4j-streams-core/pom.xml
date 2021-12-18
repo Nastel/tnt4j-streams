@@ -32,7 +32,7 @@
         <dropwizard.metrics.version>4.2.4</dropwizard.metrics.version>
 
         <org.slf4j.version>1.7.32</org.slf4j.version>
-        <log4j.version>2.16.0</log4j.version>
+        <log4j.version>2.17.0</log4j.version>
         <logback.version>1.2.7</logback.version>
         <tnt4j.logger.version>0.3.2</tnt4j.logger.version>
         <jslt.version>0.1.11</jslt.version>
