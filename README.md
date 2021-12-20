@@ -199,7 +199,7 @@ Mapping of streamed data to activity event fields are performed by parser. To ma
 * tags:
     * `field-map` - tag is used to perform manual mapping from streamed data value `source` to field value `target.`
 
-sample:
+Sample:
 ```xml
 <parser name="TokenParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityTokenParser">
     <.../>
@@ -385,7 +385,7 @@ value to `EVENT`.
 
 **NOTE:** Custom fields values can be found as activity event properties:
 
-sample:
+Sample:
 ```xml
 <field name="Transport" locator="ActivityTransport" locator-type="Label"/>
 <field name="Topic" locator="TopicName" locator-type="Label"/>
@@ -481,7 +481,7 @@ make separate set of related child activities.
 
 **NOTE:** if upper level parser resolved data is incompatible with stacked parser, stacked parser is not applied to parse that data.
 
-sample:
+Sample:
 ```xml
 <tnt-data-source
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -4536,11 +4536,11 @@ To define dynamic property value resolution define property using pattern:
 where `env.property.name` is property name from one of defined sources set, e.g.:
 ```xml
     <!-- Java system properties -->
-    <property name="UsedJava" value="${java.version}"/>
-    <!-- OS environment variables -->
-    <property name="JavaHome" value="${JAVA_HOME}"/>
-    <!-- TNT4J properties -->
-    <property name="SinkLogFile" value="${event.sink.factory.Filename}"/>
+<property name="UsedJava" value="${java.version}"/>
+        <!-- OS environment variables -->
+<property name="JavaHome" value="${JAVA_HOME}"/>
+        <!-- TNT4J properties -->
+<property name="SinkLogFile" value="${event.sink.factory.Filename}"/>
 ```
 
 It is also possible to use dynamic property value resolution for a fragment of property value:
@@ -4574,7 +4574,7 @@ These parameters are applicable to all types of streams.
   not used directly by stream itself, but can be used in stream bound parsers configuration over dynamic locators or variable expressions to
   enrich parsing context. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="UseExecutors" value="true"/>
 <property name="ExecutorThreadsQuantity" value="5"/>
@@ -4595,7 +4595,7 @@ These parameters are applicable to all types of streams.
 * `FileName` - defines file name to persist cache entries as XML. Default value - `./persistedCache.xml`. (Optional)
 * `PersistingPeriod` - cache persisting period in seconds. Value `<= 0` disables periodic persisting. Default value - `0`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="MaxSize" value="500"/>
 <property name="ExpireDuration" value="30"/>
@@ -4612,7 +4612,7 @@ These parameters are applicable to streams which uses parsers to parse incoming 
   log entry and continues. Default value - `false`. (Optional)
 * `GroupingActivityName` - name of ACTIVITY entity used to group excel workbook streamed events. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="HaltIfNoParser" value="true"/>
 <property name="GroupingActivityName" value="Events from XLSX file"/>
@@ -4621,12 +4621,12 @@ These parameters are applicable to streams which uses parsers to parse incoming 
 ##### Buffered streams parameters
 
 * `BufferSize` - maximal buffer queue capacity. Default value - `1024`. (Optional)
-* `BufferDropWhenFull` - flag indicating to drop buffer queue offered Raw activity data entries when queue gets full. Default value
-    - `false`. (Optional, deprecated - use `FullBufferAddPolicy` instead)
+* `BufferDropWhenFull` - flag indicating to drop buffer queue offered Raw activity data entries when queue gets full. Default value -
+  `false`. (Optional, deprecated - use `FullBufferAddPolicy` instead)
 * `FullBufferAddPolicy` - defines policy how to perform adding new RAW activity data entry, when buffer queue is full: `WAIT` or `DROP`.
   Default value - `WAIT. (Optional)
 
-  sample:
+Sample:
  ```xml
 <property name="BufferSize" value="2048"/>
 <property name="BufferDropWhenFull" value="true"/>
@@ -4644,8 +4644,8 @@ Stream output can be configured using these configuration properties:
 * `RetryStateCheck` - flag indicating whether tracker state check shall be performed repeatedly, or number of retries to perform. If
   `false`, then streaming process exits with `java.lang.IllegalStateException` on first failure. If `true`, then state check retry procedure
   repeats until success (may repeat infinite number of times). Default value - `false` or `1`. (Optional)
-* `RetryPeriod` - period in seconds to wait before next issue of state check or activity recording operation after failure. Default value
-   - `10sec.`. (Optional)
+* `RetryPeriod` - period in seconds to wait before next issue of state check or activity recording operation after failure. Default value -
+  `10sec.`. (Optional)
 * `RetryInterval` - alias for `RetryPeriod`. (Optional)
 * `ResolveServerFromDNS` - flag indicating whether to resolve activity entity host name/IP from DNS server. Default value - `false`. (
   Optional)
@@ -4655,12 +4655,12 @@ Stream output can be configured using these configuration properties:
 * `BuildSourceFQNFromStreamedData` - flag indicating whether to set streamed activity entity `Source` FQN build from activity fields data
   instead of default on configured in `tnt4j.properties`. Default value - `true`. (Optional)
 * `SourceFQN` - `Source` FQN pattern to be used when building it from streamed activity entity fields values. Format
-  is: `SourceType1=${FieldName1}#SourceType2=${FieldName2}#SourceType3=${FieldName3}...`. Default value
-  - `APPL=${ApplName}#USER=${UserName}#SERVER=${ServerName}#NETADDR=${ServerIp}#GEOADDR=${Location}`. (Optional)
+  is: `SourceType1=${FieldName1}#SourceType2=${FieldName2}#SourceType3=${FieldName3}...`. Default value -
+  `APPL=${ApplName}#USER=${UserName}#SERVER=${ServerName}#NETADDR=${ServerIp}#GEOADDR=${Location}`. (Optional)
 * `SendStreamStates` - flag indicating whether to send stream status change messages (`startup`/`shutdown`) to output endpoint e.g.
   [jKoolCloud](https://www.jkoolcloud.com/). Default value - `true`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="TNT4JConfigFile" value="../../configuration/tnt4j.properties"/>
 <tnt4j-properties>
@@ -4728,7 +4728,7 @@ or
     * `tags` - tags list (delimited using `,`) for a parser. Tags are used to map incoming parseable data package with parser instance
       dedicated to parse it.
 
-  sample:
+Sample:
 ```xml
 <tnt-data-source
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -4751,7 +4751,7 @@ or
     * `matchExp` - defines context or data match criteria (expression) for a parser reference. If match criteria does not match incoming
       data or parsing context, that parser will be not applied to parse the data.
 
-  sample:
+Sample:
 ```xml
 <tnt-data-source
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -4910,8 +4910,8 @@ and Oracle's [Using XPath Functions](https://docs.oracle.com/cd/E35413_01/doc.72
 * `StartFromLatest` - flag `true/false` indicating that streaming should be performed from latest file entry line. If `false` - then all
   lines from available files are streamed on startup. Actual only if `FilePolling` or `RestoreState` properties are set to `true`. Default
   value - `true`. (Optional)
-* `RangeToStream` - defines the colon-separated range of file line numbers that should be parsed and streamed to jKoolCloud. Default value
-   - `1:`. (Optional)
+* `RangeToStream` - defines the colon-separated range of file line numbers that should be parsed and streamed to jKoolCloud. Default value -
+  `1:`. (Optional)
 * `ActivityDelim` - defines activities data delimiter used by stream. Value can be: `EOL` - end of line, `EOF` - end of file/stream, or any
   user defined symbol or string. Default value - `EOL`. (Optional)
 * `KeepLineSeparators` - flag indicating whether to return line separators at the end of read line. Default value - `false`. (Optional)
@@ -4922,7 +4922,7 @@ and Oracle's [Using XPath Functions](https://docs.oracle.com/cd/E35413_01/doc.72
   `java.nio.charset.Charset#forName(String)` to be handled properly. `guess` value indicates that stream (except HDFS) shall guess charset
   using some set of first bytes from file. Default value - one returned by `java.nio.charset.Charset#defaultCharset()`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="FileName" value="C:/Tomcat_7_0_34/logs/localhost_access_log.*.txt"/>
 <property name="FileReadDelay" value="5"/>
@@ -4946,7 +4946,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 * `Port` - port number to accept character stream over TCP/IP. (Required - just one of: `FileName` or `Port`)
 * `RestartOnInputClose` - flag indicating to restart stream if input socked gets closed. Default value - `false`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="FileName" value="messages.json"/>
 ```
@@ -4999,7 +4999,7 @@ General stream configuration parameters:
   (Optional)
 * set of target JSR-203 compliant `FileSystemProvider` supported properties
 
-  sample:
+Sample:
 ```xml
 <property name="Host" value="172.16.6.26"/>
 <property name="Port" value="22"/>
@@ -5021,7 +5021,7 @@ JSR-203 File Bytes feed stream class name is `com.jkoolcloud.tnt4j.streams.input
 * `FileName` - the system-dependent file name: path or URI. (Required)
 * `RestartOnInputClose` - flag indicating to restart stream if input socked gets closed. Default value - `false`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="FileName" value="ssh.unix:///home/osboxes/single-log/orders.log"/>
 <property name="RestartOnInputClose" value="true"/>
@@ -5036,7 +5036,7 @@ JSR-203 File Line stream class name is `com.jkoolcloud.tnt4j.streams.inputs.File
 
 * `FileName` - the system-dependent file name or file name pattern defined using wildcard character `*`: path or URI. (Required)
 
-  sample:
+Sample:
 ```xml
 <property name="FileName" value="ssh.unix:///home/osboxes/single-log/orders.log"/>
 ```
@@ -5051,7 +5051,7 @@ and ['File line stream parameters (also from Hdfs)'](#file-line-stream-parameter
   `java.nio.charset.Charset#forName(String)` to be handled properly. Default value - one returned by
   `java.nio.charset.Charset#defaultCharset()`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="InputCloseable" value="false"/>
 <property name="Charset" value="UTF-16LE"/>
@@ -5083,7 +5083,7 @@ Stream class: `com.jkoolcloud.tnt4j.streams.inputs.HttpStream`
     * `KeystorePass` - keystore password. (Optional) Actual only if `UseSSL` is set to `true`.
     * `KeyPass` - key password. (Optional) Actual only if `UseSSL` is set to `true`.
 
-  sample:
+Sample:
 ```xml
 <property name="Port" value="8081"/>
 <property name="UseSSL" value="true"/>
@@ -5104,7 +5104,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 * List of JNDI context configuration properties supported by JMS server implementation. See `javax.naming.Context` for more details.
   (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="java.naming.provider.url" value="tcp://localhost:61616"/>
 <property name="Topic" value="topic.SampleJMSTopic,topic.OtherSampleJMSTopic"/>
@@ -5134,7 +5134,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 * List of Kafka Consumer configuration properties.
   See [Kafka Consumer configuration reference](https://kafka.apache.org/documentation/#consumerconfigs).
 
-  sample:
+Sample:
 ```xml
 <property name="Topic" value="TNT4JKafkaTestTopic"/>
 <property name="Offset" value="2"/>
@@ -5177,7 +5177,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Parse
     * `Keystore` - keystore path. (Optional) Actual only if `UseSSL` is set to `true`.
     * `KeystorePass` - keystore password. (Optional) Actual only if `UseSSL` is set to `true`.
 
-  sample:
+Sample:
 ```xml
 <property name="ServerURI" value="tcp://localhost:1883"/>
 <property name="Topic" value="TNT4JStreams"/>
@@ -5228,7 +5228,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 * `CMQC.XXXXXXX_PROPERTY` - any `CMQC` defined Queue Manager connection property. You can define multiple `CMQC` connection properties per
   `stream` definition, but only one per `property` definition. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="QueueManager" value="QMGR"/>
 <property name="Queue" value="SYSTEM.ADMIN.TRACE.ACTIVITY.QUEUE"/>
@@ -5262,7 +5262,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters).
 * `SuppressBrowseGets` - flag indicating whether to exclude WMQ BROWSE type GET operation traces from streaming. Default value - `false`.
   (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="TraceOperations" value="MQXF_(GET|PUT|CLOSE)"/>
 <property name="ExcludedRC" value="MQRC_NO_MSG_AVAILABLE|30737"/>
@@ -5305,7 +5305,7 @@ KeyStore/TrustStore, to run WMQ stream you'll need:
   `java.nio.charset.Charset#forName(String)` to be handled properly. Default value - one returned by
   `java.nio.charset.Charset#defaultCharset()`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="FileName" value="./tnt4j-streams-core/samples/zip-stream/sample.gz"/>
 <property name="ArchType" value="GZIP"/>
@@ -5368,7 +5368,7 @@ request/invocation/execution parameters and scheduler. Steps are invoked/execute
                 * `matchExp` tag is used to define evaluation match expression to check if request context (request parameters value, stream
                   properties, cache values) matches it
 
-  sample:
+Sample:
 ```xml
 <!-- Sample scenario for RESTful services request -->
 <scenario name="Sample REST stream scenario">
@@ -5466,7 +5466,7 @@ Generic configuration properties:
 * List of Quartz configuration properties.
   See [Quartz Configuration Reference](http://www.quartz-scheduler.org/documentation/quartz-2.3.0/configuration/) for details. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="SynchronizeRequests" value="true"/>
 <property name="DropRecurrentRequests" value="false"/>
@@ -5483,7 +5483,7 @@ Generic configuration properties:
   and put property with same name into stream properties list (e.g. `<property name="WsEndpoint" value="https://192.168.3.3/ws"/>`) to have
   value mapped into request data. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="DisableSSL" value="true"/>
 <!-- Custom WS request properties -->
@@ -5498,7 +5498,7 @@ Generic configuration properties:
 * `SecurityResponseParserTag` - defines tag value used to map `login` request data and parser used to parse it. Default value - `login`.
   (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="SecurityCachedTokenKey" value="SessionIDToken"/>
 <property name="SecurityResponseParserTag" value="loginData"/>
@@ -5512,7 +5512,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
   (Optional)
 * `DefaultMaxPerRouteConnections` - defines the maximum number of concurrent connections per HTTP route. Default value - `2`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="MaxTotalPoolConnections" value="10"/>
 <property name="DefaultMaxPerRouteConnections" value="4"/>
@@ -5548,7 +5548,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 * when `UseExecutors` is set to `true` and `ExecutorThreadsQuantity` is greater than `1`, value for that property is reset to `1` since
   `java.sql.ResultSet` can't be accessed in multi-thread manner.
 
-  sample:
+Sample:
  ```xml
 <property name="QueryFetchRows" value="500"/>
 <property name="QueryMaxRows" value="50000"/>
@@ -5572,10 +5572,10 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 * `RestartOnInputClose` - flag indicating to restart Server Socket (open new instance) if listened one gets closed or fails to accept
   connection. (Optional)
 * `BufferSize` - maximal buffer queue capacity. Default value - `1024`. (Optional)
-* `BufferDropWhenFull` - flag indicating to drop buffer queue offered Raw activity data entries when queue gets full. Default value
-   - `false`. (Optional)
+* `BufferDropWhenFull` - flag indicating to drop buffer queue offered Raw activity data entries when queue gets full. Default value -
+  `false`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="FileName" value="tnt4j-stream-activities.log"/>
 ```
@@ -5595,7 +5595,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters).
 * `SheetsToProcess` - defines workbook sheets name filter mask (wildcard or RegEx) to process only sheets which names matches this mask. (Optional)
 * `WorkbookPassword` - excel workbook password. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="FileName" value="./tnt4j-streams-msoffice/samples/xlsx-rows/sample.xlsx"/>
 <property name="SheetsToProcess" value="Sheet(1|8|12)"/>
@@ -5609,7 +5609,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Parse
 * `RangeToStream` - defines the colon-separated range of spreadsheet row numbers that should be parsed and streamed to jKoolCloud. Default
   value - `1:`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="RangeToStream" value="5:30"/>
 ```
@@ -5635,13 +5635,13 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 ##### Attributes
 
 * `manualFieldsOrder` - flag indicating whether configuration defined fields order shall be preserved in streaming process. By default
-  fields are ordered by value resolution type: RAW activity data values, activity entity fields values, cache entries values. Default value
-  - `false`.
+  fields are ordered by value resolution type: RAW activity data values, activity entity fields values, cache entries values. Default value -
+  `false`.
 * `default-data-type` - specifies default `datatype` attribute value bound for all fields/locators of this parser. Default value - `String`.
   See See ['TNT4J Events field mappings'](#tnt4j-events-field-mappings) for attribute `datatype` details.
 * `default-emptyAsNull` - specifies default `emptyAsNull` attribute value for all fields/locators of this parser. Default value - `true`.
 
-  sample:
+Sample:
 ```xml
 <parser name="TestParser" class="com.my.company.ActivityTestParser" manualFieldsOrder="true" default-data-type="Generic" default-emptyAsNull="false">
     <.../>
@@ -5666,7 +5666,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
   not used directly by parser itself, but can be used in parser configuration over dynamic locators or variable expressions to enrich
   parsing context. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="UseActivityDataAsMessageForUnset" value="true"/>
 <property name="ActivityDelim" value="EOF"/>
@@ -5694,7 +5694,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
   map data contained values to name/value pair. **NOTE:** this parameter takes preference on `FieldDelim` and `ValueDelim` parameters.
   (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="FieldDelim" value=";"/>
 <property name="ValueDelim" value="-"/>
@@ -5712,7 +5712,7 @@ Also see [Activity map parser](#activity-map-parser) regarding higher level pars
   pattern should match complete input string, or `FIND` - pattern has to match sub-sequence within input string. Default value - `MATCH`.
   (Optional)
 
-  sample:
+Sample:
 * index-capturing groups:
     ```xml
         <property name="Pattern" value="((\S+) (\S+) (\S+))"/>
@@ -5764,7 +5764,7 @@ Also see [Generic parser parameters](#generic-parser-parameters).
 * `StripQuotes` - whether surrounding double quotes should be stripped from extracted data values. Default value -
   `true`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="FieldDelim" value=";"/>
 <property name="Pattern" value="(\S+)"/>
@@ -5781,7 +5781,7 @@ use [TNT4J-Streams predefined custom XPath functions](#tnt4j-streams-predefined-
 * `Namespace` - additional XML namespace mappings. Default value - `null`. (Optional)
 * `NamespaceAware` - indicates that parser has to provide support for XML namespaces. Default value - `true`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="Namespace" value="xsi=http://www.w3.org/2001/XMLSchema-instance"/>
 <property name="Namespace" value="tnt4j=https://jkool.jkoolcloud.com/jKool/xsds"/>
@@ -5823,7 +5823,7 @@ Sample of field definition for signature calculation:
 * `LogPattern` - access log pattern. (Optional, if RegEx `Pattern` property is defined)
 * `ConfRegexMapping` - custom log pattern token and RegEx mapping. (Optional, actual only if `LogPattern` property is used)
 
-  sample:
+Sample:
 ```xml
 <property name="LogPattern" value="%h %l %u %t &quot;%r&quot; %s %b %D"/>
 <property name="ConfRegexMapping" value="%h=(\S+)"/>
@@ -5881,10 +5881,10 @@ Also see [Generic parser parameters](#generic-parser-parameters).
 
 #### Activity map parser
 
-* `LocPathDelim` - locator path in map delimiter. Empty value means locator value should not be delimited into path elements. Default value
-  - `.`. (Optional)
+* `LocPathDelim` - locator path in map delimiter. Empty value means locator value should not be delimited into path elements. Default value -
+  `.`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="LocPathDelim" value="/"/>
 ```
@@ -5944,7 +5944,7 @@ Using `#` locator without any manual map entry mapping is equivalent to `*` loca
 * List of `Option.[OPTION_NAME]` - defines set of JsonPath configuration options. See
   [Option](https://javadoc.io/doc/com.jayway.jsonpath/json-path/latest/com/jayway/jsonpath/Option.html). (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="ReadLines" value="false"/>
 <!-- Jackson Object Mapper's Deserialization features -->
@@ -5981,7 +5981,7 @@ Also see [Generic parser parameters](#generic-parser-parameters).
 * `ConvertToString` - flag indicating whether to convert message payload `byte[]` data to string. Applicable to `BytesMessage` and
   `StreamMessage`. Default value - `false`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="ConvertToString" value="true"/>
 ```
@@ -6066,7 +6066,7 @@ List of predefined locators for this parser:
   field/locator data type is `String` (meaning translated value can be assigned to field). If value of particular field should be left as
   number (e.g., `ReasonCode`), use field/locator attribute `datatype="Number"`. Default value - `true`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="TranslateNumValues" value="false"/> 
 ```
@@ -6208,7 +6208,7 @@ IBM MQ versions starting `9.1` adds these additional entries:
 * `SupportedClass` - defines class name of parser supported objects. Parser can have multiple definitions of this property. It is useful
   when just some specific set of objects has to be handled by this parser instead of all passed objects. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="SupportedClass" value="org.apache.kafka.common.TopicPartition"/>
 <property name="SupportedClass" value="com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.KafkaTraceEventData"/>
@@ -6239,7 +6239,7 @@ This parser resolved data map may contain such entries:
   is set to `true` - original cell value provided by Apache POI API is used e.g., making all numeric cells values as decimals (`double`)
   what is not very comfortable when entered cell value is `integer`. Default value - `false`. (Optional)
 
-  sample:
+Sample:
 ```xml
 <property name="UseFormattedCellValue" value="true"/>
 ```

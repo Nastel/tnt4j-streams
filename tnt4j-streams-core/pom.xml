@@ -29,10 +29,10 @@
         <zookeeper.version>3.7.0</zookeeper.version>
 
         <groovy.version>3.0.9</groovy.version>
-        <dropwizard.metrics.version>4.2.4</dropwizard.metrics.version>
+        <dropwizard.metrics.version>4.2.5</dropwizard.metrics.version>
 
         <org.slf4j.version>1.7.32</org.slf4j.version>
-        <log4j.version>2.16.0</log4j.version>
+        <log4j.version>2.17.0</log4j.version>
         <logback.version>1.2.7</logback.version>
         <tnt4j.logger.version>0.3.2</tnt4j.logger.version>
         <jslt.version>0.1.11</jslt.version>
@@ -253,6 +253,10 @@
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-core</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
