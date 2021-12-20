@@ -94,7 +94,7 @@ Running TNT4J-Streams
           <dependency>
               <groupId>com.jkoolcloud.tnt4j.streams</groupId>
               <artifactId>tnt4j-streams-core</artifactId>
-              <version>1.13.0</version>
+              <version>1.13.1</version>
           </dependency>
       ```
     * Write streams configuration file. See ['Streams configuration'](#streams-configuration) chapter for more details
@@ -1197,7 +1197,7 @@ particular cached value.
 ## Samples
 
 ### Running samples
-When release assemblies are built, samples are located in `samples` directory, e.g., `build/tnt4j-streams-1.13.0/samples`. To run particular
+When release assemblies are built, samples are located in `samples` directory, e.g., `build/tnt4j-streams-1.13.1/samples`. To run particular
 sample:
 * go to sample directory
 * run `run.bat` or `run.sh` depending on your OS
@@ -6658,7 +6658,7 @@ Modules list:
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
          <artifactId>tnt4j-streams-core</artifactId>
-         <version>1.13.0</version>
+         <version>1.13.1</version>
      </dependency>
   ```
 * `Elastic-Beats` (O) - Elastic Beats provided data streaming module. Maven dependency:
@@ -6666,7 +6666,7 @@ Modules list:
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
          <artifactId>tnt4j-streams-elastic-beats</artifactId>
-         <version>1.13.0</version>
+         <version>1.13.1</version>
      </dependency>
   ```
 * `Flume-Plugin` (O) - Apache Flume provided data streaming module. Maven dependency:
@@ -6674,7 +6674,7 @@ Modules list:
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
          <artifactId>tnt4j-streams-flume-plugin</artifactId>
-         <version>1.13.0</version>
+         <version>1.13.1</version>
      </dependency>
   ```
 * `Fs` (O) - JSR-203 compliant [FileSystem](https://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html) provided files data
@@ -6683,7 +6683,7 @@ Modules list:
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
          <artifactId>tnt4j-streams-fs</artifactId>
-         <version>1.13.0</version>
+         <version>1.13.1</version>
      </dependency>
   ```
 * `Hdfs` (O) - HDFS (Apache Hadoop) provided data streaming module. Maven dependency:
@@ -6691,7 +6691,7 @@ Modules list:
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
          <artifactId>tnt4j-streams-hdfs</artifactId>
-         <version>1.13.0</version>
+         <version>1.13.1</version>
      </dependency>
   ```
 * `JMS` (O) - JMS (Java Message Service) provided data streaming module. Maven dependency:
@@ -6699,7 +6699,7 @@ Modules list:
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
          <artifactId>tnt4j-streams-jms</artifactId>
-         <version>1.13.0</version>
+         <version>1.13.1</version>
      </dependency>
   ```
 * `Kafka` (O) - Apache Kafka provided data streaming module. Maven dependency:
@@ -6707,7 +6707,7 @@ Modules list:
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
          <artifactId>tnt4j-streams-kafka</artifactId>
-         <version>1.13.0</version>
+         <version>1.13.1</version>
      </dependency>
   ```
 * `Mqtt` (O) - MQTT provided data streaming module. Maven dependency:
@@ -6715,7 +6715,7 @@ Modules list:
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
          <artifactId>tnt4j-streams-mqtt</artifactId>
-         <version>1.13.0</version>
+         <version>1.13.1</version>
      </dependency>
   ```
 * `MsOffice` (O) - MS Office Excel provided data streaming module. Maven dependency:
@@ -6723,7 +6723,7 @@ Modules list:
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
          <artifactId>tnt4j-streams-msoffice</artifactId>
-         <version>1.13.0</version>
+         <version>1.13.1</version>
      </dependency>
   ```
 * `WMQ` (O) - IBM MQ provided data streaming module. Maven dependency:
@@ -6731,7 +6731,7 @@ Modules list:
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
          <artifactId>tnt4j-streams-wmq</artifactId>
-         <version>1.13.0</version>
+         <version>1.13.1</version>
      </dependency>
   ```
 * `WS` (O) - web-service (or OS command) provided data streaming module. Maven dependency:
@@ -6739,7 +6739,7 @@ Modules list:
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
          <artifactId>tnt4j-streams-ws</artifactId>
-         <version>1.13.0</version>
+         <version>1.13.1</version>
      </dependency>
   ```
 * `Chronicle` (O) - [Chronicle Queue](https://chronicle.software/products/queue/) provided data streaming module. Maven dependency:
@@ -6747,7 +6747,7 @@ Modules list:
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
          <artifactId>tnt4j-streams-chronicle</artifactId>
-         <version>1.13.0</version>
+         <version>1.13.1</version>
      </dependency>
   ```
 * `Samples` (O) - integration into custom API sample module. Maven dependency:
@@ -6755,7 +6755,7 @@ Modules list:
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
          <artifactId>tnt4j-streams-samples</artifactId>
-         <version>1.13.0</version>
+         <version>1.13.1</version>
      </dependency>
   ```
 * `Distribution` (OU) - distributable package build module.
