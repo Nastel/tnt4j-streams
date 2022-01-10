@@ -14,7 +14,7 @@
     <artifactId>tnt4j-streams-msoffice</artifactId>
 
     <properties>
-        <org.apache.poi.version>5.0.0</org.apache.poi.version>
+        <org.apache.poi.version>5.1.0</org.apache.poi.version>
     </properties>
 
     <build>
@@ -100,6 +100,10 @@
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>log4j-api</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
