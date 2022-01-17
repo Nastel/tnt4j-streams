@@ -95,6 +95,9 @@
                             <!-- SLF4J logger dependency and transitives -->
                             <exclude>org.slf4j*:*</exclude>
                             <exclude>log4j*:*</exclude>
+                            <!-- LOG4J2-SLF4J logger dependency and transitives -->
+                            <exclude>org.apache.logging.log4j*:*</exclude>
+                            <exclude>com.lmax*:*</exclude>
                             <!-- Common dependencies and its transitives-->
                             <exclude>com.google.guava:guava</exclude>
                             <exclude>com.fasterxml.jackson.core:*</exclude>
