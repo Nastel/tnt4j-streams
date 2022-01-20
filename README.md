@@ -3,6 +3,18 @@
 -----------------------
 **NOTE:** `TNT4J-Streams` version `1.13.0` migrated logger to `log4j2`. In case you have changed default `TNT4J-Streams` logger
 configuration using previous `TNT4J-Streams` versions, please check new logger configuration file [log4j2.xml](./config/log4j2.xml).
+
+### Major `Log4j12` to `Log4j2` migration notes to consider
+
+1. `Log4j2` supports configuration defined in `XML`, `JSON`, `YAML` and `properties` formats (**NOTE:** `Log4j2` `XML` and `properties`
+   formats **differs** from ones used by `Log4j12`). Previous `Log4j12` `log4j.properties` file defined configuration shall be migrated into
+   one of these new configuration definition formats.
+1. `Log4j2` changed configuration file definition System property name from `log4j.configuration` to `log4j2.configurationFile`.
+1. See [Log4j 2.x migration guide](https://logging.apache.org/log4j/2.x/manual/migration.html) and
+   [Log4j 2.x configuration reference](https://logging.apache.org/log4j/2.0/manual/configuration.html) for more details
+1. `Log4j2` used asynchronous logging techniques noticeably increases application performance comparing to `Log4j12`. See
+   [Log4j 2.x Asynchronous Logging Performance report](https://logging.apache.org/log4j/2.x/manual/async.html#Asynchronous_Logging_Performance)
+   as reference.
 -----------------------
 
 TNT4J Streams allows data streaming, parsing from various data sources into TNT4J event sinks.
@@ -25,7 +37,7 @@ Why TNT4J-Streams
     * Logstash
     * WMQ (IBM MQ)
     * OS pipes
-    * Zipped files (also from HDFS)
+    * Zipped files (also applies for Hdfs)
     * Standard Java InputStream/Reader
     * JAX-RS service (JSON/XML)
     * JAX-WS service
@@ -143,14 +155,14 @@ Mapping of streamed data to activity event fields are performed by parser. To ma
         * one of number type enumerators: `integer`/`int`, `long`, `double`, `float`, `short`, `byte`, `biginteger`/`bigint`/`bint`,
           `bigdecimal`/`bigdec`/`bdec` and `any`. `any` will resolve any possible numeric value out of provided string, e.g.
           string `"30hj00"`
-          will result value `30`. It also allows to define casting mode, by adding prefix to number type enumerator (except
+          will result value `30`. It also allows defining casting mode, by adding prefix to number type enumerator (except
           enumerator `any`):
             * default casting mode without prefix is `EXACT`: numeric casting without significant value loss. In case number can't be cast
               to target type, original value is kept.
             * `~` - `API` casting mode: numeric casting shall be performed using plain Java API and in some cases resulting significant
               value loss.
-            * `^` - `UP_BOUND` casting mode: if value can't be cast to target type, closest upper bound type shall be used to maintain value
-              without significant loss. Upper bound sequences:
+            * `^` - `UP_BOUND` casting mode: if value can't be cast to target type, the closest upper bound type shall be used to maintain 
+              value without significant loss. Upper bound sequences:
                 * For floating point numbers: `Float`, `Double`, `BigDecimal`
                 * For non-floating point numbers: `Byte`, `Short`, `Integer`, `Long`, `Float`, `Double`, `BigInteger`, `BigDecimal`
 
@@ -621,7 +633,7 @@ See [Parser matching data or parsing context](#parser-matching-data-or-parsing-c
   of maps into `voutParser` and first map (child) entry `slpAttributes` has value map entry `transactionType`, the rest - not. But we want
   all produced snapshots to have field `transactionType` and to have value defined in first child. Locator
   `^.child[0].transactionType` allows us to access that wanted value from first child (in case current child entry is the first one, field
-  value is simply remapped to itself). Meanwhile parser `vinParser` can access `voutParser` produced snapshots field `transactionIndex`
+  value is simply remapped to itself). Meanwhile, parser `vinParser` can access `voutParser` produced snapshots field `transactionIndex`
   value since they both "are under" same parent parser `TransactionParserEnhanced`.
 
   When two or more stacked parsers produces related sets of activity entities (having same count of child entities), it may be useful to
@@ -676,7 +688,7 @@ aggregation into parent activity. Attribute has two possible values:
   processed by all stacked parsers. This is default value when attribute `aggregation` definition is missing in configuration.
 * `Relate` - resolved activity entities are collected as children of parent activity. As a result there will be one parent activity entity
   having collection of child activities resolved by stacked parsers. **NOTE:** this value has alias `Join` left for backward compatibility,
-  but it is not recommended to use it anymore and should be changed right away for existing configurations. Activity entities can have these
+  but it is not recommended using it anymore and should be changed right away for existing configurations. Activity entities can have these
   relations:
     * `ACTIVITY` - can have any entity as child: `ACTIVITY`, `EVENT`, `SNAPSHOT`
     * `EVENT` - can have only `SNAPSHOT` as a child
@@ -724,7 +736,7 @@ or
     </stream>
 </tnt-data-source>
 ```
-It allows to send as many activity entities to jKool as there are child activity entities resolved by stacked parsers, **merging** those
+It allows sending as many activity entities to jKool as there are child activity entities resolved by stacked parsers, **merging** those
 child activity entities data with parent activity entity data. E.g. when parser builds activity entities relations like this (4 entities in
 total):
 ```
@@ -743,7 +755,7 @@ Event3 having ChilEvent3 + ParentActivity data
 This is useful when streamed data is aggregated in one data package, like JSON/XML data having some header values and array of payload
 entries (see `mft-tracking` sample XML's), but you need only those payload entries maintaining some header data contained values to be set
 to jKool. Or like in `mft_fte` sample, when MFT `transaction` progress event `transferSet` node having `source` and `destination`
-definitions and you need to split them into separate events maintaining some `transaction` data values.
+definitions, and you need to split them into separate events maintaining some `transaction` data values.
 
 ### Field value transformations
 
@@ -855,7 +867,7 @@ named `SomeQueueName@Agent1`):
 When transformation is defined for a field containing multiple locators, field value transformation is applied to all field locators
 aggregated field value.
 
-Sample above states that field value combined from locators `loc1` and `loc2` and separated by `,` should be upper cased. For example
+Sample above states that field value combined from locators `loc1` and `loc2` and separated by `,` should be upper-cased. For example
 locator `loc1` resolves value `value1`, locator `loc2` resolves value `vaLue2`. Then field value before transformations is `value1,vaLue2`
 and field value after transformation is `VALUE1,VALUE2`.
 
@@ -876,7 +888,7 @@ and field value after transformation is `VALUE1,VALUE2`.
 </field>
 ```
 
-Sample above states that locator `loc1` resolved value should be upper cased and locator `loc2` resolved value should be upper cased and
+Sample above states that locator `loc1` resolved value should be upper-cased and locator `loc2` resolved value should be upper-cased and
 concatenated with string `_transformed`. Then those transformed values should be aggregated to field value separated by `,` symbol. For
 example locator `loc1` resolved value `value1`, then after transformation value is changed to `VALUE1`. Locator `loc2` resolved value
 `value2`, then after transformation value is changed to `VALIUE2_transformed`. Field aggregates those locators values to
@@ -1088,7 +1100,7 @@ More complex sample involving field name resolution from map and using collectio
 Locator `ColumnNames` resolved map of e.g. some table column names, where map entry key string `ColumnX` (`X` stands for column index) and
 value is column name string. Consider locator `*.2` resolves list/array of cell values for that table over RegEx. Dynamic field name
 definition `${ColumnNameLoc}.Column$index` pre-fills token `$index` with cell index (from list/array), refers locator `ColumnNameLoc`
-resolved map, and finally picks map entry value having key `ColumnX` (`Column0`, `Column1` and so on..).
+resolved map, and finally picks map entry value having key `ColumnX` (`Column0`, `Column1` and so on...).
 
 Sample of using another `field` resolved value in locator definition:
 ```xml
@@ -1760,14 +1772,14 @@ properly handle file rolling.
 
 `FileReadDelay` property indicates that file changes are streamed every 20 seconds.
 
-`StartFromLatest` property indicates that stream should start from latest entry record in log file. Setting this property to `false` would
-stream all log entries starting from oldest file matching wildcard pattern.
+`StartFromLatest` property indicates that stream should start from the latest entry record in log file. Setting this property to `false` 
+would stream all log entries starting from the oldest file matching wildcard pattern.
 
 **NOTE:** Stream stops only when critical runtime error/exception occurs or application gets terminated.
 
 #### HDFS
 
-These samples shows how to read or poll HDFS files contents. Samples are very similar to ['Log file polling'](#log-file-polling) or
+These samples show how to read or poll HDFS files contents. Samples are very similar to ['Log file polling'](#log-file-polling) or
 ['Apache Access log single file'](#apache-access-log-single-file). Difference is that specialized stream classes are used.
 
 * Simple HDFS file streaming
@@ -2088,7 +2100,7 @@ Sample files can be found in `samples/elastic-beats` directory.
 `dashboards` directory contains exported jKool dashboard dedicated to visualize data for this sample. You can import it into your jKool
 repository.
 
-How to setup Elastic Beats environment see [`samples/elastic-beats/readme.md`](tnt4j-streams-elastic-beats/samples/elastic-beats/readme.md)
+How to set up Elastic Beats environment see [`samples/elastic-beats/readme.md`](tnt4j-streams-elastic-beats/samples/elastic-beats/readme.md)
 
 `sampleMsg.json` file contains sample Elastic Beats provided Logstash message as JSON data prepared using configuration of this sample. This
 sample JSON is for you to see and better understand parsers mappings. Do not use it as Logstash input!
@@ -3006,7 +3018,7 @@ defined by this set will be filtered out from activities stream. Set entries may
 #### Angulartics (AngularJS tracing)
 
 This sample shows how to stream JavaScript events traces from Angulartics. TNT4J-Angulartics-plugin sends trace data over HTTP request
-`http://localhost:9595`. Thus to process this we will need `HttpStream` running on port `9595`.
+`http://localhost:9595`. Thus, to process this we will need `HttpStream` running on port `9595`.
 
 Sample files can be found in `samples/angular-js-tracing` directory.
 
@@ -3063,7 +3075,7 @@ named `JSONPayloadParser` to parse it.
 #### AJAX
 
 This sample shows how to stream JavaScript events traces from AJAX. TNT4J-AJAX-interceptor sends trace data over HTTP request
-`http://localhost:9595`. Thus to process this we will need `HttpStream` running on port `9595`.
+`http://localhost:9595`. Thus, to process this we will need `HttpStream` running on port `9595`.
 
 Sample files can be found in `samples/ajax` directory.
 
@@ -3133,7 +3145,7 @@ named `JSONPayloadParser` to parse it.
 #### Node.js
 
 This sample shows how to stream JavaScript events traces from Node.js. TNT4J-njsTrace-plugin sends trace data over HTTP request
-`http://localhost:9595`. Thus to process this we will need `HttpStream` running on port `9595`.
+`http://localhost:9595`. Thus, to process this we will need `HttpStream` running on port `9595`.
 
 Sample files can be found in `samples/node.js` directory.
 
@@ -3298,7 +3310,7 @@ the parser for your use.
 Sample stream configuration:
 
 **NOTE:** To use this weather forecast sample, you will have to sign up for a free subscription to one of the weather services at
-[OpenWeatherMap](https://openweathermap.org/api) (for example, Current Weather Data or 5 Day Forecast) and get an API key (APPID), which
+[OpenWeatherMap](https://openweathermap.org/api) (for example, Current Weather Data or 5-day Forecast) and get an API key (APPID), which
 must be substituted (replace placeholder `<YOUR_APP_TOKEN>`) in the URL line of streams config.
 
 ```xml
@@ -3372,7 +3384,7 @@ parser for your use.
 Sample stream configuration:
 
 **NOTE:** To use this weather forecast sample, you will have to sign up for a free subscription to one of the weather services at
-[OpenWeatherMap](https://openweathermap.org/api) (for example, Current Weather Data or 5 Day Forecast) and get an API key (APPID), which
+[OpenWeatherMap](https://openweathermap.org/api) (for example, Current Weather Data or 5-day Forecast) and get an API key (APPID), which
 must be substituted (replace placeholder `<YOUR_APP_TOKEN>`) in the URL line of streams config.
 
 ```xml
@@ -3541,10 +3553,10 @@ Sample files can be found in `samples/b2bi-jdbc-stream` directory (`tnt4j-stream
 **NOTE:** in `run.bat/run.sh` file set variable `JDBC_LIBPATH` value to reference JDBC implementation (`PostgreSQL`, `MySQL`, `DB2`,
 `Oracle` and etc.) libraries used by your environment.
 
-See sample [data source configuration](./tnt4j-streams-ws/samples/b2bi-jdbc-stream/tnt-data-source.xml).
+See sample [data source configuration](./tnt4j-streams-ws/samples/b2bi-jdbc-stream/tnt-data-source_oracle.xml).
 
 Fill in these configuration value placeholders:
-* `[HOST]` - define your host for B2Bi database. Optionally you can completely change JDBC URL yo match your JDBC driver, port and database.
+* `[HOST]` - define your host for B2Bi database. Optionally you can completely change JDBC URL to match your JDBC driver, port and database.
 * `[USER_NAME]` - define your database user name.
 * `[USER_PASS]` - define your database user password.
 
@@ -3683,8 +3695,8 @@ TNT4J event field value.
 
 **NOTE:** `ExcelRowStream` uses DOM based MS Excel file reading, thus memory consumption for large file may be significant, but it allows
 random cells access and precise formula evaluation. In case memory consumption is critical factor, use `ExcelSXSSFRowStream` instead of
-`ExcelRowStream`. It uses Apache POI SXSSF API to read MS Excel as a stream consistently iterating over workbook sheets rows and cells. Thus
-it may have some drawback on cell formula evaluation. For more information
+`ExcelRowStream`. It uses Apache POI SXSSF API to read MS Excel as a stream consistently iterating over workbook sheets rows and cells.
+Thus, it may have some drawback on cell formula evaluation. For more information
 see [Apache POI spreadsheet documentation](https://poi.apache.org/spreadsheet/).
 
 ##### Sheets
@@ -3817,7 +3829,7 @@ unparseable entries. Stream puts received request payload data as `byte[]` to ma
 carrying system metrics data. Each snapshot is parsed using stacked `CollectdStatsDataParser` parser (map parser because parent JSON parser
 already made map data structures from Raw `collectd` report JSON data).
 
-`CollectdStatsDataParser` maps map entries to snapshot fields `EventName`, `Category`, `ServerName`, `StartTime`. Also this parser uses
+`CollectdStatsDataParser` maps map entries to snapshot fields `EventName`, `Category`, `ServerName`, `StartTime`. Also, this parser uses
 dynamic field named `${FieldNameLoc}`. Attribute values containing variable expressions `${}` indicates that these attributes can have
 dynamic values resolved from streamed data. Such variable expressions has to reference locators identifiers (`field-locator` attribute `id`)
 to resolve and fill actual data. Field attribute `split`, that if field value locator resolves collection (list or array) of values, values
@@ -4235,7 +4247,7 @@ See [`Readme.md`](tnt4j-streams-samples/README.md) of `tnt4j-streams-samples` mo
 ### tnt4j-log4j12
 
 * in `config/log4j.properties` file change log appender to
-  `log4j.appender.tnt4j=com.jkoolcloud.tnt4j.logger.log4j.TNT4JAppender`. Note that there should be on line like
+  `log4j.appender.tnt4j=com.jkoolcloud.tnt4j.logger.log4j.TNT4JAppender`. Note that there should be a line like
   `log4j.appender.tnt4j=` in this file, so please comment or remove all others if available.
 * in `pom.xml` file of `core` change dependencies - uncomment:
 ```xml
@@ -4567,7 +4579,7 @@ These parameters are applicable to all types of streams.
         * `ExecutorRejectedTaskOfferTimeout` - time to wait (in seconds) for a task to be inserted into bounded queue if max. queue size is
           reached. Default value - `20sec`. (Optional) Actual only if `ExecutorsBoundedModel` is set to `true`.
 * `PingLogActivityCount` - defines repetitive number of streamed activity entities to put "ping" log entry with stream statistics. Default
-  value - `-1` meaning `NEVER`. (Optional, can be OR'ed with `PingLogActivityDelay`.
+  value - `-1` meaning `NEVER`. (Optional, can be OR'ed with `PingLogActivityDelay`).
 * `PingLogActivityDelay` - defines repetitive interval in seconds between "ping" log entries with stream statistics. Default value - `-1`
   meaning `NEVER`. (Optional, can be OR'ed with `PingLogActivityCount`.
 * Set of user defined stream context properties. To define stream context property add `ctx:` prefix to property name. These properties are
@@ -4651,7 +4663,7 @@ Stream output can be configured using these configuration properties:
   Optional)
 * `SplitRelatives` - flag indicating whether to send activity entity child entities independently merging data from both parent and child
   entity fields into produced entity. Default value - `false`. (Optional). **NOTE**: This value has alias `TurnOutActivityChildren` left for
-  backward compatibility, but it is not recommended to use it anymore - change it right away for existing configurations.
+  backward compatibility, but it is not recommended using it anymore - change it right away for existing configurations.
 * `BuildSourceFQNFromStreamedData` - flag indicating whether to set streamed activity entity `Source` FQN build from activity fields data
   instead of default on configured in `tnt4j.properties`. Default value - `true`. (Optional)
 * `SourceFQN` - `Source` FQN pattern to be used when building it from streamed activity entity fields values. Format
@@ -4774,7 +4786,7 @@ Sample:
 
 ###### Parser matching data or parsing context
 
-It is possible to define context or data match criteria for a parser reference. It allows to apply parser on provided data only when data or
+It is possible to define context or data match criteria for a parser reference. It allows applying parser on provided data only when data or
 parsing context matches defined evaluation expression. One parser reference can have multiple match expressions. In that case **all of them
 must evaluate to positive match** for parser to be applied. **NOTE:** when parser reference has no match expressions defined, only
 incompatible data type prevents it from being applied.
@@ -4907,7 +4919,7 @@ and Oracle's [Using XPath Functions](https://docs.oracle.com/cd/E35413_01/doc.72
 * `RestoreState` - flag `true/false` indicating whether files read state should be stored and restored on stream restart. Note, if
   `StartFromLatest` is set to `false` - read state storing stays turned on, but previous stored read state is reset (no need to delete state
   file manually). Default value - `false`. (Optional)
-* `StartFromLatest` - flag `true/false` indicating that streaming should be performed from latest file entry line. If `false` - then all
+* `StartFromLatest` - flag `true/false` indicating that streaming should be performed from the latest file entry line. If `false` - then all
   lines from available files are streamed on startup. Actual only if `FilePolling` or `RestoreState` properties are set to `true`. Default
   value - `true`. (Optional)
 * `RangeToStream` - defines the colon-separated range of file line numbers that should be parsed and streamed to jKoolCloud. Default value -
@@ -4919,7 +4931,7 @@ and Oracle's [Using XPath Functions](https://docs.oracle.com/cd/E35413_01/doc.72
   `START_FROM_BEGINNING` - read file from beginning, `CONTINUE_FROM_LAST` - continue reading file from last line (skipping all available
   lines). Default value - `START_FROM_BEGINNING`. (Optional)
 * `Charset` - charset name used to decode file(s) contained data. Charset name must comply Java specification (be resolvable by
-  `java.nio.charset.Charset#forName(String)` to be handled properly. `guess` value indicates that stream (except HDFS) shall guess charset
+  `java.nio.charset.Charset#forName(String)`) to be handled properly. `guess` value indicates that stream (except HDFS) shall guess charset
   using some set of first bytes from file. Default value - one returned by `java.nio.charset.Charset#defaultCharset()`. (Optional)
 
 Sample:
@@ -4975,15 +4987,15 @@ environment variable `SSH_AUTH_SOCK` is configured.
 
 General stream configuration parameters:
 * `Host` - remote machine host name/IP address. Default value - `localhost`. (Optional - can be defined over stream property `FileName`,
-  e.g. `ftp://username:password@hostname:port/[FILE_PATH]`
+  e.g. `ftp://username:password@hostname:port/[FILE_PATH]`)
 * `Port` - remote machine port number to accept connection. (Optional - can be defined over stream property `FileName`, e.g.
-  `ftp://username:password@hostname:port/[FILE_PATH]`
+  `ftp://username:password@hostname:port/[FILE_PATH]`)
 * `UserName` - remote machine authorized user name. (Optional - can be defined over stream property `FileName`, e.g.
-  `ftp://username:password@hostname:port/[FILE_PATH]`
+  `ftp://username:password@hostname:port/[FILE_PATH]`)
 * `Password` - remote machine authorized user password. (Optional - can be defined over stream property `FileName`, e.g.
-  `ftp://username:password@hostname:port/[FILE_PATH]`
+  `ftp://username:password@hostname:port/[FILE_PATH]`)
 * `Scheme` - file access protocol scheme name. Default value - `scp`. (Optional - can be defined over stream property `FileName`, e.g.
-  `ssh.unix:///[FILE_PATH]`
+  `ssh.unix:///[FILE_PATH]`)
 * `StrictHostKeyChecking` - flag indicating whether strictly check add remote host keys changes against ssh know hosts.
     * If flag value is set to `yes`, ssh will never automatically add host keys to the `~/.ssh/known_hosts` file and will refuse to connect
       to a host whose host key has changed. This provides maximum protection against trojan horse attacks, but can be troublesome when the
@@ -5042,13 +5054,13 @@ Sample:
 ```
 
 Also see [JSR-203 FileSystem streams parameters](#jsr-203-filesystem-streams-parameters)
-and ['File line stream parameters (also from Hdfs)'](#file-line-stream-parameters-also-from-hdfs)
+and ['File line stream parameters (also applies for Hdfs)'](#file-line-stream-parameters-also-applies-for-hdfs)
 
 #### Standard Java input stream parameters
 
 * `InputCloseable` - flag indicating if stream has to close input when stream is closing. Default value - `true`. (Optional)
 * `Charset` - charset name used to decode file(s) contained data. Charset name must comply Java specification (be resolvable by
-  `java.nio.charset.Charset#forName(String)` to be handled properly. Default value - one returned by
+  `java.nio.charset.Charset#forName(String)`) to be handled properly. Default value - one returned by
   `java.nio.charset.Charset#defaultCharset()`. (Optional)
 
 Sample:
@@ -5197,7 +5209,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 * `Topic` - Topic name. (Required - at least one of `Queue`, `Topic`, `Subscription`, `TopicString`)
 * `Subscription` - Subscription name. (Required - at least one of `Queue`, `Topic`, `Subscription`, `TopicString`)
 * `TopicString` - Topic string. (Required - at least one of `Queue`, `Topic`, `Subscription`, `TopicString`)
-* `Host` - WMQ connection host name. In addition supports WMQ connection format - `HOST(PORT)` and `HOST:PORT`. Also can have multiple
+* `Host` - WMQ connection host name. In addition, supports WMQ connection format - `HOST(PORT)` and `HOST:PORT`. Also, can have multiple
   values delimited using `,` symbol. Alias for `CMQC.HOST_NAME_PROPERTY` Queue Manager connection property. (Optional)
 * `Port` - WMQ connection port number. Alias for `CMQC.PORT_PROPERTY` Queue Manager connection property. Default value - `1414`. (Optional)
 * `UserName` - WMQ user identifier. Alias for `CMQC.USER_ID_PROPERTY` Queue Manager connection property. (Optional)
@@ -5209,7 +5221,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
   (Optional)
 * `OpenOptions` - defines open options value used to access queue or topic. It can define numeric options value or concatenation of MQ
   constant names/values delimited by `|` symbol. If options definition starts with `!`, it means that this options set should be used as
-  complete and passed to Queue Manager without changes. By default these open options are appended to predefined set of:
+  complete and passed to Queue Manager without changes. By default, these open options are appended to predefined set of:
 
   Predefined set of open options for queue:
     * MQOO_FAIL_IF_QUIESCING
@@ -5295,14 +5307,14 @@ KeyStore/TrustStore, to run WMQ stream you'll need:
   see [IBM docs for Oracle and IBM cipher suites mapping](https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_8.0.0/com.ibm.mq.dev.doc/q113220_.htm).
 * set system property `-Djavax.net.debug=ssl` to enable verbose JVM debug messages for SSL communication.
 
-#### Zipped file line stream parameters (also from Hdfs)
+#### Zipped file line stream parameters (also applies for Hdfs)
 
 * `FileName` - defines zip file path and concrete zip file entry name or entry name pattern defined using characters `*`
   and `?`. Definition pattern is `zipFilePath!entryNameWildcard`. E.g.:
   `./tnt4j-streams-core/samples/zip-stream/sample.zip!2/*.txt`. (Required)
 * `ArchType` - defines archive type. Can be one of: `ZIP`, `GZIP`, `JAR`. Default value - `ZIP`. (Optional)
 * `Charset` - charset name used to decode file(s) contained data. Charset name must comply Java specification (be resolvable by
-  `java.nio.charset.Charset#forName(String)` to be handled properly. Default value - one returned by
+  `java.nio.charset.Charset#forName(String)`) to be handled properly. Default value - one returned by
   `java.nio.charset.Charset#defaultCharset()`. (Optional)
 
 Sample:
@@ -5604,7 +5616,7 @@ Sample:
 
 Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Parseable streams parameters'](#parseable-streams-parameters).
 
-##### Ms Excel Rows Stream parameters
+##### MS Excel Rows Stream parameters
 
 * `RangeToStream` - defines the colon-separated range of spreadsheet row numbers that should be parsed and streamed to jKoolCloud. Default
   value - `1:`. (Optional)
@@ -5634,11 +5646,11 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 
 ##### Attributes
 
-* `manualFieldsOrder` - flag indicating whether configuration defined fields order shall be preserved in streaming process. By default
+* `manualFieldsOrder` - flag indicating whether configuration defined fields order shall be preserved in streaming process. By default,
   fields are ordered by value resolution type: RAW activity data values, activity entity fields values, cache entries values. Default value -
   `false`.
 * `default-data-type` - specifies default `datatype` attribute value bound for all fields/locators of this parser. Default value - `String`.
-  See See ['TNT4J Events field mappings'](#tnt4j-events-field-mappings) for attribute `datatype` details.
+  See ['TNT4J Events field mappings'](#tnt4j-events-field-mappings) for attribute `datatype` details.
 * `default-emptyAsNull` - specifies default `emptyAsNull` attribute value for all fields/locators of this parser. Default value - `true`.
 
 Sample:
@@ -5676,8 +5688,8 @@ Sample:
 
 ##### Common locators
 
-* `$DATA$` - allows to set complete activity data as field value and redirect it to stacked parser if such is defined for that field.
-* `$METADATA$` - allows to access activity bound meta-data map. Activity meta-data binding is stream specific: some streams may not provide
+* `$DATA$` - allows setting complete activity data as field value and redirect it to stacked parser if such is defined for that field.
+* `$METADATA$` - allows accessing activity bound meta-data map. Activity meta-data binding is stream specific: some streams may not provide
   any meta-data. To get list of stream provided meta-data entries, see particular stream documentation (both JavaDoc and readme).
 * field wildcard locators having `*` symbol within field name e.g. `FieldNameFragment*` are used to capture map of activity entity field
   values, where map entry key is field name and value is field value.
@@ -5690,7 +5702,7 @@ Sample:
   match the format supported by this parser. Default value - `null`. (Optional)
 * `StripQuotes` - whether surrounding double quotes should be stripped from extracted data values. Default value -
   `true`. (Optional)
-* `EntryPattern` - pattern used to to split data into name/value pairs. It should define two RegEx groups named `key` and `value` used to
+* `EntryPattern` - pattern used to split data into name/value pairs. It should define two RegEx groups named `key` and `value` used to
   map data contained values to name/value pair. **NOTE:** this parameter takes preference on `FieldDelim` and `ValueDelim` parameters.
   (Optional)
 
@@ -5898,7 +5910,7 @@ them as activity entity fields/properties by using map entry data as follows:
 * map entry key - field/property name
 * map entry value - field/property value
 
-Locator path token `*` can be omitted if last path token resolves to `java.util.Map` type value. However to get complete map for root path
+Locator path token `*` can be omitted if last path token resolves to `java.util.Map` type value. However, to get complete map for root path
 level you must define it `locator="*"` anyway, since locator value can't be empty.
 
 **NOTE:** using locator path token value `#` (e.g. `locator="#"`) you can make parser to get all yet parser un-touched map entries from that
@@ -6087,7 +6099,7 @@ and it would be equivalent to this transformation:
     </field-transform>
 </field>
 ```
-Also to convert binary WMQ message payload to string using CCSIDs, use transformation like this:
+Also, to convert binary WMQ message payload to string using CCSIDs, use transformation like this:
 ```xml
 <field name="MQTrace_CodedCharsetId" locator="MQGACF_ACTIVITY_TRACE.MQIA_CODED_CHAR_SET_ID" locator-type="Label" datatype="Number"/>
 <field name="Message" locator="MQGACF_ACTIVITY_TRACE.MQBACF_MESSAGE_DATA" locator-type="Label" datatype="Binary">
@@ -6162,9 +6174,9 @@ Sample of field definition for signature calculation:
 PCF message can have grouped parameters - all messages will have header `MQCFH` and may have `MQCFGR` type parameters.
 * To access PCF message header fields use `MQCFH` expression with header field name delimited using `.` (e.g., `MQCFH.CompCode`).
 * To access PCF message parameters use MQ constant name/value (e.g., `MQCACF_APPL_NAME` or `3024`).
-* To access inner `MQCFGR` (or inner inner and so on) parameters use group parameter MQ constant name/value with grouped parameter MQ
+* To access inner `MQCFGR` (or inner-inner and so on) parameters use group parameter MQ constant name/value with grouped parameter MQ
   constant name/value delimited using `.` (e.g., `MQGACF_ACTIVITY_TRACE.MQIACF_COMP_CODE`).
-* In case PCF parameter refers `MQI` structure, inner (or inner inner and so on) structure fields can be accessed by adding `.` delimited
+* In case PCF parameter refers `MQI` structure, inner (or inner-inner and so on) structure fields can be accessed by adding `.` delimited
   MQI structure fields names to locator path after root MQI structure parameter identifier (e.g.,
   `MQGACF_ACTIVITY_TRACE.MQBACF_MQMD_STRUCT.MsgId` or `MQGACF_ACTIVITY_TRACE.MQBACF_MQCNO_STRUCT.clientConn.userIdentifier`).
 * Additionally `PCFMessage` may contain `MQMD` data copied from transport `MQMessage`. To access `MQMD` values use `MQMD` expression with
@@ -6231,7 +6243,7 @@ Also see [Activity map parser](#activity-map-parser) regarding higher level pars
 This parser resolved data map may contain such entries:
 * `rfh2Folders` - RFH2 folders data XML string. Root element for this XML is `<rfh2Folders>`. Further XPath based parsing can be processed
   by [Activity XML parser](#activity-xml-parser)
-* `jmsMsgPayload` - JMS JMS message payload data: de-serialized object or bytes if serialisation can't be done.
+* `jmsMsgPayload` - JMS message payload data: de-serialized object or bytes if serialisation can't be done.
 
 #### Activity MS Excel parser
 
@@ -6359,7 +6371,7 @@ activity data before data gets parsed by enclosing parser.
 
 ### External resources import into stream configuration
 
-`TNT4J-Streams` allows to have external resources importer to stream data source configuration.
+`TNT4J-Streams` allows to have external resources' importer to stream data source configuration.
 
 External values mapping resources import sample:
 ```xml
@@ -6519,7 +6531,7 @@ samples.core.single-log=../samples/single-log/tnt-data-source.xml
 under this initial ZK path.
 
 **NOTE:** Do not start you configuration files referencing properties with `zk.`. Such streams configuration reference definition properties
-will be ignored and files referenced by these properties wont be used in upload process.
+will be ignored and files referenced by these properties won't be used in upload process.
 
 `config.*` and `samples.*` properties defines streams configuration files data mapping to ZK nodes.
 
@@ -6760,7 +6772,7 @@ Modules list:
   ```
 * `Distribution` (OU) - distributable package build module.
 
-All optional modules (extensions) depends to `core` module and can't be build and run without it.
+All optional modules (extensions) depends on `core` module and can't be build and run without it.
 
 **NOTE:** `Samples` module provides no additional features to TNT4J streaming framework. It contains only streams API use samples.
 **NOTE:** `Distribution` module performs Maven post-build release assemblies delivery to `build/` directory.
@@ -6778,7 +6790,7 @@ defined dependencies automatically.
 ### Manually installed dependencies
 
 Some of required and optional dependencies may be not available in public [Maven Repository](http://repo.maven.apache.org/maven2/). In this
-case we would recommend to download those dependencies manually into module's `lib` directory and install into local Maven repository by
+case we would recommend downloading those dependencies manually into module's `lib` directory and install into local Maven repository by
 running Maven script `lib/pom.xml` with `install` goal.
 
 ## Building
@@ -6791,7 +6803,7 @@ running Maven script `lib/pom.xml` with `install` goal.
 * To make maven required `source` and `javadoc` packages, use profile `pack-maven`
 * To make maven central compliant release having `source`, `javadoc` and all signed packages, use `maven-release` profile
 
-By default Maven will build all modules defined in `tnt4j-streams/pom.xml` file.
+By default, Maven will build all modules defined in `tnt4j-streams/pom.xml` file.
 
 If you do not want to build some of optional modules, comment those out like `WMQ` module is. Or you can define Maven to build your
 preferred set of modules using `-pl, --projects` argument (comma separated modules list) together with `-am, --also-make` argument, e.g.:
