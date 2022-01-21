@@ -62,7 +62,7 @@ import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
  * <li>RetryStateCheck - flag indicating whether tracker state check shall be performed repeatedly, or number of retries
  * to perform. If {@code false}, then streaming process exits with {@link java.lang.IllegalStateException} on first
  * failure. If {@code true}, then state check retry procedure repeats until success (may repeat infinite number of
- * times). Default value - {@code false} or {@code 1}. (Optional)</li>
+ * times). Default value - {@code true}. (Optional)</li>
  * <li>RetryPeriod - period in seconds to wait before next issue of state check or activity recording operation after
  * failure. Default value - '10sec.'. (Optional)</li>
  * <li>RetryInterval - alias for RetryPeriod. (Optional)</li>
@@ -97,7 +97,7 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 	private String tnt4jCfgPath;
 	private Map<String, String> tnt4jProperties;
 
-	private int stateCheckRetries = 1;
+	private int stateCheckRetries = Integer.MAX_VALUE;
 	protected long retryPeriod = CONN_RETRY_PERIOD;
 	private boolean sendStreamStates = true;
 	private JKoolNotificationListener jKoolNotificationListener = new JKoolNotificationListener();
@@ -266,9 +266,7 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 			} catch (NumberFormatException exc) {
 				boolean retryStateCheck = Utils.toBoolean((String) value);
 
-				if (retryStateCheck) {
-					stateCheckRetries = Integer.MAX_VALUE;
-				}
+				stateCheckRetries = retryStateCheck ? Integer.MAX_VALUE : 1;
 			}
 		} else if (OutputProperties.PROP_SEND_STREAM_STATES.equalsIgnoreCase(name)) {
 			sendStreamStates = Utils.toBoolean((String) value);

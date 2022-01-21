@@ -4655,7 +4655,7 @@ Stream output can be configured using these configuration properties:
 * `TNT4JConfigZKNode` - defines ZooKeeper path where stream configuration is located. Default value - ``. (Optional)
 * `RetryStateCheck` - flag indicating whether tracker state check shall be performed repeatedly, or number of retries to perform. If
   `false`, then streaming process exits with `java.lang.IllegalStateException` on first failure. If `true`, then state check retry procedure
-  repeats until success (may repeat infinite number of times). Default value - `false` or `1`. (Optional)
+  repeats until success (may repeat infinite number of times). Default value - `true`. (Optional)
 * `RetryPeriod` - period in seconds to wait before next issue of state check or activity recording operation after failure. Default value -
   `10sec.`. (Optional)
 * `RetryInterval` - alias for `RetryPeriod`. (Optional)
