@@ -253,7 +253,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 			}
 
 			if (repCount == null) {
-				repCount = 1;
+				repCount = -1;
 			}
 
 			TimeUnit timeUnit = ssd == null ? TimeUnit.SECONDS : ssd.getUnits();

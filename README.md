@@ -1,6 +1,7 @@
 # TNT4J-Streams
 
 -----------------------
+
 **NOTE:** `TNT4J-Streams` version `1.13.0` migrated logger to `log4j2`. In case you have changed default `TNT4J-Streams` logger
 configuration using previous `TNT4J-Streams` versions, please check new logger configuration file [log4j2.xml](./config/log4j2.xml).
 
@@ -15,6 +16,7 @@ configuration using previous `TNT4J-Streams` versions, please check new logger c
 1. `Log4j2` used asynchronous logging techniques noticeably increases application performance comparing to `Log4j12`. See
    [Log4j 2.x Asynchronous Logging Performance report](https://logging.apache.org/log4j/2.x/manual/async.html#Asynchronous_Logging_Performance)
    as reference.
+
 -----------------------
 
 TNT4J Streams allows data streaming, parsing from various data sources into TNT4J event sinks.
@@ -5350,7 +5352,7 @@ request/invocation/execution parameters and scheduler. Steps are invoked/execute
         * `schedule-simple` tag has required attributes:
             * `interval` - schedule interval as positive integer (non-zero) numeric value. (Required)
             * `units` - schedule interval time units name. Default value - `MILLISECONDS`. (Optional)
-            * `repeatCount` - schedule repeats count as integer numeric value, where `-1` means endless. Default value - `1`. (Optional)
+            * `repeatCount` - schedule repeats count as integer numeric value, where `-1` means endless. Default value - `-1`. (Optional)
             * `startDelay` - schedule start delay interval as positive integer (zero valid) numeric value. Default value - `0`. (Optional)
             * `startDelayUnits` - schedule start delay time units name. Default value - `SECONDS`. (Optional)
         * `request` is XML tag to define string represented request data (e.g., system command with parameters). To define XML contents it

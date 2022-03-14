@@ -25,10 +25,9 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @version $Revision: 1 $
  */
-public class SimpleSchedulerData extends AbstractSchedulerData {
+public class SimpleSchedulerData extends RepeatingSchedulerData {
 	private long interval = 0;
 	private TimeUnit units;
-	private Integer repeatCount;
 
 	/**
 	 * Constructs a new SimpleSchedulerData. Defines invocations interval in provided time units.
@@ -92,24 +91,5 @@ public class SimpleSchedulerData extends AbstractSchedulerData {
 	 */
 	public void setUnits(String unitsName) {
 		this.units = StringUtils.isEmpty(unitsName) ? TimeUnit.SECONDS : TimeUnit.valueOf(unitsName.toUpperCase());
-	}
-
-	/**
-	 * Returns invocations count.
-	 *
-	 * @return invocations count
-	 */
-	public Integer getRepeatCount() {
-		return repeatCount;
-	}
-
-	/**
-	 * Sets invocations count.
-	 *
-	 * @param repeatCount
-	 *            invocations count
-	 */
-	public void setRepeatCount(Integer repeatCount) {
-		this.repeatCount = repeatCount;
 	}
 }
