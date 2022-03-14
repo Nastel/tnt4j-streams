@@ -58,7 +58,7 @@ public class ChronicleQueueStream extends TNTParseableInputStream<Object> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(ChronicleQueueStream.class);
 
 	private File queuePath;
-	private Map<String, Class<?>> classNameMap = new HashMap<>();
+	private final Map<String, Class<?>> classNameMap = new HashMap<>();
 	private String handlingClasses;
 
 	private ChronicleQueue queue;
@@ -171,8 +171,9 @@ public class ChronicleQueueStream extends TNTParseableInputStream<Object> {
 				return true;
 			}
 
-			assert context.isData();
-			accept(context.wire());
+			if (context.isData()) {
+				accept(context.wire());
+			}
 		}
 
 		return lastRead != null;
@@ -199,7 +200,7 @@ public class ChronicleQueueStream extends TNTParseableInputStream<Object> {
 		Bytes<?> bytes = wire.bytes();
 		long r = bytes.readPosition();
 		wire.readEventName(sb);
-		// roll back position to where is was before we read the SB
+		// roll back position to where it was before we read the SB
 		bytes.readPosition(r);
 
 		return true;
