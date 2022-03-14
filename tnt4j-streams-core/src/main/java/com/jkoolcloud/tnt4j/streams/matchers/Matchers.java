@@ -195,7 +195,7 @@ public class Matchers {
 	 * @param expression
 	 *            match expression string
 	 * @param valBindings
-	 *            expresion variable and value bindings map
+	 *            expression variable and value bindings map
 	 * @return {@code true} if {@code valBindings} filled-in {@code expression} matches, {@code false} - otherwise
 	 * 
 	 * @throws Exception

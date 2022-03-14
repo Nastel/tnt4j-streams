@@ -71,7 +71,7 @@ public interface StreamEntityFilter<T> {
 	 * excluded from streaming.
 	 * 
 	 * @param valBindings
-	 *            expresion variable and value bindings map
+	 *            expression variable and value bindings map
 	 * @return {@code true} if filter matching value should be excluded from streaming, {@code false} - otherwise
 	 * 
 	 * @throws com.jkoolcloud.tnt4j.streams.filters.FilterException

@@ -214,7 +214,7 @@ public abstract class AbstractExpressionFilter<T> extends AbstractEntityFilter<T
 	 * @param eVar
 	 *            expression variable
 	 * @param valBindings
-	 *            expresion variable and value bindings map
+	 *            expression variable and value bindings map
 	 * @return resolved expression variable bound value
 	 */
 	protected Property resolveFieldKeyAndValue(String eVar, Map<String, ?> valBindings) {
