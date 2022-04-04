@@ -42,8 +42,8 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
  * {@link ActivityRegExParser}):
  * <ul>
  * <li>LogPattern - access log pattern. (Optional, if RegEx {@link Pattern} property is defined)</li>
- * <li>ConfRegexMapping - custom log pattern token and RegEx mapping. (Optional, actual only if {@code LogPattern}
- * property is used)</li>
+ * <li>ConfRegexMapping - custom log pattern token (must be wildcard or RegEx compliant string) and RegEx mapping.
+ * (Optional, actual only if {@code LogPattern} property is used)</li>
  * </ul>
  * <p>
  * RegEx group names and log pattern tokens mapping:
@@ -272,7 +272,7 @@ public class ApacheAccessLogParser extends ActivityRegExParser {
 		StringBuilder logRegexBuff = new StringBuilder();
 		int pos = 0;
 		while (matcher.find()) {
-			logRegexBuff.append(apacheLogPattern.substring(pos, matcher.start()));
+			logRegexBuff.append(apacheLogPattern, pos, matcher.start());
 			logRegexBuff.append(mapConfigTokenToRegex(matcher.group()));
 			pos = matcher.end();
 		}

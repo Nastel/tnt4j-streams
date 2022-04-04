@@ -5835,7 +5835,8 @@ Sample of field definition for signature calculation:
 #### Apache access log parser
 
 * `LogPattern` - access log pattern. (Optional, if RegEx `Pattern` property is defined)
-* `ConfRegexMapping` - custom log pattern token and RegEx mapping. (Optional, actual only if `LogPattern` property is used)
+* `ConfRegexMapping` - custom log pattern token (must be wildcard or RegEx compliant string) and RegEx mapping. (Optional, actual only if
+  `LogPattern` property is used)
 
 Sample:
 ```xml
