@@ -17,7 +17,7 @@ import com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser;
 
 import net.openhft.chronicle.queue.ChronicleQueue;
 import net.openhft.chronicle.queue.ExcerptAppender;
-import net.openhft.chronicle.wire.AbstractMarshallable;
+import net.openhft.chronicle.wire.AbstractCommonMarshallable;
 
 public class ChronicleQueueStreamTest {
 
@@ -42,7 +42,6 @@ public class ChronicleQueueStreamTest {
 				return item;
 			}
 		};
-		stream.addReference(new NullActivityOutput());
 
 		Path testQueue = Files.createTempDirectory("testQueue");
 		ChronicleQueue queue = ChronicleQueue.single(testQueue.toFile().getAbsolutePath());
@@ -53,6 +52,7 @@ public class ChronicleQueueStreamTest {
 				"com.jkoolcloud.tnt4j.streams.inputs.ChronicleQueueStreamTest$EntryDefinition");
 		stream.setProperty(ChronicleQueueProperties.PROP_START_FROM_LATEST, "true");
 
+		stream.addReference(new NullActivityOutput());
 		stream.addParser(new ActivityJavaObjectParser());
 
 		stream.addStreamItemAccountingListener(new StreamItemAccountingListener() {
@@ -105,7 +105,7 @@ public class ChronicleQueueStreamTest {
 		}
 	}
 
-	public static class EntryDefinition extends AbstractMarshallable {
+	public static class EntryDefinition extends AbstractCommonMarshallable {
 		String name;
 
 		public String getName() {

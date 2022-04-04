@@ -14,7 +14,7 @@
     <artifactId>tnt4j-streams-hdfs</artifactId>
 
     <properties>
-        <org.apache.hadoop.version>3.3.1</org.apache.hadoop.version>
+        <org.apache.hadoop.version>3.3.2</org.apache.hadoop.version>
     </properties>
 
     <build>
