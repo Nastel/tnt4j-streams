@@ -34,7 +34,6 @@
         <org.slf4j.version>1.7.36</org.slf4j.version>
         <log4j.version>2.17.1</log4j.version>
         <logback.version>1.2.7</logback.version>
-        <tnt4j.logger.version>0.3.2</tnt4j.logger.version>
         <jslt.version>0.1.11</jslt.version>
         <disruptor.version>3.4.4</disruptor.version>
     </properties>
@@ -331,11 +330,11 @@
         <!--<scope>runtime</scope>-->
         <!--</dependency>-->
 
-        <!-- uncomment if tnt4j-log4j12 logger shall be used -->
+        <!-- uncomment if tnt4j-log4j logger shall be used -->
         <!--<dependency>-->
         <!--<groupId>com.jkoolcloud.tnt4j.logger</groupId>-->
-        <!--<artifactId>tnt4j-log4j12</artifactId>-->
-        <!--<version>${tnt4j.logger.version}</version>-->
+        <!--<artifactId>tnt4j-log4j</artifactId>-->
+        <!--<version>0.4.0</version>-->
         <!--<scope>runtime</scope>-->
         <!--</dependency>-->
 
@@ -351,7 +350,7 @@
         <!--<dependency>-->
         <!--<groupId>com.jkoolcloud.tnt4j.logger</groupId>-->
         <!--<artifactId>tnt4j-logback</artifactId>-->
-        <!--<version>${tnt4j.logger.version}</version>-->
+        <!--<version>0.3.3</version>-->
         <!--<scope>runtime</scope>-->
         <!--</dependency>-->
 

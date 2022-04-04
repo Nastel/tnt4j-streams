@@ -4246,7 +4246,7 @@ See [`Readme.md`](tnt4j-streams-samples/README.md) of `tnt4j-streams-samples` mo
 
 ## How to use TNT4J loggers
 
-### tnt4j-log4j12
+### tnt4j-log4j
 
 * in `config/log4j.properties` file change log appender to
   `log4j.appender.tnt4j=com.jkoolcloud.tnt4j.logger.log4j.TNT4JAppender`. Note that there should be a line like
@@ -4255,8 +4255,8 @@ See [`Readme.md`](tnt4j-streams-samples/README.md) of `tnt4j-streams-samples` mo
 ```xml
 <dependency>
     <groupId>com.jkoolcloud.tnt4j.logger</groupId>
-    <artifactId>tnt4j-log4j12</artifactId>
-    <version>0.3.1</version>
+    <artifactId>tnt4j-log4j</artifactId>
+    <version>0.4.0</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -4271,7 +4271,7 @@ See [`Readme.md`](tnt4j-streams-samples/README.md) of `tnt4j-streams-samples` mo
 <dependency>
     <groupId>com.jkoolcloud.tnt4j.logger</groupId>
     <artifactId>tnt4j-logback</artifactId>
-    <version>0.3</version>
+    <version>0.3.3</version>
     <scope>runtime</scope>
 </dependency>
 ```
