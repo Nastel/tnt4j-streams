@@ -35,8 +35,6 @@ import org.apache.poi.hssf.eventusermodel.HSSFListener;
 import org.apache.poi.hssf.eventusermodel.HSSFRequest;
 import org.apache.poi.hssf.record.*;
 import org.apache.poi.hssf.record.crypto.Biff8EncryptionKey;
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
-import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
@@ -47,6 +45,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.util.XMLHelper;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
@@ -108,6 +107,9 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 	private String rangeValue = "1:"; // NON-NLS
 	private IntRange rowRange;
 
+	private int totalRows = 0;
+	private long totalBytes = 0;
+
 	private boolean ended = false;
 
 	/**
@@ -166,6 +168,16 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 	@Override
 	protected long getActivityItemByteSize(Row activityItem) {
 		return activityItem == null ? 0 : getRowByteSize(activityItem);
+	}
+
+	@Override
+	public int getTotalActivities() {
+		return totalRows;
+	}
+
+	@Override
+	public long getTotalBytes() {
+		return totalBytes;
 	}
 
 	private static long getRowByteSize(Row activityItem) {
@@ -238,11 +250,17 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 			public void run() {
 				try {
 					File inputFile = new File(fileName);
+					totalBytes = inputFile.length();
+					InputStream is = null;
+					FileMagic fm;
 
-					InputStream is = new FileInputStream(inputFile);
-					is = FileMagic.prepareToCheckMagic(is);
-					FileMagic fm = FileMagic.valueOf(is);
-					Utils.close(is);
+					try {
+						is = new FileInputStream(inputFile);
+						is = FileMagic.prepareToCheckMagic(is);
+						fm = FileMagic.valueOf(is);
+					} finally {
+						Utils.close(is);
+					}
 
 					if (fm == FileMagic.OOXML) {
 						readXLXS(inputFile);
@@ -275,12 +293,10 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 	 *             if excel file or workbook can't be read
 	 */
 	protected void readXLS(File xlsFile) throws IOException {
-		POIFSFileSystem fs = null;
 		InputStream dis = null;
 		boolean passwordSet = false;
 
-		try {
-			fs = new POIFSFileSystem(xlsFile, true);
+		try (POIFSFileSystem fs = new POIFSFileSystem(xlsFile, true)) {
 			DirectoryNode root = fs.getRoot();
 			if (root.hasEntry("EncryptedPackage")) { // NON-NLS
 				dis = DocumentFactoryHelper.getDecryptedStream(fs, wbPass);
@@ -301,10 +317,9 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 			factory.processEvents(req, dis);
 		} finally {
 			if (passwordSet) {
-				Biff8EncryptionKey.setCurrentUserPassword((String) null);
+				Biff8EncryptionKey.setCurrentUserPassword(null);
 			}
 
-			Utils.close(fs);
 			Utils.close(dis);
 		}
 	}
@@ -365,7 +380,7 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 		DataFormatter formatter = new DataFormatter();
 		InputSource sheetSource = new InputSource(sheetInputStream);
 		try {
-			XMLReader sheetParser = SAXHelper.newXMLReader();
+			XMLReader sheetParser = XMLHelper.newXMLReader();
 			ContentHandler handler = new XSSFSheetXMLHandler(styles, null, strings, sheetHandler, formatter, false);
 			sheetParser.setContentHandler(handler);
 			sheetParser.parse(sheetSource);
@@ -405,6 +420,7 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 			this.currentRowNum = rowNum;
 			currentColNum = -1;
 			currentRow = new SXSSFRow(sheet);
+			stream.totalRows = sheet.getLastRowNum();
 		}
 
 		@Override
@@ -617,6 +633,7 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 				currentRow = new SXSSFRow(sheet);
 				currentRowNum = cellRec.getRow();
 				currentColNum = cellRec.getColumn();
+				stream.totalRows = sheet.getLastRowNum();
 			}
 		}
 
@@ -643,13 +660,13 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 				return value;
 			}
 
-			if (HSSFDateUtil.isADateFormat(formatIndex, formatString) && HSSFDateUtil.isValidExcelDate(value)) {
+			if (DateUtil.isADateFormat(formatIndex, formatString) && DateUtil.isValidExcelDate(value)) {
 				// Java wants M not m for month
 				formatString = formatString.replace('m', 'M');
 				// Change \- into -, if it's there
 				formatString = formatString.replaceAll("\\\\-", "-"); // NON-NLS
 
-				Date d = HSSFDateUtil.getJavaDate(value, false);
+				Date d = DateUtil.getJavaDate(value, false);
 				DateFormat df = new SimpleDateFormat(formatString);
 				return df.format(d);
 			}

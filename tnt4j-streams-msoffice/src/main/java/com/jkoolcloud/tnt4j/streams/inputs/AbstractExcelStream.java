@@ -65,6 +65,8 @@ public abstract class AbstractExcelStream<T> extends TNTParseableInputStream<T> 
 	private Workbook workbook;
 	private Iterator<Sheet> sheets;
 
+	private long totalBytes = 0;
+
 	/**
 	 * Attribute storing sheet/row position marker of streamed file.
 	 */
@@ -114,6 +116,11 @@ public abstract class AbstractExcelStream<T> extends TNTParseableInputStream<T> 
 	}
 
 	@Override
+	public long getTotalBytes() {
+		return totalBytes;
+	}
+
+	@Override
 	public int getActivityPosition() {
 		return activityPosition;
 	}
@@ -138,6 +145,7 @@ public abstract class AbstractExcelStream<T> extends TNTParseableInputStream<T> 
 					MsOfficeStreamConstants.RESOURCE_BUNDLE_NAME, "AbstractExcelStream.file.not.exist", fileName));
 		}
 
+		totalBytes = wbFile.length();
 		workbook = WorkbookFactory.create(wbFile, wbPass, true);
 		sheets = workbook.sheetIterator();
 	}
