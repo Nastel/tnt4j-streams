@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <parser name="AccessLogParserExt" class="com.jkoolcloud.tnt4j.streams.custom.parsers.ApacheAccessLogParser">
     <property name="LogPattern" value="%h %l %u %t &quot;%r&quot; %s %b %D"/>
-    <!--property name="LogPattern"
-              value="%h %l %u %t &quot;%r&quot; %>s %O &quot;%{Referer}i&quot; &quot;%{User-Agent}i&quot;"/-->
+    <!--property name="LogPattern" value="%h %l %u %t &quot;%r&quot; %>s %O &quot;%{Referer}i&quot; &quot;%{User-Agent}i&quot;"/-->
     <!--property name="Pattern"
               value="^(\S+) (\S+) (\S+) \[([\w:/]+\s[+\-]\d{4})\] &quot;(((\S+) (.*?)( (\S+))?)|(-))&quot; (\d{3}) (\d+|-)( (\S+)|$)"/-->
     <property name="ConfRegexMapping" value="%*r=(((\S+) (.*?)( (\S+))?)|(-))"/>
@@ -24,6 +23,5 @@
     <field name="MsgValue" locator="13" locator-type="Index"/>
     <!--<field name="Referer" locator="14" locator-type="Index"/>-->
     <!--<field name="UserAgent" locator="15" locator-type="Index"/>-->
-    <field name="ElapsedTime" locator="15" locator-type="Index" datatype="Number" format="#####0.000"
-           locale="en-US" units="Seconds"/>
+    <field name="ElapsedTime" locator="15" locator-type="Index" datatype="Number" format="#####0.000" locale="en-US" units="Seconds"/>
 </parser>
