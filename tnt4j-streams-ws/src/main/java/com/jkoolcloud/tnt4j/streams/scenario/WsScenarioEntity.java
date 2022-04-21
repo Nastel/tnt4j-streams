@@ -16,12 +16,18 @@
 
 package com.jkoolcloud.tnt4j.streams.scenario;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.collections4.CollectionUtils;
+
 import com.jkoolcloud.tnt4j.utils.Utils;
 
 /**
  * Base class for TNT4J-Streams-WS configuration entities: scenario, step, etc.
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  */
 public abstract class WsScenarioEntity {
 	private String name;
@@ -30,6 +36,8 @@ public abstract class WsScenarioEntity {
 	private String method;
 	private String username;
 	private String password;
+
+	private Map<String, String> properties;
 
 	/**
 	 * Constructs a new WsScenarioEntity. Defines scenario entity name.
@@ -133,6 +141,57 @@ public abstract class WsScenarioEntity {
 	 */
 	public String getPassword() {
 		return password;
+	}
+
+	/**
+	 * Searches step properties map for property having defined name and returns that property value. If step has no
+	 * property with defined name - {@code null} is returned.
+	 *
+	 * @param propName
+	 *            the property name
+	 * @return the value of step property having defined name, or {@code null} is step has no property with defined name
+	 */
+	public String getProperty(String propName) {
+		return properties == null ? null : properties.get(propName);
+	}
+
+	/**
+	 * Sets property for this step.
+	 * 
+	 * @param name
+	 *            property name
+	 * @param value
+	 *            property value
+	 */
+	public void setProperty(String name, String value) {
+		if (properties == null) {
+			properties = new HashMap<>();
+		}
+
+		properties.put(name, value);
+	}
+
+	/**
+	 * Sets properties values map for this step.
+	 *
+	 * @param props
+	 *            collection of properties to set for this step
+	 */
+	public void setProperties(Collection<Map.Entry<String, String>> props) {
+		if (CollectionUtils.isNotEmpty(props)) {
+			for (Map.Entry<String, String> prop : props) {
+				setProperty(prop.getKey(), prop.getValue());
+			}
+		}
+	}
+
+	/**
+	 * Returns properties collection for this step.
+	 * 
+	 * @return properties collection for this step
+	 */
+	public Collection<Map.Entry<String, String>> getProperties() {
+		return properties == null ? null : properties.entrySet();
 	}
 
 	@Override

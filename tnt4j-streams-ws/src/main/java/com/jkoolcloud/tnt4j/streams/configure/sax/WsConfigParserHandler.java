@@ -394,12 +394,12 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 		try {
 			super.checkPropertyState();
 		} catch (SAXException exc) {
-			if (!StringUtils.equalsAnyIgnoreCase(getParentElmt(PROPERTY_ELMT), STEP_ELMT)) {
+			if (!StringUtils.equalsAnyIgnoreCase(getParentElmt(PROPERTY_ELMT), SCENARIO_ELMT, STEP_ELMT)) {
 				throw new SAXParseException(
-						StreamsResources.getStringFormatted(
-								StreamsResources.RESOURCE_BUNDLE_NAME, "ConfigParserHandler.malformed.configuration2",
-								PROPERTY_ELMT, Utils.arrayToString(CONFIG_ROOT_ELMT, STREAM_ELMT, PARSER_ELMT,
-										JAVA_OBJ_ELMT, CACHE_ELMT, TNT4J_PROPERTIES_ELMT, STEP_ELMT)),
+						StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+								"ConfigParserHandler.malformed.configuration2", PROPERTY_ELMT,
+								Utils.arrayToString(CONFIG_ROOT_ELMT, STREAM_ELMT, PARSER_ELMT, JAVA_OBJ_ELMT,
+										CACHE_ELMT, TNT4J_PROPERTIES_ELMT, SCENARIO_ELMT, STEP_ELMT)),
 						currParseLocation);
 			}
 		}
@@ -416,6 +416,8 @@ public class WsConfigParserHandler extends ConfigParserHandler {
 							"WsConfigParserHandler.element.must.have.one", SCENARIO_ELMT, STEP_ELMT,
 							getLocationInfo()));
 				}
+
+				currScenario.setProperties(applyVariableProperties(currProperties.remove(qName)));
 
 				currStream.addReference(currScenario);
 				currScenario = null;

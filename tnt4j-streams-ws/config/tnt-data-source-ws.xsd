@@ -390,6 +390,13 @@
     <!-- Element <scenario> definition -->
     <xs:complexType name="Scenario">
         <xs:sequence>
+            <xs:element name="property" type="Property" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>
+                        Specifies scenario configuration property.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="step" type="ScenarioStep" minOccurs="1" maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>

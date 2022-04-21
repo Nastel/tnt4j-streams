@@ -16,23 +16,22 @@
 
 package com.jkoolcloud.tnt4j.streams.scenario;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.jkoolcloud.tnt4j.streams.configure.WsStreamProperties;
-import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
  * This class defines TNT4J-Streams-WS configuration scenario step.
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  */
 public class WsScenarioStep extends WsScenarioEntity implements AutoIdGenerator {
 	private final List<WsRequest<String>> requests = new ArrayList<>();
-	private Map<String, String> properties;
 
 	private SchedulerData schedulerData;
 
@@ -236,62 +235,16 @@ public class WsScenarioStep extends WsScenarioEntity implements AutoIdGenerator 
 		return scenario;
 	}
 
-	/**
-	 * Searches step properties map for property having defined name and returns that property value. If step has no
-	 * property with defined name - {@code null} is returned.
-	 *
-	 * @param propName
-	 *            the property name
-	 * @return the value of step property having defined name, or {@code null} is step has no property with defined name
-	 */
-	public String getProperty(String propName) {
-		return properties == null ? null : properties.get(propName);
-	}
-
-	/**
-	 * Sets property for this step.
-	 * 
-	 * @param name
-	 *            property name
-	 * @param value
-	 *            property value
-	 */
+	@Override
 	public void setProperty(String name, String value) {
-		if (properties == null) {
-			properties = new HashMap<>();
-		}
-
-		properties.put(name, value);
+		super.setProperty(name, value);
 
 		if (WsStreamProperties.PROP_SYNCHRONIZE_REQUESTS.equalsIgnoreCase(name)) {
-			boolean sync = Utils.toBoolean(value);
+			boolean sync = com.jkoolcloud.tnt4j.streams.utils.Utils.toBoolean(value);
 			if (sync) {
 				this.semaphore = new Semaphore(1);
 			}
 		}
-	}
-
-	/**
-	 * Sets properties values map for this step.
-	 *
-	 * @param props
-	 *            collection of properties to set for this step
-	 */
-	public void setProperties(Collection<Map.Entry<String, String>> props) {
-		if (CollectionUtils.isNotEmpty(props)) {
-			for (Map.Entry<String, String> prop : props) {
-				setProperty(prop.getKey(), prop.getValue());
-			}
-		}
-	}
-
-	/**
-	 * Returns properties collection for this step.
-	 * 
-	 * @return properties collection for this step
-	 */
-	public Collection<Map.Entry<String, String>> getProperties() {
-		return properties == null ? null : properties.entrySet();
 	}
 
 	/**

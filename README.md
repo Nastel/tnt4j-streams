@@ -5338,13 +5338,16 @@ request/invocation/execution parameters and scheduler. Steps are invoked/execute
 * `scenario` tag has required attribute - `name` (any string) and optional attributes: `url` (service request URL), `username` (service
   authentication user), `password` (service authentication password) and `method` (`GET`/`POST` - default value `GET`). These service access
   attributes are applied for all scenario steps if scenario does not define individual values of attributes.
+    * `property` tag has attributes:
+        * `name` - scenario configuration property name
+        * `value` - scenario configuration property value. It also can be defined as tag body.
     * `step` tag has required attribute - `name` (any string) and optional attributes: `url` (service request URL), `username` (service
       authentication user), `password` (service authentication password) and `method` (`GET`/`POST` - default value `GET`). Attributes `url`
       , `username`, `password` and `method` overrides values defined for corresponding `scenario` tag attributes. That way some scenario
       steps can have individual service access configurations.
         * `property` tag has attributes:
             * `name` - scenario step configuration property name
-            * `value` - scenario step configuration property value
+            * `value` - scenario step configuration property value. It also can be defined as tag body.
         * `schedule-cron` tag has attributes:
             * `expression` - Cron expression. (Required)
             * `startDelay` - schedule start delay interval as positive integer (zero valid) numeric value. Default value - `0`. (Optional)
