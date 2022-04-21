@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package com.jkoolcloud.tnt4j.streams;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-
-import com.jkoolcloud.tnt4j.streams.configure.sax.ConfigParserHandlerTest;
-import com.jkoolcloud.tnt4j.streams.inputs.AllInputsTests;
-
 /**
+ * Custom TNT4J-Streams formatter used to format IBM Cast Iron WebService reported data.
+ *
  * @author akausinis
  * @version 1.0
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({ ConfigParserHandlerTest.class, AllInputsTests.class })
-public class AllWsStreamTests {
-}
+
+package com.jkoolcloud.tnt4j.streams.custom.format.castiron;

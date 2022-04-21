@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.jkoolcloud.tnt4j.streams.format;
+package com.jkoolcloud.tnt4j.streams.custom.format.castiron;
 
 import java.util.*;
 
@@ -35,7 +35,7 @@ import com.jkoolcloud.tnt4j.utils.Utils;
  * Newline is added at the end of each line.
  * <p>
  * This formatter supports the following configuration properties (in addition to those supported by
- * {@link com.jkoolcloud.tnt4j.streams.format.FactNameValueFormatter}):
+ * {@link FactNameValueFormatter}):
  * <ul>
  * <li>DuplicateKeySuffix - suffix value for duplicate path level keys. Default value - {@code "_"}. (Optional)</li>
  * <li>PathLevelAttributes - configures produced path tokens sequence. Format is:

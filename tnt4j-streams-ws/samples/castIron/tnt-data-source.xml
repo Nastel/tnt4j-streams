@@ -254,7 +254,7 @@
         </entry>
     </cache>
 
-    <stream name="CastIronStreamSearchLogs" class="com.jkoolcloud.tnt4j.streams.custom.inputs.CastIronWsStream">
+    <stream name="CastIronStreamSearchLogs" class="com.jkoolcloud.tnt4j.streams.custom.inputs.castiron.CastIronWsStream">
         <property name="HaltIfNoParser" value="false"/>
 
         <property name="DisableSSL" value="true"/>
@@ -316,7 +316,7 @@
         </scenario>
     </stream>
 
-    <stream name="CastIronStreamSearchJobs" class="com.jkoolcloud.tnt4j.streams.custom.inputs.CastIronWsStream">
+    <stream name="CastIronStreamSearchJobs" class="com.jkoolcloud.tnt4j.streams.custom.inputs.castiron.CastIronWsStream">
         <property name="HaltIfNoParser" value="false"/>
 
         <property name="DisableSSL" value="true"/>
