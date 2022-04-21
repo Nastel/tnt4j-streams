@@ -140,6 +140,9 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 		if (WsStreamProperties.PROP_DROP_RECURRENT_REQUESTS.equalsIgnoreCase(name)) {
 			return dropRecurrentRequests;
 		}
+		if (name.startsWith("org.quartz.")) { // NON-NLS
+			quartzProperties.getProperty(name);
+		}
 
 		return super.getProperty(name);
 	}
@@ -644,10 +647,10 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	/**
 	 * Resolves variable defined value from:
 	 * <ul>
+	 * <li>{@code context} parameter passed entries: request, step and scenario. Value resolution from context provided
+	 * entries is stream dependent.</li>
 	 * <li>streams cache - {@link com.jkoolcloud.tnt4j.streams.utils.StreamsCache#getValue(String)}</li>
 	 * <li>stream configuration properties - {@link #getProperty(String)}</li>
-	 * <li>{@code context} parameter passed entries. Value resolution from context provided entries is stream
-	 * dependent.</li>
 	 * <li>groovy expression evaluated value - see
 	 * <a href="https://docs.groovy-lang.org/latest/html/api/groovy/time/TimeCategory.html">Groovy API TimeCategory</a>
 	 * for details. See {@link #getScript(String)} for supported groovy script additions. NOTE: expressions shall not
@@ -660,13 +663,13 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 *            variable value resolution context to use
 	 * @return variable resolved value
 	 *
-	 * @see com.jkoolcloud.tnt4j.streams.inputs.AbstractWsStream.DataFillContext#getReqParameter(String)
+	 * @see #getReqContextProperty(String, com.jkoolcloud.tnt4j.streams.inputs.AbstractWsStream.DataFillContext)
 	 * @see com.jkoolcloud.tnt4j.streams.utils.StreamsCache#getValue(String)
 	 * @see #getProperty(String)
 	 * @see #evaluateExpr(String)
 	 */
 	protected Object getVariableValue(String varName, DataFillContext context) {
-		Object rValue = context.getReqParameter(varName);
+		Object rValue = getReqContextProperty(varName, context);
 		if (rValue == null) {
 			rValue = StreamsCache.getValue(varName);
 		}
@@ -679,6 +682,39 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 			} catch (ScriptException e) {
 				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 						"AbstractWsStream.expr.evaluation.failed", varName, e.getMessage());
+			}
+		}
+
+		return rValue;
+	}
+
+	/**
+	 * Resolves request context provided property value. Property value resolution is made from context provided
+	 * entities: request, step and scenario.
+	 *
+	 * @param varName
+	 *            property name to resolve
+	 * @param context
+	 *            request context context to use
+	 * @return resolved property value
+	 * 
+	 * @see com.jkoolcloud.tnt4j.streams.inputs.AbstractWsStream.DataFillContext#getReqParameter(String)
+	 * @see com.jkoolcloud.tnt4j.streams.scenario.WsScenarioStep#getProperty(String)
+	 * @see com.jkoolcloud.tnt4j.streams.scenario.WsScenario#getProperty(String)
+	 */
+	protected Object getReqContextProperty(String varName, DataFillContext context) {
+		Object rValue = context.getReqParameter(varName);
+		if (rValue == null) {
+			WsScenarioStep reqStep = context.getRequest().getScenarioStep();
+			if (reqStep != null) {
+				rValue = reqStep.getProperty(varName);
+			}
+
+			if (rValue == null) {
+				WsScenario reqScenario = reqStep.getScenario();
+				if (reqScenario != null) {
+					rValue = reqScenario.getProperty(varName);
+				}
 			}
 		}
 
