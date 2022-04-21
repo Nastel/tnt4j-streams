@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2014-2022 JKOOL, LLC.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-ws/config/tnt-data-source-ws.xsd">
+
+    <resource-ref id="MetricsParsers" type="Parser" uri="parsers.xml"/>
+
+    <stream name="AmazonMSKMetricsStream" class="com.jkoolcloud.tnt4j.streams.inputs.RestStream">
+        <property name="HaltIfNoParser" value="false"/>
+        <property name="SplitRelatives" value="false"/>
+        <property name="SendStreamStates" value="false"/>
+        <property name="BuildSourceFQNFromStreamedData" value="true"/>
+        <property name="SourceFQN" value="APPL=${ApplName}#SERVICE=${BrokerId}#DATACENTER=${DataCenter}"/>
+        <property name="RetryStateCheck" value="true"/>
+        <property name="RetryInterval" value="300"/>
+
+        <tnt4j-properties>
+            <property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.FileEventSinkFactory"/>
+            <property name="event.sink.factory.EventSinkFactory.prod.FileName" value="./logs/tnt4j-stream-jmx_samples_socket.log"/>
+
+            <!--<property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory"/>-->
+            <!--<property name="event.sink.factory.EventSinkFactory.prod.LogSink" value="file:./logs/tnt4j-stream-jmx_samples_socket.log"/>-->
+            <!--<property name="event.sink.factory.EventSinkFactory.prod.Host" value="localhost"/>-->
+            <!--<property name="event.sink.factory.EventSinkFactory.prod.Port" value="6060"/>-->
+
+            <property name="event.formatter" value="com.jkoolcloud.tnt4j.streams.custom.format.openmetrics.FactPathValueFormatter"/>
+            <property name="event.formatter.KeyReplacements">" "->"_" "\""->"'" "/"->"%" "="->"\\" ","->"!'" "\\\\"->"\\"</property>
+            <property name="event.formatter.ValueReplacements">"\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"
+            </property>
+            <property name="event.formatter.PathLevelAttributes">domain;type1;name;request,error;name1;p4;p5;p6;p7;p8</property>
+        </tnt4j-properties>
+
+        <parser-ref name="MetricsParser"/>
+
+        <scenario name="Amazon MSK metics">
+            <property name="mskUrl" value="wzohq7.c24.kafka.us-east-1.amazonaws.com"/>
+            <property name="cluster" value="demo-cluster-1"/>
+
+            <step name="B1_Metrics"
+                  method="GET">
+                <property name="SynchronizeRequests" value="true"/>
+
+                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="0" startDelayUnits="Seconds"/>
+
+                <property name="brokerId" value="b-1"/>
+
+                <request id="B1_JMX_Metrics">
+                    http://${brokerId}.${cluster}.${mskUrl}:11001
+
+                    <req-param id="applId" value="JMX_Metrics" transient="true"/>
+                </request>
+                <request id="B1_Node_Metrics">
+                    http://${brokerId}.${cluster}.${mskUrl}:11002/metrics
+
+                    <req-param id="applId" value="Node_Metrics" transient="true"/>
+                </request>
+            </step>
+            <step name="B2_Metrics"
+                  method="GET">
+                <property name="SynchronizeRequests" value="true"/>
+
+                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="5" startDelayUnits="Seconds"/>
+
+                <property name="brokerId" value="b-2"/>
+
+                <request id="B2_JMX_Metrics">
+                    http://${brokerId}.${cluster}.${mskUrl}:11001
+
+                    <req-param id="applId" value="JMX_Metrics" transient="true"/>
+                </request>
+                <request id="B2_Node_Metrics">
+                    http://${brokerId}.${cluster}.${mskUrl}:11002/metrics
+
+                    <req-param id="applId" value="Node_Metrics" transient="true"/>
+                </request>
+            </step>
+            <step name="B3_Metrics"
+                  method="GET">
+                <property name="SynchronizeRequests" value="true"/>
+
+                <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="10" startDelayUnits="Seconds"/>
+
+                <property name="brokerId" value="b-3"/>
+
+                <request id="B3_JMX_Metrics">
+                    http://${brokerId}.${cluster}.${mskUrl}:11001
+
+                    <req-param id="applId" value="JMX_Metrics" transient="true"/>
+                </request>
+                <request id="B3_Node_Metrics">
+                    http://${brokerId}.${cluster}.${mskUrl}:11002/metrics
+
+                    <req-param id="applId" value="Node_Metrics" transient="true"/>
+                </request>
+            </step>
+        </scenario>
+    </stream>
+</tnt-data-source>
