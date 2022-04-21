@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 
 /**
- * Custom TNT4J event formatters which format incoming tracking events
+ * Custom TNT4J-Streams formatter used to format OpenMetrics reported data.
  *
  * @author akausinis
  * @version 1.0
  */
 
-package com.jkoolcloud.tnt4j.streams.format;
+package com.jkoolcloud.tnt4j.streams.custom.format.openmetrics;
