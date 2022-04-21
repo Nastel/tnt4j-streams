@@ -16,7 +16,7 @@
 
 package com.jkoolcloud.tnt4j.streams.parsers;
 
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -26,8 +26,8 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
+import org.xmlunit.matchers.CompareMatcher;
 
 import com.jkoolcloud.tnt4j.streams.TestUtils;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocator;
@@ -50,8 +50,8 @@ public class ActivityRFH2ParserTest {
 
 		String rfh2Data = new String(Files.readAllBytes(Paths.get("./samples/rfh2_jms/rfh2_data.xml")),
 				StandardCharsets.UTF_8);
-		XMLUnit.setIgnoreWhitespace(true);
-		assertXMLEqual("RFH2 folders XML string does not match", rfh2Data, fXML);
+		assertThat("RFH2 folders XML string does not match", rfh2Data,
+				CompareMatcher.isIdenticalTo(fXML).ignoreComments().ignoreWhitespace());
 
 		Object jmsData = parser.resolveLocatorValue(
 				new ActivityFieldLocator(ActivityFieldLocatorType.Label.name(), ActivityRFH2Parser.JMS_DATA),
