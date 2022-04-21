@@ -17,7 +17,9 @@
 package com.jkoolcloud.tnt4j.streams.parsers;
 
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,10 +51,11 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * This parser supports the following configuration properties (in addition to those supported by
  * {@link GenericActivityParser}):
  * <ul>
- * <li>FieldDelim - fields separator. (Optional)</li>
+ * <li>FieldDelim - fields separator. Default value - {@value DEFAULT_DELIM}. (Optional)</li>
  * <li>Pattern - pattern used to determine which types of activity data string this parser supports. When {@code null},
  * all strings are assumed to match the format supported by this parser. (Optional)</li>
- * <li>StripQuotes - whether surrounding double quotes should be stripped from extracted data values. (Optional)</li>
+ * <li>StripQuotes - whether surrounding double quotes should be stripped off. Default value - {@code true}.
+ * (Optional)</li>
  * </ul>
  * <p>
  * This activity parser supports those activity field locator types:
@@ -94,6 +97,12 @@ public class ActivityTokenParser extends GenericActivityParser<String[]> {
 	protected Pattern pattern = null;
 
 	/**
+	 * String tokenizer instance used to tokenize input string into name/value pairs. It uses {@link #fieldDelim} as
+	 * delimiter for name/value pairs.
+	 */
+	protected StringTokenizer strTokenizer = null;
+
+	/**
 	 * Constructs a new ActivityTokenParser.
 	 */
 	public ActivityTokenParser() {
@@ -103,6 +112,16 @@ public class ActivityTokenParser extends GenericActivityParser<String[]> {
 	@Override
 	protected EventSink logger() {
 		return LOGGER;
+	}
+
+	@Override
+	public void setProperties(Collection<Map.Entry<String, String>> props) {
+		super.setProperties(props);
+
+		strTokenizer = stripQuotes
+				? new StringTokenizer("", fieldDelim, StringMatcherFactory.INSTANCE.doubleQuoteMatcher())
+				: new StringTokenizer("", fieldDelim);
+		strTokenizer.setIgnoreEmptyTokens(false);
 	}
 
 	@Override
@@ -168,11 +187,9 @@ public class ActivityTokenParser extends GenericActivityParser<String[]> {
 				return null;
 			}
 		}
-		StringTokenizer tk = stripQuotes
-				? new StringTokenizer(dataStr, fieldDelim, StringMatcherFactory.INSTANCE.doubleQuoteMatcher())
-				: new StringTokenizer(dataStr, fieldDelim);
-		tk.setIgnoreEmptyTokens(false);
-		String[] fields = tk.getTokenArray();
+
+		strTokenizer.reset(dataStr);
+		String[] fields = strTokenizer.getTokenArray();
 		if (ArrayUtils.isEmpty(fields)) {
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityParser.no.fields");

@@ -17,6 +17,7 @@
 package com.jkoolcloud.tnt4j.streams.parsers;
 
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -46,11 +47,12 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * This parser supports the following configuration properties (in addition to those supported by
  * {@link com.jkoolcloud.tnt4j.streams.parsers.AbstractActivityMapParser}):
  * <ul>
- * <li>FieldDelim - fields separator. (Optional)</li>
- * <li>ValueDelim - value delimiter. (Optional)</li>
+ * <li>FieldDelim - fields separator. Default value - {@value DEFAULT_DELIM}. (Optional)</li>
+ * <li>ValueDelim - value delimiter. Default value - {@code "="}. (Optional)</li>
  * <li>Pattern - pattern used to determine which types of activity data string this parser supports. When {@code null},
  * all strings are assumed to match the format supported by this parser. (Optional)</li>
- * <li>StripQuotes - whether surrounding double quotes should be stripped from extracted data values. (Optional)</li>
+ * <li>StripQuotes - whether surrounding double quotes should be stripped off. Default value - {@code true}.
+ * (Optional)</li>
  * <li>EntryPattern - pattern used to to split data into name/value pairs. It should define two RegEx groups named
  * {@code "key"} and {@code "value"} used to map data contained values to name/value pair. NOTE: this parameter takes
  * preference on {@code "FieldDelim"} and {@code "ValueDelim"} properties. (Optional)</li>
@@ -60,6 +62,8 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  */
 public class ActivityNameValueParser extends AbstractActivityMapParser {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(ActivityNameValueParser.class);
+
+	private static final Pattern SURROUNDING_QUOTES_PATTERN = Pattern.compile("^\"|\"$"); // NON-NLS
 
 	/**
 	 * Contains the field separator (set by {@code FieldDelim} property) - Default:
@@ -93,6 +97,12 @@ public class ActivityNameValueParser extends AbstractActivityMapParser {
 	protected Pattern entryPattern = null;
 
 	/**
+	 * String tokenizer instance used to tokenize input string into name/value pairs. It uses {@link #fieldDelim} as
+	 * delimiter for name/value pairs.
+	 */
+	protected StringTokenizer strTokenizer = null;
+
+	/**
 	 * Constructs a new ActivityNameValueParser.
 	 */
 	public ActivityNameValueParser() {
@@ -102,6 +112,18 @@ public class ActivityNameValueParser extends AbstractActivityMapParser {
 	@Override
 	protected EventSink logger() {
 		return LOGGER;
+	}
+
+	@Override
+	public void setProperties(Collection<Map.Entry<String, String>> props) {
+		super.setProperties(props);
+
+		if (entryPattern == null) {
+			strTokenizer = stripQuotes
+					? new StringTokenizer("", fieldDelim, StringMatcherFactory.INSTANCE.doubleQuoteMatcher())
+					: new StringTokenizer("", fieldDelim);
+			strTokenizer.setIgnoreEmptyTokens(false);
+		}
 	}
 
 	@Override
@@ -162,7 +184,7 @@ public class ActivityNameValueParser extends AbstractActivityMapParser {
 	 * <p>
 	 * This parser supports the following class types (and all classes extending/implementing any of these):
 	 * <ul>
-	 * <li>{@link java.lang.String}</li>
+	 * <li>{@link String}</li>
 	 * <li>{@code byte[]}</li>
 	 * <li>{@link java.nio.ByteBuffer}</li>
 	 * <li>{@link java.io.Reader}</li>
@@ -222,15 +244,12 @@ public class ActivityNameValueParser extends AbstractActivityMapParser {
 			}
 		}
 
-		return entryPattern == null ? delimit(dataStr) : regex(dataStr);
+		return strTokenizer != null ? delimit(dataStr) : regex(dataStr);
 	}
 
 	private Map<String, String> delimit(String dataStr) {
-		StringTokenizer tk = stripQuotes
-				? new StringTokenizer(dataStr, fieldDelim, StringMatcherFactory.INSTANCE.doubleQuoteMatcher())
-				: new StringTokenizer(dataStr, fieldDelim);
-		tk.setIgnoreEmptyTokens(false);
-		String[] fields = tk.getTokenArray();
+		strTokenizer.reset(dataStr);
+		String[] fields = strTokenizer.getTokenArray();
 		if (ArrayUtils.isEmpty(fields)) {
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityParser.no.fields");
@@ -240,10 +259,17 @@ public class ActivityNameValueParser extends AbstractActivityMapParser {
 				"ActivityParser.split", fields.length);
 		Map<String, String> nameValues = new HashMap<>(fields.length);
 		for (String field : fields) {
-			if (field != null) {
+			if (StringUtils.isNotEmpty(field)) {
 				String[] nv = field.split(Pattern.quote(valueDelim));
 				if (ArrayUtils.isNotEmpty(nv)) {
-					nameValues.put(nv[0], nv.length > 1 ? nv[1].trim() : "");
+					String key = nv[0];
+					String value = nv.length > 1 ? nv[1].trim() : "";
+					if (stripQuotes) {
+						key = SURROUNDING_QUOTES_PATTERN.matcher(key).replaceAll("");
+						value = SURROUNDING_QUOTES_PATTERN.matcher(value).replaceAll("");
+					}
+
+					nameValues.put(key, value);
 				}
 				logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"ActivityNameValueParser.found.delim", field);
@@ -259,9 +285,11 @@ public class ActivityNameValueParser extends AbstractActivityMapParser {
 		while (matcher.find()) {
 			String key = matcher.group("key"); // NON-NLS
 			String value = matcher.group("value"); // NON-NLS
-			nameValues.put(key, value == null ? "" : value.trim());
-			logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ActivityNameValueParser.found.regex", key, value);
+			if (!StringUtils.isAllEmpty(key, value)) {
+				nameValues.put(key, value == null ? "" : value.trim());
+				logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						"ActivityNameValueParser.found.regex", key, value);
+			}
 		}
 
 		return nameValues;
