@@ -132,12 +132,21 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 	}
 
 	/**
-	 * Returns request (command/query/etc.) parameter values map.
+	 * Returns request (command/query/etc.) parameters and context properties values map. Context properties are picked
+	 * from scenario and step.
 	 * 
-	 * @return request parameters values map
+	 * @return request parameters and context properties values map
 	 */
 	public Map<String, ?> getParametersMap() {
 		Map<String, Object> pMap = new HashMap<>(parameters.size());
+
+		if (scenarioStep.getScenario() != null && scenarioStep.getScenario().hasProperties()) {
+			pMap.putAll(scenarioStep.getScenario().getPropertiesMap());
+		}
+
+		if (scenarioStep.hasProperties()) {
+			pMap.putAll(scenarioStep.getPropertiesMap());
+		}
 
 		for (Map.Entry<String, Parameter> me : parameters.entrySet()) {
 			pMap.put(me.getValue().id, me.getValue().value);

@@ -194,6 +194,24 @@ public abstract class WsScenarioEntity {
 		return properties == null ? null : properties.entrySet();
 	}
 
+	/**
+	 * Returns properties map for this step.
+	 * 
+	 * @return properties map for this step
+	 */
+	public Map<String, String> getPropertiesMap() {
+		return properties;
+	}
+
+	/**
+	 * Checks if any property is defined.
+	 * 
+	 * @return {@code true} if properties map is not {@code null} and not empty, {@code false} - otherwise
+	 */
+	public boolean hasProperties() {
+		return properties != null && !properties.isEmpty();
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(getClass().getSimpleName());
