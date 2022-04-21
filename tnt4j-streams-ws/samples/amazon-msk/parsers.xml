@@ -35,13 +35,13 @@
         <field name="EventName" value="snapName">
             <field-transform lang="groovy"><![CDATA[
                 String props = "";
-                props += (StringUtils.isEmpty(${name1}) ? "" : "name1=" + ${name1});
-                props += (props.length() > 0 ? "," : "") + "type1=" + ${type1};
-                props += (StringUtils.isEmpty(${p4}) ? "" : (props.length() > 0 ? "," : "") + "p4=" + ${p4});
-                props += (StringUtils.isEmpty(${p5}) ? "" : (props.length() > 0 ? "," : "") + "p5=" + ${p5});
-                props += (StringUtils.isEmpty(${p6}) ? "" : (props.length() > 0 ? "," : "") + "p6=" + ${p6});
-                props += (StringUtils.isEmpty(${p7}) ? "" : (props.length() > 0 ? "," : "") + "p7=" + ${p7});
-                props += (StringUtils.isEmpty(${p8}) ? "" : (props.length() > 0 ? "," : "") + "p8=" + ${p8});
+                props += (StringUtils.isEmpty(${mName}) ? "" : "mName=" + ${mName});
+                props += (props.length() > 0 ? "," : "") + "mType=" + ${mType};
+                props += (StringUtils.isEmpty(${mToken4}) ? "" : (props.length() > 0 ? "," : "") + "mToken4=" + ${mToken4});
+                props += (StringUtils.isEmpty(${mToken5}) ? "" : (props.length() > 0 ? "," : "") + "mToken5=" + ${mToken5});
+                props += (StringUtils.isEmpty(${mToken6}) ? "" : (props.length() > 0 ? "," : "") + "mToken6=" + ${mToken6});
+                props += (StringUtils.isEmpty(${mToken7}) ? "" : (props.length() > 0 ? "," : "") + "mToken7=" + ${mToken7});
+                props += (StringUtils.isEmpty(${mToken8}) ? "" : (props.length() > 0 ? "," : "") + "mToken8=" + ${mToken8});
 
                 ${domain} + ":" + props
             ]]></field-transform>
@@ -69,49 +69,49 @@
                     : ${keyTokens}[0]
             ]]></field-transform>
         </field>
-        <field name="type1" value="metricType" transparent="true">
+        <field name="mType" value="metricType" transparent="true">
             <field-transform lang="groovy"><![CDATA[
                 ${keyTokens}.length > 2
                     ? ${keyTokens}[2]
                     : ${keyTokens}[1]
             ]]></field-transform>
         </field>
-        <field name="name1" value="metricName" transparent="true">
+        <field name="mName" value="metricName" transparent="true">
             <field-transform lang="groovy"><![CDATA[
                 ${keyTokens}.length > 3
                     ? ${keyTokens}[3]
                     : null
             ]]></field-transform>
         </field>
-        <field name="p4" value="metricP4" transparent="true">
+        <field name="mToken4" value="metricToken4" transparent="true">
             <field-transform lang="groovy"><![CDATA[
                 ${keyTokens}.length > 4
                     ? ${keyTokens}[4]
                     : null
             ]]></field-transform>
         </field>
-        <field name="p5" value="metricP5" transparent="true">
+        <field name="mToken5" value="metricToken5" transparent="true">
             <field-transform lang="groovy"><![CDATA[
                 ${keyTokens}.length > 5
                     ? ${keyTokens}[5]
                     : null
             ]]></field-transform>
         </field>
-        <field name="p6" value="metricP6" transparent="true">
+        <field name="mToken6" value="metricToken6" transparent="true">
             <field-transform lang="groovy"><![CDATA[
                 ${keyTokens}.length > 6
                     ? ${keyTokens}[6]
                     : null
             ]]></field-transform>
         </field>
-        <field name="p7" value="metricP7" transparent="true">
+        <field name="mToken7" value="metricToken7" transparent="true">
             <field-transform lang="groovy"><![CDATA[
                 ${keyTokens}.length > 7
                     ? ${keyTokens}[7]
                     : null
             ]]></field-transform>
         </field>
-        <field name="p8" value="metricP8" transparent="true">
+        <field name="mToken8" value="metricToken8" transparent="true">
             <field-transform lang="groovy"><![CDATA[
                 ${keyTokens}.length > 8
                     ? ${keyTokens}[8]

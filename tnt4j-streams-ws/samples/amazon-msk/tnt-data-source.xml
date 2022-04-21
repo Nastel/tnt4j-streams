@@ -43,7 +43,9 @@
             <property name="event.formatter.KeyReplacements">" "->"_" "\""->"'" "/"->"%" "="->"\\" ","->"!'" "\\\\"->"\\"</property>
             <property name="event.formatter.ValueReplacements">"\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"
             </property>
-            <property name="event.formatter.PathLevelAttributes">domain;type1;name;request,error;name1;p4;p5;p6;p7;p8</property>
+            <property name="event.formatter.PathLevelAttributes">
+                domain;mType;name;request,error;mName;mToken4;mToken5;mToken6;mToken7;mToken8
+            </property>
         </tnt4j-properties>
 
         <parser-ref name="MetricsParser"/>
