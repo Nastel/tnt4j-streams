@@ -87,20 +87,6 @@
             <artifactId>poi-ooxml</artifactId>
             <version>${org.apache.poi.version}</version>
             <exclusions>
-                <!-- We do not deal 2D graphical data anyway -->
-                <exclusion>
-                    <artifactId>graphics2d</artifactId>
-                    <groupId>de.rototor.pdfbox</groupId>
-                </exclusion>
-                <!-- We do not deal SVG graphical data anyway -->
-                <exclusion>
-                    <artifactId>batik-all</artifactId>
-                    <groupId>org.apache.xmlgraphics</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
                 <exclusion>
                     <artifactId>log4j-api</artifactId>
                     <groupId>org.apache.logging.log4j</groupId>
