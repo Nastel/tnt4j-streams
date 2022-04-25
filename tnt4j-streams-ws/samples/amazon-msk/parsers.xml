@@ -136,7 +136,12 @@
                 List<String> payloadLines = new ArrayList<>(lines.length);
 
                 for (String line : lines) {
-                    if (!StringUtils.startsWith (line, "#")) {
+                    // Remove comment lines
+                    boolean pass = !StringUtils.startsWith (line, "#")
+                    // Add additional lines filtering, e.g. pick only 'kafka_server_XXXXXXX' lines
+                    //pass &= Matchers.evaluate("regex:kafka_server_.+", line);
+
+                    if (pass) {
                         payloadLines.add(line);
                     }
                 }
