@@ -287,7 +287,7 @@ public class TNTInputStreamStatistics
 
 	/**
 	 * Returns count of activity items available to stream. If total activities count can't be determined, then
-	 * {@code -1} is returned.
+	 * {@code 0} is returned.
 	 * 
 	 * @return total count of activities to be processed by steam
 	 */
@@ -544,6 +544,6 @@ public class TNTInputStreamStatistics
 
 	private static class StreamTotals {
 		private Long bytesTotalValue = 0L;
-		private Integer activitiesTotalValue = -1;
+		private Integer activitiesTotalValue = 0;
 	}
 }
