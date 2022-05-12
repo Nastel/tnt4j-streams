@@ -59,6 +59,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>Correlator - message correlation identifier</li>
  * <li>CorrelatorBytes - message correlation identifier bytes value</li>
  * <li>DeliveryMode - message delivery mode number</li>
+ * <li>DeliveryTime - message delivery time value</li>
  * <li>Destination - destination name this message was received from</li>
  * <li>Expiration - message's expiration time</li>
  * <li>MessageId - message identifier string</li>
@@ -68,7 +69,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>Timestamp - timestamp in milliseconds</li>
  * <li>Type - message type name supplied by the client when the message was sent</li>
  * <li>CustomMsgProps - map of properties accessible over keys enumeration {@link javax.jms.Message#getPropertyNames()}
- * and values resolved over {@link javax.jms.Message#getStringProperty(String)}</li>
+ * and values resolved over {@link javax.jms.Message#getObjectProperty(String)}</li>
  * </ul>
  * <li>ActivityTransport - value is always
  * {@value com.jkoolcloud.tnt4j.streams.utils.JMSStreamConstants#TRANSPORT_JMS}.</li>
@@ -207,7 +208,7 @@ public class ActivityJMSMessageParser extends AbstractActivityMapParser {
 	 * <li>Type - message type name supplied by the client when the message was sent</li>
 	 * <li>CustomMsgProps - map of properties accessible over keys enumeration
 	 * {@link javax.jms.Message#getPropertyNames()} and values resolved over
-	 * {@link javax.jms.Message#getStringProperty(String)}</li>
+	 * {@link javax.jms.Message#getObjectProperty(String)}</li>
 	 * </ul>
 	 *
 	 * @param message
@@ -222,7 +223,7 @@ public class ActivityJMSMessageParser extends AbstractActivityMapParser {
 		msgMetaMap.put(StreamFieldType.Correlator.name(), message.getJMSCorrelationID());
 		msgMetaMap.put("CorrelatorBytes", message.getJMSCorrelationIDAsBytes()); // NON-NLS
 		msgMetaMap.put("DeliveryMode", message.getJMSDeliveryMode()); // NON-NLS
-		// msgMetaMap.put("DeliveryTime", message.getJMSDeliveryTime()); // NON-NLS
+		msgMetaMap.put("DeliveryTime", message.getJMSDeliveryTime()); // NON-NLS
 		msgMetaMap.put("Destination", getDestinationName(message.getJMSDestination())); // NON-NLS
 		msgMetaMap.put("Expiration", message.getJMSExpiration()); // NON-NLS
 		msgMetaMap.put("MessageId", message.getJMSMessageID()); // NON-NLS
@@ -238,7 +239,7 @@ public class ActivityJMSMessageParser extends AbstractActivityMapParser {
 		if (propNames != null) {
 			while (propNames.hasMoreElements()) {
 				String pName = propNames.nextElement();
-				customPropsMap.put(pName, message.getStringProperty(pName));
+				customPropsMap.put(pName, message.getObjectProperty(pName));
 			}
 		}
 		if (!customPropsMap.isEmpty()) {

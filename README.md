@@ -6016,6 +6016,7 @@ Additional JMS message fields and mappings are supported by these locators for t
     * `Correlator` - message correlation identifier
     * `CorrelatorBytes` - message correlation identifier bytes value
     * `DeliveryMode` - message delivery mode number
+    * `DeliveryTime` - message delivery time value
     * `Destination` - destination name this message was received from
     * `Expiration` - message's expiration time
     * `MessageId` - message identifier string
