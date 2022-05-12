@@ -39,14 +39,21 @@ import com.jkoolcloud.tnt4j.utils.Utils;
  * @version $Revision: 1 $
  */
 public class FactPathValueFormatter extends FactNameValueFormatter {
+
+	/**
+	 * Default duplicate path level key values suffix {@value}.
+	 */
 	public static final String UNIQUE_SUFFIX = "_";
 
-	protected String uniqueSuffix = UNIQUE_SUFFIX;
-	protected String[][] pathLevelAttrKeys = null;
+	private String uniqueSuffix = UNIQUE_SUFFIX;
+	private String[][] pathLevelAttrKeys = null;
 
 	private Comparator<Snapshot> snapshotComparator;
 	private Comparator<Property> propertyComparator;
 
+	/**
+	 * Constructs a new instance of {@code FactPathValueFormatter}.
+	 */
 	public FactPathValueFormatter() {
 		super();
 	}
@@ -206,6 +213,17 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 		return getObjNameStr(objNameProps, snap);
 	}
 
+	/**
+	 * Makes decorated string representation of snapshot name from provided set of canonical object name properties
+	 * (attributes).
+	 *
+	 * @param objNameProps
+	 *            canonical object name properties
+	 * @param snap
+	 *            snapshot instance to construct name
+	 *
+	 * @return decorated string representation of snapshot name
+	 */
 	protected String getObjNameStr(Map<?, ?> objNameProps, Snapshot snap) {
 		StringBuilder pathBuilder = new StringBuilder(128);
 		String pv;

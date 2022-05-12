@@ -41,12 +41,33 @@ import com.jkoolcloud.tnt4j.utils.Utils;
  * @version $Revision: 1 $
  */
 public class FactNameValueFormatter extends DefaultFormatter {
+	/**
+	 * Line-feed symbol {@value}.
+	 */
 	public static final String LF = "\n";
+	/**
+	 * Carriage-return symbol {@value}.
+	 */
 	public static final String CR = "\r";
+	/**
+	 * Field separator symbol {@value}.
+	 */
 	public static final String FIELD_SEP = ",";
+	/**
+	 * Formatted data package end symbol {@value}.
+	 */
 	public static final String END_SEP = LF;
+	/**
+	 * Property path delimiter symbol {@value}.
+	 */
 	public static final String PATH_DELIM = "\\";
+	/**
+	 * Equality symbol {@value}.
+	 */
 	public static final String EQ = "=";
+	/**
+	 * Fields separator symbol {@value}.
+	 */
 	public static final String FS_REP = "!";
 
 	private static final String SELF_SNAP_NAME = "Self";
@@ -54,9 +75,20 @@ public class FactNameValueFormatter extends DefaultFormatter {
 
 	private static final String SNAP_NAME_PROP = "JMX_SNAP_NAME";
 
+	/**
+	 * Property key replacement symbols map.
+	 */
 	protected Map<String, String> keyReplacements = new HashMap<>();
+	/**
+	 * Property value replacement symbols map.
+	 */
 	protected Map<String, String> valueReplacements = new HashMap<>();
 
+	private boolean addSelfSnapshot = true;
+
+	/**
+	 * Constructs a new instance of {@code FactNameValueFormatter}.
+	 */
 	public FactNameValueFormatter() {
 		super("time.stamp={2},level={1},source={3},msg=\"{0}\"");
 
@@ -74,7 +106,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 		toString(nvString, event.getSource()).append(PATH_DELIM).append(event.getName()).append(PATH_DELIM)
 				.append("Events").append(FIELD_SEP);
 
-		if (event.getOperation().getSnapshot(SELF_SNAP_ID) == null) {
+		if (addSelfSnapshot && event.getOperation().getSnapshot(SELF_SNAP_ID) == null) {
 			Snapshot selfSnapshot = getSelfSnapshot(event.getOperation());
 			if (event.getTag() != null) {
 				Set<String> tags = event.getTag();
@@ -112,7 +144,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 		nvString.append("OBJ:Streams");
 		toString(nvString, activity.getSource()).append(PATH_DELIM).append("Activities").append(FIELD_SEP);
 
-		if (activity.getSnapshot(SELF_SNAP_ID) == null) {
+		if (addSelfSnapshot && activity.getSnapshot(SELF_SNAP_ID) == null) {
 			Snapshot selfSnapshot = getSelfSnapshot(activity);
 			selfSnapshot.add("id.count", activity.getIdCount());
 
@@ -168,8 +200,9 @@ public class FactNameValueFormatter extends DefaultFormatter {
 
 		nvString.append("OBJ:Streams");
 		toString(nvString, source).append(PATH_DELIM).append("Message").append(FIELD_SEP);
-		nvString.append("Self").append(PATH_DELIM).append("level=").append(getValueStr(level)).append(FIELD_SEP);
-		nvString.append("Self").append(PATH_DELIM).append("msg-text=");
+		nvString.append(SELF_SNAP_NAME).append(PATH_DELIM).append("level=").append(getValueStr(level))
+				.append(FIELD_SEP);
+		nvString.append(SELF_SNAP_NAME).append(PATH_DELIM).append("msg-text=");
 		Utils.quote(Utils.format(msg, args), nvString).append(END_SEP);
 		return nvString.toString();
 	}
@@ -248,7 +281,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 	 * Makes decorated string representation of snapshot name.
 	 * <p>
 	 * Snapshot name string gets symbols replaced using ones defined in {@link #keyReplacements} map.
-	 * 
+	 *
 	 * @param snap
 	 *            snapshot instance to get name
 	 * @return decorated string representation of snapshot name
@@ -264,7 +297,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 	 * @param snap
 	 *            snapshot instance
 	 * @return decorated string representation of snapshot name
-	 * 
+	 *
 	 * @see #getSnapNameStr(com.jkoolcloud.tnt4j.core.Snapshot)
 	 */
 	protected String getSnapName(Snapshot snap) {
@@ -342,6 +375,8 @@ public class FactNameValueFormatter extends DefaultFormatter {
 		} else {
 			Utils.parseReplacements(pValue, valueReplacements);
 		}
+
+		addSelfSnapshot = Utils.getBoolean("AddSelfSnapshot", settings, addSelfSnapshot);
 	}
 
 	/**
