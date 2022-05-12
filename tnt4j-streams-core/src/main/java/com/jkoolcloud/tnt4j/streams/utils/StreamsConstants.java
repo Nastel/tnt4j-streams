@@ -38,6 +38,10 @@ public final class StreamsConstants {
 	 * The constant to indicate default map key for activity transport definition.
 	 */
 	public static final String TRANSPORT_KEY = "ActivityTransport"; // NON-NLS
+	/**
+	 * The constant to indicate default map key for activity package headers.
+	 */
+	public static final String HEADERS_KEY = "Headers"; // NON-NLS
 
 	/**
 	 * The constant to indicate activity transport is HTTP.

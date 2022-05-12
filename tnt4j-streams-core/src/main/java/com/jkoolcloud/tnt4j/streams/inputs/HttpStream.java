@@ -18,6 +18,7 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -63,6 +64,10 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * <ul>
  * <li>ActivityData - raw activity data as {@code byte[]} retrieved from http request.</li>
  * <li>ActivityTransport - activity transport definition: 'Http'.</li>
+ * <li>Headers - HTTP request headers values map.</li>
+ * <li>Line - HTTP request line values map: 'Method', 'Protocol', 'Uri'</li>
+ * <li>Entity - HTTP request entity values map: 'Content-Length', 'Content-Encoding', 'Content-Type', 'Chunked',
+ * 'Repeatable', 'Streaming'</li>
  * </ul>
  * <p>
  * This activity stream supports the following configuration properties (in addition to those supported by
@@ -153,8 +158,12 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 	protected void initialize() throws Exception {
 		super.initialize();
 
-		requestHandler = new HttpStreamRequestHandler();
+		requestHandler = createHandler();
 		requestHandler.initialize();
+	}
+
+	protected HttpStreamRequestHandler createHandler() throws Exception {
+		return new HttpStreamRequestHandler();
 	}
 
 	@Override
@@ -196,8 +205,10 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 						"HttpStream.connection.timed.out");
 			} else if (ex instanceof ConnectionClosedException) {
 				LOGGER.log(OpLevel.ERROR, Utils.getExceptionMessages(ex));
-				// } else if (ex instanceof SocketException) {
-				// LOGGER.log(OpLevel.ERROR, ex.getMessage());
+			} else if (ex instanceof SocketException && ex.getMessage().contains("closed")) {
+				LOGGER.log(OpLevel.WARNING, ex.getMessage());
+			} else if (ex instanceof javax.net.ssl.SSLHandshakeException) {
+				LOGGER.log(OpLevel.ERROR, Utils.getExceptionMessages(ex));
 			} else {
 				Utils.logThrowable(LOGGER, OpLevel.ERROR,
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
@@ -300,6 +311,9 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 		 * <li>{@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#ACTIVITY_DATA_KEY} or all parameters from
 		 * request if request id URL encoded</li>
 		 * <li>{@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#TRANSPORT_KEY}</li>
+		 * <li>{@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#HEADERS_KEY}</li>
+		 * <li>{@code "Line"}</li>
+		 * <li>{@code "Entity"}</li>
 		 * </ul>
 		 */
 		@Override
@@ -336,6 +350,9 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 
 						if (!reqMap.isEmpty()) {
 							activityAvailable = true;
+
+							collectRequestMetadata(request, reqEntity, reqMap);
+
 							reqMap.put(StreamsConstants.TRANSPORT_KEY, StreamsConstants.TRANSPORT_HTTP);
 							added = addInputToBuffer(reqMap);
 						}
@@ -365,7 +382,6 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 					response.setEntity(createHtmlStringEntity(msg));
 					logger().log(OpLevel.DEBUG, msg);
 				}
-
 			}
 		}
 
@@ -374,6 +390,42 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 					ContentType.create("text/html", StandardCharsets.UTF_8));
 
 			return entity;
+		}
+
+		private void collectRequestMetadata(HttpRequest request, HttpEntity reqEntity, Map<String, Object> reqMap) {
+			Map<String, Object> headersMap = new HashMap<>();
+			HeaderIterator hIterator = request.headerIterator();
+			if (hIterator != null) {
+				while (hIterator.hasNext()) {
+					Header header = hIterator.nextHeader();
+					headersMap.put(header.getName(), header.getValue());
+				}
+			}
+			if (!headersMap.isEmpty()) {
+				reqMap.put(StreamsConstants.HEADERS_KEY, headersMap);
+			}
+
+			RequestLine reqLine = request.getRequestLine();
+			Map<String, Object> lineMap = new HashMap<>();
+			lineMap.put("Method", reqLine.getMethod()); // NON-NLS
+			lineMap.put("Protocol", reqLine.getProtocolVersion().toString()); // NON-NLS
+			lineMap.put("Uri", reqLine.getUri()); // NON-NLS
+			reqMap.put("Line", lineMap); // NON-NLS
+
+			Map<String, Object> entityMap = new HashMap<>();
+			entityMap.put("Content-Length", reqEntity.getContentLength()); // NON-NLS
+			Header reHeader = reqEntity.getContentEncoding();
+			if (reHeader != null) {
+				entityMap.put(reHeader.getName(), reHeader.getValue());
+			}
+			reHeader = reqEntity.getContentType();
+			if (reHeader != null) {
+				entityMap.put(reHeader.getName(), reHeader.getValue());
+			}
+			entityMap.put("Chunked", reqEntity.isChunked()); // NON-NLS
+			entityMap.put("Repeatable", reqEntity.isRepeatable()); // NON-NLS
+			entityMap.put("Streaming", reqEntity.isStreaming()); // NON-NLS
+			reqMap.put("Entity", entityMap); // NON-NLS
 		}
 	}
 }
