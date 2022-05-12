@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,28 @@
 
 package com.jkoolcloud.tnt4j.streams.matchers;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 /**
  * @author akausinis
  * @version 1.0
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({ RegExMatcherTest.class, StringMatcherTest.class, XPathMatcherTest.class,
-		JsonPathMatcherTest.class, Re2jMatcherTest.class })
-public class AllMatchersTests {
+public class Re2jMatcherTest {
+	@Test
+	public void evaluateTrue() throws Exception {
+		assertTrue(Matchers.evaluate("re2:ee", "rree"));
+	}
+
+	@Test
+	public void evaluateFalse() throws Exception {
+		assertFalse(Matchers.evaluate("re2:ee", "ggrr"));
+	}
+
+	@Test
+	public void evaluateAdvanced() throws Exception {
+		assertTrue(Matchers.evaluate("re2:.*", "eegg"));
+	}
 }

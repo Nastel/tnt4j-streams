@@ -4846,6 +4846,15 @@ Some samples:
     <matchExp>regex:(([a-zA-Z]*):)?(.+)</matchExp>
 </parser-ref>
 ```
+* `Google RE2` - should contain any valid Google RE2 expression. **Positive match** is got when Google RE2 expression pattern matches some
+  subsequence within provided `data` string.
+```xml
+<parser-ref ...>
+    <matchExp>re2:(:33A:)(.*)(:24B:)(.*)</matchExp>
+    <matchExp>re2:((TID)=(.[^\s:,%]*))|((USER_DATA)=(.[^\s:,%]*))</matchExp>
+    <matchExp>re2:(([a-zA-Z]*):)?(.+)</matchExp>
+</parser-ref>
+```
 * `JsonPath` - should contain any valid [JsonPath](https://github.com/json-path/JsonPath) expression. If expression evaluates as `boolean`,
   then this value is returned. If expression evaluates as `collcetion`, then to get **positive match** it must be **not empty** . In other
   cases to get **positive match**, expression should be evaluated as **non-null object**.

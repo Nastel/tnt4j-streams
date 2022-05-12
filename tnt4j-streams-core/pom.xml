@@ -36,6 +36,7 @@
         <logback.version>1.2.7</logback.version>
         <jslt.version>0.1.11</jslt.version>
         <disruptor.version>3.4.4</disruptor.version>
+        <re2j.version>1.6</re2j.version>
     </properties>
 
     <profiles>
@@ -281,6 +282,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.google.re2j</groupId>
+            <artifactId>re2j</artifactId>
+            <version>${re2j.version}</version>
+        </dependency>
 
         <!-- logging dependencies -->
         <!-- slf4j-log4j12 logger shall be used by default -->
@@ -366,7 +372,6 @@
             <version>${httpcomponents.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
 </project>

@@ -39,12 +39,13 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * @see com.jkoolcloud.tnt4j.streams.matchers.RegExMatcher
  * @see com.jkoolcloud.tnt4j.streams.matchers.XPathMatcher
  * @see com.jkoolcloud.tnt4j.streams.matchers.JsonPathMatcher
+ * @see com.jkoolcloud.tnt4j.streams.matchers.Re2jMatcher
  */
 public class Matchers {
 	/**
 	 * Match expression definition pattern.
 	 */
-	protected static final Pattern EVAL_EXP_PATTERN = Pattern.compile("((?<type>[a-zA-Z]*):)?(?<evalExp>(?s).+)"); // NON-NLS
+	protected static final Pattern EVAL_EXP_PATTERN = Pattern.compile("((?<type>[a-zA-Z0-9]*):)?(?<evalExp>(?s).+)"); // NON-NLS
 
 	private static Map<String, StreamEntityFilter<Object>> langEvaluatorsCache = new HashMap<>(5);
 
@@ -82,6 +83,8 @@ public class Matchers {
 			return validateAndProcess(JsonPathMatcher.getInstance(), evalExpression, data);
 		case "STRING": // NON-NLS
 			return validateAndProcess(StringMatcher.getInstance(), evalExpression, data);
+		case "RE2": // NON-NLS
+			return validateAndProcess(Re2jMatcher.getInstance(), evalExpression, data);
 		default:
 			return evaluate(evalType, evalExpression, data);
 		}

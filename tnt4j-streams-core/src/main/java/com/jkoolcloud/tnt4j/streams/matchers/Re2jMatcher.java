@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +18,27 @@ package com.jkoolcloud.tnt4j.streams.matchers;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
+
+import com.google.re2j.Pattern;
+import com.google.re2j.PatternSyntaxException;
 
 /**
- * Data string value match expression evaluation based on Regular Expressions (RegEx).
+ * Data string value match expression evaluation based on Google RE2 Expressions.
  *
  * @version $Revision: 1 $
  */
-public class RegExMatcher implements Matcher {
+public class Re2jMatcher implements Matcher {
 
-	private static RegExMatcher instance;
+	private static Re2jMatcher instance;
 
 	private static final Map<String, Pattern> patternsMap = new HashMap<>(5);
 
-	private RegExMatcher() {
+	private Re2jMatcher() {
 	}
 
-	static synchronized RegExMatcher getInstance() {
+	static synchronized Re2jMatcher getInstance() {
 		if (instance == null) {
-			instance = new RegExMatcher();
+			instance = new Re2jMatcher();
 		}
 
 		return instance;
@@ -49,15 +50,15 @@ public class RegExMatcher implements Matcher {
 	}
 
 	/**
-	 * Evaluates match {@code expression} against provided {@code data} using RegEx.
+	 * Evaluates match {@code expression} against provided {@code data} using Google RE2 expression.
 	 *
 	 * @param expression
-	 *            Regex expression to check
+	 *            Google RE2 expression to check
 	 * @param data
 	 *            data {@link String} to evaluate expression to
 	 * @return {@code true} if expression matches, {@code false} - otherwise
-	 * 
-	 * @throws java.util.regex.PatternSyntaxException
+	 *
+	 * @throws com.google.re2j.PatternSyntaxException
 	 *             if the {@code expression}'s syntax is invalid
 	 */
 	@Override
@@ -67,7 +68,7 @@ public class RegExMatcher implements Matcher {
 			pattern = Pattern.compile(expression);
 			patternsMap.put(expression, pattern);
 		}
-		java.util.regex.Matcher matcher = pattern.matcher(String.valueOf(data));
+		com.google.re2j.Matcher matcher = pattern.matcher(String.valueOf(data));
 		return matcher.find();
 	}
 }
