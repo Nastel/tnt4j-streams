@@ -443,7 +443,8 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 	private void applyUserTNT4JProperties() {
 		if (MapUtils.isNotEmpty(tnt4jProperties)) {
 			for (Map.Entry<String, String> tnt4jProp : tnt4jProperties.entrySet()) {
-				trackerConfig.setProperty(tnt4jProp.getKey(), tnt4jProp.getValue());
+				trackerConfig.setProperty(tnt4jProp.getKey(),
+						Utils.getSystemVarsFilledInProperty(tnt4jProp.getValue()));
 			}
 
 			((TrackerConfigStore) trackerConfig).applyProperties();

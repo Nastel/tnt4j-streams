@@ -3166,4 +3166,46 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		return Arrays.copyOfRange(array, startIdx, endIdx);
 		// return ArrayUtils.subarray (array, startIdx, endIdx);
 	}
+
+	/**
+	 * Fills in provided property value with JVM system properties and environment variables if provided property value
+	 * has any variable expressions.
+	 * <p>
+	 * To fill JVM system property value - use expression {@code "${sys:propName}"}, e.g.:
+	 * {@code "${sys:catalina.base}"}.
+	 * <p>
+	 * To fill JVM environment variable value - use expression {@code "${env:variableName}"}, e.g.:
+	 * {@code "${env:CATALINA_HOME}"}.
+	 * 
+	 * @param propertyValue
+	 *            property value to fill in
+	 * @return system properties and environment variables filed in property value
+	 * 
+	 * @see #isVariableExpression(String)
+	 * @see #resolveExpressionVariables(java.util.Collection, String)
+	 */
+	public static String getSystemVarsFilledInProperty(String propertyValue) {
+		if (isVariableExpression(propertyValue)) {
+			Collection<String> exprVars = new ArrayList<>();
+			resolveExpressionVariables(exprVars, propertyValue);
+
+			String fValue = propertyValue;
+			if (CollectionUtils.isNotEmpty(exprVars)) {
+				for (String eVar : exprVars) {
+					String varName = Utils.getVarName(eVar);
+					if (varName.startsWith("sys:")) { // NON-NLS
+						String val = System.getProperty(varName.substring("sys:".length())); // NON-NLS
+						fValue = fValue.replace(eVar, val);
+					} else if (varName.startsWith("env:")) { // NON-NLS
+						String val = System.getenv(varName.substring("env:".length())); // NON-NLS
+						fValue = fValue.replace(eVar, val);
+					}
+				}
+			}
+
+			return fValue;
+		}
+
+		return propertyValue;
+	}
 }
