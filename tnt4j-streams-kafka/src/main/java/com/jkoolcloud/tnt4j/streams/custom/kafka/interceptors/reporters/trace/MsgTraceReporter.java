@@ -52,6 +52,7 @@ import com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.TNTKafkaPIntercept
 import com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.InterceptionsReporter;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.inputs.InputStreamEventsAdapter;
+import com.jkoolcloud.tnt4j.streams.inputs.InterceptorStream;
 import com.jkoolcloud.tnt4j.streams.inputs.StreamStatus;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
@@ -113,7 +114,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 
 	private ActivityParser mainParser;
 
-	private KafkaMsgTraceStream<ActivityInfo> stream;
+	private InterceptorStream<ActivityInfo> stream;
 	private final Map<String, TraceCommandDeserializer.TopicTraceCommand> traceConfig = new HashMap<>();
 	private String cfgTopic = TRACE_CONFIG_TOPIC;
 	private Set<String> traceOptions;
@@ -130,7 +131,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 *            messages tracing options set
 	 */
 	public MsgTraceReporter(Properties interceptorProperties, Set<String> traceOpts) {
-		this(new KafkaMsgTraceStream<>(), interceptorProperties, true, traceOpts);
+		this(new InterceptorStream<>("KafkaMsgTraceStream"), interceptorProperties, true, traceOpts);
 	}
 
 	/**
@@ -145,8 +146,8 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 * @param traceOpts
 	 *            messages tracing options string
 	 */
-	MsgTraceReporter(KafkaMsgTraceStream<ActivityInfo> stream, Properties interceptorProperties,
-			boolean enableCfgPolling, String traceOpts) {
+	MsgTraceReporter(InterceptorStream<ActivityInfo> stream, Properties interceptorProperties, boolean enableCfgPolling,
+			String traceOpts) {
 		this(stream, interceptorProperties, enableCfgPolling, getTraceOptsSet(traceOpts));
 	}
 
@@ -162,12 +163,17 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 * @param traceOpts
 	 *            messages tracing options set
 	 */
-	MsgTraceReporter(KafkaMsgTraceStream<ActivityInfo> stream, Properties interceptorProperties,
-			boolean enableCfgPolling, Set<String> traceOpts) {
+	MsgTraceReporter(InterceptorStream<ActivityInfo> stream, Properties interceptorProperties, boolean enableCfgPolling,
+			Set<String> traceOpts) {
 		this.stream = stream;
 		this.traceOptions = traceOpts;
 
 		String streamName = interceptorProperties.getProperty(STREAM_PROPERTY_PREFIX + "name"); // NON-NLS
+		// ---------
+		// * make startup faster: intercepted stuff shall be enqueued and processed by stream when it starts.
+		// Interceptions startup is slow taking delay before processing (and even failure if no connection to jkool),
+		// better have delay on shutdown...
+		// -----------
 		stream.setName((StringUtils.isEmpty(streamName) ? stream.getName() : streamName) + "_" + Utils.getVMPID()); // NON-NLS
 		Properties streamProps = extractScopeProperties(interceptorProperties, STREAM_PROPERTY_PREFIX);
 		for (String propName : streamProps.stringPropertyNames()) {

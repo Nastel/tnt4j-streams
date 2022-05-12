@@ -32,6 +32,7 @@ import com.jkoolcloud.tnt4j.streams.TestUtils;
 import com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.TNTKafkaCInterceptor;
 import com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.TNTKafkaPInterceptor;
 import com.jkoolcloud.tnt4j.streams.fields.*;
+import com.jkoolcloud.tnt4j.streams.inputs.InterceptorStream;
 import com.jkoolcloud.tnt4j.streams.outputs.JKCloudActivityOutput;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
@@ -62,7 +63,7 @@ public class MsgTraceReporterTest {
 		config.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
 		config.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");
 
-		KafkaMsgTraceStream<ActivityInfo> stream = buildStream();
+		InterceptorStream<ActivityInfo> stream = buildStream();
 		MsgTraceReporter reporter = getMsgTraceReporter(stream);
 
 		for (int i = 0; i < 10; i++) {
@@ -140,7 +141,7 @@ public class MsgTraceReporterTest {
 
 	@Test
 	public void testSend() throws Exception {
-		KafkaMsgTraceStream<ActivityInfo> stream = buildStream();
+		InterceptorStream<ActivityInfo> stream = buildStream();
 		MsgTraceReporter reporter = getMsgTraceReporter(stream);
 
 		ProducerRecord producerRecord = getProducerRecord();
@@ -159,7 +160,7 @@ public class MsgTraceReporterTest {
 
 	@Test
 	public void testAck() throws Exception {
-		KafkaMsgTraceStream<ActivityInfo> stream = buildStream();
+		InterceptorStream<ActivityInfo> stream = buildStream();
 		MsgTraceReporter reporter = getMsgTraceReporter(stream);
 
 		RecordMetadata recordMetadata = new RecordMetadata(getTopicPartition(), OFFSET, OFFSET, TIMESTAMP, 123L,
@@ -204,8 +205,8 @@ public class MsgTraceReporterTest {
 		return new ProducerRecord<String, String>(TOPIC, 0, null, "VALUE"); // NON-NLS
 	}
 
-	private KafkaMsgTraceStream<ActivityInfo> buildStream() throws Exception {
-		KafkaMsgTraceStream<ActivityInfo> stream = new KafkaMsgTraceStream<ActivityInfo>() {
+	private InterceptorStream<ActivityInfo> buildStream() throws Exception {
+		InterceptorStream<ActivityInfo> stream = new InterceptorStream<ActivityInfo>() {
 			{
 				setOutput(new JKCloudActivityOutput() {
 					@Override
@@ -219,7 +220,7 @@ public class MsgTraceReporterTest {
 		return stream;
 	}
 
-	private MsgTraceReporter getMsgTraceReporter(KafkaMsgTraceStream<ActivityInfo> stream) throws Exception {
+	private MsgTraceReporter getMsgTraceReporter(InterceptorStream<ActivityInfo> stream) throws Exception {
 		// System.setProperty("tnt4j.config", "../config/tnt4j.properties");
 
 		MsgTraceReporter reporter = new MsgTraceReporter(stream, new Properties(), false, "all"); // NON-NLS
@@ -245,7 +246,7 @@ public class MsgTraceReporterTest {
 
 	@Test
 	public void testCommit() throws Exception {
-		KafkaMsgTraceStream<ActivityInfo> stream = buildStream();
+		InterceptorStream<ActivityInfo> stream = buildStream();
 		MsgTraceReporter reporter = getMsgTraceReporter(stream);
 
 		HashMap<TopicPartition, OffsetAndMetadata> map = new HashMap<>();
@@ -281,7 +282,7 @@ public class MsgTraceReporterTest {
 
 	@Test
 	public void testConsume() throws Exception {
-		KafkaMsgTraceStream<ActivityInfo> stream = buildStream();
+		InterceptorStream<ActivityInfo> stream = buildStream();
 		MsgTraceReporter reporter = getMsgTraceReporter(stream);
 
 		ConsumerRecords<Object, Object> consumerRecords = getConsumerRecords();
