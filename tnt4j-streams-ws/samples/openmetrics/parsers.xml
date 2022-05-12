@@ -124,9 +124,12 @@
         <property name="ActivityDelim" value="EOF"/>
 
         <field name="EventType" value="Activity"/>
-        <field name="DataCenter" value="Amazon_MSK"/>
-        <field name="ApplName" locator="$METADATA$.applId" locator-type="Label"/>
+        <field name="DataCenter" value="$METADATA$.dataCenter"/>
+        <field name="ServiceName" value="$METADATA$.serviceName"/>
+        <field name="RegionId" value="$METADATA$.region"/>
+        <field name="ClusterName" value="$METADATA$.cluster"/>
         <field name="BrokerId" locator="$METADATA$.brokerId" locator-type="Label"/>
+        <field name="ApplName" locator="$METADATA$.applId" locator-type="Label"/>
         <field name="EventName" value="Amazon_MSK_Metrics"/>
         <field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
         <field name="EndTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
@@ -136,8 +139,8 @@
                 List<String> payloadLines = new ArrayList<>(lines.length);
 
                 for (String line : lines) {
-                    // Remove comment lines
-                    boolean pass = !StringUtils.startsWith (line, "#")
+                    // Remove comment/empty lines
+                    boolean pass = StringUtils.isNotEmpty(line) && !StringUtils.startsWith (line, "#");
                     // Add additional lines filtering, e.g. pick only 'kafka_server_XXXXXXX' lines
                     //pass &= Matchers.evaluate("regex:kafka_server_.+", line);
 

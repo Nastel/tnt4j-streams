@@ -26,18 +26,24 @@
         <property name="SplitRelatives" value="false"/>
         <property name="SendStreamStates" value="false"/>
         <property name="BuildSourceFQNFromStreamedData" value="true"/>
-        <property name="SourceFQN" value="APPL=${ApplName}#SERVICE=${BrokerId}#DATACENTER=${DataCenter}"/>
+        <!-- Remove APPL token to have JMX and Node metrics right under broker node -->
+        <property name="SourceFQN"
+                  value="APPL=${ApplName}#APPSERVER=${BrokerId}#NETWORK=${ClusterName}#GEOADDR=${RegionId}#SERVICE=${ServiceName}#DATACENTER=${DataCenter}"/>
         <property name="RetryStateCheck" value="true"/>
         <property name="RetryInterval" value="300"/>
 
         <tnt4j-properties>
-            <property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.FileEventSinkFactory"/>
-            <property name="event.sink.factory.EventSinkFactory.prod.FileName" value="./logs/tnt4j-stream-jmx_samples_socket.log"/>
+            <!-- File sink -->
+            <!--property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.FileEventSinkFactory"/>
+            <property name="event.sink.factory.EventSinkFactory.prod.FileName" value="./logs/tnt4j-streams_samples.log"/-->
 
-            <!--<property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory"/>-->
-            <!--<property name="event.sink.factory.EventSinkFactory.prod.LogSink" value="file:./logs/tnt4j-stream-jmx_samples_socket.log"/>-->
-            <!--<property name="event.sink.factory.EventSinkFactory.prod.Host" value="localhost"/>-->
-            <!--<property name="event.sink.factory.EventSinkFactory.prod.Port" value="6060"/>-->
+            <!-- Socket sink to AutoPilot -->
+            <property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory"/>
+            <property name="event.sink.factory.EventSinkFactory.prod.LogSink" value="file:./logs/tnt4j-streams_samples_socket.log"/>
+            <!-- Change to your AP machine host/IP -->
+            <property name="event.sink.factory.EventSinkFactory.prod.Host" value="localhost"/>
+            <!-- Change to your Ap machine port - default one is 6060 -->
+            <property name="event.sink.factory.EventSinkFactory.prod.Port" value="6060"/>
 
             <property name="event.formatter" value="com.jkoolcloud.tnt4j.streams.custom.format.openmetrics.FactPathValueFormatter"/>
             <property name="event.formatter.KeyReplacements">" "->"_" "\""->"'" "/"->"%" "="->"\\" ","->"!'" "\\\\"->"\\"</property>
@@ -50,8 +56,16 @@
 
         <parser-ref name="MetricsParser"/>
 
-        <scenario name="Amazon MSK metics">
+        <scenario name="Amazon MSK metrics">
+            <!-- Set your OpenMetrics data center name -->
+            <property name="dataCenter" value="Amazon_AWS"/>
+            <!-- Set your Amazon AWS service name -->
+            <property name="serviceName" value="MSK"/>
+            <!-- Set your MSK region -->
+            <property name="region" value="us-east-1"/>
+            <!-- Set your MSK cluster host base -->
             <property name="mskUrl" value="wzohq7.c24.kafka.us-east-1.amazonaws.com"/>
+            <!-- Set your MSK cluster name -->
             <property name="cluster" value="demo-cluster-1"/>
 
             <step name="B1_Metrics"
@@ -60,6 +74,7 @@
 
                 <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="0" startDelayUnits="Seconds"/>
 
+                <!-- Set your MSK broker identifier -->
                 <property name="brokerId" value="b-1"/>
 
                 <request id="B1_JMX_Metrics">
@@ -79,6 +94,7 @@
 
                 <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="5" startDelayUnits="Seconds"/>
 
+                <!-- Set your MSK broker identifier -->
                 <property name="brokerId" value="b-2"/>
 
                 <request id="B2_JMX_Metrics">
@@ -98,6 +114,7 @@
 
                 <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="10" startDelayUnits="Seconds"/>
 
+                <!-- Set your MSK broker identifier -->
                 <property name="brokerId" value="b-3"/>
 
                 <request id="B3_JMX_Metrics">

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2014-2022 JKOOL, LLC.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-ws/config/tnt-data-source-ws.xsd">
+
+    <resource-ref id="MetricsParsers" type="Parser" uri="parsers.xml"/>
+
+    <stream name="CloudWatchMetricsStream" class="com.jkoolcloud.tnt4j.streams.inputs.HttpStream">
+        <property name="HaltIfNoParser" value="false"/>
+        <property name="SplitRelatives" value="false"/>
+        <property name="SendStreamStates" value="false"/>
+        <property name="BuildSourceFQNFromStreamedData" value="false"/>
+        <!--<property name="SourceFQN" value="DATACENTER=${DataCenter}"/>-->
+        <property name="RetryStateCheck" value="true"/>
+        <property name="RetryInterval" value="300"/>
+
+        <property name="Port" value="443"/>
+        <property name="UseSSL" value="true"/>
+        <property name="Keystore" value="file:///home/ubuntu/tnt4j-streams-1.14.0-SNAPSHOT/samples/cloudwatch/clientkeystore"/>
+        <property name="KeyPass" value="pass123"/>
+        <property name="KeystorePass" value="pass123"/>
+
+        <tnt4j-properties>
+            <!-- Set your CloudWatch data center name -->
+            <property name="source.factory.DATACENTER" value="Amazon_AWS"/>
+            <!--            <property name="source.factory.SERVICE" value="MSK"/>-->
+            <!--            <property name="source.factory.GEOADDR" value="us-east-1"/>-->
+            <!--            <property name="source.factory.NETWORK" value="demo-cluster-1"/>-->
+            <!--            <property name="source.factory.APPSERVER" value="b-1"/>-->
+            <!--            <property name="source.factory.RootFQN" value="APPSERVER=?#NETWORK=?#GEOADDR=?#SERVICE=?#DATACENTER=?"/>-->
+            <property name="source.factory.RootFQN" value="DATACENTER=?"/>
+
+            <!-- File sink -->
+            <property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.FileEventSinkFactory"/>
+            <property name="event.sink.factory.EventSinkFactory.prod.FileName" value="./logs/tnt4j-streams_samples.log"/>
+
+            <!-- Socket sink to AutoPilot -->
+            <!--<property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory"/>-->
+            <!--<property name="event.sink.factory.EventSinkFactory.prod.LogSink" value="file:./logs/tnt4j-streams_samples_socket.log"/>-->
+            <!-- Change to your AP machine host/IP -->
+            <!--<property name="event.sink.factory.EventSinkFactory.prod.Host" value="localhost"/>-->
+            <!-- Change to your Ap machine port - default one is 6060 -->
+            <!--<property name="event.sink.factory.EventSinkFactory.prod.Port" value="6060"/>-->
+
+            <property name="event.formatter" value="com.jkoolcloud.tnt4j.streams.custom.format.openmetrics.FactPathValueFormatter"/>
+            <property name="event.formatter.AddSelfSnapshot" value="false"/>
+            <property name="event.formatter.KeyReplacements">" "->"_" "\""->"'" "/"->"%" "="->"\\" ","->"!'" "\\\\"->"\\"</property>
+            <property name="event.formatter.ValueReplacements">"\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"
+            </property>
+            <property name="event.formatter.PathLevelAttributes">
+                domain;namespace;region;cluster;broker;metric;topic;cGroup;cAuth
+            </property>
+        </tnt4j-properties>
+
+        <parser-ref name="MetricsParser"/>
+    </stream>
+</tnt-data-source>
