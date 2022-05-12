@@ -117,10 +117,12 @@ public class CfgStreamsBuilder extends POJOStreamsBuilder {
 	 *            flag indicating whether OS pipe input shall be used as stream input
 	 * @param haltOnUnparsed
 	 *            flag indicating whether to stop streaming if parser fails to parse input data
+	 * @return streams configuration loader instance
+	 * 
 	 * @throws Exception
 	 *             if configuration is malformed or streams can't be initiated
 	 */
-	public void loadConfig(boolean osPipeInput, boolean haltOnUnparsed) throws Exception {
+	public StreamsConfigLoader loadConfig(boolean osPipeInput, boolean haltOnUnparsed) throws Exception {
 		StreamsConfigLoader cfg = cfgReader == null ? new StreamsConfigLoader() : new StreamsConfigLoader(cfgReader);
 
 		if (cfg != null) {
@@ -149,6 +151,8 @@ public class CfgStreamsBuilder extends POJOStreamsBuilder {
 
 			addStreams(streams);
 		}
+
+		return cfg;
 	}
 
 	/**
