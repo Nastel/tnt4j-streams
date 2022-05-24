@@ -20,6 +20,7 @@ import java.net.InetAddress;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -56,6 +57,17 @@ public class ActivityField extends AbstractFieldEntity {
 	 */
 	public static final String VALUE_INDEX_ENTRY_KEY = "$ValueIndex$"; // NON-NLS
 
+	/**
+	 * Constant defining entity metadata built-in field name {@value}.
+	 */
+	public static final String META_FIELD_RESOLVE_SERVER = "@ResolveServerFromDNS@"; // NON-NLS
+	/**
+	 * Constant defining entity metadata built-in field name {@value}.
+	 */
+	public static final String META_FIELD_SPLIT_RELATIVES = "@SplitRelatives@"; // NON-NLS
+
+	private static final Pattern METADATA_FIELD_NAME_PATTERN = Pattern.compile("@\\S+@");
+
 	private String fieldTypeName;
 	private List<ActivityFieldLocator> locators = null;
 	private String separator = null;
@@ -83,7 +95,7 @@ public class ActivityField extends AbstractFieldEntity {
 			throw new IllegalArgumentException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
 					"ActivityField.field.type.name.empty"));
 		}
-		this.fieldTypeName = fieldTypeName;
+		setFieldTypeName(fieldTypeName);
 	}
 
 	/**
@@ -173,6 +185,10 @@ public class ActivityField extends AbstractFieldEntity {
 	 */
 	public ActivityField setFieldTypeName(String fieldTypeName) {
 		this.fieldTypeName = fieldTypeName;
+
+		if (METADATA_FIELD_NAME_PATTERN.matcher(fieldTypeName).matches()) {
+			setTransparent(true);
+		}
 
 		return this;
 	}

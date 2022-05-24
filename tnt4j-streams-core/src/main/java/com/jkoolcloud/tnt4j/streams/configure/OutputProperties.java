@@ -48,6 +48,7 @@ public interface OutputProperties {
 	/**
 	 * Constant for name of built-in {@value} property.
 	 */
+	@Deprecated
 	String PROP_SPLIT_RELATIVES = "SplitRelatives"; // NON-NLS
 
 	/**

@@ -32,6 +32,7 @@ import com.jkoolcloud.tnt4j.source.DefaultSourceFactory;
 import com.jkoolcloud.tnt4j.source.Source;
 import com.jkoolcloud.tnt4j.source.SourceFactory;
 import com.jkoolcloud.tnt4j.streams.configure.OutputProperties;
+import com.jkoolcloud.tnt4j.streams.fields.ActivityField;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
@@ -47,9 +48,11 @@ import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
  * {@link com.jkoolcloud.tnt4j.streams.outputs.AbstractJKCloudOutput}):
  * <ul>
  * <li>ResolveServerFromDNS - flag indicating whether to resolve activity entity host name/IP from DNS server. Default
- * value - {@code false}. (Optional)</li>
+ * value - {@code false}. (Optional, deprecated - use * parser metadata field
+ * {@value ActivityField#META_FIELD_RESOLVE_SERVER} to set value for individual entities)</li>
  * <li>SplitRelatives - flag indicating whether to send activity entity child entities independently merging data from
- * both parent and child entity fields into produced entity. Default value - {@code false}. (Optional)</li>
+ * both parent and child entity fields into produced entity. Default value - {@code false}. (Optional, deprecated - use
+ * parser metadata field {@value ActivityField#META_FIELD_SPLIT_RELATIVES} to set value for individual entities)</li>
  * <li>BuildSourceFQNFromStreamedData - flag indicating whether to set streamed activity entity {@link Source} FQN build
  * from activity fields data instead of default on configured in 'tnt4j.properties'. Default value - {@code true}.
  * (Optional)</li>
@@ -66,7 +69,9 @@ public class JKCloudActivityOutput extends AbstractJKCloudOutput<ActivityInfo, T
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(JKCloudActivityOutput.class);
 	private static final String DEFAULT_SOURCE_FQN = "APPL=${ApplName}#SERVER=${ServerName}#NETADDR=${ServerIp}#GEOADDR=${Location}"; // NON-NLS
 
+	@Deprecated
 	private boolean resolveServer = false;
+	@Deprecated
 	private boolean splitRelatives = false;
 	private boolean buildFQNFromData = true;
 	private String sourceFQN = null;
@@ -121,12 +126,12 @@ public class JKCloudActivityOutput extends AbstractJKCloudOutput<ActivityInfo, T
 		super.logItem(ai);
 		try {
 			Tracker tracker = getTracker();
-			ai.resolveServer(resolveServer);
+			ai.resolveServer(getBooleanValue(ai.getFieldValue(ActivityField.META_FIELD_RESOLVE_SERVER), resolveServer));
 			String aiFQN = buildFQNFromData ? StringUtils.isEmpty(sourceFQN) ? DEFAULT_SOURCE_FQN : sourceFQN : null;
 
 			Map<Trackable, ActivityInfo> chTrackables = new LinkedHashMap<>();
-			if (splitRelatives && ai.hasChildren()) {
-				ai.buildSplitRelatives(tracker, chTrackables);
+			if (getBooleanValue(ai.getFieldValue(ActivityField.META_FIELD_SPLIT_RELATIVES), splitRelatives)
+					&& ai.hasChildren()) {
 			} else {
 				Trackable t = ai.buildTrackable(tracker, chTrackables);
 				recordActivity(tracker, t, ai, aiFQN);
@@ -143,10 +148,10 @@ public class JKCloudActivityOutput extends AbstractJKCloudOutput<ActivityInfo, T
 		}
 	}
 
-	private void recordActivity(Tracker tracker, Trackable t, ActivityInfo ai, String aiFQN) throws Exception {
-		alterTrackableSource(tracker, t, ai, aiFQN);
-		recordActivity(tracker, retryPeriod, t);
-		notifyEntityRecorded(ai, t);
+	private static boolean getBooleanValue(Object metaValue, boolean defaultVal) {
+		return metaValue == null //
+				? defaultVal //
+				: Utils.getBoolean(metaValue);
 	}
 
 	private void alterTrackableSource(Tracker tracker, Trackable t, ActivityInfo ai, String fqn) {

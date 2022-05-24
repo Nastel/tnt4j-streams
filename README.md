@@ -4636,7 +4636,7 @@ Sample:
 
 * `BufferSize` - maximal buffer queue capacity. Default value - `1024`. (Optional)
 * `BufferDropWhenFull` - flag indicating to drop buffer queue offered Raw activity data entries when queue gets full. Default value -
-  `false`. (Optional, deprecated - use `FullBufferAddPolicy` instead)
+  `false`. (Optional, **deprecated** - use `FullBufferAddPolicy` instead)
 * `FullBufferAddPolicy` - defines policy how to perform adding new RAW activity data entry, when buffer queue is full: `WAIT` or `DROP`.
   Default value - `WAIT. (Optional)
 
@@ -4662,10 +4662,11 @@ Stream output can be configured using these configuration properties:
   `10sec.`. (Optional)
 * `RetryInterval` - alias for `RetryPeriod`. (Optional)
 * `ResolveServerFromDNS` - flag indicating whether to resolve activity entity host name/IP from DNS server. Default value - `false`. (
-  Optional)
+  Optional, **deprecated** - use parser metadata field `@ResolveServerFromDNS@` to set value for individual entities)
 * `SplitRelatives` - flag indicating whether to send activity entity child entities independently merging data from both parent and child
-  entity fields into produced entity. Default value - `false`. (Optional). **NOTE**: This value has alias `TurnOutActivityChildren` left for
-  backward compatibility, but it is not recommended using it anymore - change it right away for existing configurations.
+  entity fields into produced entity. Default value - `false`. (Optional, **deprecated** - use parser metadata field `@SplitRelatives@` to
+  set value for individual entities). **NOTE**: This value has alias `TurnOutActivityChildren` left for backward compatibility, but it is not
+  recommended using it anymore - change it right away for existing configurations.
 * `BuildSourceFQNFromStreamedData` - flag indicating whether to set streamed activity entity `Source` FQN build from activity fields data
   instead of default on configured in `tnt4j.properties`. Default value - `true`. (Optional)
 * `SourceFQN` - `Source` FQN pattern to be used when building it from streamed activity entity fields values. Format
@@ -5956,7 +5957,7 @@ Using `#` locator without any manual map entry mapping is equivalent to `*` loca
 
 #### Activity JSON parser
 
-* `ReadLines` - indicates that complete JSON data package is single line. Default value - `true`. (Optional, deprecated -
+* `ReadLines` - indicates that complete JSON data package is single line. Default value - `true`. (Optional, **deprecated** -
   use `ActivityDelim`
   of [Generic parser](#generic-parser-parameters) instead)
 * List of `DeserializationFeature.[FEATURE_NAME]` - defines set of Jackson Object Mapper's deserialization configuration features. See

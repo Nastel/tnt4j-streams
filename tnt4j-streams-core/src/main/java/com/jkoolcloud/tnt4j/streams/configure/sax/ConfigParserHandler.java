@@ -705,7 +705,7 @@ public class ConfigParserHandler extends DefaultHandler {
 		String value = null;
 		int radix = 10;
 		String reqVal = "";
-		boolean transparent = false;
+		Boolean transparent = null;
 		boolean split = false;
 		String id = null;
 		String charset = null;
@@ -851,8 +851,10 @@ public class ConfigParserHandler extends DefaultHandler {
 		if (StringUtils.isNotEmpty(valueType)) {
 			af.setValueType(valueType);
 		}
+		if (transparent != null) {
+			af.setTransparent(transparent);
+		}
 		af.setRequired(reqVal);
-		af.setTransparent(transparent);
 		af.setSplitCollection(split);
 		af.setEmptyAsNull(emptyAsNull);
 	}
@@ -999,7 +1001,7 @@ public class ConfigParserHandler extends DefaultHandler {
 		}
 
 		af.setRequired(reqVal);
-		af.setTransparent(transparent);
+		af.setTransparent(true);
 		af.setSplitCollection(split);
 	}
 
