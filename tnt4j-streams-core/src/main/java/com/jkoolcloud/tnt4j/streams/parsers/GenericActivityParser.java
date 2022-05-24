@@ -196,6 +196,9 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		if (ParserProperties.PROP_AUTO_ARRANGE_FIELDS.equalsIgnoreCase(name)) {
 			return autoArrangeFields;
 		}
+		if (ParserProperties.PROP_PARSER_NAME.equals(name)) {
+			return getName();
+		}
 
 		String cPropertyValue = customProperties.getProperty(name);
 		if (cPropertyValue != null) {

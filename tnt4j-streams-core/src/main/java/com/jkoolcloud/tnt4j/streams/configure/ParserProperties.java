@@ -109,4 +109,9 @@ public interface ParserProperties {
 	 * Constant for name of built-in {@value} property.
 	 */
 	String PROP_AUTO_ARRANGE_FIELDS = "AutoArrangeFields"; // NON-NLS
+
+	/**
+	 * Constant for name of built-in {@value} property.
+	 */
+	String PROP_PARSER_NAME = "ParserName"; // NON-NLS
 }
