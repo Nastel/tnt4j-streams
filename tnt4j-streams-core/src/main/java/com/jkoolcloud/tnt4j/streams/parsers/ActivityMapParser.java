@@ -16,11 +16,11 @@
 
 package com.jkoolcloud.tnt4j.streams.parsers;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
@@ -66,13 +66,27 @@ public class ActivityMapParser extends AbstractActivityMapParser {
 			return null;
 		}
 
-		Map<String, Object> map = (Map<String, Object>) data;
-
-		Object activityData = map.get(StreamsConstants.ACTIVITY_DATA_KEY);
-		if (activityData instanceof byte[]) {
-			String activityDataStr = Utils.getString((byte[]) activityData);
-			map.put(StreamsConstants.ACTIVITY_DATA_KEY, activityDataStr);
+		Map<String, Object> map = null;
+		if (data instanceof Map) {
+			map = (Map<String, Object>) data;
+		} else if (data instanceof Map.Entry) {
+			map = makeMap((Map.Entry<?, ?>) data);
 		}
+
+		return map;
+	}
+
+	/**
+	 * Makes map instance from a single map entry.
+	 * 
+	 * @param mEntry
+	 *            map entry to make map
+	 * @return map containing provided single entry
+	 */
+	protected static Map<String, Object> makeMap(Map.Entry<?, ?> mEntry) {
+		Map<String, Object> map = new HashMap<>(1);
+
+		map.put(Utils.toString(mEntry.getKey()), mEntry.getValue());
 
 		return map;
 	}

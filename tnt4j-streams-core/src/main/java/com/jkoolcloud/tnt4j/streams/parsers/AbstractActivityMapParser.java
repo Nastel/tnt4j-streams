@@ -53,7 +53,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * <li>map entry value - field/property value</li>
  * </ul>
  * Locator path token {@code '*'} can be omitted if last path token resolves to {@link java.util.Map} type value.
- * However to get complete map for root path level you must define it {@code locator="*"} anyway, since locator value
+ * However, to get complete map for root path level you must define it {@code locator="*"} anyway, since locator value
  * can't be empty.
  * <p>
  * Using locator path token value {@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#MAP_UNMAPPED_TOKEN} you
@@ -149,6 +149,7 @@ public abstract class AbstractActivityMapParser extends GenericActivityParser<Ma
 	 * This parser supports the following class types (and all classes extending/implementing any of these):
 	 * <ul>
 	 * <li>{@link java.util.Map}</li>
+	 * <li>{@link java.util.Map.Entry}</li>
 	 * </ul>
 	 *
 	 * @param data
@@ -157,7 +158,7 @@ public abstract class AbstractActivityMapParser extends GenericActivityParser<Ma
 	 */
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
-		return data instanceof Map;
+		return data instanceof Map || data instanceof Map.Entry;
 	}
 
 	@Override
