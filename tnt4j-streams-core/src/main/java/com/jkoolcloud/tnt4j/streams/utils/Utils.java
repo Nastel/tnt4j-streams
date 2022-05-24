@@ -2743,25 +2743,30 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	/**
 	 * Converts provided object type {@code value} to a Boolean.
 	 * <p>
-	 * {@code value} will be converted to real boolean value only if string representation of it is {@code "true"} or
-	 * {@code "false"} (case insensitive). In all other cases {@code null} is returned.
+	 * {@code value} will be converted to real boolean value only if:
+	 * <ul>
+	 * <li>value is {@link Boolean} object</li>
+	 * <li>value is {@link String}, where {@code 'true'}, {@code 'on'}, {@code 'y'}, {@code 't'} or {@code 'yes'}
+	 * (case-insensitive) will return {@code true}/li>
+	 * </ul>
+	 * In all other cases {@code null} is returned.
 	 *
 	 * @param value
 	 *            object value to convert to a Boolean
 	 * @return boolean value resolved from provided {@code value}, or {@code null} if {@code value} does not represent
 	 *         boolean
+	 *
+	 * @see org.apache.commons.lang3.BooleanUtils#toBoolean(int)
+	 * @see org.apache.commons.lang3.BooleanUtils#toBoolean(String)
 	 */
 	public static Boolean getBoolean(Object value) {
 		if (value != null) {
+			if (value instanceof Boolean) {
+				return (Boolean) value;
+			}
 			String vStr = toString(value);
 
-			if ("true".equalsIgnoreCase(vStr)) { // NON-NLS
-				return true;
-			}
-
-			if ("false".equalsIgnoreCase(vStr)) { // NON-NLS
-				return false;
-			}
+			return BooleanUtils.toBoolean(vStr);
 		}
 
 		return null;
