@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<parser name="AccessLogParserExt" class="com.jkoolcloud.tnt4j.streams.custom.parsers.ApacheAccessLogParser">
-    <property name="LogPattern" value="%h %l %u %t &quot;%r&quot; %s %b %D"/>
-    <!--property name="LogPattern" value="%h %l %u %t &quot;%r&quot; %>s %O &quot;%{Referer}i&quot; &quot;%{User-Agent}i&quot;"/-->
-    <!--property name="Pattern"
-              value="^(\S+) (\S+) (\S+) \[([\w:/]+\s[+\-]\d{4})\] &quot;(((\S+) (.*?)( (\S+))?)|(-))&quot; (\d{3}) (\d+|-)( (\S+)|$)"/-->
-    <property name="ConfRegexMapping" value="%*r=(((\S+) (.*?)( (\S+))?)|(-))"/>
-    <property name="ConfRegexMapping" value="%*i=(.*?)"/>
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
+    <parser name="AccessLogParserExt" class="com.jkoolcloud.tnt4j.streams.custom.parsers.ApacheAccessLogParser">
+        <property name="LogPattern" value="%h %l %u %t &quot;%r&quot; %s %b %D"/>
+        <!--property name="LogPattern" value="%h %l %u %t &quot;%r&quot; %>s %O &quot;%{Referer}i&quot; &quot;%{User-Agent}i&quot;"/-->
+        <!--property name="Pattern"
+                  value="^(\S+) (\S+) (\S+) \[([\w:/]+\s[+\-]\d{4})\] &quot;(((\S+) (.*?)( (\S+))?)|(-))&quot; (\d{3}) (\d+|-)( (\S+)|$)"/-->
+        <property name="ConfRegexMapping" value="%*r=(((\S+) (.*?)( (\S+))?)|(-))"/>
+        <property name="ConfRegexMapping" value="%*i=(.*?)"/>
 
-    <field name="Location" locator="1" locator-type="Index"/>
-    <field name="UserName" locator="3" locator-type="Index"/>
-    <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
-    <field name="EventType" value="SEND"/>
-    <field name="EventName" locator="7" locator-type="Index"/>
-    <field name="ResourceName" locator="8" locator-type="Index"/>
-    <field name="CompCode" locator="12" locator-type="Index">
-        <field-map source="100:206" target="SUCCESS" type="Range"/>
-        <field-map source="300:308" target="WARNING" type="Range"/>
-        <field-map source="400:417" target="ERROR" type="Range"/>
-        <field-map source="500:511" target="ERROR" type="Range"/>
-    </field>
-    <field name="ReasonCode" locator="12" locator-type="Index"/>
-    <field name="MsgValue" locator="13" locator-type="Index"/>
-    <!--<field name="Referer" locator="14" locator-type="Index"/>-->
-    <!--<field name="UserAgent" locator="15" locator-type="Index"/>-->
-    <field name="ElapsedTime" locator="15" locator-type="Index" datatype="Number" format="#####0.000" locale="en-US" units="Seconds"/>
-</parser>
+        <field name="Location" locator="1" locator-type="Index"/>
+        <field name="UserName" locator="3" locator-type="Index"/>
+        <field name="StartTime" locator="4" locator-type="Index" format="dd/MMM/yyyy:HH:mm:ss Z" datatype="DateTime" locale="en-US"/>
+        <field name="EventType" value="SEND"/>
+        <field name="EventName" locator="7" locator-type="Index"/>
+        <field name="ResourceName" locator="8" locator-type="Index"/>
+        <field name="CompCode" locator="12" locator-type="Index">
+            <field-map source="100:206" target="SUCCESS" type="Range"/>
+            <field-map source="300:308" target="WARNING" type="Range"/>
+            <field-map source="400:417" target="ERROR" type="Range"/>
+            <field-map source="500:511" target="ERROR" type="Range"/>
+        </field>
+        <field name="ReasonCode" locator="12" locator-type="Index"/>
+        <field name="MsgValue" locator="13" locator-type="Index"/>
+        <!--<field name="Referer" locator="14" locator-type="Index"/>-->
+        <!--<field name="UserAgent" locator="15" locator-type="Index"/>-->
+        <field name="ElapsedTime" locator="15" locator-type="Index" datatype="Number" format="#####0.000" locale="en-US" units="Seconds"/>
+    </parser>
+</tnt-data-source>
