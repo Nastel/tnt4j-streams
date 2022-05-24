@@ -622,7 +622,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
-	 * Makes a new {@link String} by decoding the specified array of bytes using using system default
+	 * Makes a new {@link String} by decoding the specified array of bytes using system default
 	 * {@link java.nio.charset.Charset#defaultCharset()} charset.
 	 *
 	 * @param strBytes
@@ -753,7 +753,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
-	 * Close an socket without exceptions.
+	 * Close the socket without exceptions.
 	 * <p>
 	 * For Java 6 backward comparability.
 	 *
@@ -771,7 +771,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
-	 * Close an server socket without exceptions.
+	 * Close the server socket without exceptions.
 	 * <p>
 	 * For Java 6 backward comparability.
 	 *
@@ -789,11 +789,11 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
-	 * Returns first non empty text string available to read from defined reader.
+	 * Returns first non-empty text string available to read from defined reader.
 	 *
 	 * @param reader
 	 *            reader to use for reading
-	 * @return non empty text string, or {@code null} if the end of the stream has been reached
+	 * @return non-empty text string, or {@code null} if the end of the stream has been reached
 	 * @throws java.io.IOException
 	 *             If an I/O error occurs
 	 */
@@ -1011,16 +1011,51 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	/**
 	 * Makes {@link Object} type array from provided object instance.
 	 * <p>
-	 * Acts same as {@link #makeArray(Object, Class)}, where {@code makeArray(obj, null)}.
+	 * Acts same as {@link #makeArray(Object, boolean)}, where {@code makeArray(obj, false)}.
 	 *
 	 * @param obj
 	 *            object instance to make an array
 	 * @return array made of provided object, or {@code null} if obj is {@code null}
 	 *
-	 * @see #makeArray(Object, Class)
+	 * @see #makeArray(Object, boolean)
 	 */
 	public static Object[] makeArray(Object obj) {
-		return makeArray(obj, null);
+		return makeArray(obj, false);
+	}
+
+	/**
+	 * Makes {@link Object} type array from provided object instance.
+	 * <p>
+	 * Acts same as {@link #makeArray(Object, Class, boolean)}, where {@code makeArray(obj, null, splitRelatives)}.
+	 * 
+	 * @param obj
+	 *            object instance to make an array
+	 * @param splitPrimitives
+	 *            flag indicating whether to split primitives array into element objects array
+	 * @return array made of provided object, or {@code null} if obj is {@code null}
+	 * 
+	 * @see #makeArray(Object, Class, boolean)
+	 */
+	public static Object[] makeArray(Object obj, boolean splitPrimitives) {
+		return makeArray(obj, null, splitPrimitives);
+	}
+
+	/**
+	 * Makes {@link Object} type array from provided object instance.
+	 * <p>
+	 * Acts same as {@link #makeArray(Object, Class, boolean)}, where {@code makeArray(obj, cls, false)}.
+	 * 
+	 * @param obj
+	 *            object instance to make an array
+	 * @param cls
+	 *            desired array type class, can be {@code null} - then array type will be the most common class of all
+	 *            array/collection elements
+	 * @return array made of provided object, or {@code null} if obj is {@code null}
+	 * 
+	 * @see #makeArray(Object, Class, boolean)
+	 */
+	public static Object[] makeArray(Object obj, Class<?> cls) {
+		return makeArray(obj, cls, false);
 	}
 
 	/**
@@ -1033,7 +1068,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * <li>In all other cases - new single item array is created.</li>
 	 * </ul>
 	 * <p>
-	 * Particular type of produced array is most common class for all parameter {@code obj} defined array/collection
+	 * Particular type of produced array is the most common class for all parameter {@code obj} defined array/collection
 	 * elements, but not lower level than defined {@code cls}
 	 *
 	 * @param obj
@@ -1041,13 +1076,15 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @param cls
 	 *            desired array type class, can be {@code null} - then array type will be the most common class of all
 	 *            array/collection elements
+	 * @param splitPrimitives
+	 *            flag indicating whether to split primitives array into element objects array
 	 * @return array made of provided object, or {@code null} if obj is {@code null}
 	 *
 	 * @see #makeArray(Object[], Class)
 	 * @see #makeArray(java.util.Collection, Class)
 	 * @see #primitiveArrayToObject(Object)
 	 */
-	public static Object[] makeArray(Object obj, Class<?> cls) {
+	public static Object[] makeArray(Object obj, Class<?> cls, boolean splitPrimitives) {
 		if (obj == null) {
 			return null;
 		}
@@ -1055,7 +1092,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		if (isObjArray(obj)) {
 			return makeArray((Object[]) obj, cls);
 		}
-		if (isPrimitiveArray(obj)) {
+		if (isPrimitiveArray(obj) && splitPrimitives) {
 			return primitiveArrayToObject(obj);
 		}
 		if (obj instanceof Collection) {
@@ -1070,7 +1107,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *
 	 * @param coll
 	 *            collection to make an array
-	 * @return an array containing all of the elements in provided collection
+	 * @return an array containing all the elements in provided collection
 	 *
 	 * @see #makeArray(java.util.Collection, Class)
 	 */
@@ -1081,15 +1118,15 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 	/**
 	 * Makes {@link Object} type array from provided {@link java.util.Collection} instance {@code coll}. Particular type
-	 * of produced array is most common class for all parameter {@code coll} defined collection elements, but not lower
-	 * level than defined {@code cls}.
+	 * of produced array is the most common class for all parameter {@code coll} defined collection elements, but not
+	 * lower level than defined {@code cls}.
 	 *
 	 * @param coll
 	 *            collection to make an array
 	 * @param cls
 	 *            desired array type class, can be {@code null} - then array type will be the most common class of all
 	 *            collection elements
-	 * @return an array containing all of the elements in provided collection
+	 * @return an array containing all elements in provided collection
 	 *
 	 * @see #determineCommonClass(Iterable, Class)
 	 */
@@ -1105,12 +1142,12 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
-	 * Makes {@link Object} type array from provided object {@code array}. Particular type of produced array is most
+	 * Makes {@link Object} type array from provided object {@code array}. Particular type of produced array is the most
 	 * common class for all parameter {@code array} defined array elements.
 	 *
 	 * @param array
 	 *            array to change type
-	 * @return an changed type array
+	 * @return the changed type array
 	 *
 	 * @see #makeArray(Object[], Class)
 	 */
@@ -1120,7 +1157,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
-	 * Makes {@link Object} type array from provided object {@code array}. Particular type of produced array is most *
+	 * Makes {@link Object} type array from provided object {@code array}. Particular type of produced array is the most
 	 * common class for all parameter {@code array} defined array elements, but not lower level than defined
 	 * {@code cls}.
 	 *
@@ -1129,7 +1166,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @param cls
 	 *            desired array type class, can be {@code null} - then array type will be the most common class of all
 	 *            {@code array} array elements
-	 * @return an changed type array
+	 * @return the changed type array
 	 *
 	 * @see #determineCommonClass(Object[], Class)
 	 */
@@ -1258,7 +1295,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *
 	 * @param map
 	 *            map to make an array
-	 * @return an array containing all of the elements in provided map
+	 * @return an array containing all the elements in provided map
 	 *
 	 * @see #makeArray(java.util.Collection)
 	 */
@@ -1780,7 +1817,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * Removes {@code null} elements from array.
 	 *
 	 * @param array
-	 *            array to cleanup
+	 *            array to clean up
 	 * @param <T>
 	 *            type of array elements
 	 * @return new array instance without {@code null} elements
@@ -2283,7 +2320,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *            array/list instance to get element
 	 * @param index
 	 *            index of the element to return
-	 * @return it value of the indexed component in the specified array/list
+	 * @return the value of the indexed component in the specified array/list
 	 * 
 	 * @throws IllegalArgumentException
 	 *             if the specified object is not an array
@@ -2474,7 +2511,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
-	 * Checks if {@code obj} is empty ans has empty content considering when it is:
+	 * Checks if {@code obj} is empty and has empty content considering when it is:
 	 * <ul>
 	 *
 	 * <li>{@link String} - is {@code null} or equal to {@code ""}</li>
@@ -2866,10 +2903,10 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 					sb.append("Caused by: ").append(it.toString()).append("\n"); // NON-NLS
 				}
 
-				StackTraceElement[] strs = it.getStackTrace();
-				int sLength = Math.min(depth, strs.length);
+				StackTraceElement[] stackTraces = it.getStackTrace();
+				int sLength = Math.min(depth, stackTraces.length);
 				for (int si = 0; si < sLength; si++) {
-					sb.append("\tat ").append(strs[si]).append("\n"); // NON-NLS
+					sb.append("\tat ").append(stackTraces[si]).append("\n"); // NON-NLS
 				}
 			}
 
@@ -3114,7 +3151,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * Copies the specified ending range of the specified array into a new array.
 	 * 
 	 * @param array
-	 *            the array from which a ending range is to be copied
+	 *            the array from which an ending range is to be copied
 	 * @param startIdx
 	 *            the initial index of the range to be copied, inclusive
 	 * @param <T>

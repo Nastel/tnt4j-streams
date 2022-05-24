@@ -757,9 +757,6 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 				value = String.valueOf(value).getBytes();
 			}
 		}
-		// else if (value instanceof Serializable) {
-		// return SerializationUtils.serialize((Serializable) value);
-		// }
 
 		return value;
 	}
