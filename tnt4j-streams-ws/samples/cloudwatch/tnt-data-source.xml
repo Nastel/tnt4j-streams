@@ -31,7 +31,7 @@
         <property name="RetryInterval" value="300"/>
 
         <property name="Port" value="443"/>
-        <property name="UseSSL" value="true"/>
+        <property name="UseSSL" value="false"/>
         <property name="Keystore" value="file:///home/ubuntu/tnt4j-streams-1.14.0-SNAPSHOT/samples/cloudwatch/clientkeystore"/>
         <property name="KeyPass" value="pass123"/>
         <property name="KeystorePass" value="pass123"/>
