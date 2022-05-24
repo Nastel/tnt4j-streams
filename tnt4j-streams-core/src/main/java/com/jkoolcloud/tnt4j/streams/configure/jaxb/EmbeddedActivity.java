@@ -83,6 +83,12 @@ public class EmbeddedActivity {
 	@XmlAttribute(name = "id")
 	@Generated(value = "com.sun.tools.internal.xjc.Driver", date = "2017-04-25T04:53:31+03:00", comments = "JAXB RI v2.2.4-2")
 	protected String id;
+	@XmlAttribute(name = "datatype")
+	@Generated(value = "com.sun.tools.internal.xjc.Driver", date = "2017-06-02T02:29:59+03:00", comments = "JAXB RI v2.2.4-2")
+	protected DataTypes datatype;
+	@XmlAttribute(name = "charset")
+	@Generated(value = "com.sun.tools.internal.xjc.Driver", date = "2017-06-02T02:29:59+03:00", comments = "JAXB RI v2.2.4-2")
+	protected String charset;
 
 	public EmbeddedActivity() {
 	}
@@ -92,10 +98,12 @@ public class EmbeddedActivity {
 		this.locator = locator;
 	}
 
-	public EmbeddedActivity(String name, String locator, String locatorType) {
+	public EmbeddedActivity(String name, String locator, String locatorType, DataTypes datatype, String charset) {
 		this.name = name;
 		this.locator = locator;
 		this.locatorType = locatorType;
+		this.datatype = datatype;
+		this.charset = charset;
 	}
 
 	/**
@@ -357,4 +365,53 @@ public class EmbeddedActivity {
 		this.id = value;
 	}
 
+	/**
+	 * Gets the value of the datatype property.
+	 *
+	 * @return possible object is {@link DataTypes }
+	 *
+	 */
+	@Generated(value = "com.sun.tools.internal.xjc.Driver", date = "2017-06-02T02:29:59+03:00", comments = "JAXB RI v2.2.4-2")
+	public DataTypes getDatatype() {
+		if (datatype == null) {
+			return DataTypes.STRING;
+		} else {
+			return datatype;
+		}
+	}
+
+	/**
+	 * Sets the value of the datatype property.
+	 *
+	 * @param value
+	 *            allowed object is {@link DataTypes }
+	 *
+	 */
+	@Generated(value = "com.sun.tools.internal.xjc.Driver", date = "2017-06-02T02:29:59+03:00", comments = "JAXB RI v2.2.4-2")
+	public void setDatatype(DataTypes value) {
+		this.datatype = value;
+	}
+
+	/**
+	 * Gets the value of the charset property.
+	 *
+	 * @return possible object is {@link String }
+	 *
+	 */
+	@Generated(value = "com.sun.tools.internal.xjc.Driver", date = "2017-06-02T02:29:59+03:00", comments = "JAXB RI v2.2.4-2")
+	public String getCharset() {
+		return charset;
+	}
+
+	/**
+	 * Sets the value of the charset property.
+	 *
+	 * @param value
+	 *            allowed object is {@link String }
+	 *
+	 */
+	@Generated(value = "com.sun.tools.internal.xjc.Driver", date = "2017-06-02T02:29:59+03:00", comments = "JAXB RI v2.2.4-2")
+	public void setCharset(String value) {
+		this.charset = value;
+	}
 }

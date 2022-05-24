@@ -249,8 +249,9 @@ public class Parser {
 		getEmbeddedActivity().add(new EmbeddedActivity(name, locator));
 	}
 
-	public void addEmbeddedActivity(String name, String locator, String locatorType) {
-		getEmbeddedActivity().add(new EmbeddedActivity(name, locator, locatorType));
+	public void addEmbeddedActivity(String name, String locator, String locatorType, DataTypes dataType,
+			String charset) {
+		getEmbeddedActivity().add(new EmbeddedActivity(name, locator, locatorType, dataType, charset));
 	}
 
 	/**

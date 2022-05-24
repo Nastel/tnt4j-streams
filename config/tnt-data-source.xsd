@@ -2004,6 +2004,22 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+
+        <xs:attribute name="datatype" use="optional" type="DataTypes" default="String">
+            <xs:annotation>
+                <xs:documentation>
+                    Indicates how to interpret value extracted for this field.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+
+        <xs:attribute name="charset" use="optional" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    Specifies charset name for binary data value.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:attributeGroup>
 
     <!-- Element <embedded-activity> definition -->

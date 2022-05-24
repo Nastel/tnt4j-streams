@@ -940,9 +940,10 @@ public class ConfigParserHandler extends DefaultHandler {
 		String locatorType = null;
 		String locator = null;
 		String reqVal = "";
-		boolean transparent = true;
 		boolean split = true;
 		String id = null;
+		ActivityFieldDataType dataType = null;
+		String charset = null;
 		for (int i = 0; i < attrs.getLength(); i++) {
 			String attName = attrs.getQName(i);
 			String attValue = attrs.getValue(i);
@@ -956,6 +957,10 @@ public class ConfigParserHandler extends DefaultHandler {
 				reqVal = attValue;
 			} else if (ID_ATTR.equals(attName)) {
 				id = attValue;
+			} else if (DATA_TYPE_ATTR.equals(attName)) {
+				dataType = ActivityFieldDataType.valueOf(attValue);
+			} else if (CHARSET_ATTR.equals(attName)) {
+				charset = attValue;
 			} else {
 				unknownAttribute(EMBEDDED_ACTIVITY_ELMT, attName);
 			}
@@ -969,6 +974,11 @@ public class ConfigParserHandler extends DefaultHandler {
 		ActivityField af = new ActivityField(field);
 		currField = new ActivityFieldData(af);
 
+		if (dataType == null) {
+			dataType = currParser.getDefaultDataType() == null ? ActivityFieldDataType.AsInput
+					: currParser.getDefaultDataType();
+		}
+
 		String[] locators = currParser.canHaveDelimitedLocators() ? locator.split(Pattern.quote(LOC_DELIM))
 				: new String[] { locator };
 		for (String loc : locators) {
@@ -978,8 +988,12 @@ public class ConfigParserHandler extends DefaultHandler {
 				if (StringUtils.isNotEmpty(id)) {
 					afl.setId(id);
 				}
-				afl.setDataType(currParser.getDefaultDataType() == null ? ActivityFieldDataType.AsInput
-						: currParser.getDefaultDataType());
+				if (dataType != null) {
+					afl.setDataType(dataType);
+				}
+				if (StringUtils.isNotEmpty(charset)) {
+					afl.setCharset(charset);
+				}
 				currField.addLocator(afl);
 			}
 		}
