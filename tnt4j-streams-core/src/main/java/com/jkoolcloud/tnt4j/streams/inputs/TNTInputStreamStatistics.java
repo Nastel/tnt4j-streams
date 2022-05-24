@@ -420,6 +420,7 @@ public class TNTInputStreamStatistics
 					getMainStatisticsModule().outputActivities.inc();
 					break;
 				case SNAPSHOT:
+				case DATASET:
 					outputSnapshots.inc();
 					getMainStatisticsModule().outputSnapshots.inc();
 					break;
@@ -434,13 +435,14 @@ public class TNTInputStreamStatistics
 
 	@Override
 	public void onItemRecorded(Object item, Trackable trackable) {
+		Integer snapshotCount = null;
 		if (trackable instanceof Activity) {
-			int snapshotCount = ((Activity) trackable).getSnapshotCount();
-			outputSnapshots.inc(snapshotCount);
-			getMainStatisticsModule().outputSnapshots.inc();
+			snapshotCount = ((Activity) trackable).getSnapshotCount();
+		} else if (trackable instanceof TrackingEvent) {
+			snapshotCount = ((TrackingEvent) trackable).getOperation().getSnapshotCount();
 		}
-		if (trackable instanceof TrackingEvent) {
-			int snapshotCount = ((TrackingEvent) trackable).getOperation().getSnapshotCount();
+
+		if (snapshotCount != null) {
 			outputSnapshots.inc(snapshotCount);
 			getMainStatisticsModule().outputSnapshots.inc(snapshotCount);
 		}

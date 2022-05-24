@@ -392,7 +392,7 @@ public class ActivityInfo {
 
 		// is it a boolean
 		try {
-			Boolean b = getBooleanValue(fieldValue);
+			Boolean b = Utils.getBoolean(fieldValue);
 			if (b != null) {
 				return b;
 			}
@@ -442,11 +442,11 @@ public class ActivityInfo {
 		if (StringUtils.isNotEmpty(field.getFormattingPattern())) {
 			value = Utils.makeArray(value);
 		}
-		if (value instanceof Object[]) {
+		if (Utils.isObjArray(value)) {
 			return formatValuesArray((Object[]) value, field);
 		} else if (value instanceof byte[]) {
 			return Utils.encodeHex((byte[]) value);
-		} else if (value != null && value.getClass().isArray()) {
+		} else if (Utils.isPrimitiveArray(value)) {
 			return ArrayUtils.toString(value);
 		}
 
@@ -729,15 +729,15 @@ public class ActivityInfo {
 	 * @param tracker
 	 *            {@link com.jkoolcloud.tnt4j.tracker.Tracker} instance to be used to build
 	 *            {@link com.jkoolcloud.tnt4j.core.Trackable} activity data package
-	 * @param chTrackables
-	 *            collection to add built child trackables, not included into parent trackable and transmitted
-	 *            separately, e.g., activity child events
+	 * @param childMap
+	 *            map to add built child trackables, not included into parent trackable and transmitted separately,
+	 *            e.g., activity child events
 	 * @return trackable instance made from this activity entity data
 	 * @throws IllegalArgumentException
 	 *             if {@code tracker} is null
 	 * @see com.jkoolcloud.tnt4j.streams.outputs.JKCloudActivityOutput#logItem(ActivityInfo)
 	 */
-	public Trackable buildTrackable(Tracker tracker, Map<Trackable, ActivityInfo> chTrackables) {
+	public Trackable buildTrackable(Tracker tracker, Map<Trackable, ActivityInfo> childMap) {
 		if (tracker == null) {
 			throw new IllegalArgumentException(
 					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "ActivityInfo.tracker.null"));
@@ -751,13 +751,13 @@ public class ActivityInfo {
 				"ActivityInfo.building.trackable", tracker.getId(), eventType, trackingId);
 
 		if (eventType == OpType.ACTIVITY) {
-			return buildActivity(tracker, eventName, trackingId, chTrackables);
+			return buildActivity(tracker, eventName, trackingId, childMap);
 		} else if (eventType == OpType.SNAPSHOT) {
 			return buildSnapshot(tracker, eventName, trackingId);
 		} else if (eventType == OpType.DATASET) {
 			return buildDataset(tracker, eventName, trackingId);
 		} else {
-			return buildEvent(tracker, eventName, trackingId, chTrackables);
+			return buildEvent(tracker, eventName, trackingId, childMap);
 		}
 	}
 
@@ -800,8 +800,8 @@ public class ActivityInfo {
 	 * {@link com.jkoolcloud.tnt4j.core.Dataset} using the specified tracker for this activity data entity to be sent to
 	 * jKoolCloud.
 	 * <p>
-	 * Does same as {@link #buildTrackable(com.jkoolcloud.tnt4j.tracker.Tracker, java.util.Map)} where
-	 * {@code chTrackables} list is {@code null}.
+	 * Does same as {@link #buildTrackable(com.jkoolcloud.tnt4j.tracker.Tracker, java.util.Map)} where {@code childMap}
+	 * list is {@code null}.
 	 *
 	 * @param tracker
 	 *            {@link com.jkoolcloud.tnt4j.tracker.Tracker} instance to be used to build
@@ -824,12 +824,12 @@ public class ActivityInfo {
 	 *            name of tracking event
 	 * @param trackId
 	 *            identifier (signature) of tracking event
-	 * @param chTrackables
-	 *            collection to add built child trackables, not included into parent event and transmitted separately
+	 * @param childMap
+	 *            map to add built child trackables, not included into parent event and transmitted separately
 	 * @return tracking event instance
 	 */
 	protected TrackingEvent buildEvent(Tracker tracker, String trackName, String trackId,
-			Map<Trackable, ActivityInfo> chTrackables) {
+			Map<Trackable, ActivityInfo> childMap) {
 		trackName = getVerifiedEntityName(trackName, trackId, TrackingEvent.class);
 
 		TrackingEvent event = tracker.newEvent(severity == null ? OpLevel.INFO : severity, trackName, (String) null,
@@ -909,7 +909,7 @@ public class ActivityInfo {
 		}
 
 		if (hasChildren()) {
-			buildChildren(tracker, event, chTrackables);
+			buildChildren(tracker, event, childMap);
 		}
 
 		return event;
@@ -924,12 +924,12 @@ public class ActivityInfo {
 	 *            name of tracking activity
 	 * @param trackId
 	 *            identifier (signature) of tracking activity
-	 * @param chTrackables
-	 *            collection to add built child trackables, not included into parent activity and transmitted separately
+	 * @param childMap
+	 *            map to add built child trackables, not included into parent activity and transmitted separately
 	 * @return tracking activity instance
 	 */
 	protected TrackingActivity buildActivity(Tracker tracker, String trackName, String trackId,
-			Map<Trackable, ActivityInfo> chTrackables) {
+			Map<Trackable, ActivityInfo> childMap) {
 		trackName = getVerifiedEntityName(trackName, trackId, TrackingActivity.class);
 
 		TrackingActivity activity = tracker.newActivity(severity == null ? OpLevel.INFO : severity, trackName);
@@ -1008,38 +1008,78 @@ public class ActivityInfo {
 		}
 
 		if (hasChildren()) {
-			buildChildren(tracker, activity, chTrackables);
+			buildChildren(tracker, activity, childMap);
 		}
 
 		return activity;
 	}
 
-	private void buildChildren(Tracker tracker, Trackable pTrackable, Map<Trackable, ActivityInfo> chTrackables) {
-		List<ActivityInfo> cais = getChildren(true);
-		for (ActivityInfo child : cais) {
+	private void buildChildren(Tracker tracker, Trackable parent, Map<Trackable, ActivityInfo> childMap) {
+		List<ActivityInfo> childList = getChildren(true);
+		for (ActivityInfo child : childList) {
 			if (!child.isDeliverable()) {
 				LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"ActivityInfo.filtered.child", child);
 				continue;
 			}
 
-			if (chTrackables == null && !isEmbeddableChild(pTrackable, child)) {
-				continue;
+			if (childMap == null) {
+				if (!isEmbeddableChild(parent, child)) {
+					continue;
+				}
+			} else {
+				if (isChildAlreadyBuilt(childMap.keySet(), child.determineTrackingId())) {
+					continue;
+				}
 			}
 
-			Trackable cTrackable = buildChild(tracker, child, pTrackable);
-			boolean consumed = addTrackableChild(pTrackable, cTrackable);
+			Trackable cTrackable = buildChild(tracker, child, parent);
+			boolean consumed = addTrackableChild(parent, cTrackable);
 
-			if (!consumed && chTrackables != null) {
-				chTrackables.put(cTrackable, child);
+			if (!consumed && childMap != null) {
+				childMap.put(cTrackable, child);
 			}
 		}
 	}
 
-	private boolean isEmbeddableChild(Trackable pTrackable, ActivityInfo child) {
-		if (pTrackable != null && child != null) {
-			return child.eventType == OpType.SNAPSHOT
-					&& (pTrackable instanceof TrackingEvent || pTrackable instanceof Activity);
+	private static boolean isEmbeddableChild(Trackable parent, ActivityInfo child) {
+		if (parent != null && child != null) {
+			return isSnapshotType(child.eventType) && isOperation(parent);
+		}
+
+		return false;
+	}
+
+	private static boolean isSnapshotType(OpType opType) {
+		return opType == OpType.SNAPSHOT || opType == OpType.DATASET;
+	}
+
+	private static boolean isOperation(Trackable trackable) {
+		return trackable instanceof Activity || trackable instanceof TrackingEvent;
+	}
+
+	private static boolean isNoop(OpType opType) {
+		return opType == OpType.NOOP;
+	}
+
+	private static boolean isChildAlreadyBuilt(Set<Trackable> trackables, String chId) {
+		for (Trackable trackable : trackables) {
+			if (trackable.getTrackingId().equals(chId)) {
+				return true;
+			}
+
+			Trackable snap = null;
+			if (trackable instanceof Activity) {
+				TrackingActivity ta = (TrackingActivity) trackable;
+				snap = ta.getSnapshot(chId);
+			} else if (trackable instanceof TrackingEvent) {
+				TrackingEvent te = (TrackingEvent) trackable;
+				snap = te.getOperation().getSnapshot(chId);
+			}
+
+			if (snap != null) {
+				return true;
+			}
 		}
 
 		return false;
@@ -1049,54 +1089,53 @@ public class ActivityInfo {
 	 * Builds child entity trackables as split relatives by merging this (parent) activity entity data into child
 	 * entity.
 	 * <p>
-	 * If no child relatives are available, only this (parent) activity build trackable is added to {@code chTrackables}
+	 * If no child relatives are available, only this (parent) activity build trackable is added to {@code childMap}
 	 * collation.
 	 *
 	 * @param tracker
 	 *            communication gateway to use to record activity
-	 * @param chTrackables
-	 *            collection to add built child trackables
+	 * @param childMap
+	 *            map to add built child trackables
 	 *
 	 * @see #merge(ActivityInfo)
 	 */
-	public void buildSplitRelatives(Tracker tracker, Map<Trackable, ActivityInfo> chTrackables) {
-		List<ActivityInfo> cais = getChildren(true);
-		for (ActivityInfo child : cais) {
+	public void buildSplitRelatives(Tracker tracker, Map<Trackable, ActivityInfo> childMap) {
+		List<ActivityInfo> childList = getChildren(true);
+		for (ActivityInfo child : childList) {
 			if (!child.isDeliverable()) {
 				LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"ActivityInfo.filtered.child", child);
 				continue;
 			}
 
-			child.determineTrackingId(cais.size() > 1 ? null : this.trackingId);
+			child.determineTrackingId(childList.size() > 1 ? null : this.trackingId);
 			child.merge(this);
-			verifyDuplicates(child, chTrackables);
-			Trackable t = child.buildTrackable(tracker);
-			if (chTrackables != null) {
-				chTrackables.put(t, child);
+			verifyDuplicates(child, childMap);
+			Trackable trackable = child.buildTrackable(tracker);
+			if (childMap != null) {
+				childMap.put(trackable, child);
 			}
 		}
 
-		if (chTrackables != null && chTrackables.isEmpty()) {
-			verifyDuplicates(this, chTrackables);
-			Trackable t = buildTrackable(tracker);
-			chTrackables.put(t, this);
+		if (childMap != null && childMap.isEmpty()) {
+			verifyDuplicates(this, childMap);
+			Trackable trackable = buildTrackable(tracker);
+			childMap.put(trackable, this);
 		}
 	}
 
-	private void verifyDuplicates(ActivityInfo child, Map<Trackable, ActivityInfo> chTrackables) {
-		Map.Entry<Trackable, ActivityInfo> dCh = getDuplicate(child, chTrackables);
+	private void verifyDuplicates(ActivityInfo child, Map<Trackable, ActivityInfo> childMap) {
+		Map.Entry<Trackable, ActivityInfo> dCh = getDuplicate(child, childMap);
 		if (dCh != null) {
 			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityInfo.duplicate.child", child.trackingId, child, dCh.getValue());
 		}
 	}
 
-	private Map.Entry<Trackable, ActivityInfo> getDuplicate(ActivityInfo child,
-			Map<Trackable, ActivityInfo> chTrackables) {
-		if (chTrackables != null) {
-			for (Map.Entry<Trackable, ActivityInfo> chT : chTrackables.entrySet()) {
-				if (chT.getKey().getTrackingId().equals(child.trackingId)) {
+	private Map.Entry<Trackable, ActivityInfo> getDuplicate(ActivityInfo child, Map<Trackable, ActivityInfo> childMap) {
+		if (childMap != null) {
+			for (Map.Entry<Trackable, ActivityInfo> chT : childMap.entrySet()) {
+				if (chT.getKey().getTrackingId().equals(child.determineTrackingId())) {
 					return chT;
 				}
 			}
@@ -1105,28 +1144,27 @@ public class ActivityInfo {
 		return null;
 	}
 
-	private static boolean addTrackableChild(Trackable pTrackable, Trackable chTrackable) {
-		if (pTrackable != null && chTrackable != null) {
-			if (pTrackable instanceof TrackingEvent) {
-				TrackingEvent pEvent = (TrackingEvent) pTrackable;
-				if (chTrackable instanceof Snapshot) {
-					Snapshot chSnapshot = (Snapshot) chTrackable;
+	private static boolean addTrackableChild(Trackable parent, Trackable child) {
+		if (parent != null && child != null) {
+			if (parent instanceof TrackingEvent) {
+				TrackingEvent pEvent = (TrackingEvent) parent;
+				if (child instanceof Snapshot) {
+					Snapshot chSnapshot = (Snapshot) child;
 					pEvent.getOperation().addSnapshot(chSnapshot);
 
 					return true;
 				}
-			} else if (pTrackable instanceof Activity) {
-				Activity pActivity = (Activity) pTrackable;
-				pActivity.add(chTrackable);
+			} else if (parent instanceof Activity) {
+				Activity pActivity = (Activity) parent;
+				pActivity.add(child);
 
-				return chTrackable instanceof Snapshot;
+				return child instanceof Snapshot;
 			}
 
-			if (StringUtils.equals(chTrackable.getParentId(), pTrackable.getTrackingId())) {
+			if (StringUtils.equals(child.getParentId(), parent.getTrackingId())) {
 				LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"ActivityInfo.invalid.child", resolveTrackableType(chTrackable),
-						resolveTrackableType(pTrackable), resolveChildTypesFor(pTrackable), chTrackable.getTrackingId(),
-						pTrackable.getTrackingId());
+						"ActivityInfo.invalid.child", resolveTrackableType(child), resolveTrackableType(parent),
+						resolveChildTypesFor(parent), child.getTrackingId(), parent.getTrackingId());
 			}
 
 		}
@@ -1162,7 +1200,7 @@ public class ActivityInfo {
 
 	private static Trackable buildChild(Tracker tracker, ActivityInfo child, Trackable parent) {
 		if (StringUtils.isEmpty(child.parentId)) {
-			if (parent.getType() != OpType.NOOP) {
+			if (!isNoop(parent.getType())) {
 				child.parentId = parent.getTrackingId();
 			}
 		}
@@ -1213,7 +1251,7 @@ public class ActivityInfo {
 
 	private String getVerifiedEntityName(String trackName, String trackId, Class<?> eClass) {
 		// NOTE: TNT4J API fails if operation name is null
-		if (StringUtils.isEmpty(trackName) && eventType != OpType.NOOP) {
+		if (StringUtils.isEmpty(trackName) && !isNoop(eventType)) {
 			if (StringUtils.isNotEmpty(guid)) {
 				trackName = guid;
 			} else {
@@ -1420,10 +1458,6 @@ public class ActivityInfo {
 		return (T) num;
 	}
 
-	private static Boolean getBooleanValue(Object value) {
-		return value instanceof Boolean ? (Boolean) value : Utils.getBoolean(value);
-	}
-
 	/**
 	 * Merges activity info data fields values. Values of fields are changed only if they currently hold default
 	 * (initial) value.
@@ -1452,7 +1486,7 @@ public class ActivityInfo {
 		if (StringUtils.isEmpty(eventName)) {
 			eventName = otherAi.eventName;
 		}
-		if (eventType == null || eventType == OpType.NOOP) {
+		if (eventType == null || isNoop(eventType)) {
 			eventType = substitute(eventType, otherAi.eventType);
 		}
 		if (eventStatus == null) {

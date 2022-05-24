@@ -129,19 +129,17 @@ public class JKCloudActivityOutput extends AbstractJKCloudOutput<ActivityInfo, T
 			ai.resolveServer(getBooleanValue(ai.getFieldValue(ActivityField.META_FIELD_RESOLVE_SERVER), resolveServer));
 			String aiFQN = buildFQNFromData ? StringUtils.isEmpty(sourceFQN) ? DEFAULT_SOURCE_FQN : sourceFQN : null;
 
-			Map<Trackable, ActivityInfo> chTrackables = new LinkedHashMap<>();
+			Map<Trackable, ActivityInfo> childMap = new LinkedHashMap<>();
 			if (getBooleanValue(ai.getFieldValue(ActivityField.META_FIELD_SPLIT_RELATIVES), splitRelatives)
 					&& ai.hasChildren()) {
+				ai.buildSplitRelatives(tracker, childMap);
 			} else {
-				Trackable t = ai.buildTrackable(tracker, chTrackables);
-				recordActivity(tracker, t, ai, aiFQN);
+				Trackable trackable = ai.buildTrackable(tracker, childMap);
+				recordActivity(tracker, trackable, ai, aiFQN);
 			}
 
-			for (Map.Entry<Trackable, ActivityInfo> chTrackable : chTrackables.entrySet()) {
-				ActivityInfo cai = chTrackable.getValue();
-
-				Trackable chT = chTrackable.getKey();
-				recordActivity(tracker, chT, cai, aiFQN);
+			for (Map.Entry<Trackable, ActivityInfo> child : childMap.entrySet()) {
+				recordActivity(tracker, child.getKey(), child.getValue(), aiFQN);
 			}
 		} finally {
 			notifyLoggingFinish(ai);
@@ -154,15 +152,21 @@ public class JKCloudActivityOutput extends AbstractJKCloudOutput<ActivityInfo, T
 				: Utils.getBoolean(metaValue);
 	}
 
-	private void alterTrackableSource(Tracker tracker, Trackable t, ActivityInfo ai, String fqn) {
+	private void recordActivity(Tracker tracker, Trackable trackable, ActivityInfo ai, String aiFQN) throws Exception {
+		alterTrackableSource(tracker, trackable, ai, aiFQN);
+		recordActivity(tracker, retryPeriod, trackable);
+		notifyEntityRecorded(ai, trackable);
+	}
+
+	private void alterTrackableSource(Tracker tracker, Trackable trackable, ActivityInfo ai, String fqn) {
 		Source tSrc = getItemSource(tracker, ai, fqn);
-		t.setSource(tSrc);
+		trackable.setSource(tSrc);
 
 		Collection<Snapshot> snapshots = null;
-		if (t instanceof Activity) {
-			snapshots = ((Activity) t).getSnapshots();
-		} else if (t instanceof TrackingEvent) {
-			snapshots = ((TrackingEvent) t).getOperation().getSnapshots();
+		if (trackable instanceof Activity) {
+			snapshots = ((Activity) trackable).getSnapshots();
+		} else if (trackable instanceof TrackingEvent) {
+			snapshots = ((TrackingEvent) trackable).getOperation().getSnapshots();
 		}
 
 		if (CollectionUtils.isNotEmpty(snapshots)) {
