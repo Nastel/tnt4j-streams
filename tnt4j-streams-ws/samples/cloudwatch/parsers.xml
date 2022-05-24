@@ -19,10 +19,64 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
+    <parser name="DimensionsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Snapshot"/>
+
+        <field name="BrokerId" locator="Broker ID" locator-type="Label" transparent="true">
+            <field-transform lang="groovy"><![CDATA[
+                StringUtils.isEmpty($fieldValue)
+                    ? $fieldValue
+                    : StringUtils.isNumeric ($fieldValue)
+                        ? "b-" + $fieldValue
+                        : $fieldValue
+            ]]></field-transform>
+        </field>
+        <field name="InstanceId" locator="InstanceId" locator-type="Label" transparent="true"/>
+        <field name="ClusterName" locator="Cluster Name" locator-type="Label" transparent="true"/>
+        <field name="Topic" locator="Topic" locator-type="Label" transparent="true"/>
+        <field name="ConsumerGroup" locator="Consumer Group" locator-type="Label" transparent="true"/>
+        <field name="ClientAuth" locator="Client Authentication" locator-type="Label" transparent="true"/>
+
+        <field name="Rest" locator="#" locator-type="Label"/>
+    </parser>
+    <parser name="ValueParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Snapshot"/>
+
+        <field name="Max" locator="max" locator-type="Label"/>
+        <field name="Min" locator="min" locator-type="Label"/>
+        <field name="Sum" locator="sum" locator-type="Label"/>
+        <field name="Count" locator="count" locator-type="Label"/>
+        <field name="P99" locator="p99" locator-type="Label"/>
+        <field name="P99_9" locator="p99.9" locator-type="Label"/>
+        <field name="Median" locator="TM(25%:75%)" locator-type="Label"/>
+
+        <field name="Rest" locator="#" locator-type="Label"/>
+    </parser>
     <parser name="MetricLineParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
         <property name="ActivityDelim" value="EOL"/>
 
         <field name="EventType" value="Snapshot"/>
+        <field name="Severity" value="INFO"/>
+
+        <field name="MetricStreamName" locator="$.metric_stream_name" locator-type="Label" transparent="true"/>
+        <field name="UserName" locator="$.account_id" locator-type="Label" transparent="true"/>
+        <field name="Region" locator="$.region" locator-type="Label" transparent="true"/>
+        <field name="Namespace" locator="$.namespace" locator-type="Label" transparent="true"/>
+        <field name="MetricName" locator="$.metric_name" locator-type="Label" transparent="true"/>
+
+        <embedded-activity name="Dimensions" locator="$.dimensions" locator-type="Label">
+            <parser-ref name="DimensionsParser" aggregation="Merge"/>
+        </embedded-activity>
+
+        <field name="StartTime" locator="$.timestamp" locator-type="Label" datatype="Timestamp"/>
+        <field name="EndTime" locator="StartTime" locator-type="Activity"/>
+
+        <embedded-activity name="Value" locator="$.value" locator-type="Label">
+            <parser-ref name="ValueParser" aggregation="Merge"/>
+        </embedded-activity>
+
+        <field name="Unit" locator="$.unit" locator-type="Label"/>
+
         <field name="EventName" value="snapName">
             <field-transform lang="groovy"><![CDATA[
                 String props = "";
@@ -38,44 +92,12 @@
                 ${MetricStreamName} + ":" + props
             ]]></field-transform>
         </field>
-        <field name="Severity" value="INFO"/>
-
-        <field name="MetricStreamName" locator="$.metric_stream_name" locator-type="Label" transparent="true"/>
-        <field name="UserName" locator="$.account_id" locator-type="Label" transparent="true"/>
-        <field name="Region" locator="$.region" locator-type="Label" transparent="true"/>
-        <field name="Namespace" locator="$.namespace" locator-type="Label" transparent="true"/>
-        <field name="MetricName" locator="$.metric_name" locator-type="Label" transparent="true"/>
-
-        <field name="BrokerId" locator="$.dimensions.['Broker ID']" locator-type="Label" transparent="true">
-            <field-transform lang="groovy"><![CDATA[
-                StringUtils.isEmpty($fieldValue)
-                    ? $fieldValue
-                    : StringUtils.isNumeric ($fieldValue)
-                        ? "b-" + $fieldValue
-                        : $fieldValue
-            ]]></field-transform>
-        </field>
-        <field name="ClusterName" locator="$.dimensions.['Cluster Name']" locator-type="Label" transparent="true"/>
-        <field name="Topic" locator="$.dimensions.Topic" locator-type="Label" transparent="true"/>
-        <field name="ConsumerGroup" locator="$.dimensions.['Consumer Group']" locator-type="Label" transparent="true"/>
-        <field name="ClientAuth" locator="$.dimensions.['Client Authentication']" locator-type="Label" transparent="true"/>
-
-        <field name="StartTime" locator="$.timestamp" locator-type="Label" datatype="Timestamp"/>
-        <field name="EndTime" locator="StartTime" locator-type="Activity"/>
-
-        <field name="Max" locator="$.value.max" locator-type="Label"/>
-        <field name="Min" locator="$.value.min" locator-type="Label"/>
-        <field name="Sum" locator="$.value.sum" locator-type="Label"/>
-        <field name="Count" locator="$.value.count" locator-type="Label"/>
-        <field name="P99" locator="$.value.p99" locator-type="Label"/>
-        <field name="Unit" locator="$.unit" locator-type="Label"/>
-
-        <field name="Rest" locator="#" locator-type="Label"/>
     </parser>
     <parser name="MetricEntryParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser" manualFieldsOrder="true">
         <property name="ActivityDelim" value="EOL"/>
 
         <field name="EventType" value="Activity"/>
+        <field name="EventName" value="AWSCloudWatchMetric"/>
 
         <field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
         <field name="EndTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
@@ -116,7 +138,7 @@
     <parser name="MetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
 
         <field name="EventType" value="NOOP"/>
-        <embedded-activity name="MetricsData" locator="ActivityData" locator-type="Label">
+        <embedded-activity name="MetricsData" locator="ActivityData" locator-type="Label" datatype="String">
             <field-transform lang="groovy"><![CDATA[
                 String[] lines = $fieldValue.split("\\r|\\n");
                 List<String> payloadLines = new ArrayList<>(lines.length);
