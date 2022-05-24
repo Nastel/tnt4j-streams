@@ -111,10 +111,14 @@ public class HttpServletStream extends InterceptorStream<Map<String, ?>> {
 
 	@Override
 	protected long getActivityItemByteSize(Map<String, ?> activityItem) {
-		byte[] activityData = (byte[]) activityItem.get(StreamsConstants.ACTIVITY_DATA_KEY);
-		if (activityData != null) {
-			return activityData.length;
+		Object payload = activityItem.get(StreamsConstants.ACTIVITY_DATA_KEY);
+
+		if (payload instanceof byte[]) {
+			return ((byte[]) payload).length;
+		} else if (payload instanceof String) {
+			return ((String) payload).length();
 		}
+
 		Integer cLength = (Integer) Utils.getMapValueByPath("Metadata.ContentLength", activityItem);
 		if (cLength != null) {
 			return cLength.longValue();

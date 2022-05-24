@@ -21,14 +21,12 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.*;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.config.SocketConfig;
@@ -192,9 +190,15 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 
 	@Override
 	protected long getActivityItemByteSize(Map<String, ?> itemMap) {
-		byte[] payload = (byte[]) itemMap.get(StreamsConstants.ACTIVITY_DATA_KEY);
+		Object payload = itemMap.get(StreamsConstants.ACTIVITY_DATA_KEY);
 
-		return payload == null ? 0 : payload.length;
+		if (payload instanceof byte[]) {
+			return ((byte[]) payload).length;
+		} else if (payload instanceof String) {
+			return ((String) payload).length();
+		}
+
+		return 0;
 	}
 
 	private static class HttpStreamExceptionLogger implements ExceptionLogger {
@@ -342,9 +346,21 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 								}
 							}
 						} else {
-							byte[] bytes = EntityUtils.toByteArray(reqEntity);
-							if (ArrayUtils.isNotEmpty(bytes)) {
-								reqMap.put(StreamsConstants.ACTIVITY_DATA_KEY, bytes);
+							ContentType reqContType = ContentType.get(reqEntity);
+							if (reqContType != null && reqContType.getCharset() == null) {
+								ContentType defaultContType = ContentType.getByMimeType(reqContType.getMimeType());
+								if (defaultContType != null) {
+									reqContType = defaultContType;
+								}
+							}
+							Object entityData;
+							if (reqContType == null || reqContType.getCharset() == null) {
+								entityData = EntityUtils.toByteArray(reqEntity);
+							} else {
+								entityData = EntityUtils.toString(reqEntity, reqContType.getCharset());
+							}
+							if (entityData != null) {
+								reqMap.put(StreamsConstants.ACTIVITY_DATA_KEY, entityData);
 							}
 						}
 
@@ -386,8 +402,7 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 		}
 
 		private StringEntity createHtmlStringEntity(String msg) {
-			StringEntity entity = new StringEntity(Utils.format(HTML_MSG_PATTERN, msg),
-					ContentType.create("text/html", StandardCharsets.UTF_8));
+			StringEntity entity = new StringEntity(Utils.format(HTML_MSG_PATTERN, msg), ContentType.TEXT_HTML);
 
 			return entity;
 		}

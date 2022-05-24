@@ -31,6 +31,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.entity.ContentType;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
 
@@ -332,8 +333,13 @@ public class TNT4JStreamsServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try (PrintWriter out = resp.getWriter()) {
-			out.println("<html>"); // NON-NLS
+			out.println("<!DOCTYPE html>"); // NON-NLS
+			out.println("<html lang=\"en\">"); // NON-NLS
 			out.println("<head>"); // NON-NLS
+			out.println("<meta charset=\"UTF-8\">"); // NON-NLS
+			out.println("<meta name=\"description\" content=\"TNT4J-Streams servlet status.\">"); // NON-NLS
+			out.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"); // NON-NLS
+			out.println("<title>Streaming status</title>"); // NON-NLS
 			out.println("</head>"); // NON-NLS
 			out.println("<body>"); // NON-NLS
 			if (streamsStatesMap.isEmpty()) {
@@ -414,7 +420,14 @@ public class TNT4JStreamsServlet extends HttpServlet {
 
 		byte[] bytes = IOUtils.toByteArray(req.getInputStream());
 		if (ArrayUtils.isNotEmpty(bytes)) {
-			reqMap.put(StreamsConstants.ACTIVITY_DATA_KEY, bytes);
+			String reqContType = req.getContentType();
+			ContentType contType = ContentType.getByMimeType(reqContType);
+			Object entityData = bytes;
+			if (contType != null && contType.getCharset() != null) {
+				entityData = new String(bytes, contType.getCharset());
+			}
+
+			reqMap.put(StreamsConstants.ACTIVITY_DATA_KEY, entityData);
 		}
 
 		Enumeration<String> names = req.getParameterNames();
@@ -452,7 +465,7 @@ public class TNT4JStreamsServlet extends HttpServlet {
 			reqMap.put(StreamsConstants.TRANSPORT_KEY, StreamsConstants.TRANSPORT_HTTP);
 
 			LOGGER.log(OpLevel.DEBUG, StreamsResources.getString(ServletStreamConstants.RESOURCE_BUNDLE_NAME,
-					"TNT4JStreamsServlet.passing.map.to.streams.progress.init"), req.getRequestedSessionId());
+					"TNT4JStreamsServlet.passing.map.to.streams"), req.getRequestedSessionId());
 			for (HttpServletStream httpServletStream : httpServletStreams) {
 				added |= httpServletStream.addInputToBuffer(reqMap);
 			}
