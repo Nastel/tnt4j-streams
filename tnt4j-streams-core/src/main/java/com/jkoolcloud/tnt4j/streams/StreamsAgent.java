@@ -129,20 +129,7 @@ public final class StreamsAgent {
 				// CfgStreamsBuilder().setConfig(cfgFileName).setStreamListener(dsl).setTaskListener(dsl));
 			}
 
-			if (streamThreads != null) {
-				boolean complete = false;
-				while (!complete) {
-					try {
-						synchronized (streamThreads) {
-							streamThreads.wait();
-							if (restarting) {
-								complete = true;
-							}
-						}
-					} catch (InterruptedException exc) {
-					}
-				}
-			}
+			waitForStreamsToComplete();
 		}
 	}
 
@@ -158,15 +145,17 @@ public final class StreamsAgent {
 		};
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("\n"); // NON-NLS
-		sb.append("------------------------------------------------------------------------\n"); // NON-NLS
+		sb.append(System.lineSeparator());
+		sb.append("------------------------------------------------------------------------") // NON-NLS
+				.append(System.lineSeparator());
 		for (String property : envProps) {
 			sb.append(String.format("%20s: %s", // NON-NLS
 					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, property),
 					System.getProperty(property)));
-			sb.append("\n"); // NON-NLS
+			sb.append(System.lineSeparator());
 		}
-		sb.append("------------------------------------------------------------------------\n"); // NON-NLS
+		sb.append("------------------------------------------------------------------------") // NON-NLS
+				.append(System.lineSeparator());
 
 		return sb.toString();
 	}
@@ -206,16 +195,20 @@ public final class StreamsAgent {
 	 *            streams builder to build streams context
 	 *
 	 * @see #run(com.jkoolcloud.tnt4j.streams.configure.build.StreamsBuilder)
+	 * @see com.jkoolcloud.tnt4j.streams.configure.build.CfgStreamsBuilder#isLoaded()
 	 */
 	protected static void loadConfigAndRun(CfgStreamsBuilder builder) {
-		try {
-			builder.loadConfig(osPipeInput, haltOnUnparsed);
-		} catch (SAXException | IllegalStateException e) {
-			LOGGER.log(OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"StreamsAgent.cfg.error", Utils.getExceptionMessages(e));
-		} catch (Throwable e) {
-			Utils.logThrowable(LOGGER, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"StreamsAgent.start.failed", e);
+		if (!builder.isLoaded()) {
+			try {
+				builder.loadConfig(osPipeInput, haltOnUnparsed);
+			} catch (SAXException | IllegalStateException e) {
+				LOGGER.log(OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						"StreamsAgent.cfg.error", Utils.getExceptionMessages(e));
+			} catch (Throwable e) {
+				Utils.logThrowable(LOGGER, OpLevel.ERROR,
+						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "StreamsAgent.start.failed",
+						e);
+			}
 		}
 
 		run(builder);
@@ -303,6 +296,26 @@ public final class StreamsAgent {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Waits for all running streams within default streams thread group to complete.
+	 */
+	public static void waitForStreamsToComplete() {
+		if (streamThreads != null) {
+			boolean complete = false;
+			while (!complete) {
+				try {
+					synchronized (streamThreads) {
+						streamThreads.wait();
+						if (restarting) {
+							complete = true;
+						}
+					}
+				} catch (InterruptedException exc) {
+				}
+			}
+		}
 	}
 
 	/**

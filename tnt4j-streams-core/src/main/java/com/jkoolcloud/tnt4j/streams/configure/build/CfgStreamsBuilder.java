@@ -46,6 +46,8 @@ public class CfgStreamsBuilder extends POJOStreamsBuilder {
 	private Reader cfgReader;
 	private String[] names;
 
+	private boolean loaded = false;
+
 	/**
 	 * Sets streams configuration to be loaded from defined file path.
 	 * 
@@ -150,9 +152,20 @@ public class CfgStreamsBuilder extends POJOStreamsBuilder {
 			}
 
 			addStreams(streams);
+
+			loaded = true;
 		}
 
 		return cfg;
+	}
+
+	/**
+	 * Checks if configuration is already loaded.
+	 * 
+	 * @return {@code true} if configuration is already loaded, {@code false} - otherwise
+	 */
+	public boolean isLoaded() {
+		return loaded;
 	}
 
 	/**
