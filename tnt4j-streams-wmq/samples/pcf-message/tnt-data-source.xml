@@ -25,11 +25,11 @@
         <!-- message fields -->
         <field name="QMgrName" locator="MQCA_Q_MGR_NAME" locator-type="Label"/>
         <field name="ServerName" locator="MQCACF_HOST_NAME" locator-type="Label"/>
-        <field name="StartTime" separator=" " datatype="DateTime" format="yyyy-MM-dd HH:mm:ss">
+        <field name="StartTime" separator=" " datatype="DateTime" format="yyyy-MM-dd HH:mm:ss|yyyy-MM-dd HH.mm.ss">
             <field-locator locator="MQCAMO_START_DATE" locator-type="Label"/>
             <field-locator locator="MQCAMO_START_TIME" locator-type="Label"/>
         </field>
-        <field name="EndTime" separator=" " datatype="DateTime" format="yyyy-MM-dd HH:mm:ss">
+        <field name="EndTime" separator=" " datatype="DateTime" format="yyyy-MM-dd HH:mm:ss|yyyy-MM-dd HH.mm.ss">
             <field-locator locator="MQCAMO_END_DATE" locator-type="Label"/>
             <field-locator locator="MQCAMO_END_TIME" locator-type="Label"/>
         </field>
@@ -48,6 +48,9 @@
         <field name="PointerSize" locator="MQIACF_POINTER_SIZE" locator-type="Label"/>
         <field name="Platform" locator="MQIA_PLATFORM" locator-type="Label"/>
         <field name="Correlator" locator="MQBACF_CORREL_ID" locator-type="Label" datatype="Binary"/>
+        <field name="TrackingId" locator="MQBACF_MSG_ID" locator-type="Label" datatype="Binary"/>
+        <field name="AccountingToken" locator="MQBACF_ACCOUNTING_TOKEN" locator-type="Label" datatype="Binary"/>
+        <field name="GroupId" locator="MQBACF_GROUP_ID" locator-type="Label" datatype="Binary"/>
     </parser>
 
     <stream name="WmqStreamPCF" class="com.jkoolcloud.tnt4j.streams.inputs.WmqStreamPCF">

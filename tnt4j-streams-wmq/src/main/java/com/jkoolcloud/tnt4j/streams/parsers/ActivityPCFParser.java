@@ -246,31 +246,35 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 		if (i == 0 && paramStr.equals(HEAD_MQCFH)) {
 			val = resolvePCFHeaderValue(locator, path[i + 1], (PCFMessage) pcfContent);
 		} else if (i == 0 && paramStr.equalsIgnoreCase(HEAD_MQMD)) {
-			val = resolveMDMQHeaderValue(locator, path[i + 1], (PCFMessage) pcfContent);
+			val = resolveMDMQHeaderValue(locator, path[i + 1], pcfContent);
 		} else {
 			try {
 				Integer paramId = WmqUtils.getParamId(paramStr);
 				PCFParameter[] params = WmqUtils.getParameters(pcfContent, paramId);
 
-				if (params.length == 0) {
+				if (ArrayUtils.isEmpty(params)) {
+					params = WmqUtils.getParameters(pcfContent, WmqStreamConstants.PCF_MQMD_HEADER + paramId);
+				}
+
+				if (ArrayUtils.isEmpty(params)) {
 					val = null;
-				} else if (params.length == 1) {
-					PCFParameter param = params.length > 0 ? params[0] : null;
-					if (!isLastPathToken(path, i)) {
-						if (param instanceof MQCFGR) {
-							val = getParamValue(locator, path, (MQCFGR) param, ++i, cData);
+				} else {
+					if (params.length == 1 && !isLastPathToken(path, i)) {
+						if (params[0] instanceof MQCFGR) {
+							val = getParamValue(locator, path, (MQCFGR) params[0], ++i, cData);
 						} else if (isMqiStructParam(paramStr)) {
-							val = resolveMqiStructValue(locator, param, path, i, pcfContent, cData);
+							val = resolveMqiStructValue(locator, params[0], path, i, pcfContent, cData);
 						}
 					} else {
-						if (param instanceof MQCFGR && isDataSupportedByStackedParser(cData.getField(), param)) {
-							val = param;
+						if (params[0] instanceof MQCFGR
+								&& isDataSupportedByStackedParser(cData.getField(), params[0])) {
+							val = params;
 						} else {
-							val = resolvePCFParamValue(locator, param);
+							val = resolvePCFParamsValue(locator, params);
 						}
 					}
-				} else {
-					val = params;
+
+					val = Utils.simplifyValue(val);
 				}
 			} catch (NoSuchElementException exc) {
 				throw new ParseException(StreamsResources.getStringFormatted(WmqStreamConstants.RESOURCE_BUNDLE_NAME,
@@ -304,41 +308,41 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 	private Object resolvePCFHeaderValue(ActivityFieldLocator locator, String hAttrName, PCFMessage pcfMsg) {
 		Integer val = null;
 		Object mappedValue = null;
-		if ("command".equals(hAttrName.toLowerCase())) { // NON-NLS
+		if ("command".equalsIgnoreCase(hAttrName)) { // NON-NLS
 			val = pcfMsg.getHeader().getCommand();
 			if (isValueTranslatable(locator.getDataType())) {
 				mappedValue = MQConstants.lookup(val, "MQCMD_.*"); // NON-NLS
 			}
-		} else if ("msgseqnumber".equals(hAttrName.toLowerCase())) { // NON-NLS
+		} else if ("msgseqnumber".equalsIgnoreCase(hAttrName)) { // NON-NLS
 			val = pcfMsg.getHeader().getMsgSeqNumber();
-		} else if ("control".equals(hAttrName.toLowerCase())) { // NON-NLS
+		} else if ("control".equalsIgnoreCase(hAttrName)) { // NON-NLS
 			val = pcfMsg.getHeader().getControl();
 			if (isValueTranslatable(locator.getDataType())) {
 				mappedValue = MQConstants.lookup(val, "MQCFC_.*"); // NON-NLS
 			}
-		} else if ("compcode".equals(hAttrName.toLowerCase())) { // NON-NLS
+		} else if ("compcode".equalsIgnoreCase(hAttrName)) { // NON-NLS
 			val = pcfMsg.getHeader().getCompCode();
 			if (isValueTranslatable(locator.getDataType())) {
 				mappedValue = MQConstants.lookupCompCode(val);
 			}
-		} else if ("reason".equals(hAttrName.toLowerCase())) { // NON-NLS
+		} else if ("reason".equalsIgnoreCase(hAttrName)) { // NON-NLS
 			val = pcfMsg.getHeader().getReason();
 			if (isValueTranslatable(locator.getDataType())) {
 				mappedValue = MQConstants.lookupReasonCode(val);
 			}
-		} else if ("parametercount".equals(hAttrName.toLowerCase())) { // NON-NLS
+		} else if ("parametercount".equalsIgnoreCase(hAttrName)) { // NON-NLS
 			val = pcfMsg.getHeader().getParameterCount();
-		} else if ("type".equals(hAttrName.toLowerCase())) { // NON-NLS
+		} else if ("type".equalsIgnoreCase(hAttrName)) { // NON-NLS
 			val = pcfMsg.getHeader().getType();
 			if (isValueTranslatable(locator.getDataType())) {
 				mappedValue = MQConstants.lookup(val, "MQCFT_.*"); // NON-NLS
 			}
-		} else if ("version".equals(hAttrName.toLowerCase())) { // NON-NLS
+		} else if ("version".equalsIgnoreCase(hAttrName)) { // NON-NLS
 			val = pcfMsg.getHeader().getVersion();
 			// if (isValueTranslatable(locator.getDataType())) {
 			// mappedValue = MQConstants.lookup(val, "MQCFH_VERSION_.*"); // NON-NLS
 			// }
-		} else if ("struclength".equals(hAttrName.toLowerCase())) { // NON-NLS
+		} else if ("struclength".equalsIgnoreCase(hAttrName)) { // NON-NLS
 			val = pcfMsg.getHeader().getStrucLength();
 		}
 
@@ -349,16 +353,16 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 		return translateNumValues && isTextualLocatorDataType(fDataType);
 	}
 
-	private Object resolveMDMQHeaderValue(ActivityFieldLocator locator, String hAttrName, PCFMessage pcfMsg)
+	private Object resolveMDMQHeaderValue(ActivityFieldLocator locator, String hAttrName, PCFContent pcfContent)
 			throws ParseException {
 		try {
 			Integer paramId = getMQMDParamId(hAttrName);
-			PCFParameter param = pcfMsg.getParameter(WmqStreamConstants.PCF_MQMD_HEADER + paramId);
+			PCFParameter param = pcfContent.getParameter(WmqStreamConstants.PCF_MQMD_HEADER + paramId);
 
 			return resolvePCFParamValue(locator, param);
 		} catch (NoSuchElementException exc) {
 			throw new ParseException(StreamsResources.getStringFormatted(WmqStreamConstants.RESOURCE_BUNDLE_NAME,
-					"ActivityPCFParser.unresolved.mqmd.parameter", hAttrName), getPCFPosition(pcfMsg));
+					"ActivityPCFParser.unresolved.mqmd.parameter", hAttrName), getPCFPosition(pcfContent));
 		}
 	}
 
@@ -423,6 +427,36 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 	}
 
 	/**
+	 * Resolves PCF parameters values array.
+	 * <p>
+	 * This method iterates through parameters array elements calling
+	 * {@link #resolvePCFParamValue(com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocator, com.ibm.mq.headers.pcf.PCFParameter)}
+	 * method and setting returned value into array. Produced array is always of same size as provided {@code params}
+	 * array.
+	 * 
+	 * @param locator
+	 *            activity field locator
+	 * @param params
+	 *            PCF parameters array to resolve values from
+	 * @return resolved PCF parameters values array, or {@code null} if provided parameters array is {@code null}
+	 * 
+	 * @see #resolvePCFParamValue(com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocator,
+	 *      com.ibm.mq.headers.pcf.PCFParameter)
+	 */
+	protected Object[] resolvePCFParamsValue(ActivityFieldLocator locator, PCFParameter... params) {
+		if (params == null) {
+			return params;
+		}
+
+		Object[] pValues = new Object[params.length];
+		for (int i = 0; i < params.length; i++) {
+			pValues[i] = resolvePCFParamValue(locator, params[i]);
+		}
+
+		return pValues;
+	}
+
+	/**
 	 * Resolves PCF parameter value.
 	 * <p>
 	 * If parser property 'TranslateNumValues' is set to {@code true} - then if possible, resolved numeric value gets
@@ -436,7 +470,7 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 	 *            activity field locator
 	 * @param param
 	 *            PCF parameter to resolve value from
-	 * @return resolved PCF parameter value
+	 * @return resolved PCF parameter value, or {@code null} if provided parameter is {@code null}
 	 *
 	 * @see #getParamValue(com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocator, String[],
 	 *      com.ibm.mq.headers.pcf.PCFContent, int,
@@ -445,7 +479,7 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 	 */
 	protected Object resolvePCFParamValue(ActivityFieldLocator locator, PCFParameter param) {
 		if (param == null) {
-			return null;
+			return param;
 		}
 
 		Object val = param.getValue();
