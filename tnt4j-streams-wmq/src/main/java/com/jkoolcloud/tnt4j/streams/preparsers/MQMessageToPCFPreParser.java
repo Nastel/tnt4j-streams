@@ -17,31 +17,25 @@
 package com.jkoolcloud.tnt4j.streams.preparsers;
 
 import com.ibm.mq.MQMessage;
-import com.ibm.mq.constants.MQConstants;
 import com.ibm.mq.headers.pcf.PCFMessage;
-import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
+import com.jkoolcloud.tnt4j.streams.inputs.WmqStreamPCF;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
-import com.jkoolcloud.tnt4j.streams.utils.WmqStreamConstants;
 
 /**
  * RAW activity data pre-parser capable to convert incoming activity data from {@link com.ibm.mq.MQMessage} to
  * {@link com.ibm.mq.headers.pcf.PCFMessage} format.
  * 
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
+ * 
+ * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityPCFParser
  */
 public class MQMessageToPCFPreParser extends AbstractMQMessagePreParser<PCFMessage> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(MQMessageToPCFPreParser.class);
 
 	@Override
 	public PCFMessage preParse(MQMessage mqMsg) throws Exception {
-		PCFMessage msgData = new PCFMessage(mqMsg);
-		msgData.addParameter(MQConstants.MQBACF_CORREL_ID, mqMsg.correlationId);
-		LOGGER.log(OpLevel.TRACE, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
-				"WmqStream.message.data", msgData.size(), msgData);
-
-		return msgData;
+		return WmqStreamPCF.msgToPCF(mqMsg);
 	}
 
 	@Override

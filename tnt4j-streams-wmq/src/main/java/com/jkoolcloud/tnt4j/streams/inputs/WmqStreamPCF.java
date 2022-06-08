@@ -41,7 +41,9 @@ import com.jkoolcloud.tnt4j.streams.utils.WmqStreamConstants;
  * <p>
  * This activity stream supports configuration properties from {@link AbstractWmqStream} (and higher hierarchy streams).
  *
- * @version $Revision: 2 $
+ * @version $Revision: 3 $
+ * 
+ * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityPCFParser
  */
 public class WmqStreamPCF extends AbstractWmqStream<PCFContent> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(WmqStreamPCF.class);
@@ -60,18 +62,35 @@ public class WmqStreamPCF extends AbstractWmqStream<PCFContent> {
 
 	@Override
 	protected PCFContent getActivityDataFromMessage(MQMessage mqMsg) throws Exception {
+		return msgToPCF(mqMsg);
+	}
+
+	/**
+	 * Converts provided {@link com.ibm.mq.MQMessage} {@code mqMsg} to {@link com.ibm.mq.headers.pcf.PCFMessage}.
+	 * <p>
+	 * MQ message {@link com.ibm.mq.MQMD} header values are added into PCF message as parameters prefixed with
+	 * {@code "MQMD."}.
+	 * 
+	 * @param mqMsg
+	 *            MQ message instance
+	 * @return PCF message
+	 * 
+	 * @throws Exception
+	 *             if MQ message can't be converted to PCF message
+	 */
+	public static PCFMessage msgToPCF(MQMessage mqMsg) throws Exception {
 		PCFMessage msgData = new PCFMessage(mqMsg);
 		// appending missing MQMD fields to PCF message
 		handleMQMDParameters(msgData, mqMsg);
 
-		logger().log(OpLevel.TRACE, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+		LOGGER.log(OpLevel.TRACE, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
 				"WmqStream.message.data", msgData.size(), msgData);
 
 		return msgData;
 	}
 
-	private void handleMQMDParameters(PCFMessage msgData, MQMessage mqMsg) {
-		logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+	private static void handleMQMDParameters(PCFMessage msgData, MQMessage mqMsg) {
+		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
 				"WmqStreamPCF.adding.mq.to.pcf");
 
 		addMQMDParameterToPCFMessage(msgData, MQConstants.MQIACF_REPORT, mqMsg.report);
@@ -116,12 +135,12 @@ public class WmqStreamPCF extends AbstractWmqStream<PCFContent> {
 		}
 	}
 
-	private void addMQMDParameterToPCFMessage(PCFMessage msg, int paramId, Object val) {
+	private static void addMQMDParameterToPCFMessage(PCFMessage msg, int paramId, Object val) {
 		if (val == null) {
 			return;
 		}
 
-		logger().log(OpLevel.TRACE, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+		LOGGER.log(OpLevel.TRACE, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
 				"WmqStreamPCF.adding.pcf.param", PCFConstants.lookupParameter(paramId), paramId, Utils.toString(val));
 
 		if (val instanceof Integer) {
