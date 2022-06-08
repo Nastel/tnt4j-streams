@@ -29,6 +29,7 @@ import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.jkoolcloud.tnt4j.streams.StreamsAgent;
@@ -44,15 +45,16 @@ import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
  */
 public class ActivityCacheTest {
 
-	private static final String PROGRESS_FILE = "./samples/cached-values/eventFirst.json"; // NON-NLS
-	private static final String START_FILE = "./samples/cached-values/eventSecond.json"; // NON-NLS
-	// private static final String END_FILE = "./samples/cached-values/eventThird.json"; // NON-NLS
+	private static final String PROGRESS_FILE = "./samples/cached-values/event1.json"; // NON-NLS
+	private static final String START_FILE = "./samples/cached-values/event2.json"; // NON-NLS
+	// private static final String END_FILE = "./samples/cached-values/event3.json"; // NON-NLS
 
 	private static final Integer TEST_PORT = 9595;
 
 	private static final String cfgFile = "./samples/cached-values/tnt-data-source.xml"; // NON-NLS
 
 	@Test
+	@Ignore("Integration test")
 	public void runStreams() throws Exception {
 		InputStreamListener streamListener = mock(InputStreamListener.class);
 		StreamTasksListener streamTasksListener = mock(StreamTasksListener.class);

@@ -653,7 +653,7 @@ public class ActivityInfo {
 	private static Collection<String> addStrings(Collection<String> collection, String... strings) {
 		if (ArrayUtils.isNotEmpty(strings)) {
 			if (collection == null) {
-				collection = new HashSet<>();
+				collection = new LinkedHashSet<>();
 			}
 
 			for (String str : strings) {
@@ -1518,7 +1518,7 @@ public class ActivityInfo {
 		}
 		if (otherAi.correlator != null) {
 			if (correlator == null) {
-				correlator = new HashSet<>();
+				correlator = new LinkedHashSet<>();
 			}
 
 			correlator.addAll(otherAi.correlator);
@@ -1532,7 +1532,7 @@ public class ActivityInfo {
 		}
 		if (otherAi.tag != null) {
 			if (tag == null) {
-				tag = new HashSet<>();
+				tag = new LinkedHashSet<>();
 			}
 
 			tag.addAll(otherAi.tag);

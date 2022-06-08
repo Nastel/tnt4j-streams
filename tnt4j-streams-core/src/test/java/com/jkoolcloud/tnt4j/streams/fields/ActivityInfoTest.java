@@ -21,10 +21,7 @@ import static org.mockito.Mockito.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import org.junit.Test;
 
@@ -62,7 +59,12 @@ public class ActivityInfoTest {
 
 			if (test) {
 				Object result = activityInfo.getFieldValue(field.name());
-				assertEquals("Value not equal", value.valueExpected, result);
+				if (value.valueExpected instanceof Collection && result instanceof Collection) {
+					assertArrayEquals("Value not equal", ((Collection<?>) value.valueExpected).toArray(),
+							((Collection<?>) result).toArray());
+				} else {
+					assertEquals("Value not equal", value.valueExpected, result);
+				}
 			}
 		}
 		activityInfo.setEventName("TestActivity");
