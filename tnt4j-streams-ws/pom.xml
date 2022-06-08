@@ -17,7 +17,8 @@
         <quartz.version>2.3.2</quartz.version>
         <hikaricp.version>4.0.3</hikaricp.version>
 
-        <jaxws.version>2.3.3</jaxws.version>
+        <jaxws.api.version>2.3.3</jaxws.api.version>
+        <jaxws.rt.version>2.3.5</jaxws.rt.version>
     </properties>
 
     <profiles>
@@ -31,12 +32,12 @@
                 <dependency>
                     <groupId>jakarta.xml.ws</groupId>
                     <artifactId>jakarta.xml.ws-api</artifactId>
-                    <version>${jaxws.version}</version>
+                    <version>${jaxws.api.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>com.sun.xml.ws</groupId>
                     <artifactId>jaxws-rt</artifactId>
-                    <version>${jaxws.version}</version>
+                    <version>${jaxws.rt.version}</version>
                 </dependency>
             </dependencies>
         </profile>
