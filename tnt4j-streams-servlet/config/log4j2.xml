@@ -21,8 +21,8 @@
                xsi:schemaLocation="http://logging.apache.org/log4j/2.0/config">
     <Properties>
         <Property name="tnt4j.streams.log.filename">${sys:catalina.base}/logs/tnt4j-streams.log</Property>
-        <Property name="tnt4j.activities.prod.log.filename">${sys:catalina.base}/logs/tnt4j-streams-prod-activities.log</Property>
-        <Property name="tnt4j.activities.qa.log.filename">${sys:catalina.base}/logs/tnt4j-streams-qa-activities.log</Property>
+        <Property name="tnt4j.activities.jkool.log.filename">${sys:catalina.base}/logs/tnt4j-streams-jkool-activities.log</Property>
+        <Property name="tnt4j.activities.ap.log.filename">${sys:catalina.base}/logs/tnt4j-streams-ap-activities.log</Property>
     </Properties>
     <Appenders>
         <!-- ### direct log messages to console ### -->
@@ -51,10 +51,10 @@
                 <Pattern>%d{ISO8601} %-5p [%t!%c{1}] - %m%n</Pattern>
             </PatternLayout>
         </RollingFile>
-        <!--  ### branch for sink written 'prod' activity entities logger ### -->
-        <RollingFile name="activities_prod_log"
-                     fileName="${tnt4j.activities.prod.log.filename}"
-                     filePattern="${tnt4j.activities.prod.log.filename}.%i.gz"
+        <!--  ### branch for sink written 'jkool' activity entities logger ### -->
+        <RollingFile name="activities_jkool_log"
+                     fileName="${tnt4j.activities.jkool.log.filename}"
+                     filePattern="${tnt4j.activities.jkool.log.filename}.%i.gz"
                      ignoreExceptions="false" createOnDemand="true">
             <Policies>
                 <OnStartupTriggeringPolicy/>
@@ -62,7 +62,7 @@
             </Policies>
             <DefaultRolloverStrategy max="30" fileIndex="min">
                 <Delete basePath="${baseDir}" maxDepth="1">
-                    <IfFileName glob="${tnt4j.activities.prod.log.filename}.*.gz"/>
+                    <IfFileName glob="${tnt4j.activities.jkool.log.filename}.*.gz"/>
                     <IfLastModified age="30d"/>
                     <!--IfAccumulatedFileCount exceeds="30"/-->
                 </Delete>
@@ -71,10 +71,10 @@
                 <Pattern>%m%n</Pattern>
             </PatternLayout>
         </RollingFile>
-        <!--  ### branch for sink written 'qa' activity entities logger ### -->
-        <RollingFile name="activities_qa_log"
-                     fileName="${tnt4j.activities.qa.log.filename}"
-                     filePattern="${tnt4j.activities.qa.log.filename}.%i.gz"
+        <!--  ### branch for sink written 'ap' activity entities logger ### -->
+        <RollingFile name="activities_ap_log"
+                     fileName="${tnt4j.activities.ap.log.filename}"
+                     filePattern="${tnt4j.activities.ap.log.filename}.%i.gz"
                      ignoreExceptions="false" createOnDemand="true">
             <Policies>
                 <OnStartupTriggeringPolicy/>
@@ -82,7 +82,7 @@
             </Policies>
             <DefaultRolloverStrategy max="10" fileIndex="min">
                 <Delete basePath="${baseDir}" maxDepth="1">
-                    <IfFileName glob="${tnt4j.activities.qa.log.filename}.*.gz"/>
+                    <IfFileName glob="${tnt4j.activities.ap.log.filename}.*.gz"/>
                     <IfLastModified age="30d"/>
                     <!--IfAccumulatedFileCount exceeds="30"/-->
                 </Delete>
@@ -105,11 +105,11 @@
         <!-- ### jesl API logger -->
         <!-- <asyncLogger name="com.jkoolcloud.jesl" level="DEBUG"/> -->
         <!-- #### streamed activity entities logger #### -->
-        <asyncLogger name="com.jkoolcloud.tnt4j.streams.activities_prod_log" level="INFO" additivity="false">
-            <AppenderRef ref="activities_prod_log"/>
+        <asyncLogger name="com.jkoolcloud.tnt4j.streams.activities_jkool_log" level="INFO" additivity="false">
+            <AppenderRef ref="activities_jkool_log"/>
         </asyncLogger>
-        <asyncLogger name="com.jkoolcloud.tnt4j.streams.activities_qa_log" level="INFO" additivity="false">
-            <AppenderRef ref="activities_qa_log"/>
+        <asyncLogger name="com.jkoolcloud.tnt4j.streams.activities_ap_log" level="INFO" additivity="false">
+            <AppenderRef ref="activities_ap_log"/>
         </asyncLogger>
     </Loggers>
 </Configuration>

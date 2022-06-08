@@ -23,7 +23,6 @@
 
     <stream name="CloudWatchMetricsStream" class="com.jkoolcloud.tnt4j.streams.inputs.HttpServletStream">
         <property name="HaltIfNoParser" value="false"/>
-        <property name="SplitRelatives" value="false"/>
         <property name="SendStreamStates" value="false"/>
         <property name="BuildSourceFQNFromStreamedData" value="false"/>
         <!--<property name="SourceFQN" value="DATACENTER=${DataCenter}"/>-->
@@ -55,27 +54,41 @@
             <!--            <property name="source.factory.RootFQN" value="APPSERVER=?#NETWORK=?#GEOADDR=?#SERVICE=?#DATACENTER=?"/>-->
             <property name="source.factory.RootFQN" value="DATACENTER=?"/>
 
+            <property name="event.sink.factory.BroadcastSequence" value="ap,jkool"/>
+
             <!-- File sink -->
-            <property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.FileEventSinkFactory"/>
-            <property name="event.sink.factory.EventSinkFactory.prod.FileName" value="${sys:catalina.base}/logs/tnt4j-streams_samples.log"/>
+            <property name="event.sink.factory.EventSinkFactory.ap" value="com.jkoolcloud.tnt4j.sink.impl.FileEventSinkFactory"/>
+            <property name="event.sink.factory.EventSinkFactory.ap.FileName" value="${sys:catalina.base}/logs/tnt4j-streams_samples.log"/>
 
             <!-- Socket sink to AutoPilot -->
-            <!--            <property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory"/>-->
-            <!--            <property name="event.sink.factory.EventSinkFactory.prod.LogSink"
-                                  value="file:${sys:catalina.base}/logs/tnt4j-streams_samples_socket.log"/-->
+            <!--property name="event.sink.factory.EventSinkFactory.ap" value="com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory"/>
+            <property name="event.sink.factory.EventSinkFactory.ap.LogSink" value="file:${sys:catalina.base}/logs/tnt4j-streams_samples_socket.log"/-->
             <!-- Change to your AP machine host/IP -->
-            <!--            <property name="event.sink.factory.EventSinkFactory.prod.Host" value="localhost"/>-->
+            <!--property name="event.sink.factory.EventSinkFactory.ap.Host" value="localhost"/-->
             <!-- Change to your Ap machine port - default one is 6060 -->
-            <!--            <property name="event.sink.factory.EventSinkFactory.prod.Port" value="6060"/>-->
+            <!--property name="event.sink.factory.EventSinkFactory.ap.Port" value="6060"/-->
 
-            <!--property name="event.formatter" value="com.jkoolcloud.tnt4j.streams.custom.format.openmetrics.FactPathValueFormatter"/>
-            <property name="event.formatter.AddSelfSnapshot" value="false"/>
-            <property name="event.formatter.KeyReplacements">" "->"_" "\""->"'" "/"->"%" "="->"\\" ","->"!'" "\\\\"->"\\"</property>
-            <property name="event.formatter.ValueReplacements">"\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"
+            <property name="event.sink.factory.EventSinkFactory.ap.Formatter"
+                      value="com.jkoolcloud.tnt4j.streams.custom.format.openmetrics.FactPathValueFormatter"/>
+            <property name="event.sink.factory.EventSinkFactory.ap.Formatter.AddSelfSnapshot" value="false"/>
+            <property name="event.sink.factory.EventSinkFactory.ap.Formatter.KeyReplacements">
+                " "->"_" "\""->"'" "/"->"%" "="->"\\" ","->"!'" "\\\\"->"\\"
             </property>
-            <property name="event.formatter.PathLevelAttributes">
-                domain;namespace;region;cluster;broker;metric;topic;cGroup;cAuth
-            </property-->
+            <property name="event.sink.factory.EventSinkFactory.ap.Formatter.ValueReplacements">
+                "\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"
+            </property>
+            <property name="event.sink.factory.EventSinkFactory.ap.Formatter.PathLevelAttributes">
+                domain;namespace;region;cluster,streamName;broker;metric;topic;cGroup;cAuth
+            </property>
+
+            <!-- JKool/XRay sink -->
+            <property name="event.sink.factory.EventSinkFactory.jkool" value="com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory"/>
+            <property name="event.sink.factory.EventSinkFactory.jkool.LogSink"
+                      value="slf4j:com.jkoolcloud.tnt4j.streams.activities_jkool_log"/>
+            <property name="event.sink.factory.EventSinkFactory.jkool.Url" value="https://xraytest.nastel.com:6585"/>
+            <property name="event.sink.factory.EventSinkFactory.jkool.Token" value="bcf419b4-dba2-45fa-9ca8-cf2e4de99285"/>
+
+            <property name="event.sink.factory.EventSinkFactory.jkool.Formatter" value="com.jkoolcloud.tnt4j.format.JSONFormatter"/>
         </tnt4j-properties>
 
         <parser-ref name="KinesisFirehoseParser"/>
