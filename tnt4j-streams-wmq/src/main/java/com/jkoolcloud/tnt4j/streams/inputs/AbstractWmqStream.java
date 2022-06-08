@@ -170,7 +170,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 	private boolean stripHeaders = true;
 	private String connectionStr = null;
 	// QM connection parameters
-	private Hashtable<String, Object> mqConnProps = new Hashtable<>(6);
+	private final Hashtable<String, Object> mqConnProps = new Hashtable<>(6);
 
 	private long reconnectDelay = QMGR_CONN_RETRY_INTERVAL;
 
@@ -178,7 +178,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 	private boolean forceOpenOptions;
 
 	private MQMessage mqMsg;
-	private Queue<Pair<String, Integer>> connections = new ArrayDeque<>(5);
+	private final Queue<Pair<String, Integer>> connections = new ArrayDeque<>(5);
 
 	protected AbstractWmqStream() {
 		mqConnProps.put(CMQC.PORT_PROPERTY, 1414);

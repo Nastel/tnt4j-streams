@@ -93,7 +93,7 @@ public class MQProbeStructs {
 		byte[] pad;
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAMQAPINT} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TAMQAPINT} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -188,7 +188,7 @@ public class MQProbeStructs {
 		public TAAXC exitContext;
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAAPINTINFO} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TAAPINTINFO} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -301,7 +301,7 @@ public class MQProbeStructs {
 		public TAMD msgDesc;
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAMQINFO} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TAMQINFO} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -398,7 +398,7 @@ public class MQProbeStructs {
 		byte[] unused; // 28
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAOD} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TAOD} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -483,7 +483,7 @@ public class MQProbeStructs {
 		public String resolvedQMgrName; // 48
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAMSGOPT} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TAMSGOPT} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -597,7 +597,7 @@ public class MQProbeStructs {
 		public String applOriginData; // 4
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAMD} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TAMD} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -709,7 +709,7 @@ public class MQProbeStructs {
 		public double timer;
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TIME_INFO} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TIME_INFO} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -780,7 +780,7 @@ public class MQProbeStructs {
 		public int delta_usec;
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code APXDELTA} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code APXDELTA} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -859,7 +859,7 @@ public class MQProbeStructs {
 		byte[] unused2; // 4 /* pad struct to next multiple of 8 bytes */
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code APXSIGNTR} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code APXSIGNTR} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -938,7 +938,7 @@ public class MQProbeStructs {
 		public int msgage_usec;
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code MSGAGE} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code MSGAGE} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -1016,7 +1016,7 @@ public class MQProbeStructs {
 		public String qMgrName; // 48
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAAXP} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TAAXP} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -1108,7 +1108,7 @@ public class MQProbeStructs {
 		byte[] unused; // 28 byte[]?
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAAXC} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TAAXC} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -1207,7 +1207,7 @@ public class MQProbeStructs {
 		byte[] pad; // remaining buffer size
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAZOS} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TAZOS} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -1368,7 +1368,7 @@ public class MQProbeStructs {
 		byte[] unused2; // 4
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAMQBATCH} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TAMQBATCH} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -1530,7 +1530,7 @@ public class MQProbeStructs {
 		public TAMD msgDesc;
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAMQCD} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TAMQCD} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -1671,7 +1671,7 @@ public class MQProbeStructs {
 		public String hostName; // 256;
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAHID} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TAHID} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -1803,7 +1803,7 @@ public class MQProbeStructs {
 		public int sqlLen;
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TADB2} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TADB2} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -1984,7 +1984,7 @@ public class MQProbeStructs {
 		public short msgOffset;
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TACCD} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TACCD} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -2100,7 +2100,7 @@ public class MQProbeStructs {
 		public String msgId; // 8
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TAMQCICS} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TAMQCICS} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -2175,7 +2175,7 @@ public class MQProbeStructs {
 		public long timer; // 8
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code TACICSINFO} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code TACICSINFO} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -2335,7 +2335,7 @@ public class MQProbeStructs {
 		public double cmtaend;
 
 		/**
-		 * Reads bytes brom provided byte buffer {@code bb} into {@code CMTA} data structure.
+		 * Reads bytes from provided byte buffer {@code bb} into {@code CMTA} data structure.
 		 * 
 		 * @param bb
 		 *            byte buffer to pull bytes
@@ -2640,7 +2640,7 @@ public class MQProbeStructs {
 		private static final int INVALID_STRUC_SIZE = 1;
 		private static final int INVALID_STRUC_ID = 2;
 
-		private int faultType;
+		private final int faultType;
 
 		/**
 		 * Constructs an {@code MQStructException} with the specified fault type identifier.

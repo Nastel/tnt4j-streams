@@ -196,7 +196,7 @@ public class WmqUtils {
 		return paramsList.toArray(new PCFParameter[0]);
 	}
 
-	private static Map<String, Integer> PCF_PARAMS_CACHE = new HashMap<>();
+	private static final Map<String, Integer> PCF_PARAMS_CACHE = new HashMap<>();
 
 	/**
 	 * Translates PCF parameter MQ constant name to constant numeric value.
@@ -299,7 +299,7 @@ public class WmqUtils {
 	 * @see #computeSignature(Object...)
 	 */
 	public static Object computeSignature(Object value, String sigDelim, EventSink logger) {
-		Object[] sigItems = null;
+		Object[] sigItems;
 		if (value instanceof String) {
 			String sigStr = (String) value;
 			sigItems = sigStr.split(Pattern.quote(sigDelim));
@@ -706,7 +706,7 @@ public class WmqUtils {
 					stream.write(buffer.toString().getBytes(Charset.defaultCharset()));
 					stream.flush();
 					buffer.setLength(0);
-					display_offset += (long) chars_read;
+					display_offset += chars_read;
 				}
 
 			}
