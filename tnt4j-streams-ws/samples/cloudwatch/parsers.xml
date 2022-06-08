@@ -36,19 +36,20 @@
         <field name="Topic" locator="Topic" locator-type="Label" transparent="true"/>
         <field name="ConsumerGroup" locator="Consumer Group" locator-type="Label" transparent="true"/>
         <field name="ClientAuth" locator="Client Authentication" locator-type="Label" transparent="true"/>
+        <field name="DeliveryStreamName" locator="DeliveryStreamName" locator-type="Label" transparent="true"/>
 
         <field name="Rest" locator="#" locator-type="Label"/>
     </parser>
     <parser name="ValueParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="Snapshot"/>
 
-        <field name="Max" locator="max" locator-type="Label"/>
-        <field name="Min" locator="min" locator-type="Label"/>
-        <field name="Sum" locator="sum" locator-type="Label"/>
-        <field name="Count" locator="count" locator-type="Label"/>
-        <field name="P99" locator="p99" locator-type="Label"/>
-        <field name="P99_9" locator="p99.9" locator-type="Label"/>
-        <field name="Median" locator="TM(25%:75%)" locator-type="Label"/>
+        <field name="Max" locator="max" locator-type="Label" datatype="Number"/>
+        <field name="Min" locator="min" locator-type="Label" datatype="Number"/>
+        <field name="Sum" locator="sum" locator-type="Label" datatype="Number"/>
+        <field name="Count" locator="count" locator-type="Label" datatype="Number"/>
+        <field name="P99" locator="p99" locator-type="Label" datatype="Number"/>
+        <field name="P99_9" locator="p99.9" locator-type="Label" datatype="Number"/>
+        <field name="Median" locator="TM(25%:75%)" locator-type="Label" datatype="Number"/>
 
         <field name="Rest" locator="#" locator-type="Label"/>
     </parser>
@@ -85,6 +86,7 @@
                 props += (StringUtils.isEmpty(${ClusterName}) ? "" : (props.length() > 0 ? "," : "") + "cluster=" + ${ClusterName});
                 props += (StringUtils.isEmpty(${BrokerId}) ? "" : (props.length() > 0 ? "," : "") + "broker=" + ${BrokerId});
                 props += (StringUtils.isEmpty(${Topic}) ? "" : (props.length() > 0 ? "," : "") + "topic=" + ${Topic});
+                props += (StringUtils.isEmpty(${DeliveryStreamName}) ? "" : (props.length() > 0 ? "," : "") + "streamName=" + ${DeliveryStreamName});
                 props += (StringUtils.isEmpty(${ConsumerGroup}) ? "" : (props.length() > 0 ? "," : "") + "cGroup=" + ${ConsumerGroup});
                 props += (StringUtils.isEmpty(${ClientAuth}) ? "" : (props.length() > 0 ? "," : "") + "cAuth=" + ${ClientAuth});
                 props += (StringUtils.isEmpty(${MetricName}) ? "" : (props.length() > 0 ? "," : "") + "metric=" + ${MetricName});
@@ -113,16 +115,46 @@
         <property name="ActivityDelim" value="EOF"/>
 
         <field name="EventType" value="NOOP"/>
+        <field name="ParserName" locator="ParserName" locator-type="ParserProp" transparent="true"/>
         <embedded-activity name="MetricsData" locator="$DATA$" locator-type="Label">
             <field-transform lang="groovy"><![CDATA[
                 String[] lines = $fieldValue.split("\\r|\\n");
                 List<String> payloadLines = new ArrayList<>(lines.length);
 
+                String[] includeMetrics = new String[] {
+                    "ActiveControllerCount",
+                    "CpuIdle",
+                    "CpuSystem",
+                    "CpuUser",
+                    "GlobalPartitionCount",
+                    "GlobalTopicCount",
+                    "KafkaAppLogsDiskUsed",
+                    "KafkaDataLogsDiskUsed",
+                    "MemoryBuffered",
+                    "MemoryCached",
+                    "MemoryFree",
+                    "MemoryUsed",
+                    "NetworkRxDropped",
+                    "NetworkRxErrors",
+                    "NetworkRxPackets",
+                    "NetworkTxDropped",
+                    "NetworkTxErrors",
+                    "NetworkTxPackets",
+                    "OfflinePartitionsCount",
+                    "RootDiskUsed",
+                    "SwapFree",
+                    "SwapUsed",
+                    "ZooKeeperRequestLatencyMsMean",
+                    "ZooKeeperRequestLatencyMsMean"
+                };
+
                 for (String line : lines) {
                     // Remove comment/empty lines
                     boolean pass = StringUtils.isNotEmpty(line);
-                    // Add additional lines filtering, e.g. pick only 'kafka_server_XXXXXXX' lines
+                    // Add additional lines match filtering, e.g. pick only 'kafka_server_XXXXXXX' lines
                     //pass &= Matchers.evaluate("regex:kafka_server_.+", line);
+                    // Add additional lines contains filtering, e.g. from set of metric names
+                    //pass &= StringUtils.containsAny (line, includeMetrics)
 
                     if (pass) {
                         payloadLines.add(line);
@@ -138,25 +170,9 @@
     <parser name="MetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
 
         <field name="EventType" value="NOOP"/>
+        <field name="ParserName" locator="ParserName" locator-type="ParserProp" transparent="true"/>
         <embedded-activity name="MetricsData" locator="ActivityData" locator-type="Label" datatype="String">
-            <field-transform lang="groovy"><![CDATA[
-                String[] lines = $fieldValue.split("\\r|\\n");
-                List<String> payloadLines = new ArrayList<>(lines.length);
-
-                for (String line : lines) {
-                    // Remove comment/empty lines
-                    boolean pass = StringUtils.isNotEmpty(line);
-                    // Add additional lines filtering, e.g. pick only 'kafka_server_XXXXXXX' lines
-                    //pass &= Matchers.evaluate("regex:kafka_server_.+", line);
-
-                    if (pass) {
-                        payloadLines.add(line);
-                    }
-                }
-
-                return payloadLines;
-            ]]></field-transform>
-            <parser-ref name="MetricEntryParser" aggregation="Relate"/>
+            <parser-ref name="MetricsParserStr" aggregation="Merge"/>
         </embedded-activity>
     </parser>
 </tnt-data-source>
