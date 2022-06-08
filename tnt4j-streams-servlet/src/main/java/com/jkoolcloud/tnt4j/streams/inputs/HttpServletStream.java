@@ -52,7 +52,7 @@ public class HttpServletStream extends InterceptorStream<Map<String, ?>> {
 	 * Constructs a new HttpServletStream.
 	 */
 	public HttpServletStream() {
-		super();
+		this(HttpServletStream.class.getSimpleName());
 	}
 
 	/**

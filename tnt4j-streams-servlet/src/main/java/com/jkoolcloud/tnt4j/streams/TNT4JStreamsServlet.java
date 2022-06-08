@@ -45,6 +45,7 @@ import com.jkoolcloud.tnt4j.streams.configure.ServletStreamProperties;
 import com.jkoolcloud.tnt4j.streams.configure.StreamsConfigLoader;
 import com.jkoolcloud.tnt4j.streams.configure.build.CfgStreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.configure.build.POJOStreamsBuilder;
+import com.jkoolcloud.tnt4j.streams.configure.build.StreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.inputs.*;
 import com.jkoolcloud.tnt4j.streams.utils.*;
 
@@ -210,10 +211,10 @@ public class TNT4JStreamsServlet extends HttpServlet {
 		};
 
 		try (InputStream is = openStream(cfgFileStreams)) {
-			CfgStreamsBuilder cfgBuilder = new CfgStreamsBuilder().setConfig(is);
-			StreamsConfigLoader cfgLoader = cfgBuilder.loadConfig(false, true);
+			StreamsBuilder streamsBuilder = new CfgStreamsBuilder().setConfig(is);
+			StreamsConfigLoader cfgLoader = ((CfgStreamsBuilder) streamsBuilder).loadConfig(false, true);
 
-			Collection<TNTInputStream<?, ?>> streams = cfgBuilder.getStreams();
+			Collection<TNTInputStream<?, ?>> streams = streamsBuilder.getStreams();
 			if (CollectionUtils.isNotEmpty(streams)) {
 				for (TNTInputStream<?, ?> stream : streams) {
 					if (stream instanceof HttpServletStream) {
@@ -221,16 +222,17 @@ public class TNT4JStreamsServlet extends HttpServlet {
 						httpServletStreams.add((HttpServletStream) stream);
 					}
 				}
-
-				StreamsAgent.run(cfgBuilder);
 			} else {
 				HttpServletStream httpServletStream = new HttpServletStream(
 						TNT4JStreamsServlet.class.getSimpleName() + "Stream"); // NON-NLS
 				httpServletStream.addParsers(cfgLoader.getParsers());
 				httpServletStream.addStreamListener(l);
 				httpServletStreams.add(httpServletStream);
-				StreamsAgent.run(new POJOStreamsBuilder().addStream(httpServletStream));
+
+				streamsBuilder = new POJOStreamsBuilder().addStream(httpServletStream);
 			}
+
+			StreamsAgent.runFromAPI(streamsBuilder);
 
 			Iterator<HttpServletStream> httpServletStreamsItr = httpServletStreams.iterator();
 			if (httpServletStreamsItr.hasNext()) {
@@ -292,8 +294,11 @@ public class TNT4JStreamsServlet extends HttpServlet {
 	 * @param resource
 	 *            resource descriptor: filename, path, URI
 	 * @return opened input stream for provided resource, or {@code null} if stream can't be opened
+	 * 
+	 * @throws java.io.IOException
+	 *             if provided resource can't be opened
 	 */
-	protected InputStream openStream(String resource) {
+	protected InputStream openStream(String resource) throws IOException {
 		InputStream in = Utils.getResourceAsStream(resource);
 		if (in == null) {
 			try {
@@ -312,6 +317,11 @@ public class TNT4JStreamsServlet extends HttpServlet {
 				LOGGER.log(OpLevel.ERROR, StreamsResources.getString(ServletStreamConstants.RESOURCE_BUNDLE_NAME,
 						"TNT4JStreamsServlet.input.open.fail.uri"), e);
 			}
+		}
+
+		if (in == null) {
+			throw new IOException(StreamsResources.getStringFormatted(ServletStreamConstants.RESOURCE_BUNDLE_NAME,
+					"TNT4JStreamsServlet.input.open.resource.fail", resource));
 		}
 
 		return in;
@@ -624,13 +634,12 @@ public class TNT4JStreamsServlet extends HttpServlet {
 		if (!httpServletStreams.isEmpty()) {
 			for (HttpServletStream httpServletStream : httpServletStreams) {
 				httpServletStream.markEnded();
-				httpServletStream.stop();
 			}
 		}
 
 		httpServletStreams.clear();
 
-		StreamsAgent.stopStreams();
+		StreamsAgent.waitForStreamsToComplete();
 
 		super.destroy();
 
