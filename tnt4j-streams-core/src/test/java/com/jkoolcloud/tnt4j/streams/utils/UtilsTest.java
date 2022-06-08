@@ -296,6 +296,29 @@ public class UtilsTest {
 		assertFalse(cArray instanceof AbstractCollection[]);
 		assertFalse(cArray instanceof Collection[]);
 		assertTrue(cArray instanceof Object[]);
+
+		int[] intArray = new int[] { 0, 1, 2, 3, 4, 5 };
+
+		cArray = Utils.makeArray(intArray);
+		assertTrue(cArray[0] instanceof int[]);
+		assertTrue(((int[]) cArray[0])[3] == 3);
+		assertTrue(intArray.hashCode() == cArray[0].hashCode());
+
+		cArray = Utils.makeArray(intArray, true);
+		assertTrue(cArray instanceof Integer[]);
+		assertTrue(((Integer[]) cArray)[3] == 3);
+
+		Set<String> set = new LinkedHashSet<>();
+		set.add("0");
+		set.add("1");
+		set.add("2");
+		set.add("3");
+		set.add("4");
+		set.add("5");
+
+		cArray = Utils.makeArray(set);
+		assertTrue(cArray instanceof String[]);
+		assertTrue(cArray[3] == "3");
 	}
 
 	@Test
