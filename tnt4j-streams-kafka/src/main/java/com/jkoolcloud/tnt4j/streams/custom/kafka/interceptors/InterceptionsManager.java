@@ -182,6 +182,9 @@ public class InterceptionsManager {
 				"InterceptionsManager.unbind.reference", ref, references.size());
 
 		if (references.isEmpty()) {
+			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
+					"InterceptionsManager.shutdown.reporters", reporters.size());
+
 			for (InterceptionsReporter rep : reporters) {
 				rep.shutdown();
 			}

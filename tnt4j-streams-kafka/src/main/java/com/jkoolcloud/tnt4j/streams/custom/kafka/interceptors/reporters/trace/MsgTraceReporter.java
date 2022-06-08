@@ -131,7 +131,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 	 *            messages tracing options set
 	 */
 	public MsgTraceReporter(Properties interceptorProperties, Set<String> traceOpts) {
-		this(new InterceptorStream<>("KafkaMsgTraceStream"), interceptorProperties, true, traceOpts);
+		this(new InterceptorStream<>("KafkaMsgTraceStream"), interceptorProperties, true, traceOpts); // NON-NLS
 	}
 
 	/**
