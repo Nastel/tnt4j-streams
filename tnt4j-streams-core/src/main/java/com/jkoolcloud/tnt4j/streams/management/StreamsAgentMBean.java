@@ -18,6 +18,7 @@ package com.jkoolcloud.tnt4j.streams.management;
 
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -38,6 +39,8 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
 public class StreamsAgentMBean extends StandardMBean implements AgentMBean {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(StreamsAgentMBean.class);
 
+	private static final AtomicInteger AGENT_ID = new AtomicInteger();
+
 	private ObjectName mbObjName;
 
 	/**
@@ -50,6 +53,7 @@ public class StreamsAgentMBean extends StandardMBean implements AgentMBean {
 			Hashtable<String, String> props = new Hashtable<>(2);
 			props.put("type", "Agent"); // NON-NLS
 			props.put("name", "management"); // NON-NLS
+			props.put("agentId", String.valueOf(AGENT_ID.getAndIncrement())); // NON-NLS
 			mbObjName = new ObjectName(StreamsAgent.class.getPackage().getName(), props);
 		} catch (MalformedObjectNameException e) {
 			Utils.logThrowable(LOGGER, OpLevel.WARNING,
