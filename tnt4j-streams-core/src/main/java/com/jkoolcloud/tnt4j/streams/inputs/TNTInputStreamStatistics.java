@@ -102,18 +102,24 @@ public class TNTInputStreamStatistics
 
 		if (stream == null) {
 			try {
-				Gauge<?> startTime = metrics.register(streamName + START_TIME_KEY,
-						new JmxAttributeGauge(new ObjectName("java.lang:type=Runtime"), "StartTime"));
-				Gauge<String> elapsedTimeGauge = metrics.register(streamName + ":elapsed time", new Gauge<String>() {
+				Gauge<?> startTimeGauge;
+				try {
+					startTimeGauge = new JmxAttributeGauge(new ObjectName("java.lang:type=Runtime"), "StartTime"); // NON-NLS
+					startTimeGauge.getValue();
+				} catch (Throwable exc) {
+					startTimeGauge = new DefaultSettableGauge<>(System.currentTimeMillis());
+				}
+				Gauge<?> startTime = metrics.register(streamName + START_TIME_KEY, startTimeGauge);
+				Gauge<String> elapsedTimeGauge = metrics.register(streamName + ":elapsed time", new Gauge<String>() { // NON-NLS
 					@Override
 					public String getValue() {
 						return Duration.durationHMS((Long) startTime.getValue());
 					}
 				});
-				Gauge<String> cacheGauge = metrics.register(streamName + ":cache load", new Gauge<String>() {
+				Gauge<String> cacheGauge = metrics.register(streamName + ":cache load", new Gauge<String>() { // NON-NLS
 					@Override
 					public String getValue() {
-						return StreamsCache.cacheSize() + "/" + StreamsCache.cacheMaxSize();
+						return StreamsCache.cacheSize() + "/" + StreamsCache.cacheMaxSize(); // NON-NLS
 					}
 				});
 			} catch (Exception e) {
@@ -121,7 +127,7 @@ public class TNTInputStreamStatistics
 		} else {
 			Counter startTime = metrics.counter(streamName + START_TIME_KEY);
 			startTime.inc(System.currentTimeMillis());
-			Gauge<String> elapsedTimeGauge = metrics.register(streamName + ":elapsed time", new Gauge<String>() {
+			Gauge<String> elapsedTimeGauge = metrics.register(streamName + ":elapsed time", new Gauge<String>() { // NON-NLS
 				@Override
 				public String getValue() {
 					return Duration.durationHMS(startTime.getCount());
