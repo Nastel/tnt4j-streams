@@ -41,19 +41,12 @@
                     <include>**/*.*</include>
                 </includes>
             </resource>
-            <resource>
-                <directory>../</directory>
-                <targetPath>META-INF</targetPath>
-                <includes>
-                    <include>LICENSE</include>
-                </includes>
-            </resource>
         </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.3.2</version>
                 <configuration>
                     <!--<archiveClasses>true</archiveClasses>-->
                     <webResources>
@@ -63,6 +56,13 @@
                             <includes>
                                 <include>*.properties</include>
                                 <include>*.xml</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <directory>../</directory>
+                            <targetPath>META-INF</targetPath>
+                            <includes>
+                                <include>LICENSE</include>
                             </includes>
                         </resource>
                     </webResources>
@@ -113,11 +113,6 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>${javax.servlet-api.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
-            <artifactId>tnt4j-streams-ws</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
