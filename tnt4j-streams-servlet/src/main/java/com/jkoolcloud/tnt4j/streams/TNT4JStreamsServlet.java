@@ -631,17 +631,19 @@ public class TNT4JStreamsServlet extends HttpServlet {
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getString(ServletStreamConstants.RESOURCE_BUNDLE_NAME,
 				"TNT4JStreamsServlet.destroy.start"), getServletInfo());
 
-		if (!httpServletStreams.isEmpty()) {
-			for (HttpServletStream httpServletStream : httpServletStreams) {
-				httpServletStream.markEnded();
+		try {
+			if (!httpServletStreams.isEmpty()) {
+				for (HttpServletStream httpServletStream : httpServletStreams) {
+					httpServletStream.markEnded();
+				}
 			}
+
+			httpServletStreams.clear();
+		} finally {
+			StreamsAgent.waitForStreamsToComplete();
+
+			super.destroy();
 		}
-
-		httpServletStreams.clear();
-
-		StreamsAgent.waitForStreamsToComplete();
-
-		super.destroy();
 
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getString(ServletStreamConstants.RESOURCE_BUNDLE_NAME,
 				"TNT4JStreamsServlet.destroy.end"), getServletInfo());
