@@ -34,7 +34,7 @@ Why TNT4J-Streams
     * MQTT
     * HTTP
     * JMS
-    * Apache Kafka (as Consumer and as Server/Consumer)
+    * Apache Kafka (as Consumer and as Producer/Consumer interceptor)
     * Apache Flume
     * Logstash
     * WMQ (IBM MQ)
@@ -49,6 +49,7 @@ Why TNT4J-Streams
     * FileSystem (JSR-203 compliant) provided files (accessing remote files over SCP/SSH, SFTP, etc.)
     * JDBC
     * [Chronicle Queue](https://chronicle.software/products/queue/)
+    * Artemis Broker or Producer/Consumer interceptor
 
 * Files (including provided by HDFS and JSR-203 FileSystem) can be streamed:
     * as "whole at once" - when a stream starts, it reads file contents line by line meaning a single file line holds data of a single
@@ -2582,6 +2583,10 @@ to parser.
 
 **NOTE:** Stream stops only when critical runtime error/exception occurs or application gets terminated.
 
+#### ActiveMQ Artemis interceptors
+
+See [Artemis interceptors sample README](tnt4j-streams-jms/samples/artemis-interceptors/README.md) for details.
+
 #### Kafka consumer stream
 
 This sample shows how to stream activity events received over Apache Kafka transport as messages. Sample also shows how to use stacked
@@ -4357,7 +4362,7 @@ tracking.selector.Repository:com.jkoolcloud.tnt4j.repository.FileTokenRepository
 #### [jKoolCloud](https://www.jkoolcloud.com/) sink configuration
 
 ```properties
-    #### jKoolCloud event sink factory configuration ####
+#### jKoolCloud event sink factory configuration ####
 event.sink.factory:com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory
 event.sink.factory.LogSink:file:./logs/tnt4j-streams-activities.log
 
