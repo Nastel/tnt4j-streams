@@ -11,7 +11,7 @@ All the rest configuration is for advanced use cases: different kafka server hos
 
 **NOTE:** check if your `tnt4j.properties` file has stanza:
 ```properties
-source: com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics
+source: com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.reporters.metrics
 ```
 if there is no such, it must be you have an old build of TNT4J-Streams, or you have not built `tnt4j-streams-kafka` module.
 
@@ -20,14 +20,14 @@ if there is no such, it must be you have an old build of TNT4J-Streams, or you h
 #### Interceptors binding
 
 To bind interceptors to any producer/consumer alter configuration properties:
-* producer: 
+* producer:
 ```properties
-interceptor.classes=com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.TNTKafkaPInterceptor
+interceptor.classes=com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.TNTKafkaPInterceptor
 ```
 
 * consumer:
 ```properties
-interceptor.classes=com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.TNTKafkaCInterceptor
+interceptor.classes=com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.TNTKafkaCInterceptor
 ```
 #### Interceptors collected metrics streaming
 
@@ -36,10 +36,10 @@ To configure interceptors collected metrics streaming to dedicated Kafka topic u
 (e.g. `./config/tnt4j.properties`), used by TNT4J-Streams over system property `tnt4j.config`. When building TNT4J-Streams deliverable 
 package with `tnt4j-streams-kafka` module included - this merge is performed automatically.
 
-* Define a stanza for source `com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics` (without this metrics will not be 
+* Define a stanza for source `com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.reporters.metrics` (without this metrics will not be 
 reported to dedicated Kafka topic):
     ```properties
-      source: com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics
+      source: com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.reporters.metrics
     ```
 * Set TNT4J to use `KafkaSink` to send interceptors collected statistics to dedicated Kafka topic (e.g. `tnt4j-kafka-interceptor-metrics`):
     * referring Kafka producer configuration file
@@ -84,7 +84,7 @@ intercepted operations:
 
   Default value - `none`.
 * `messages.tracer.stream.parser` - parser reference, used to parse Kafka interceptors trace events (of class 
-`com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.KafkaTraceEventData`). Reference mey be defined using pattern 
+`com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.reporters.trace.KafkaTraceEventData`). Reference mey be defined using pattern 
 `parsers_cfg_file_name_path#parserName`, where:
     * `parsers_cfg_file_path` - is parsers configuration file path (absolute or relative to interceptors configuration file). (Optional). 
     Default value - `tnt-data-source_kafka_msg_trace.xml`. 

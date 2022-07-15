@@ -15,8 +15,8 @@
  */
 
 /**
- * Contains the API (classes and interfaces) for the jKool LLC TNT4J-Streams custom parsers targeting standard
- * activities data formats.
+ * Contains the API (classes and interfaces) for the jKool LLC TNT4J-Streams custom parsers targeting standard activity
+ * data formats.
  *
  * @author akausinis
  * @version 1.0

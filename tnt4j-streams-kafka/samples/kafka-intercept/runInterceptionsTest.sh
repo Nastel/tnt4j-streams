@@ -21,6 +21,6 @@ else
   JAVA_EXEC="$JAVA_HOME/bin/java"
 fi
 
-$JAVA_EXEC $STREAMSOPTS -classpath "$LIBPATH" com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.InterceptorsTest
+$JAVA_EXEC $STREAMSOPTS -classpath "$LIBPATH" com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.InterceptorsTest
 
 read -p "Press [Enter] key to exit..."

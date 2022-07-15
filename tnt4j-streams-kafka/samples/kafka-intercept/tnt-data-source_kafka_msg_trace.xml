@@ -44,7 +44,7 @@
             <field-transform lang="groovy" name="SendSignatureTransform"><![CDATA[
                 ${Value} == null
                     ? null
-                    : com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.MsgTraceReporter.calcSignature(${Topic}, ${Value})
+                    : com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.reporters.trace.MsgTraceReporter.calcSignature(${Topic}, ${Value})
             ]]></field-transform>
         </field>
 
@@ -126,7 +126,7 @@
             <field-transform lang="groovy" name="ConsumeSignatureTransform"><![CDATA[
                 ${Value} == null
                     ? null
-                    : com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.MsgTraceReporter.calcSignature(${Topic}, ${Value})
+                    : com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.reporters.trace.MsgTraceReporter.calcSignature(${Topic}, ${Value})
             ]]></field-transform>
         </field>
 
@@ -149,7 +149,7 @@
     <!-- CONSUMER parsers end -->
 
     <parser name="KafkaTraceParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
-        <property name="SupportedClass" value="com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.KafkaTraceEventData"/>
+        <property name="SupportedClass" value="com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.reporters.trace.KafkaTraceEventData"/>
 
         <!-- SEND fields -->
         <field name="producerRecord" locator="producerRecord" locator-type="Label" transparent="true">
@@ -191,7 +191,7 @@
                     : null
             ]]></field-transform>
         </field>
-        <field name="ParentID" locator="parentId" locator-type="Label"/>
+        <field name="ParentId" locator="parentId" locator-type="Label"/>
         <field name="MessageAge" locator="msgAgeMs" locator-type="Label"/>
 
         <field name="ResourceName" formattingPattern="QUEUE={0}">

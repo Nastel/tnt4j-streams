@@ -2,7 +2,7 @@
 
 1. Install Kafka (if not yet), but **NOTE** this guide written to perform actions on a clean instance of Kafka installation - if you already
    made any changes to your Kafka environment, it **may require some improvisation**.
-1. Add `tnt4j-streams-kafka-[VERSION]-all.jar` to Kafka class-path:
+1. Add `tnt4j-streams-kafka-[VERSION]-interceptor.jar` to Kafka class-path:
     1. If you can put files into `<KAFKA_INSTALL_DIR>/libs` dir, then just copy it there.
     1. If you wish to have streams lib isolated, then put jar to dedicated directory (e.g. `<KAFKA_INSTALL_DIR>/libs/tnt4j`). Then alter
        `<KAFKA_INSTALL_DIR>/bin/kafka-run-class` script file:
@@ -67,13 +67,13 @@
 1. Alter `<KAFKA_INSTALL_DIR>/config/consumer.properties` by adding:
     ```properties
     client.id=kafka-x-ray-intercept-test-consumer
-    interceptor.classes=com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.TNTKafkaCInterceptor
+    interceptor.classes=com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.TNTKafkaCInterceptor
     ```
 1. Alter `<KAFKA_INSTALL_DIR>/config/procuder.properties` by adding:
     ```properties
     # NOTE: when using with Kafka console-producer, value will be reset to 'console-producer' (turns out to be hardcoded)
     client.id=kafka-x-ray-intercept-test-producer
-    interceptor.classes=com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.TNTKafkaPInterceptor
+    interceptor.classes=com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.TNTKafkaPInterceptor
     ```
 1. Alter `<KAFKA_INSTALL_DIR>/config/tools-log4j.properties` by adding:
     ```properties
@@ -109,53 +109,53 @@
     ```
    In case Kafka switched to `log4j2` see [tools-log4j2.xml](./../seamless/config/tools-log4j2.xml) as a sample configuration.
 1. Copy your `tnt4j.properties` file (one having your JKool token defined) into `<KAFKA_INSTALL_DIR>/config` directory. Also, check if your
-   `tnt4j.properties` file contains stanza for source `com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics`. If not -
+   `tnt4j.properties` file contains stanza for source `com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.reporters.metrics`. If not -
    append it with this one:
     ```properties
     # Stanza used for TNT4J-Streams-Kafka interceptors reporters sources
     {
-    	source: com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.metrics
-    	source.factory: com.jkoolcloud.tnt4j.source.SourceFactoryImpl
-    	source.factory.APPL: Kafka-X-Ray-Interceptors-DEV
-    	source.factory.DATACENTER: SLABS
-    	source.factory.RootFQN: APPL=?#RUNTIME=?#SERVER=?#NETADDR=?#DATACENTER=?
-    	source.factory.RootSSN: kafka-x-ray-metrics
+        source: com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.reporters.metrics
+        source.factory: com.jkoolcloud.tnt4j.source.SourceFactoryImpl
+        source.factory.APPL: Kafka-X-Ray-Interceptors-DEV
+        source.factory.DATACENTER: SLABS
+        source.factory.RootFQN: APPL=?#RUNTIME=?#SERVER=?#NETADDR=?#DATACENTER=?
+        source.factory.RootSSN: kafka-x-ray-metrics
 
-    	tracker.factory: com.jkoolcloud.tnt4j.tracker.DefaultTrackerFactory
-    	dump.sink.factory: com.jkoolcloud.tnt4j.dump.DefaultDumpSinkFactory
-    	tracker.default.snapshot.category: kafka-x-ray-metrics-snapshot
+        tracker.factory: com.jkoolcloud.tnt4j.tracker.DefaultTrackerFactory
+        dump.sink.factory: com.jkoolcloud.tnt4j.dump.DefaultDumpSinkFactory
+        tracker.default.snapshot.category: kafka-x-ray-metrics-snapshot
 
-    	# event sink configuration: destination and data format
-    	# NOTE: IT IS NOT RECOMMENDED TO USE BufferedEventSinkFactory (asynchronous sinks) WITH STREAMS. Streams and sinks are meant to
-    	# act in sync, especially when sink (e.g., 'JKCloud', 'Mqtt', 'Kafka') consumer uses network communication.
-    	###event.sink.factory: com.jkoolcloud.tnt4j.sink.impl.BufferedEventSinkFactory
-    	###event.sink.factory.PooledLoggerFactory: com.jkoolcloud.tnt4j.sink.impl.PooledLoggerFactoryImpl
+        # event sink configuration: destination and data format
+        # NOTE: IT IS NOT RECOMMENDED TO USE BufferedEventSinkFactory (asynchronous sinks) WITH STREAMS. Streams and sinks are meant to
+        # act in sync, especially when sink (e.g., 'JKCloud', 'Mqtt', 'Kafka') consumer uses network communication.
+        ###event.sink.factory: com.jkoolcloud.tnt4j.sink.impl.BufferedEventSinkFactory
+        ###event.sink.factory.PooledLoggerFactory: com.jkoolcloud.tnt4j.sink.impl.PooledLoggerFactoryImpl
 
-    	#### Kafka event sink factory configuration ####
-    	event.sink.factory: com.jkoolcloud.tnt4j.sink.impl.kafka.KafkaEventSinkFactory
-    	event.sink.factory.topic: tnt4j-kafka-interceptor-metrics
-    	## You can configure sink used Kafka Producer by providing external configuration file path
-    	# event.sink.factory.propFile: ../config/tnt4j-kafka.properties
-    	## Or right there within sink factory configuration
-    	event.sink.factory.bootstrap.servers: localhost:9092
-    	event.sink.factory.acks: all
-    	event.sink.factory.retries: 0
-    	event.sink.factory.linger.ms: 1
-    	event.sink.factory.buffer.memory: 33554432
-    	event.sink.factory.key.serializer: org.apache.kafka.common.serialization.StringSerializer
-    	event.sink.factory.value.serializer: org.apache.kafka.common.serialization.StringSerializer
-    	event.sink.factory.client.id: kafka-x-ray-metrics-reporter
-    	#### Kafka event sink factory configuration end ####
+        #### Kafka event sink factory configuration ####
+        event.sink.factory: com.jkoolcloud.tnt4j.sink.impl.kafka.KafkaEventSinkFactory
+        event.sink.factory.topic: tnt4j-kafka-interceptor-metrics
+        ## You can configure sink used Kafka Producer by providing external configuration file path
+        # event.sink.factory.propFile: ../config/tnt4j-kafka.properties
+        ## Or right there within sink factory configuration
+        event.sink.factory.bootstrap.servers: localhost:9092
+        event.sink.factory.acks: all
+        event.sink.factory.retries: 0
+        event.sink.factory.linger.ms: 1
+        event.sink.factory.buffer.memory: 33554432
+        event.sink.factory.key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        event.sink.factory.value.serializer: org.apache.kafka.common.serialization.StringSerializer
+        event.sink.factory.client.id: kafka-x-ray-metrics-reporter
+        #### Kafka event sink factory configuration end ####
 
-    	event.formatter: com.jkoolcloud.tnt4j.format.LevelingJSONFormatter
-    	#event.formatter.Newline: true
-    	; Configures special numeric values handling. Can be one of: SUPPRESS, ENQUOTE, MAINTAIN. Default value: SUPPRESS
-    	event.formatter.SpecNumbersHandling: SUPPRESS
-    	event.formatter.Level: 2
-    	event.formatter.KeyReplacements: ","->";" "."->"_" "\\"->"_"
+        event.formatter: com.jkoolcloud.tnt4j.format.LevelingJSONFormatter
+        #event.formatter.Newline: true
+        ; Configures special numeric values handling. Can be one of: SUPPRESS, ENQUOTE, MAINTAIN. Default value: SUPPRESS
+        event.formatter.SpecNumbersHandling: SUPPRESS
+        event.formatter.Level: 2
+        event.formatter.KeyReplacements: ","->";" "."->"_" "\\"->"_"
 
-    	tracking.selector: com.jkoolcloud.tnt4j.selector.DefaultTrackingSelector
-    	tracking.selector.Repository: com.jkoolcloud.tnt4j.repository.FileTokenRepository
+        tracking.selector: com.jkoolcloud.tnt4j.selector.DefaultTrackingSelector
+        tracking.selector.Repository: com.jkoolcloud.tnt4j.repository.FileTokenRepository
     }
     ```
 1. Create file `<KAFKA_INSTALL_DIR>/config/interceptorsC.properties` and fill it with these properties:
@@ -168,7 +168,7 @@
     ### Kafka messages tracing configuration
     # Possible values: all, none, consume, commit
     messages.tracer.trace=all
-    # Default parser reference is from -all.jar resource
+    # Default parser reference is from -interceptor.jar resource
     messages.tracer.stream.parser=tnt-data-source_kafka_msg_trace_custom.xml#KafkaTraceParser
     messages.tracer.stream.name=KafkaConsumerXXXStream
     ## Additional stream configuration properties
@@ -195,7 +195,7 @@
     ### Kafka messages tracing configuration
     # Possible values: all, none, send, ack
     messages.tracer.trace=all
-    # Default parser reference is from -all.jar resource
+    # Default parser reference is from -interceptor.jar resource
     messages.tracer.stream.parser=tnt-data-source_kafka_msg_trace_custom.xml#KafkaTraceParser
     messages.tracer.stream.name=KafkaProducerXXXStream
     ## Additional stream configuration properties
@@ -217,7 +217,7 @@
    `<KAFKA_INSTALL_DIR>/config/tnt-data-source_kafka_msg_trace_custom.xml` to have it easily accessible and editable in your Kafka
    environment.
 
-   By default this file resides inside `tnt4j-streams-kafka-[VERSION]-all.jar` and is used for traces messages parsing if interceptors
+   By default, this file resides inside `tnt4j-streams-kafka-[VERSION]-interceptor.jar` and is used for traces messages parsing if interceptors
    configuration does not define any other parser reference.
 1. Run Kafka provided console producer/consumer:
     * *UIX:

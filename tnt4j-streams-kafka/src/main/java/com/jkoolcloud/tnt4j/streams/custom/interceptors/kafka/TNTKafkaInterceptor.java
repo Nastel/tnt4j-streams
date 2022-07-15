@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package com.jkoolcloud.tnt4j.streams;
+package com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import java.io.Closeable;
+import java.util.Map;
 
-import com.jkoolcloud.tnt4j.streams.configure.sax.ConfigParserHandlerTest;
-import com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.AllKafkaInterceptorsTests;
-import com.jkoolcloud.tnt4j.streams.inputs.AllInputsTests;
+import org.apache.kafka.common.ClusterResourceListener;
 
 /**
- * @author akausinis
- * @version 1.0
+ * This interface defines operations commonly used by TNT4J-Streams Kafka interceptors.
+ *
+ * @version $Revision: 1 $
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({ ConfigParserHandlerTest.class, AllInputsTests.class, AllKafkaInterceptorsTests.class })
-public class AllKafkaStreamTests {
+public interface TNTKafkaInterceptor extends Closeable, ClusterResourceListener {
+
+	/**
+	 * Returns configuration properties map.
+	 *
+	 * @return configuration properties map
+	 */
+	Map<String, ?> getConfig();
 }

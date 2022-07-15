@@ -6243,7 +6243,7 @@ IBM MQ versions starting `9.1` adds these additional entries:
 Sample:
 ```xml
 <property name="SupportedClass" value="org.apache.kafka.common.TopicPartition"/>
-<property name="SupportedClass" value="com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.reporters.trace.KafkaTraceEventData"/>
+<property name="SupportedClass" value="com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.reporters.trace.KafkaTraceEventData"/>
 ```
 
 Also see [Generic parser parameters](#generic-parser-parameters) regarding higher level parser configuration.

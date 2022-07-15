@@ -289,7 +289,7 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 			} catch (IOException exc) {
 				Utils.logThrowable(logger(), OpLevel.WARNING,
 						StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
-						"KafkaConsumerStream.consumer.cfgFile.load.failed", exc);
+						"KafkaConsumerStream.consumer.cfgFile.load.failed", cfgFileName, exc);
 			}
 		}
 	}

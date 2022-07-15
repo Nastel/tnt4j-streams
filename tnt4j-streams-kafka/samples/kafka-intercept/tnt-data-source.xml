@@ -28,7 +28,7 @@
             <parser-ref name="MetricsParser" aggregation="Merge"/>
         </field>
 
-        <field name="clientID" locator="$.ClientId" locator-type="Label"/>
+        <field name="clientId" locator="$.ClientId" locator-type="Label"/>
         <field name="Call" locator="$.CallName" locator-type="Label"/>
 
         <field name="Offset" locator="$.Offset.offset" locator-type="Label"/>
@@ -60,7 +60,7 @@
         <field name="LastOffset" locator="LastProduced" locator-type="Cache"/>
         <field name="LastOffsetTime" locator="LastProducedTime" locator-type="Cache"/>
 
-        <field name="clientID" locator="$.ClientId" locator-type="Label"/>
+        <field name="clientId" locator="$.ClientId" locator-type="Label"/>
         <field name="Call" locator="$.CallName" locator-type="Label"/>
 
         <field name="Offset" locator="$.Offset.offset" locator-type="Label"/>
@@ -109,7 +109,7 @@
         <field name="LastOffset" locator="LastProduced" locator-type="Cache"/>
         <field name="LastOffsetTime" locator="LastProducedTime" locator-type="Cache"/>
 
-        <field name="clientID" locator="$.ClientId" locator-type="Label"/>
+        <field name="clientId" locator="$.ClientId" locator-type="Label"/>
         <field name="Call" locator="$.CallName" locator-type="Label"/>
 
         <field name="Offset" locator="$.Offset.offset" locator-type="Label"/>
@@ -172,7 +172,7 @@
             <parser-ref name="MetricsParser" aggregation="Merge"/>
         </field>
 
-        <field name="clientID" locator="$.ClientId" locator-type="Label"/>
+        <field name="clientId" locator="$.ClientId" locator-type="Label"/>
         <field name="Call" locator="$.CallName" locator-type="Label"/>
 
         <field name="Offset" locator="$.Offset.offset" locator-type="Label"/>

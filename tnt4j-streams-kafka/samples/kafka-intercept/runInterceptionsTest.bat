@@ -19,5 +19,5 @@ IF ["%JAVA_HOME%"] EQU [""] (
 )
 
 @echo on
-%JAVA_EXEC% %STREAMSOPTS% -classpath "%LIBPATH%" com.jkoolcloud.tnt4j.streams.custom.kafka.interceptors.InterceptorsTest
+%JAVA_EXEC% %STREAMSOPTS% -classpath "%LIBPATH%" com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.InterceptorsTest
 pause
