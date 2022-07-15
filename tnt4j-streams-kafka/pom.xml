@@ -38,7 +38,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.2</version>
                 <configuration>
                     <archive>
                         <!--<index>true</index>-->
@@ -64,10 +64,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.3.0</version>
                 <configuration>
                     <shadedArtifactAttached>true</shadedArtifactAttached>
-                    <shadedClassifierName>all</shadedClassifierName>
+                    <shadedClassifierName>interceptor</shadedClassifierName>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <transformers>
                         <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -82,25 +82,30 @@
                     </transformers>
                     <artifactSet>
                         <excludes>
+                            <!-- ### Shared client dependencies ### -->
                             <!-- Kafka dependency and its transitives -->
                             <exclude>org.apache.kafka:*</exclude>
-                            <exclude>org.scala*:*</exclude>
                             <exclude>com.github.luben:zstd-jni</exclude>
                             <exclude>org.lz4:lz4-java</exclude>
                             <exclude>org.xerial.snappy:snappy-java</exclude>
+                            <!-- ################################## -->
+
+                            <!-- ### Shared broker dependencies ### -->
                             <!-- Zookeeper dependency and its transitives -->
-                            <exclude>org.apache.zookeeper:*</exclude>
+                            <!--exclude>org.apache.zookeeper:*</exclude>
                             <exclude>io.netty:*</exclude>
-                            <exclude>org.apache.yetus:audience-annotations</exclude>
+                            <exclude>org.apache.yetus:audience-annotations</exclude-->
+
                             <!-- SLF4J logger dependency and transitives -->
                             <exclude>org.slf4j*:*</exclude>
-                            <exclude>log4j*:*</exclude>
                             <!-- LOG4J2-SLF4J logger dependency and transitives -->
                             <exclude>org.apache.logging.log4j*:*</exclude>
                             <exclude>com.lmax*:*</exclude>
+
                             <!-- Common dependencies and its transitives-->
-                            <exclude>com.google.guava:guava</exclude>
-                            <exclude>com.fasterxml.jackson.core:*</exclude>
+                            <!--exclude>com.google.guava:guava</exclude>
+                            <exclude>com.fasterxml.jackson.core:*</exclude-->
+                            <!-- ################################## -->
                         </excludes>
                     </artifactSet>
                     <filters>
