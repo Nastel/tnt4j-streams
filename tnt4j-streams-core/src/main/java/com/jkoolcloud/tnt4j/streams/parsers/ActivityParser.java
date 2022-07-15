@@ -236,7 +236,7 @@ public abstract class ActivityParser implements NamedObject {
 					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 							"ActivityParser.stacked.parser.applied", name, field, parserRef, applied);
 
-					if (applied) {
+					if (applied && !parserRef.isContinuous()) {
 						break;
 					}
 				} catch (Exception exc) {

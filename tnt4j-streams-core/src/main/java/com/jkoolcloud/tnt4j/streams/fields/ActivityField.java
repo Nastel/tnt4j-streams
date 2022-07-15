@@ -1055,7 +1055,7 @@ public class ActivityField extends AbstractFieldEntity {
 		}
 
 		@Override
-		public Boolean matchTags(String[] dataTags) {
+		public Boolean matchTags(String... dataTags) {
 			return parserRef.matchTags(dataTags);
 		}
 

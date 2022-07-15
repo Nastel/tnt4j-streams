@@ -35,9 +35,9 @@ import com.jkoolcloud.tnt4j.source.Source;
 import com.jkoolcloud.tnt4j.streams.matchers.Matchers;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
+import com.jkoolcloud.tnt4j.streams.utils.Utils;
 import com.jkoolcloud.tnt4j.tracker.TrackingActivity;
 import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
-import com.jkoolcloud.tnt4j.utils.Utils;
 
 /**
  * This class implements TNT4J Sink filter using {@link com.jkoolcloud.tnt4j.streams.matchers.Matchers} supported
@@ -99,12 +99,12 @@ public class EventMatchExpressionFilter implements SinkEventFilter, Configurable
 		}
 
 		Set<String> vars = new HashSet<>();
-		com.jkoolcloud.tnt4j.streams.utils.Utils.resolveExpressionVariables(vars, matchExp);
+		Utils.resolveExpressionVariables(vars, matchExp);
 
 		Map<String, Object> valBindings = new HashMap<>(vars.size());
 		if (CollectionUtils.isNotEmpty(vars)) {
 			for (String rdVar : vars) {
-				Object vValue = trackable.getFieldValue(com.jkoolcloud.tnt4j.streams.utils.Utils.getVarName(rdVar));
+				Object vValue = trackable.getFieldValue(Utils.getVarName(rdVar));
 				valBindings.put(rdVar, vValue);
 			}
 		}
@@ -112,8 +112,7 @@ public class EventMatchExpressionFilter implements SinkEventFilter, Configurable
 		try {
 			return Matchers.evaluateBindings(matchExp, valBindings);
 		} catch (Exception exc) {
-			com.jkoolcloud.tnt4j.streams.utils.Utils.logThrowable(LOGGER, OpLevel.ERROR,
-					StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+			Utils.logThrowable(LOGGER, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"EventMatchExpressionFilter.match.evaluation.failed", matchExp, exc);
 			return false;
 		}

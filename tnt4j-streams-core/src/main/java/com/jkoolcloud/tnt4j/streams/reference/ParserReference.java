@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.reference;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.BooleanUtils;
 
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
@@ -29,7 +30,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * @version $Revision: 1 $
  */
 public class ParserReference implements Reference<ActivityParser> {
-	private ActivityParser parser;
+	private final ActivityParser parser;
 	private String[] tags;
 
 	/**
@@ -102,7 +103,7 @@ public class ParserReference implements Reference<ActivityParser> {
 	 *         {@code dataTags} or parser reference bound tags matches any element of both arrays, {@code false} -
 	 *         otherwise
 	 */
-	public Boolean matchTags(String[] dataTags) {
+	public Boolean matchTags(String... dataTags) {
 		if (ArrayUtils.isEmpty(dataTags) || ArrayUtils.isEmpty(tags)) {
 			return null;
 		}
@@ -120,5 +121,15 @@ public class ParserReference implements Reference<ActivityParser> {
 	@Override
 	public String toString() {
 		return parser.getName();
+	}
+
+	/**
+	 * Checks if this parser reference is continuous and shall not break stacked parsers chain for parsing provided
+	 * entity data.
+	 * 
+	 * @return {@code true} if this reference is tagged as {@code "continuous"}, {@code false} - otherwise
+	 */
+	public boolean isContinuous() {
+		return BooleanUtils.toBooleanDefaultIfNull(matchTags("continuous"), false); // NON-NLS
 	}
 }
