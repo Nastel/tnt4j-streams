@@ -72,6 +72,7 @@ Why TNT4J-Streams
     * Collectd
     * Nagios
     * Elastic Beats
+    * AWS CloudWatch metrics over Kinesis FireHose
 
   just by applying configuration and without additional coding.
 
@@ -3227,6 +3228,10 @@ How to setup sample environment
 see [`samples/node.js-blocking-event-loop/readme.md`](tnt4j-streams-core/samples/node.js-blocking-event-loop/readme.md)
 
 Sample stream configuration is same as in ['Node.js'](#nodejs) sample.
+
+#### AWS CloudWatch metrics over Kinesis FireHose
+
+See [CloudWatch metrics sample README](tnt4j-streams-servlet/samples/cloudwatch-servlet/README.md) for details.
 
 #### JAX-WS
 

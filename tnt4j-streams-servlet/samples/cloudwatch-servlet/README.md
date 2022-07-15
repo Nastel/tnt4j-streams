@@ -97,7 +97,7 @@ Individual TNT4J streams scope configuration is made in `tnt-data-source.xml` fi
 Major entities in stream configuration are
 * `CloudWatchMetricsStream` of class `com.jkoolcloud.tnt4j.streams.inputs.HttpServletStream` picking HTTP POST transmitted request payload 
   as stream input data
-* `ResponseTemplate` property defining stream servlet response template. AWS Kinetics FireHose requires particular JSON response to ensure 
+* `ResponseTemplate` property defining stream servlet response template. AWS Kinesis FireHose requires particular JSON response to ensure 
   successful communication
 * `tnt4j-properties` section defining individual stream TNT4J configuration:
   * property `event.sink.factory.BroadcastSequence` defines produced activities broadcasting sinks. Default set of sinks is for AutoPilot 
