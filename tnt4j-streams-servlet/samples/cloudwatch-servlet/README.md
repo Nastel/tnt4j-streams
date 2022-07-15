@@ -38,7 +38,7 @@
    **NOTE:** for most general case there is no need for you to change `log4j2.xml`, `tnt4j*.propeties` and `parsers.xml` files. The only
    file requiring to make your changes is `tnt-data-source.xml`.
 4. Download TNT4J-Streams `war` package latest version release from [GitHub releases](https://github.com/Nastel/tnt4j-streams/releases). It 
-   shall be available under `assets` section of release.
+   shall be available in the `assets` section of release.
 5. Deploy `tnt4j-streams-<VERSION>.war` or `tnt4j-streams-servlet-<VERSION>.war` file to your web sever web-apps dir, e.g. 
    `<TOMCAT_DIR>/webapps`. **NOTE:** remove version token from `war` package file name to preserve web-app context on every deployment.
 6. Start web sever, if it is not already running.
