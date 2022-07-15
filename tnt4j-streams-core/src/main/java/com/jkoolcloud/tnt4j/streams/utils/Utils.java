@@ -1636,6 +1636,8 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @return properties loaded from file
 	 * @throws java.io.IOException
 	 *             if an error occurred when reading properties file
+	 * @throws java.lang.IllegalArgumentException
+	 *             if system property value is {@code null} or empty
 	 *
 	 * @see #loadPropertiesFile(String)
 	 */
@@ -1653,13 +1655,20 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @return properties loaded from file
 	 * @throws java.io.IOException
 	 *             if an error occurred when reading properties file
+	 * @throws java.lang.IllegalArgumentException
+	 *             if properties file path is {@code null} or empty
 	 *
 	 * @see java.util.Properties#load(java.io.InputStream)
 	 */
 	public static Properties loadPropertiesFile(String propFile) throws IOException {
+		if (StringUtils.isEmpty(propFile)) {
+			throw new IllegalArgumentException(
+					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "Utils.empty.file.name"));
+		}
+
 		Properties fProps = new Properties();
 
-		try (InputStream is = new FileInputStream(new File(propFile))) {
+		try (InputStream is = new FileInputStream(propFile)) {
 			fProps.load(is);
 		}
 
