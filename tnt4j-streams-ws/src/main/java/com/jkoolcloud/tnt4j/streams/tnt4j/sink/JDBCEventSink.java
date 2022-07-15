@@ -39,7 +39,7 @@ import com.zaxxer.hikari.HikariDataSource;
 /**
  * This class implements {@link EventSink} with JDBC and HikariCP as the underlying sink implementation.
  *
- * @version $Revision : 3 $
+ * @version $Revision: 3 $
  * 
  * @see com.jkoolcloud.tnt4j.streams.tnt4j.sink.JDBCEventSinkFactory
  * @see com.jkoolcloud.tnt4j.streams.tnt4j.format.SQLFormatter

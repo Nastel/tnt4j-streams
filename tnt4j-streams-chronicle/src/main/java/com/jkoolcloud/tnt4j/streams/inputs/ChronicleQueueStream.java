@@ -50,7 +50,7 @@ import net.openhft.chronicle.wire.Wires;
  * <li>MarshallClass - class name of marshaled Chronicle queue entries. (Required)</li>
  * </ul>
  *
- * @version $Revision: 2$
+ * @version $Revision: 2 $
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  */
