@@ -18,7 +18,7 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://java.sun.com/xml/ns/javaee"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-         id="WebApp_ID" version="3.0">
+         id="tnt4j-streams-servlet" version="3.0">
 
     <display-name>TNT4J Streams</display-name>
     <description>TNT4J Streams web servlet</description>
@@ -39,12 +39,12 @@
         <init-param>
             <param-name>tnt4j.config</param-name>
             <param-value>tnt4j.properties</param-value>
-            <description>TNT4J Configuration file path</description>
+            <description>TNT4J configuration file path</description>
         </init-param>
         <init-param>
             <param-name>log4j2.config</param-name>
             <param-value>log4j2.xml</param-value>
-            <description>LOG4J2 Configuration file path</description>
+            <description>log4j V2 configuration file path</description>
         </init-param>
         <init-param>
             <param-name>streams.config</param-name>
