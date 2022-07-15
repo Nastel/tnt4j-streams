@@ -135,6 +135,21 @@ public class TransformationPreParser extends AbstractPreParser<Object, Object> i
 		useParserInput = Utils.getBoolean(PROP_USE_PARSER_INPUT, settings, true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This pre-parser supports the following class types (and all classes extending/implementing any of these):
+	 * <ul>
+	 * <li>{@link Object}</li>
+	 * </ul>
+	 */
+	@Override
+	public boolean isDataClassSupported(Object data) {
+		return useParserInput //
+				? super.isDataClassSupported(data) //
+				: data instanceof Object;
+	}
+
 	@Override
 	public Object preParse(Object data) throws Exception {
 		return transformation.transform(data, null);

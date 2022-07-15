@@ -26,7 +26,7 @@ import java.nio.ByteBuffer;
  * @param <V>
  *            the type of activity data to convert
  * @param <O>
- *            type of converted activity data
+ *            the type of converted activity data
  *
  * @version $Revision: 1 $
  */
