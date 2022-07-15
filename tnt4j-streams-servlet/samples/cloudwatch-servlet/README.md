@@ -148,7 +148,7 @@ file defines these parsers:
 ## Metrics filtering
 
 You may want to pick just some set of provided metrics to be streamed. To filter metrics, filtering logic can be done in `MetricsParserStr` 
-parser field (embedded activity) `MetricsData` [transformation](parsers.xml#L204). Default filter removes all empty lines available:
+parser field (embedded activity) `MetricsData` [transformation](parsers.xml#L198). Default filter removes all empty lines available:
 ```groovy
 boolean pass = StringUtils.isNotEmpty(line);
 ```
