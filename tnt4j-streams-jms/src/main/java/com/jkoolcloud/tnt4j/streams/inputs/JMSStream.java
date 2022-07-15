@@ -57,7 +57,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * {@link javax.naming.Context} for more details. (Optional)</li>
  * </ul>
  *
- * @version $Revision: 1$
+ * @version $Revision: 1 $
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  */

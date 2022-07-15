@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2014-2022 JKOOL, LLC.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
+
+    <resource-ref id="ArtemisInterceptorParsers" type="Parser" uri="parsers.xml"/>
+
+    <stream name="ArtemisJMSInterceptorStream" class="com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.JMSInterceptorStream">
+        <property name="HaltIfNoParser" value="false"/>
+        <property name="SendStreamStates" value="false"/>
+        <property name="BuildSourceFQNFromStreamedData" value="false"/>
+        <!--<property name="SourceFQN" value="DATACENTER=${DataCenter}"/>-->
+        <property name="RetryStateCheck" value="true"/>
+        <property name="RetryInterval" value="300"/>
+
+        <property name="UseExecutors" value="true"/>
+        <property name="ExecutorThreadsQuantity" value="5"/>
+        <property name="ExecutorsTerminationTimeout" value="20"/>
+        <property name="ExecutorsBoundedModel" value="true"/>
+        <property name="ExecutorRejectedTaskOfferTimeout" value="20"/>
+
+        <parser-ref name="InterceptorBootstrapParser"/>
+    </stream>
+</tnt-data-source>

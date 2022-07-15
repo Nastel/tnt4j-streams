@@ -13,6 +13,16 @@
 
     <artifactId>tnt4j-streams-jms</artifactId>
 
+    <properties>
+        <jakarta.jms.version>2.0.3</jakarta.jms.version>
+        <artemis.version>2.19.1</artemis.version>
+
+        <solace.version>10.14.0</solace.version>
+        <rabbitmq.version>2.4.0</rabbitmq.version>
+        <zeromq.version>3.0.1-RELEASE</zeromq.version>
+        <rocketmq.version>4.9.3</rocketmq.version>
+    </properties>
+
     <build>
         <resources>
             <resource>
@@ -33,7 +43,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.2</version>
                 <configuration>
                     <archive>
                         <!--<index>true</index>-->
@@ -55,6 +65,108 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>client-interceptor</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedClassifierName>artemis-client-interceptor</shadedClassifierName>
+                            <artifactSet>
+                                <excludes>
+                                    <!-- ### Shared client dependencies ### -->
+                                    <!-- Artemis dependencies and its transitives -->
+                                    <exclude>org.apache.activemq:artemis*</exclude>
+                                    <!-- ################################## -->
+
+                                    <!-- SLF4J logger dependency and transitives -->
+                                    <exclude>org.slf4j*:*</exclude>
+                                    <!-- LOG4J2-SLF4J logger dependency and transitives -->
+                                    <exclude>org.apache.logging.log4j*:*</exclude>
+                                    <exclude>com.lmax*:*</exclude>
+                                    <!-- ################################## -->
+                                </excludes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>broker-interceptor</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedClassifierName>artemis-broker-interceptor</shadedClassifierName>
+                            <artifactSet>
+                                <excludes>
+                                    <!-- ### Shared client dependencies ### -->
+                                    <!-- Artemis dependencies and its transitives -->
+                                    <exclude>org.apache.activemq:artemis*</exclude>
+                                    <!-- ################################## -->
+
+                                    <!-- ### Shared broker dependencies ### -->
+                                    <!-- Zookeeper dependency and its transitives -->
+                                    <exclude>org.apache.zookeeper:*</exclude>
+                                    <exclude>io.netty:*</exclude>
+                                    <exclude>org.apache.yetus:audience-annotations</exclude>
+
+                                    <!-- SLF4J logger dependency and transitives -->
+                                    <exclude>org.slf4j*:*</exclude>
+                                    <!-- LOG4J2-SLF4J logger dependency and transitives -->
+                                    <exclude>org.apache.logging.log4j*:*</exclude>
+                                    <exclude>com.lmax*:*</exclude>
+
+                                    <!-- Common dependencies and its transitives-->
+                                    <exclude>com.google.guava:guava</exclude>
+                                    <exclude>commons-beanutils:*</exclude>
+                                    <exclude>commons-collections:*</exclude>
+                                    <exclude>org.apache.commons:commons-configuration2:*</exclude>
+                                    <exclude>org.apache.commons:commons-lang3:*</exclude>
+                                    <exclude>commons-logging:*</exclude>
+                                    <exclude>org.apache.commons:commons-text:*</exclude>
+                                    <exclude>jakarta.activation:jakarta.activation-api:*</exclude>
+                                    <exclude>jakarta.jms:jakarta.jms-api:*</exclude>
+                                    <exclude>jakarta.xml.bind:jakarta.xml.bind-api:*</exclude>
+                                    <exclude>org.glassfish.jaxb:jaxb-runtime:*</exclude>
+                                    <!-- ################################## -->
+                                </excludes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <manifestEntries>
+                                <!--<Implementation-Vendor>${product.vendor}</Implementation-Vendor>-->
+                                <!--<Implementation-Title>${product.name}</Implementation-Title>-->
+                                <!--<Implementation-Version>${project.version}-${maven.build.timestamp}</Implementation-Version>-->
+                                <!--<Main-Class>com.jkoolcloud.tnt4j.streams.StreamsAgent</Main-Class>-->
+                                <Class-Path>.</Class-Path>
+                            </manifestEntries>
+                        </transformer>
+                    </transformers>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <!-- Remove jars contained signatures -->
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -81,7 +193,78 @@
         <dependency>
             <groupId>jakarta.jms</groupId>
             <artifactId>jakarta.jms-api</artifactId>
-            <version>2.0.3</version>
+            <version>${jakarta.jms.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-jms-client</artifactId>
+            <version>${artemis.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-amqp-protocol</artifactId>
+            <version>${artemis.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-io</artifactId>
+                    <groupId>commons-io</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-lang3</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-text</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-configuration2</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-hqclient-protocol</artifactId>
+            <version>${artemis.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-hornetq-protocol</artifactId>
+            <version>${artemis.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-openwire-protocol</artifactId>
+            <version>${artemis.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-stomp-protocol</artifactId>
+            <version>${artemis.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-mqtt-protocol</artifactId>
+            <version>${artemis.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -93,53 +276,66 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-client</artifactId>
-            <version>5.17.0</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>com.solacesystems</groupId>
             <artifactId>sol-jms</artifactId>
-            <version>10.14.0</version>
-            <scope>test</scope>
+            <version>${solace.version}</version>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-logging</artifactId>
                     <groupId>commons-logging</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-jms_1.1_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq.jms</groupId>
             <artifactId>rabbitmq-jms</artifactId>
-            <version>2.4.0</version>
-            <scope>test</scope>
+            <version>${rabbitmq.version}</version>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-jms_1.1_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>org.zeromq</groupId>-->
-        <!--<artifactId>jeromq-jms</artifactId>-->
-        <!--<version>3.0.1-RELEASE</version>-->
-        <!--<scope>test</scope>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>org.apache.rocketmq</groupId>-->
-        <!--<artifactId>rocketmq-client</artifactId>-->
-        <!--<version>4.9.3</version>-->
-        <!--<scope>test</scope>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.zeromq</groupId>
+            <artifactId>jeromq-jms</artifactId>
+            <version>${zeromq.version}</version>
+            <scope>provided</scope>
+            <!-- Instead of using variables jeromq pom file defines absolute path, so we exclude -->
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sun.tools</groupId>
+                    <artifactId>tools</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.tools</groupId>
+                    <artifactId>jconsole</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-client</artifactId>
+            <version>${rocketmq.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-lang3</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
 </project>

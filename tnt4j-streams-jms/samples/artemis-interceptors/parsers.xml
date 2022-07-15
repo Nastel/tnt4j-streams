@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2014-2022 JKOOL, LLC.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
+
+    <!-- Message properties parser -->
+    <parser name="PropertiesParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <field name="AllProps" locator="*" locator-type="Label"/>
+    </parser>
+
+    <!-- Connection attributes parser -->
+    <parser name="ConnectionParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <field name="ConnClientId" locator="conn:clientID" locator-type="Label"/>
+        <field name="ConnCreateTime" locator="conn:creationTime" locator-type="Label" datatype="Timestamp"/>
+        <!--field name="ConnSubject" locator="conn:subject" locator-type="Label"/-->
+        <field name="ConnProtocolName" locator="conn:protocolName" locator-type="Label"/>
+        <!--field name="" locator="conn:transportConnection:localAddress" locator-type="Label"/>
+        <field name="" locator="conn:transportConnection:ID" locator-type="Label"/>
+        <field name="" locator="conn:transportConnection:remoteAddress" locator-type="Label"/-->
+        <field name="ConnClient" locator="conn:client" locator-type="Label" datatype="AsInput" value-type="flag"/>
+        <field name="ConnId" locator="conn:ID" locator-type="Label"/>
+        <!--field name="ConnLocalAddr" locator="conn:transportLocalAddress" locator-type="Label"/-->
+        <field name="ConnRemoteAddr" locator="conn:remoteAddress" locator-type="Label"/>
+        <field name="ConnLocalAddr" locator="conn:localAddress" locator-type="Label"/>
+        <field name="ConnSrvRedirectTo" locator="conn:transportConnection:redirectTo" locator-type="Label"/>
+
+        <!--        <field name="Rest" locator="#" locator-type="Label"/>-->
+    </parser>
+
+    <!-- Stomp protocol messages parser -->
+    <parser name="StompParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Event"/>
+        <field name="EventName" value="ArtemisStompPacket"/>
+
+        <!--  TODO  -->
+
+        <embedded-activity name="ConnectionAttributes" locator="$DATA$" locator-type="Label">
+            <parser-ref name="ConnectionParser" aggregation="Merge"/>
+        </embedded-activity>
+
+        <field name="Rest" locator="#" locator-type="Label"/>
+    </parser>
+
+    <!-- OpenWire protocol messages parser -->
+    <parser name="OpenWireParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Event"/>
+        <field name="EventName" value="ArtemisOpenWirePacket"/>
+
+        <!--  TODO  -->
+
+        <embedded-activity name="ConnectionAttributes" locator="$DATA$" locator-type="Label">
+            <parser-ref name="ConnectionParser" aggregation="Merge"/>
+        </embedded-activity>
+
+        <field name="Rest" locator="#" locator-type="Label"/>
+    </parser>
+
+    <!-- MQTT protocol messages parser -->
+    <parser name="MQTTParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Event"/>
+        <field name="EventName" value="ArtemisMQTTPacket"/>
+
+        <!--  TODO  -->
+
+        <embedded-activity name="ConnectionAttributes" locator="$DATA$" locator-type="Label">
+            <parser-ref name="ConnectionParser" aggregation="Merge"/>
+        </embedded-activity>
+
+        <field name="Rest" locator="#" locator-type="Label"/>
+    </parser>
+
+    <!-- AMQP protocol messages parser -->
+    <parser name="AmqpParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Event"/>
+        <field name="EventName" value="ArtemisAmqpPacket"/>
+
+        <!--  TODO  -->
+
+        <embedded-activity name="ConnectionAttributes" locator="$DATA$" locator-type="Label">
+            <parser-ref name="ConnectionParser" aggregation="Merge"/>
+        </embedded-activity>
+
+        <field name="Rest" locator="#" locator-type="Label"/>
+    </parser>
+
+    <!-- CORE protocol messages parser -->
+    <parser name="PacketParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Event"/>
+        <field name="EventName" locator="packet:class" locator-type="Label"/>
+
+        <field name="Correlator" locator="packet:correlationID" locator-type="Label">
+            <filter name="PkgCorrelatorFilter">
+                <expression handle="include" lang="groovy"><![CDATA[
+                    $fieldValue > 0
+                ]]></expression>
+            </filter>
+        </field>
+        <field name="MessageId" locator="packet:message:messageID" locator-type="Label"/>
+        <field name="Correlator" locator="MessageId" locator-type="Activity">
+            <filter name="MsgCorrelatorFilter">
+                <expression handle="include" lang="groovy"><![CDATA[
+                    $fieldValue > 0
+                ]]></expression>
+            </filter>
+        </field>
+        <field name="ServerMsg" locator="packet:message:serverMessage" locator-type="Label"/>
+        <field name="MessageType" locator="packet:message:type" locator-type="Label">
+            <field-map source="0" target="DEFAULT"/>
+            <field-map source="2" target="OBJECT"/>
+            <field-map source="3" target="TEXT"/>
+            <field-map source="4" target="BYTES"/>
+            <field-map source="5" target="MAP"/>
+            <field-map source="6" target="STREAM"/>
+            <field-map source="7" target="EMBEDDED"/>
+            <field-map source="8" target="LARGE_EMBEDDED"/>
+        </field>
+        <field name="UserId" locator="packet:message:userID" locator-type="Label"/>
+        <field name="Writable" locator="packet:message:buffer:writable" locator-type="Label" datatype="AsInput" value-type="flag"/>
+        <field name="DeliveryCount" locator="packet:message:deliveryCount" locator-type="Label"/>
+        <field name="StartTime" locator="packet:message:timestamp" locator-type="Label" datatype="Timestamp"/>
+        <field name="EndTime" locator="ictx:interceptTimestamp" locator-type="Label" datatype="Timestamp"/>
+        <field name="ResourceName" formattingPattern="QUEUE={0}">
+            <field-locator locator="packet:message:address" locator-type="Label"/>
+        </field>
+        <field name="ScheduledDeliveryTime" locator="packet:message:scheduledDeliveryTime" locator-type="Label" datatype="Timestamp"/>
+        <field name="GroupId" locator="packet:message:groupID" locator-type="Label"/>
+        <field name="Message" locator="packet:message:stringBody" locator-type="Label"/>
+        <field name="Priority" locator="packet:message:priority" locator-type="Label" datatype="Number"/>
+        <field name="BodySize" locator="packet:message:bodySize" locator-type="Label"/>
+        <field name="MsgReplyTo" locator="packet:message:replyTo" locator-type="Label"/>
+        <field name="MsgCorrelator" locator="packet:message:correlationID" locator-type="Label"/>
+        <field name="Correlator" locator="MsgCorrelator" locator-type="Activity" datatype="String"/>
+        <field name="MsgExpiration" locator="packet:message:expiration" locator-type="Label"/>
+        <field name="MsgCompressed" locator="packet:message:compressed" locator-type="Label" datatype="AsInput" value-type="flag"/>
+        <embedded-activity name="Properties" locator="packet:message:properties:map" locator-type="Label">
+            <parser-ref name="PropertiesParser" aggregation="Merge"/>
+        </embedded-activity>
+        <field name="PkgType" locator="packet:type" locator-type="Label">
+            <field-map source="10" target="PING"/>
+            <field-map source="11" target="DISCONNECT"/>
+            <field-map source="12" target="DISCONNECT_CONSUMER"/>
+            <field-map source="13" target="DISCONNECT_CONSUMER_KILL"/>
+            <field-map source="20" target="EXCEPTION"/>
+            <field-map source="21" target="NULL_RESPONSE"/>
+            <field-map source="22" target="PACKETS_CONFIRMED"/>
+            <field-map source="30" target="CREATESESSION"/>
+            <field-map source="31" target="CREATESESSION_RESP"/>
+            <field-map source="32" target="REATTACH_SESSION"/>
+            <field-map source="33" target="REATTACH_SESSION_RESP"/>
+            <field-map source="34" target="CREATE_QUEUE"/>
+            <field-map source="35" target="DELETE_QUEUE"/>
+            <field-map source="36" target="CREATE_SHARED_QUEUE"/>
+            <field-map source="39" target="SESS_XA_FAILED"/>
+            <field-map source="40" target="SESS_CREATECONSUMER"/>
+            <field-map source="41" target="SESS_ACKNOWLEDGE"/>
+            <field-map source="42" target="SESS_EXPIRED"/>
+            <field-map source="43" target="SESS_COMMIT"/>
+            <field-map source="44" target="SESS_ROLLBACK"/>
+            <field-map source="45" target="SESS_QUEUEQUERY"/>
+            <field-map source="46" target="SESS_QUEUEQUERY_RESP"/>
+            <field-map source="49" target="SESS_BINDINGQUERY"/>
+            <field-map source="50" target="SESS_BINDINGQUERY_RESP"/>
+            <field-map source="51" target="SESS_XA_START"/>
+            <field-map source="52" target="SESS_XA_END"/>
+            <field-map source="53" target="SESS_XA_COMMIT"/>
+            <field-map source="54" target="SESS_XA_PREPARE"/>
+            <field-map source="55" target="SESS_XA_RESP"/>
+            <field-map source="56" target="SESS_XA_ROLLBACK"/>
+            <field-map source="57" target="SESS_XA_JOIN"/>
+            <field-map source="58" target="SESS_XA_SUSPEND"/>
+            <field-map source="59" target="SESS_XA_RESUME"/>
+            <field-map source="60" target="SESS_XA_FORGET"/>
+            <field-map source="61" target="SESS_XA_INDOUBT_XIDS"/>
+            <field-map source="62" target="SESS_XA_INDOUBT_XIDS_RESP"/>
+            <field-map source="63" target="SESS_XA_SET_TIMEOUT"/>
+            <field-map source="64" target="SESS_XA_SET_TIMEOUT_RESP"/>
+            <field-map source="65" target="SESS_XA_GET_TIMEOUT"/>
+            <field-map source="66" target="SESS_XA_GET_TIMEOUT_RESP"/>
+            <field-map source="67" target="SESS_START"/>
+            <field-map source="68" target="SESS_STOP"/>
+            <field-map source="69" target="SESS_CLOSE"/>
+            <field-map source="70" target="SESS_FLOWTOKEN"/>
+            <field-map source="71" target="SESS_SEND"/>
+            <field-map source="72" target="SESS_SEND_LARGE"/>
+            <field-map source="73" target="SESS_SEND_CONTINUATION"/>
+            <field-map source="74" target="SESS_CONSUMER_CLOSE"/>
+            <field-map source="75" target="SESS_RECEIVE_MSG"/>
+            <field-map source="76" target="SESS_RECEIVE_LARGE_MSG"/>
+            <field-map source="77" target="SESS_RECEIVE_CONTINUATION"/>
+            <field-map source="78" target="SESS_FORCE_CONSUMER_DELIVERY"/>
+            <field-map source="79" target="SESS_PRODUCER_REQUEST_CREDITS"/>
+            <field-map source="80" target="SESS_PRODUCER_CREDITS"/>
+            <field-map source="81" target="SESS_INDIVIDUAL_ACKNOWLEDG"/>
+            <field-map source="82" target="SESS_PRODUCER_FAIL_CREDITS"/>
+            <field-map source="90" target="REPLICATION_RESPONSE"/>
+            <field-map source="91" target="REPLICATION_APPEND"/>
+            <field-map source="92" target="REPLICATION_APPEND_TX"/>
+            <field-map source="93" target="REPLICATION_DELETE"/>
+            <field-map source="94" target="REPLICATION_DELETE_TX"/>
+            <field-map source="95" target="REPLICATION_PREPARE"/>
+            <field-map source="96" target="REPLICATION_COMMIT_ROLLBACK"/>
+            <field-map source="97" target="REPLICATION_PAGE_WRITE"/>
+            <field-map source="98" target="REPLICATION_PAGE_EVENT"/>
+            <field-map source="99" target="REPLICATION_LARGE_MESSAGE_BEGIN"/>
+            <field-map source="100" target="REPLICATION_LARGE_MESSAGE_END"/>
+            <field-map source="101" target="REPLICATION_LARGE_MESSAGE_WRITE"/>
+            <field-map source="103" target="REPLICATION_SYNC_FILE"/>
+            <field-map source="104" target="SESS_ADD_METADATA"/>
+            <field-map source="105" target="SESS_ADD_METADATA2"/>
+            <field-map source="106" target="SESS_UNIQUE_ADD_METADATA"/>
+            <field-map source="110" target="CLUSTER_TOPOLOGY"/>
+            <field-map source="111" target="NODE_ANNOUNCE"/>
+            <field-map source="112" target="SUBSCRIBE_TOPOLOGY"/>
+            <field-map source="113" target="SUBSCRIBE_TOPOLOGY_V2"/>
+            <field-map source="114" target="CLUSTER_TOPOLOGY_V2"/>
+            <field-map source="115" target="BACKUP_REGISTRATION"/>
+            <field-map source="116" target="BACKUP_REGISTRATION_FAILED"/>
+            <field-map source="120" target="REPLICATION_START_FINISH_SYNC"/>
+            <field-map source="121" target="REPLICATION_SCHEDULED_FAILOVER"/>
+            <field-map source="122" target="CLUSTER_TOPOLOGY_V3"/>
+            <field-map source="123" target="NODE_ANNOUNCE_V2"/>
+            <field-map source="124" target="DISCONNECT_V2"/>
+            <field-map source="125" target="CLUSTER_CONNECT"/>
+            <field-map source="126" target="CLUSTER_CONNECT_REPLY"/>
+            <field-map source="127" target="BACKUP_REQUEST"/>
+            <field-map source="-1" target="BACKUP_REQUEST_RESPONSE"/>
+            <field-map source="-2" target="QUORUM_VOTE"/>
+            <field-map source="-3" target="QUORUM_VOTE_REPLY"/>
+            <field-map source="-4" target="CHECK_FOR_FAILOVER"/>
+            <field-map source="-5" target="CHECK_FOR_FAILOVER_REPLY"/>
+            <field-map source="-6" target="SCALEDOWN_ANNOUNCEMENT"/>
+            <field-map source="-7" target="SESS_QUEUEQUERY_RESP_V2"/>
+            <field-map source="-8" target="SESS_BINDINGQUERY_RESP_V2"/>
+            <field-map source="-9" target="REPLICATION_RESPONSE_V2"/>
+            <field-map source="-10" target="SESS_BINDINGQUERY_RESP_V3"/>
+            <field-map source="-11" target="CREATE_ADDRESS"/>
+            <field-map source="-12" target="CREATE_QUEUE_V2"/>
+            <field-map source="-13" target="CREATE_SHARED_QUEUE_V2"/>
+            <field-map source="-14" target="SESS_QUEUEQUERY_RESP_V3"/>
+            <field-map source="-15" target="SESS_BINDINGQUERY_RESP_V4"/>
+            <field-map source="-16" target="FEDERATION_DOWNSTREAM_CONNECT"/>
+            <field-map source="-17" target="CLUSTER_TOPOLOGY_V4"/>
+            <field-map source="-18" target="CREATESESSION_V2"/>
+            <field-map source="-19" target="DISCONNECT_V3"/>
+        </field>
+        <field name="PkgChannelId" locator="packet:channelID" locator-type="Label"/>
+        <field name="PkgDeliveryCount" locator="packet:deliveryCount" locator-type="Label"/>
+
+        <embedded-activity name="ConnectionAttributes" locator="$DATA$" locator-type="Label">
+            <parser-ref name="ConnectionParser" aggregation="Merge"/>
+        </embedded-activity>
+
+        <!--        <field name="Rest" locator="#" locator-type="Label"/>-->
+    </parser>
+
+    <!-- Interceptor bootstrap parser  -->
+    <parser name="InterceptorBootstrapParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+        <field name="PacketClass" locator="packet:class" locator-type="Label" datatype="String" transparent="true"/>
+        <embedded-activity name="PacketData" locator="$DATA$" locator-type="Label">
+            <parser-ref name="PacketParser" aggregation="Merge">
+                <!--matchExp>string:containsAny(${PacketClass}, .core.)</matchExp-->
+                <matchExp>groovy:StringUtils.containsAny(${PacketClass}, ".core.")</matchExp>
+            </parser-ref>
+            <parser-ref name="AmqpParser" aggregation="Merge">
+                <matchExp>groovy:StringUtils.containsAny(${PacketClass}, ".amqp.")</matchExp>
+            </parser-ref>
+            <parser-ref name="MQTTParser" aggregation="Merge">
+                <matchExp>groovy:StringUtils.containsAny(${PacketClass}, ".mqtt.", "MQTT")</matchExp>
+            </parser-ref>
+            <parser-ref name="OpenWireParser" aggregation="Merge">
+                <matchExp>groovy:StringUtils.containsAny(${PacketClass}, ".command.", ".openwire.", "OpenWire")</matchExp>
+            </parser-ref>
+            <parser-ref name="StompParser" aggregation="Merge">
+                <matchExp>groovy:StringUtils.containsAny(${PacketClass}, ".stomp.", "Stomp")</matchExp>
+            </parser-ref>
+        </embedded-activity>
+    </parser>
+</tnt-data-source>
