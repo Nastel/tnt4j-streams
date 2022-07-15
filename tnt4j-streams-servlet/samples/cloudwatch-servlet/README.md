@@ -30,16 +30,17 @@
       2. change AutoPilot sink host value (property `event.sink.factory.EventSinkFactory.ap.Host`) to match your AutoPilot instance. Default
          is `localhost`.
       3. change AutoPilot sink port value (property `event.sink.factory.EventSinkFactory.ap.Port`) to match your AutoPilot instance. Default
-         is `6060`. 
-      5. change `https://data.jkoolcloud.com` to your jKool/XRay streaming endpoint URL. 
-      6. change `jkool-access-token` placeholder to your jKool/XRay streaming token if you are willing to stream into that repo
+         is `6060`.
+      4. change `https://data.jkoolcloud.com` to your jKool/XRay streaming endpoint URL. 
+      5. change `jkool-access-token` placeholder to your jKool/XRay streaming token if you are willing to stream into that repo
    6. [parsers.xml](parsers.xml) - TNT4J-Streams parsers configuration
 
    **NOTE:** for most general case there is no need for you to change `log4j2.xml`, `tnt4j*.propeties` and `parsers.xml` files. The only
    file requiring to make your changes is `tnt-data-source.xml`.
-4. Deploy `tnt4j-streams-servlet-<VERSION>.war` or `tnt4j-streams-<VERSION>.war` file to your web sever web-apps dir, e.g. 
+4. Download TNT4J-Streams `war` package latest version release from [GitHub releases](https://github.com/Nastel/tnt4j-streams/releases).
+5. Deploy `tnt4j-streams-<VERSION>.war` or `tnt4j-streams-servlet-<VERSION>.war` file to your web sever web-apps dir, e.g. 
    `<TOMCAT_DIR>/webapps`. **NOTE:** remove version token from `war` package file name to preserve web-app context on every deployment.
-5. Start web sever, if it is not already running.
+6. Start web sever, if it is not already running.
 
 # TL;DR
 
