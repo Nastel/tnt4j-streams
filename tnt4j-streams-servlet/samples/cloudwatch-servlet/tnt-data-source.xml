@@ -17,7 +17,7 @@
 
 <tnt-data-source
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-ws/config/tnt-data-source-ws.xsd">
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
     <resource-ref id="MetricsParsers" type="Parser" uri="parsers.xml"/>
 
@@ -54,19 +54,23 @@
             <!--            <property name="source.factory.RootFQN" value="APPSERVER=?#NETWORK=?#GEOADDR=?#SERVICE=?#DATACENTER=?"/>-->
             <property name="source.factory.RootFQN" value="DATACENTER=?"/>
 
+            <!-- Sequence of sinks to broadcast stream produced activities. You may leave just one of them to sent data to single endpoint -->
             <property name="event.sink.factory.BroadcastSequence" value="ap,jkool"/>
 
-            <!-- File sink -->
-            <property name="event.sink.factory.EventSinkFactory.ap" value="com.jkoolcloud.tnt4j.sink.impl.FileEventSinkFactory"/>
-            <property name="event.sink.factory.EventSinkFactory.ap.FileName" value="${sys:catalina.base}/logs/tnt4j-streams_samples.log"/>
-
             <!-- Socket sink to AutoPilot -->
-            <!--property name="event.sink.factory.EventSinkFactory.ap" value="com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory"/>
-            <property name="event.sink.factory.EventSinkFactory.ap.LogSink" value="file:${sys:catalina.base}/logs/tnt4j-streams_samples_socket.log"/-->
+            <property name="event.sink.factory.EventSinkFactory.ap" value="com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory"/>
+            <property name="event.sink.factory.EventSinkFactory.ap.LogSink" value="file:${sys:catalina.base}/logs/tnt4j-streams_samples_socket.log"/>
             <!-- Change to your AP machine host/IP -->
-            <!--property name="event.sink.factory.EventSinkFactory.ap.Host" value="localhost"/-->
+            <property name="event.sink.factory.EventSinkFactory.ap.Host" value="localhost"/>
             <!-- Change to your Ap machine port - default one is 6060 -->
-            <!--property name="event.sink.factory.EventSinkFactory.ap.Port" value="6060"/-->
+            <property name="event.sink.factory.EventSinkFactory.ap.Port" value="6060"/>
+
+            <!-- Activities routing by activity field "RoutePath" value "ap" or null -->
+            <property name="event.sink.factory.EventSinkFactory.ap.Filter"
+                      value="com.jkoolcloud.tnt4j.streams.sink.filters.EventMatchExpressionFilter"/>
+            <property name="event.sink.factory.EventSinkFactory.ap.Filter.MatchExp"><![CDATA[
+                groovy: StringUtils.equalsAny(${RoutePath}, "ap", null)
+            ]]></property>
 
             <property name="event.sink.factory.EventSinkFactory.ap.Formatter"
                       value="com.jkoolcloud.tnt4j.streams.custom.format.openmetrics.FactPathValueFormatter"/>
@@ -77,6 +81,7 @@
             <property name="event.sink.factory.EventSinkFactory.ap.Formatter.ValueReplacements">
                 "\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"
             </property>
+            <!-- Path of activity name properties to build AutoPilot facts tree layout -->
             <property name="event.sink.factory.EventSinkFactory.ap.Formatter.PathLevelAttributes">
                 domain;namespace;region;cluster,streamName;broker;metric;topic;cGroup;cAuth
             </property>
@@ -85,8 +90,15 @@
             <property name="event.sink.factory.EventSinkFactory.jkool" value="com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory"/>
             <property name="event.sink.factory.EventSinkFactory.jkool.LogSink"
                       value="slf4j:com.jkoolcloud.tnt4j.streams.activities_jkool_log"/>
-            <property name="event.sink.factory.EventSinkFactory.jkool.Url" value="https://xraytest.nastel.com:6585"/>
-            <property name="event.sink.factory.EventSinkFactory.jkool.Token" value="bcf419b4-dba2-45fa-9ca8-cf2e4de99285"/>
+            <property name="event.sink.factory.EventSinkFactory.jkool.Url" value="https://data.jkoolcloud.com"/>
+            <property name="event.sink.factory.EventSinkFactory.jkool.Token" value="jkool-access-token"/>
+
+            <!-- Activities routing by activity field "RoutePath" value "xray" -->
+            <property name="event.sink.factory.EventSinkFactory.jkool.Filter"
+                      value="com.jkoolcloud.tnt4j.streams.sink.filters.EventMatchExpressionFilter"/>
+            <property name="event.sink.factory.EventSinkFactory.jkool.Filter.MatchExp"><![CDATA[
+                groovy:StringUtils.equals(${RoutePath}, "xray")
+            ]]></property>
 
             <property name="event.sink.factory.EventSinkFactory.jkool.Formatter" value="com.jkoolcloud.tnt4j.format.JSONFormatter"/>
         </tnt4j-properties>

@@ -19,15 +19,29 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
-    <parser name="OpenTelemetryParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser">
-        <field name="EventType" value="Snapshot"/>
-        <field name="EventName" value="OpenTelemetryValues"/>
+    <parser name="DimensionsParserXRay" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
 
-        <field name="ParserName" locator="ParserName" locator-type="ParserProp" transparent="true"/>
+        <field name="BrokerId" locator="Broker ID" locator-type="Label">
+            <field-transform lang="groovy"><![CDATA[
+                StringUtils.isEmpty($fieldValue)
+                    ? $fieldValue
+                    : StringUtils.isNumeric ($fieldValue)
+                        ? "b-" + $fieldValue
+                        : $fieldValue
+            ]]></field-transform>
+        </field>
+        <field name="InstanceId" locator="InstanceId" locator-type="Label"/>
+        <field name="ClusterName" locator="Cluster Name" locator-type="Label"/>
+        <field name="Topic" locator="Topic" locator-type="Label"/>
+        <field name="ConsumerGroup" locator="Consumer Group" locator-type="Label"/>
+        <field name="ClientAuth" locator="Client Authentication" locator-type="Label"/>
+        <field name="DeliveryStreamName" locator="DeliveryStreamName" locator-type="Label"/>
+
+        <field name="Rest" locator="#" locator-type="Label"/>
     </parser>
-
-    <parser name="DimensionsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Snapshot"/>
+    <parser name="DimensionsParserAP" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
 
         <field name="BrokerId" locator="Broker ID" locator-type="Label" transparent="true">
             <field-transform lang="groovy"><![CDATA[
@@ -48,7 +62,7 @@
         <field name="Rest" locator="#" locator-type="Label"/>
     </parser>
     <parser name="ValueParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Snapshot"/>
+        <field name="EventType" value="NOOP"/>
 
         <field name="Max" locator="max" locator-type="Label" datatype="Number"/>
         <field name="Min" locator="min" locator-type="Label" datatype="Number"/>
@@ -60,7 +74,63 @@
 
         <field name="Rest" locator="#" locator-type="Label"/>
     </parser>
-    <parser name="MetricLineParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
+
+    <parser name="MetricLineParserXRay" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
+        <property name="ActivityDelim" value="EOL"/>
+
+        <field name="EventType" value="Snapshot"/>
+        <field name="Severity" value="INFO"/>
+
+        <field name="MetricStreamName" locator="$.metric_stream_name" locator-type="Label"/>
+        <field name="UserName" locator="$.account_id" locator-type="Label"/>
+        <field name="Region" locator="$.region" locator-type="Label"/>
+        <field name="Namespace" locator="$.namespace" locator-type="Label"/>
+        <field name="MetricName" locator="$.metric_name" locator-type="Label"/>
+
+        <embedded-activity name="Dimensions" locator="$.dimensions" locator-type="Label">
+            <parser-ref name="DimensionsParserXRay" aggregation="Merge"/>
+        </embedded-activity>
+
+        <field name="StartTime" locator="$.timestamp" locator-type="Label" datatype="Timestamp"/>
+        <field name="EndTime" locator="StartTime" locator-type="Activity"/>
+
+        <embedded-activity name="Value" locator="$.value" locator-type="Label">
+            <parser-ref name="ValueParser" aggregation="Merge"/>
+        </embedded-activity>
+
+        <field name="Unit" locator="$.unit" locator-type="Label"/>
+
+        <field name="EventName" separator="|">
+            <field-locator locator="Namespace" locator-type="Activity"/>
+            <field-locator locator="Region" locator-type="Activity"/>
+            <field-locator locator="ClusterName" locator-type="Activity"/>
+            <field-locator locator="BrokerId" locator-type="Activity"/>
+            <field-locator locator="MetricName" locator-type="Activity"/>
+        </field>
+        <field name="Category" value="AWSCloudWatchMetric"/>
+        <field name="Guid" separator="|">
+            <field-locator locator="StartTime" locator-type="Activity" format="yyyy-MM-dd_HH:mm:ss" timezone="UTC"/>
+            <field-locator locator="EventName" locator-type="Activity"/>
+        </field>
+    </parser>
+    <parser name="MetricEntryParserXRay" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser" manualFieldsOrder="true">
+        <property name="ActivityDelim" value="EOL"/>
+
+        <field name="EventType" value="Activity"/>
+        <field name="EventName" value="AWSCloudWatchMetrics"/>
+        <field name="RoutePath" value="xray"/>
+
+        <field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
+        <field name="EndTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
+
+        <embedded-activity name="MetricDataXRay" locator="$DATA$" locator-type="Label">
+            <parser-ref name="MetricLineParserXRay" aggregation="Relate"/>
+        </embedded-activity>
+
+        <field name="DataCenter" value="Amazon_AWS"/>
+    </parser>
+
+    <parser name="MetricLineParserAP" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
         <property name="ActivityDelim" value="EOL"/>
 
         <field name="EventType" value="Snapshot"/>
@@ -73,7 +143,7 @@
         <field name="MetricName" locator="$.metric_name" locator-type="Label" transparent="true"/>
 
         <embedded-activity name="Dimensions" locator="$.dimensions" locator-type="Label">
-            <parser-ref name="DimensionsParser" aggregation="Merge"/>
+            <parser-ref name="DimensionsParserAP" aggregation="Merge"/>
         </embedded-activity>
 
         <field name="StartTime" locator="$.timestamp" locator-type="Label" datatype="Timestamp"/>
@@ -88,31 +158,32 @@
         <field name="EventName" value="snapName">
             <field-transform lang="groovy"><![CDATA[
                 String props = "";
-                props += (StringUtils.isEmpty(${Namespace}) ? "" : "namespace=" + ${Namespace});
-                props += (StringUtils.isEmpty(${Region}) ? "" : (props.length() > 0 ? "," : "") + "region=" + ${Region});
-                props += (StringUtils.isEmpty(${ClusterName}) ? "" : (props.length() > 0 ? "," : "") + "cluster=" + ${ClusterName});
-                props += (StringUtils.isEmpty(${BrokerId}) ? "" : (props.length() > 0 ? "," : "") + "broker=" + ${BrokerId});
-                props += (StringUtils.isEmpty(${Topic}) ? "" : (props.length() > 0 ? "," : "") + "topic=" + ${Topic});
+                props += (StringUtils.isEmpty(${Namespace})          ? "" : "namespace=" + ${Namespace});
+                props += (StringUtils.isEmpty(${Region})             ? "" : (props.length() > 0 ? "," : "") + "region="     + ${Region});
+                props += (StringUtils.isEmpty(${ClusterName})        ? "" : (props.length() > 0 ? "," : "") + "cluster="    + ${ClusterName});
+                props += (StringUtils.isEmpty(${BrokerId})           ? "" : (props.length() > 0 ? "," : "") + "broker="     + ${BrokerId});
+                props += (StringUtils.isEmpty(${Topic})              ? "" : (props.length() > 0 ? "," : "") + "topic="      + ${Topic});
                 props += (StringUtils.isEmpty(${DeliveryStreamName}) ? "" : (props.length() > 0 ? "," : "") + "streamName=" + ${DeliveryStreamName});
-                props += (StringUtils.isEmpty(${ConsumerGroup}) ? "" : (props.length() > 0 ? "," : "") + "cGroup=" + ${ConsumerGroup});
-                props += (StringUtils.isEmpty(${ClientAuth}) ? "" : (props.length() > 0 ? "," : "") + "cAuth=" + ${ClientAuth});
-                props += (StringUtils.isEmpty(${MetricName}) ? "" : (props.length() > 0 ? "," : "") + "metric=" + ${MetricName});
+                props += (StringUtils.isEmpty(${ConsumerGroup})      ? "" : (props.length() > 0 ? "," : "") + "cGroup="     + ${ConsumerGroup});
+                props += (StringUtils.isEmpty(${ClientAuth})         ? "" : (props.length() > 0 ? "," : "") + "cAuth="      + ${ClientAuth});
+                props += (StringUtils.isEmpty(${MetricName})         ? "" : (props.length() > 0 ? "," : "") + "metric="     + ${MetricName});
 
                 ${MetricStreamName} + ":" + props
             ]]></field-transform>
         </field>
     </parser>
-    <parser name="MetricEntryParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser" manualFieldsOrder="true">
+    <parser name="MetricEntryParserAP" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser" manualFieldsOrder="true">
         <property name="ActivityDelim" value="EOL"/>
 
         <field name="EventType" value="Activity"/>
-        <field name="EventName" value="AWSCloudWatchMetric"/>
+        <field name="EventName" value="AWSCloudWatchMetrics"/>
+        <field name="RoutePath" value="ap"/>
 
         <field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
         <field name="EndTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
 
-        <embedded-activity name="MetricData" locator="$DATA$" locator-type="Label">
-            <parser-ref name="MetricLineParser" aggregation="Relate"/>
+        <embedded-activity name="MetricDataAP" locator="$DATA$" locator-type="Label">
+            <parser-ref name="MetricLineParserAP" aggregation="Relate"/>
         </embedded-activity>
 
         <field name="DataCenter" value="Amazon_AWS"/>
@@ -128,7 +199,7 @@
                 String[] lines = $fieldValue.split("\\r|\\n");
                 List<String> payloadLines = new ArrayList<>(lines.length);
 
-                String[] includeMetrics = new String[] {
+                String[] kafkaIncludeMetrics = new String[] {
                     "ActiveControllerCount",
                     "CpuIdle",
                     "CpuSystem",
@@ -161,7 +232,9 @@
                     // Add additional lines match filtering, e.g. pick only 'kafka_server_XXXXXXX' lines
                     //pass &= Matchers.evaluate("regex:kafka_server_.+", line);
                     // Add additional lines contains filtering, e.g. from set of metric names
-                    //pass &= StringUtils.containsAny (line, includeMetrics)
+                    /*if (StringUtils.contains(line, "AWS/Kafka")) {
+                        pass &= StringUtils.containsAny(line, kafkaIncludeMetrics);
+                    }*/
 
                     if (pass) {
                         payloadLines.add(line);
@@ -170,7 +243,8 @@
 
                 return payloadLines;
             ]]></field-transform>
-            <parser-ref name="MetricEntryParser" aggregation="Relate"/>
+            <parser-ref name="MetricEntryParserAP" aggregation="Relate" tags="continuous"/>
+            <parser-ref name="MetricEntryParserXRay" aggregation="Relate" tags="continuous"/>
         </embedded-activity>
     </parser>
 
@@ -178,7 +252,7 @@
         <property name="ActivityDelim" value="EOF"/>
 
         <field name="EventType" value="NOOP"/>
-        <field name="EventName" value="AWSCloudWatchMetric"/>
+        <field name="EventName" value="AWSCloudWatchMetrics"/>
         <field name="ParserName" locator="ParserName" locator-type="ParserProp" transparent="true"/>
 
         <field name="RequestId" locator="$.requestId" locator-type="Label"/>
@@ -200,16 +274,23 @@
         </embedded-activity>
     </parser>
 
+    <!--parser name="OpenTelemetryParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser">
+        <field name="EventType" value="Snapshot"/>
+        <field name="EventName" value="OpenTelemetryValues"/>
+
+        <field name="ParserName" locator="ParserName" locator-type="ParserProp" transparent="true"/>
+    </parser-->
+
     <parser name="KinesisFirehoseParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <property name="ActivityDelim" value="EOF"/>
 
         <field name="EventType" value="NOOP"/>
         <field name="MetricsData" locator="ActivityData" locator-type="Label" datatype="AsInput" transparent="true">
-            <parser-ref name="OpenTelemetryParser" aggregation="Merge">
+            <!--parser-ref name="OpenTelemetryParser" aggregation="Merge">
                 <matchExp><![CDATA[groovy:
                     $fieldValue != null && $fieldValue.getClass().isArray()
                 ]]></matchExp>
-            </parser-ref>
+            </parser-ref-->
             <parser-ref name="KinesisFirehoseParserStr" aggregation="Merge">
                 <matchExp>string:contains("records":)</matchExp>
             </parser-ref>
