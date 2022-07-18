@@ -54,7 +54,22 @@ public class ClientInterceptorTest {
 			Queue queue = session.createQueue("InterceptorsTestQueue");
 			MessageProducer producer = session.createProducer(queue);
 
-			String msgText = "This is a text test message";
+			// String msgText = "This is a text test message";
+			String msgText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+					+ "<tracking_event xsi:noNamespaceSchemaLocation=\"wp.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"
+					+ "    <HostName>ix52</HostName>\n"
+					+ "    <HostInfo>719942XXI50XI52DataPower XI50DataPower XI52(unknown)68901505XI50.6.0.0.2XI52.6.0.0.22344472013/09/21\n"
+					+ "        08:54:342016-02-2317:51:29 EST2015-07-1516:30:19 EDTenable\n" + "    </HostInfo>\n"
+					+ "    <Service>WMQ_MPGateway</Service>\n" + "    <Domain>richardp</Domain>\n"
+					+ "    <Policy>WMQ_ProcessingPolicy</Policy>\n" + "    <Rule>WMQ_ProcessingPolicy_rule_1</Rule>\n"
+					+ "    <EventType>RECEIVE</EventType>\n"
+					+ "    <Signature>331671a8-b853-4ba8-9a28-399ef639c817</Signature>\n" + "    <Tag>325454247</Tag>\n"
+					+ "    <StartTime datatype=\"Timestamp\" units=\"Milliseconds\">1456267889507</StartTime>\n"
+					+ "    <ResponseMode>0</ResponseMode>\n" + "    <ErrorCode>0x00000000</ErrorCode>\n"
+					+ "    <ErrorSubCode>0x00000000</ErrorSubCode>\n" + "    <ErrorMsg/>\n"
+					+ "    <MsgData format=\"string\">Simple XSL TransformationTest Message</MsgData>\n"
+					+ "</tracking_event>";
+
 			String pName = "testProperty";
 			String pValue = "testValue";
 

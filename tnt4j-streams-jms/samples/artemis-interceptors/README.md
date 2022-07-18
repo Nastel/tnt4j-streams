@@ -15,7 +15,8 @@ Consider your broker has default directories layout, where:
 1. Create `<broker>/etc/tnt4j` dir to store TNT4J-Streams dedicated configuration:
    1. Copy `interceptors.properties` file into that dir.
    1. Copy `logging.properties` file into that dir.
-   1. Copy `parsers.xml` file into that dir.
+   1. Copy `interceptor_parsers.xml` file into that dir.
+   1. Copy `msg_parsers.xml` file into that dir.
    1. Copy `tntj4*.properties` files into that dir.
    1. Copy `tnt-data-source.xml` file into that dir.
 1. Alter `<broker>/etc/tnt4j/tnt4j-streams.properties` file by setting your jKool token in line 
@@ -89,6 +90,46 @@ Interceptors can produce such map layouts:
   property names path. This is **default** layout.
 * `DEEP` - produces map constructed by making dedicated entry value map for complex type properties.
 
+### Parsing message payload
+
+#### `Core` protocol
+
+If there is a need to parse intercepted message payload, you can bind your parser to `Message` field like this:
+1. Define your message payload parser in `msg_parsers.xml` file like this:
+   ```xml
+   <!-- Sample Message XML payload parser -->
+   <parser name="XML_Data_Parser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
+       <field name="EventType" value="NOOP"/>
+
+       <field name="HostName" locator="/tracking_event/HostName" locator-type="Label"/>
+   </parser>
+   ```
+1. Bind parser reference to `Message` field in `interceptor_parsers.xml` file like this:
+   ```xml
+   <field name="Message" locator="packet:message:stringBody" locator-type="Label">
+       <!-- To parse message payload, put your parser reference here -->
+       <parser-ref name="XML_Data_Parser" aggregation="Merge"/>
+   </field>
+   ```
+
+### Message properties
+
+#### `Core` protocol
+
+Intercepted message properties are parsed by `PropertiesParser` parser:
+```xml
+<!-- Message properties parser -->
+<parser name="PropertiesParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+    <field name="EventType" value="NOOP"/>
+
+    <field name="AllProps" locator="#" locator-type="Label"/>
+</parser>
+```
+By default, it performs simple direct properties mapping into produced TNT4J event.
+
+But if there is known set of properties used in messages, here you can define additional mapping logic by defining meaningful property 
+names, transforming values or aggregating multiple properties values.
+
 ## Binding interceptors
 
 Same interceptors can be used for both ActiveMQ Artemis client (producer/consumer) and server (broker) side API interceptions. Naturally 
@@ -160,7 +201,7 @@ Put `tnt4j-streams-jms-<VERSION>-artemis-broker-interceptor.jar` into your broke
       </core>
   </configuration>
   ```
-  There we bind all available TNT4J-Streams interceptors, but you can pick just ones matching your broker enabled acceptor protocols.
+  Here we bind all available TNT4J-Streams interceptors, but you can pick just ones matching your broker enabled acceptor protocols.
 * To define system property `tnt4j.config` pointing where to look for TNT4J configuration edit your broker run script file `artemis.cmd` 
   (or `artemis.sh`) by appending `JVM_ARGS` variable definition:
   * MS Windows

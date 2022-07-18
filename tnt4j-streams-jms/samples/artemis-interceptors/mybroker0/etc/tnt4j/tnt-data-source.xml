@@ -19,7 +19,8 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
-    <resource-ref id="ArtemisInterceptorParsers" type="Parser" uri="parsers.xml"/>
+    <resource-ref id="ArtemisMessageParsers" type="Parser" uri="msg_parsers.xml"/>
+    <resource-ref id="ArtemisInterceptorParsers" type="Parser" uri="interceptor_parsers.xml"/>
 
     <stream name="ArtemisJMSInterceptorStream" class="com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.JMSInterceptorStream">
         <property name="HaltIfNoParser" value="false"/>

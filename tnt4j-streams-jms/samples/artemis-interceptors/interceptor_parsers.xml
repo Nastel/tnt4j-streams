@@ -23,7 +23,7 @@
     <parser name="PropertiesParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="NOOP"/>
 
-        <field name="AllProps" locator="*" locator-type="Label"/>
+        <field name="AllProps" locator="#" locator-type="Label"/>
     </parser>
 
     <!-- Connection attributes parser -->
@@ -52,6 +52,8 @@
         <field name="EventType" value="Event"/>
         <field name="EventName" value="ArtemisStompPacket"/>
 
+        <!--  TODO  -->
+
         <embedded-activity name="ConnectionAttributes" locator="$DATA$" locator-type="Label">
             <parser-ref name="ConnectionParser" aggregation="Merge"/>
         </embedded-activity>
@@ -63,6 +65,8 @@
     <parser name="OpenWireParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="Event"/>
         <field name="EventName" value="ArtemisOpenWirePacket"/>
+
+        <!--  TODO  -->
 
         <embedded-activity name="ConnectionAttributes" locator="$DATA$" locator-type="Label">
             <parser-ref name="ConnectionParser" aggregation="Merge"/>
@@ -76,6 +80,8 @@
         <field name="EventType" value="Event"/>
         <field name="EventName" value="ArtemisMQTTPacket"/>
 
+        <!--  TODO  -->
+
         <embedded-activity name="ConnectionAttributes" locator="$DATA$" locator-type="Label">
             <parser-ref name="ConnectionParser" aggregation="Merge"/>
         </embedded-activity>
@@ -87,6 +93,8 @@
     <parser name="AmqpParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="Event"/>
         <field name="EventName" value="ArtemisAmqpPacket"/>
+
+        <!--  TODO  -->
 
         <embedded-activity name="ConnectionAttributes" locator="$DATA$" locator-type="Label">
             <parser-ref name="ConnectionParser" aggregation="Merge"/>
@@ -136,7 +144,10 @@
         </field>
         <field name="ScheduledDeliveryTime" locator="packet:message:scheduledDeliveryTime" locator-type="Label" datatype="Timestamp"/>
         <field name="GroupId" locator="packet:message:groupID" locator-type="Label"/>
-        <field name="Message" locator="packet:message:stringBody" locator-type="Label"/>
+        <field name="Message" locator="packet:message:stringBody" locator-type="Label">
+            <!-- To parse message payload, put your parser reference here -->
+            <!--parser-ref name="XML_Data_Parser" aggregation="Merge"/-->
+        </field>
         <field name="Priority" locator="packet:message:priority" locator-type="Label" datatype="Number"/>
         <field name="BodySize" locator="packet:message:bodySize" locator-type="Label"/>
         <field name="MsgReplyTo" locator="packet:message:replyTo" locator-type="Label"/>
@@ -271,6 +282,7 @@
         <field name="PacketClass" locator="packet:class" locator-type="Label" datatype="String" transparent="true"/>
         <embedded-activity name="PacketData" locator="$DATA$" locator-type="Label">
             <parser-ref name="PacketParser" aggregation="Merge">
+                <!--matchExp>string:containsAny(${PacketClass}, .core.)</matchExp-->
                 <matchExp>groovy:StringUtils.containsAny(${PacketClass}, ".core.")</matchExp>
             </parser-ref>
             <parser-ref name="AmqpParser" aggregation="Merge">
