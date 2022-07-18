@@ -13,12 +13,15 @@ Consider your broker has default directories layout, where:
 
 1. Copy `tnt4j-streams-jms-<VERSION>-artemis-broker-interceptor.jar` to your broker lib dir `<broker>/lib`.
 1. Create `<broker>/etc/tnt4j` dir to store TNT4J-Streams dedicated configuration:
-   1. Copy `interceptors.properties` file into that dir.
-   1. Copy `logging.properties` file into that dir.
-   1. Copy `interceptor_parsers.xml` file into that dir.
-   1. Copy `msg_parsers.xml` file into that dir.
-   1. Copy `tntj4*.properties` files into that dir.
-   1. Copy `tnt-data-source.xml` file into that dir.
+   * Whole config dir:
+      1. Copy [tnt4j](mybroker0/etc/tnt4j) dir content into that dir.
+   * Files one-by-one:
+      1. Copy [interceptors.properties](mybroker0/etc/tnt4j/interceptors.properties) file into that dir.
+      1. Copy [logging.properties](mybroker0/etc/tnt4j/logging.properties) file into that dir.
+      1. Copy [interceptor_parsers.xml](mybroker0/etc/tnt4j/interceptor_parsers.xml) file into that dir.
+      1. Copy [msg_parsers.xml](mybroker0/etc/tnt4j/msg_parsers.xml) file into that dir.
+      1. Copy [tntj4*.properties](mybroker0/etc/tnt4j/tnt4j.properties) files into that dir.
+      1. Copy [tnt-data-source.xml](mybroker0/etc/tnt4j/tnt-data-source.xml) file into that dir.
 1. Alter `<broker>/etc/tnt4j/tnt4j-streams.properties` file by setting your jKool token in line 
   `event.sink.factory.EventSinkFactory.prod.Token`: replace value `prod-access-token` with your token. 
 1. Alter `<broker>/etc/broker.xml` by changing sections `remoting-incoming-interceptors` and `remoting-outgoing-interceptors`:
