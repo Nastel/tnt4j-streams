@@ -112,14 +112,15 @@ public class NumericFormatter {
 	 * <p>
 	 * Pattern also can be one of number types enumerators: {@code "integer"}, {@code "int"}, {@code "long"},
 	 * {@code "double"}, {@code "float"}, {@code "short"}, {@code "byte"}, {@code "bigint"}, {@code "biginteger"},
-	 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@code "any"}. {@code "any"} will
-	 * resolve any possible numeric value out of provided string, e.g. {@code "30hj00"} will result {@code 30}.
+	 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@value FormatterContext#ANY}.
+	 * {@value FormatterContext#ANY} will resolve any possible numeric value out of provided string, e.g.
+	 * {@code "30hj00"} will result {@code 30}.
 	 * <p>
-	 * {@code "~"} prefixed number type enumerator (except {@code "any"}) means numeric casting shall be performed using
-	 * plain Java API, in some cases resulting significant value loss.
+	 * {@code "~"} prefixed number type enumerator (except {@value FormatterContext#ANY}) means numeric casting shall be
+	 * performed using plain Java API, in some cases resulting significant value loss.
 	 * <p>
-	 * {@code "^"} prefixed number type enumerator (except {@code "any"}) means if value can't be cast to defined type,
-	 * closest upper bound type shall be used to maintain value without significant loss.
+	 * {@code "^"} prefixed number type enumerator (except {@value FormatterContext#ANY}) means if value can't be cast
+	 * to defined type, closest upper bound type shall be used to maintain value without significant loss.
 	 * <p>
 	 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to target
 	 * type, original value is kept.
@@ -215,14 +216,15 @@ public class NumericFormatter {
 	 * <p>
 	 * Pattern also can be one of number types enumerators: {@code "integer"}, {@code "int"}, {@code "long"},
 	 * {@code "double"}, {@code "float"}, {@code "short"}, {@code "byte"}, {@code "bigint"}, {@code "biginteger"},
-	 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@code "any"}. {@code "any"} will
-	 * resolve any possible numeric value out of provided string, e.g. {@code "30hj00"} will result {@code 30}.
+	 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@value FormatterContext#ANY}.
+	 * {@value FormatterContext#ANY} will resolve any possible numeric value out of provided string, e.g.
+	 * {@code "30hj00"} will result {@code 30}.
 	 * <p>
-	 * {@code "~"} prefixed number type enumerator (except {@code "any"}) means numeric casting shall be performed using
-	 * plain Java API, in some cases resulting significant value loss.
+	 * {@code "~"} prefixed number type enumerator (except {@value FormatterContext#ANY}) means numeric casting shall be
+	 * performed using plain Java API, in some cases resulting significant value loss.
 	 * <p>
-	 * {@code "^"} prefixed number type enumerator (except {@code "any"}) means if value can't be cast to defined type,
-	 * closest upper bound type shall be used to maintain value without significant loss.
+	 * {@code "^"} prefixed number type enumerator (except {@value FormatterContext#ANY}) means if value can't be cast
+	 * to defined type, closest upper bound type shall be used to maintain value without significant loss.
 	 * <p>
 	 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to target
 	 * type, original value is kept.
@@ -338,36 +340,38 @@ public class NumericFormatter {
 	 * <li>to cast to {@link java.math.BigDecimal} - {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"}</li>
 	 * </ul>
 	 * <p>
-	 * {@code "~"} prefixed number type enumerator (except {@code "any"}) means numeric casting shall be performed using
-	 * plain Java API, in some cases resulting significant value loss.
+	 * {@code "~"} prefixed number type enumerator (except {@value FormatterContext#ANY}) means numeric casting shall be
+	 * performed using plain Java API, in some cases resulting significant value loss.
 	 * <p>
-	 * {@code "^"} prefixed number type enumerator (except {@code "any"}) means if value can't be cast to defined type,
-	 * closest upper bound type shall be used to maintain value without significant loss.
+	 * {@code "^"} prefixed number type enumerator (except {@value FormatterContext#ANY}) means if value can't be cast
+	 * to defined type, closest upper bound type shall be used to maintain value without significant loss.
 	 * <p>
 	 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to target
 	 * type, original value is kept.
 	 * 
 	 * @param num
 	 *            number value to cast
-	 * @param type
-	 *            number type name to cast number to
+	 * @param typeExpr
+	 *            number type expression containing type name and cast mode prefix
 	 * @return number value cast to desired numeric type
 	 */
-	public static Number castNumber(Number num, String type) {
-		if (StringUtils.isNotEmpty(type)) {
-			Class<? extends Number> nType;
+	public static Number castNumber(Number num, String typeExpr) {
+		if (StringUtils.isNotEmpty(typeExpr)) {
 			CastMode cMode;
+			String type;
 
-			if (type.startsWith(CastMode.API.symbol)) {
-				nType = FormatterContext.NUMBER_TYPES.get(type.substring(1));
+			if (typeExpr.startsWith(CastMode.API.symbol)) {
+				type = typeExpr.substring(1);
 				cMode = CastMode.API;
-			} else if (type.startsWith(CastMode.UP_BOUND.symbol)) {
-				nType = FormatterContext.NUMBER_TYPES.get(type.substring(1));
+			} else if (typeExpr.startsWith(CastMode.UP_BOUND.symbol)) {
+				type = typeExpr.substring(1);
 				cMode = CastMode.UP_BOUND;
 			} else {
-				nType = FormatterContext.NUMBER_TYPES.get(type);
+				type = typeExpr;
 				cMode = CastMode.EXACT;
 			}
+
+			Class<? extends Number> nType = FormatterContext.getNumberClass(type);
 
 			return castNumber(num, nType, cMode);
 		}
@@ -655,6 +659,9 @@ public class NumericFormatter {
 	 * Number formatting context values.
 	 */
 	public static class FormatterContext {
+		/**
+		 * Constant defining generic number type name {@value}.
+		 */
 		public static final String ANY = "any"; // NON-NLS
 
 		private static Map<String, Class<? extends Number>> NUMBER_TYPES = new HashMap<>(13);
@@ -703,13 +710,13 @@ public class NumericFormatter {
 		 * <p>
 		 * Pattern also can be one of number types enumerators: {@code "integer"}, {@code "int"}, {@code "long"},
 		 * {@code "double"}, {@code "float"}, {@code "short"}, {@code "byte"}, {@code "bigint"}, {@code "biginteger"},
-		 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@code "any"}. {@code "any"} will
+		 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@value ANY}. {@value ANY} will
 		 * resolve any possible numeric value out of provided string, e.g. {@code "30hj00"} will result {@code 30}.
 		 * <p>
-		 * {@code "~"} prefixed number type enumerator (except {@code "any"}) means numeric casting shall be performed
+		 * {@code "~"} prefixed number type enumerator (except {@value ANY}) means numeric casting shall be performed
 		 * using plain Java API, in some cases resulting significant value loss.
 		 * <p>
-		 * {@code "^"} prefixed number type enumerator (except {@code "any"}) means if value can't be cast to defined
+		 * {@code "^"} prefixed number type enumerator (except {@value ANY}) means if value can't be cast to defined
 		 * type, closest upper bound type shall be used to maintain value without significant loss.
 		 * <p>
 		 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to
@@ -727,13 +734,13 @@ public class NumericFormatter {
 		 * <p>
 		 * Pattern also can be one of number types enumerators: {@code "integer"}, {@code "int"}, {@code "long"},
 		 * {@code "double"}, {@code "float"}, {@code "short"}, {@code "byte"}, {@code "bigint"}, {@code "biginteger"},
-		 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@code "any"}. {@code "any"} will
+		 * {@code "bint"}, {@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} and {@value ANY}. {@value ANY} will
 		 * resolve any possible numeric value out of provided string, e.g. {@code "30hj00"} will result {@code 30}.
 		 * <p>
-		 * {@code "~"} prefixed number type enumerator (except {@code "any"}) means numeric casting shall be performed
+		 * {@code "~"} prefixed number type enumerator (except {@value ANY}) means numeric casting shall be performed
 		 * using plain Java API, in some cases resulting significant value loss.
 		 * <p>
-		 * {@code "^"} prefixed number type enumerator (except {@code "any"}) means if value can't be cast to defined
+		 * {@code "^"} prefixed number type enumerator (except {@value ANY}) means if value can't be cast to defined
 		 * type, closest upper bound type shall be used to maintain value without significant loss.
 		 * <p>
 		 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to
@@ -753,7 +760,7 @@ public class NumericFormatter {
 			if (numNamePattern) {
 				String numName = pattern.startsWith(CastMode.API.symbol) || pattern.startsWith(CastMode.UP_BOUND.symbol)
 						? pattern.substring(1) : pattern;
-				numNamePattern = NUMBER_TYPES.get(numName.toLowerCase()) != null;
+				numNamePattern = getNumberClass(numName) != null;
 			}
 
 			if (!numNamePattern) {
@@ -801,6 +808,27 @@ public class NumericFormatter {
 			// : new DecimalFormat(GENERIC_NUMBER_PATTERN, new DecimalFormatSymbols(loc));
 
 			return loc == null ? NumberFormat.getNumberInstance() : NumberFormat.getNumberInstance(loc);
+		}
+
+		/**
+		 * Resolves number class for provided number type name. Supported number type names are:
+		 * <ul>
+		 * <li>{@code "int"} or {@code "integer"} for {@link Integer}</li>
+		 * <li>{@code "long"} for {@link Long}</li>
+		 * <li>{@code "double"} for {@link Double}</li>
+		 * <li>{@code "float"} for {@link Float}</li>
+		 * <li>{@code "byte"} for {@link Byte}</li>
+		 * <li>{@code "bigint"}, {@code "biginteger"}, {@code "bint"} for {@link BigInteger}</li>
+		 * <li>{@code "bigdec"}, {@code "bigdecimal"}, {@code "bdec"} for {@link BigDecimal}</li>
+		 * <li>{@value ANY} for {@link Number}</li>
+		 * </ul>
+		 * 
+		 * @param type
+		 *            number class type name
+		 * @return number class for provided type name
+		 */
+		private static Class<? extends Number> getNumberClass(String type) {
+			return NUMBER_TYPES.get(type.toLowerCase());
 		}
 	}
 
