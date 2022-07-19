@@ -256,19 +256,19 @@ under the License.
       -->
 
     <remoting-incoming-interceptors>
-	   <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.PacketInterceptor</class-name>
-	   <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.AmqpInterceptor</class-name>
-	   <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.MQTTInterceptor</class-name>
-	   <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.OpenWireInterceptor</class-name>
-	   <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.StompInterceptor</class-name>
-	</remoting-incoming-interceptors>
+       <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.PacketInterceptor</class-name>
+       <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.AmqpInterceptor</class-name>
+       <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.MQTTInterceptor</class-name>
+       <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.OpenWireInterceptor</class-name>
+       <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.StompInterceptor</class-name>
+    </remoting-incoming-interceptors>
 
-	<remoting-outgoing-interceptors>
-	   <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.PacketInterceptor</class-name>
-	   <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.AmqpInterceptor</class-name>
-	   <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.MQTTInterceptor</class-name>
-	   <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.OpenWireInterceptor</class-name>
-	   <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.StompInterceptor</class-name>
-	</remoting-outgoing-interceptors>
+    <remoting-outgoing-interceptors>
+       <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.PacketInterceptor</class-name>
+       <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.AmqpInterceptor</class-name>
+       <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.MQTTInterceptor</class-name>
+       <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.OpenWireInterceptor</class-name>
+       <class-name>com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis.StompInterceptor</class-name>
+    </remoting-outgoing-interceptors>
    </core>
 </configuration>
