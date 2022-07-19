@@ -14,13 +14,14 @@
     <artifactId>tnt4j-streams-jms</artifactId>
 
     <properties>
-        <jakarta.jms.version>2.0.3</jakarta.jms.version>
-        <artemis.version>2.19.1</artemis.version>
+        <jakarta.jms.version>2.0.3</jakarta.jms.version> <!-- 3.0.x changes javax packages to jakarta -->
+        <artemis.version>2.19.1</artemis.version>   <!-- 2.20.x requires java 11 -->
 
-        <solace.version>10.14.0</solace.version>
+        <activemq.version>5.16.5</activemq.version>   <!-- 5.17.x requires java 11 -->
+        <solace.version>10.15.0</solace.version>
         <rabbitmq.version>2.4.0</rabbitmq.version>
         <zeromq.version>3.0.1-RELEASE</zeromq.version>
-        <rocketmq.version>4.9.3</rocketmq.version>
+        <rocketmq.version>4.9.4</rocketmq.version>
     </properties>
 
     <build>
@@ -275,6 +276,23 @@
             <scope>test</scope>
         </dependency>
 
+        <!--  Optional JMS implementations -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-client</artifactId>
+            <version>${activemq.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-jms_1.1_spec</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>com.solacesystems</groupId>
             <artifactId>sol-jms</artifactId>
