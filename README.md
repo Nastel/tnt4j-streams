@@ -6789,6 +6789,14 @@ Modules list:
          <version>1.14.1</version>
      </dependency>
   ```
+* `Servlet` (M) - integration into custom API sample module. Maven dependency:
+  ```xml
+     <dependency>
+         <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+         <artifactId>tnt4j-streams-servlet</artifactId>
+         <version>1.14.1</version>
+     </dependency>
+  ```
 * `Snappy` (O) - integration into custom API sample module. Maven dependency:
   ```xml
      <dependency>
