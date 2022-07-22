@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2014-2022 JKOOL, LLC.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
+
+    <!--  Pre-parser to decompress Snappy packet of binary data -->
+    <java-object name="SnappyBinPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.SnappyBinaryPreParser"/>
+
+    <!--  Pre-parser to decompress Snappy packet of text data -->
+    <java-object name="SnappyToStringPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.SnappyBinaryPreParser">
+        <param name="charsetName" type="java.lang.String" value="UTF-8"/>
+    </java-object>
+
+    <!--  Pre-parser to decompress Snappy input stream of binary data -->
+    <java-object name="SnappyInputStreamPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.SnappyInputStreamPreParser"/>
+
+    <!--  Pre-parser to decompress Snappy input stream of text data -->
+    <java-object name="SnappyInputStreamToStringPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.SnappyInputStreamPreParser">
+        <param name="charsetName" type="java.lang.String" value="UTF-8"/>
+    </java-object>
+
+    <parser name="SnappyCompressedMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
+        <reference name="SnappyToStringPreParser"/>
+
+        <!-- fields mapping goes here ... -->
+    </parser>
+
+    <parser name="MetricsParserStr" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
+        <!-- fields mapping goes here ...  -->
+    </parser>
+
+    <parser name="MetricsRequestParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <property name="ActivityDelim" value="EOF"/>
+
+        <field name="EventType" value="NOOP"/>
+        <field name="MetricsData" locator="ActivityData" locator-type="Label" datatype="AsInput" transparent="true">
+            <parser-ref name="SnappyCompressedMetricsParser" aggregation="Merge">
+                <matchExp><![CDATA[groovy:
+                    $fieldValue != null && $fieldValue.getClass().isArray()
+                ]]></matchExp>
+            </parser-ref>
+            <parser-ref name="MetricsParserStr" aggregation="Merge"/>
+        </field>
+    </parser>
+
+</tnt-data-source>

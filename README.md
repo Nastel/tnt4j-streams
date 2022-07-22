@@ -50,6 +50,7 @@ Why TNT4J-Streams
     * JDBC
     * [Chronicle Queue](https://chronicle.software/products/queue/)
     * Artemis Broker or Producer/Consumer interceptor
+    * Snappy compressed binary data or input stream
 
 * Files (including provided by HDFS and JSR-203 FileSystem) can be streamed:
     * as "whole at once" - when a stream starts, it reads file contents line by line meaning a single file line holds data of a single
@@ -78,6 +79,7 @@ Why TNT4J-Streams
 
 * Redirect streamed data from different TNT4J based producer APIs like `tnt4j-stream-*` - to be TNT4J based streams concentrator.
 * Run TNT4J-Streams as system daemon service.
+* Run TNT4J-Streams as HTTP `POST` requests consumer servlet.
 
 Importing TNT4J-Streams project into IDE
 ======================================
@@ -6787,6 +6789,14 @@ Modules list:
          <version>1.14.1</version>
      </dependency>
   ```
+* `Snappy` (O) - integration into custom API sample module. Maven dependency:
+  ```xml
+     <dependency>
+         <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+         <artifactId>tnt4j-streams-snappy</artifactId>
+         <version>1.14.1</version>
+     </dependency>
+  ```
 * `Samples` (O) - integration into custom API sample module. Maven dependency:
   ```xml
      <dependency>
@@ -6886,6 +6896,8 @@ Maven tests run is disabled by default. To enable Maven to run tests set Maven c
 * in `ws` module run JUnit test suite named `AllWsStreamTests`
 * in `msoffice` module run JUnit test suite named `AllMsOfficeStreamTests`
 * in `chronicle` module run JUnit test suite named `AllChronicleStreamTests`
+* in `servlet` module run JUnit test suite named `AllServletStreamTests`
+* in `snappy` module run JUnit test suite named `AllSnappyStreamTests` 
 
 Known Projects Using TNT4J-STREAMS
 ===============================================
