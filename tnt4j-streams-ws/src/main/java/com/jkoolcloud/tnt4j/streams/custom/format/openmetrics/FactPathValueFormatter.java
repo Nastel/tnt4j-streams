@@ -197,7 +197,7 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 	@Override
 	protected String getSnapNameStr(Snapshot snap) {
 		String objCanonName = snap.getName();
-		if (Utils.isEmpty(objCanonName)) {
+		if (StringUtils.isEmpty(objCanonName)) {
 			return objCanonName;
 		}
 
@@ -293,7 +293,7 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 	 * @return appended path string builder instance
 	 */
 	protected StringBuilder appendPath(StringBuilder pathBuilder, String pathToken) {
-		if (!Utils.isEmpty(pathToken)) {
+		if (StringUtils.isNotEmpty(pathToken)) {
 			pathBuilder.append(pathBuilder.length() > 0 ? PATH_DELIM : "").append(pathToken);
 		}
 

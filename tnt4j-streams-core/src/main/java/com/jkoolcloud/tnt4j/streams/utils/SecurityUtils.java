@@ -194,7 +194,7 @@ public class SecurityUtils {
 				continue;
 			}
 
-			if (arg.equals(PARAM_ENCRYPT) || arg.equals(PARAM_ENCRYPT2)) {
+			if (StringUtils.equalsAny(arg, PARAM_ENCRYPT, PARAM_ENCRYPT2)) {
 				if (StringUtils.isNotEmpty(cmd)) {
 					System.out.println(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
 							"SecurityUtils.invalid.args"));
@@ -203,7 +203,7 @@ public class SecurityUtils {
 				}
 
 				cmd = arg;
-			} else if (arg.equals(PARAM_DECRYPT) || arg.equals(PARAM_DECRYPT2)) {
+			} else if (StringUtils.equalsAny(arg, PARAM_DECRYPT, PARAM_DECRYPT2)) {
 				if (StringUtils.isNotEmpty(cmd)) {
 					System.out.println(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
 							"SecurityUtils.invalid.args"));
@@ -212,7 +212,7 @@ public class SecurityUtils {
 				}
 
 				cmd = arg;
-			} else if (PARAM_HELP1.equals(arg) || PARAM_HELP2.equals(arg)) {
+			} else if (StringUtils.equalsAny(arg, PARAM_HELP1, PARAM_HELP2)) {
 				printUsage();
 				return false;
 			} else if (arg.startsWith("-")) { // NON-NLS

@@ -2009,7 +2009,7 @@ public class ConfigParserHandler extends DefaultHandler {
 				currParser.setProperties(applyVariableProperties(currProperties.remove(qName)));
 				currParser.organizeFields();
 				currParser = null;
-			} else if (FIELD_ELMT.equals(qName) || EMBEDDED_ACTIVITY_ELMT.equals(qName)) {
+			} else if (StringUtils.equalsAny(qName, FIELD_ELMT, EMBEDDED_ACTIVITY_ELMT)) {
 				if (currField != null) {
 					handleActivityField(currField, qName);
 					currParser.addField(currField.field);

@@ -603,7 +603,7 @@ public final class StreamsAgent {
 				osPipeInput = true;
 			} else if (PARAM_SKIP_UNPARSED.equals(arg)) {
 				haltOnUnparsed = false;
-			} else if (PARAM_HELP1.equals(arg) || PARAM_HELP2.equals(arg)) {
+			} else if (StringUtils.equalsAny(arg, PARAM_HELP1, PARAM_HELP2)) {
 				printUsage();
 				return false;
 			} else {

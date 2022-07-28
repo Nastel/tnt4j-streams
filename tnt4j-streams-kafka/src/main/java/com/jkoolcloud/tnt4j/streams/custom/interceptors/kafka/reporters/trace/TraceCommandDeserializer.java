@@ -206,7 +206,7 @@ public class TraceCommandDeserializer implements Deserializer<TraceCommandDeseri
 		 * @return {@code true} if topic matches messages tracing command state, {@code false} - otherwise
 		 */
 		public boolean match(String topic, boolean needMarkCount) {
-			if (topic.equals(this.topic) || this.topic.equals(MASTER_CONFIG)) {
+			if (StringUtils.equalsAny(this.topic, topic, MASTER_CONFIG)) {
 				if (count != null) {
 					if (needMarkCount) {
 						count--;
