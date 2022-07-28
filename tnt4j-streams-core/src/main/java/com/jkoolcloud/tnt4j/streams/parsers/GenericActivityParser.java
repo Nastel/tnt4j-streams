@@ -1372,9 +1372,14 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 				if (fpParser.isUsingParserForInput()) {
 					data = getNextActivityString(data);
 				}
-				for (ActivityDataPreParser<Object, Object> preParser : preParsers) {
+				for (int pId = 0; pId < preParsers.size(); pId++) {
+					ActivityDataPreParser<Object, ?> preParser = preParsers.get(pId);
 					boolean validData = preParser.isDataClassSupported(data);
-					boolean logicalValid = isLogicalTypeSupported(preParser.dataTypeReturned());
+					boolean logicalValid = pId < preParsers.size() - 1;
+
+					if (!logicalValid) {
+						logicalValid = isLogicalTypeSupported(preParser.dataTypeReturned());
+					}
 					if (validData && logicalValid) {
 						logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 								"ActivityParser.pre.parsing.data", Utils.getName(preParser));
@@ -1396,7 +1401,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	}
 
 	protected boolean isLogicalTypeSupported(String logicalType) {
-		return logicalType == null || "OBJECT".equals(logicalType) // NON-NLS
+		return StringUtils.equalsAny(logicalType, null, "OBJECT", "BINARY", "TEXT") // NON-NLS
 				|| ArrayUtils.contains(getActivityDataType(), logicalType);
 	}
 
