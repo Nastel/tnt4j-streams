@@ -241,161 +241,161 @@ Sample:
 ### Predefined fields set
 
 ```java
-    /**
+/**
  * Name of application associated with the activity.
  */
-    ApplName(String.class),
+ApplName(String.class),
 
-	/**
-	 * Host name of server to associate with activity.
-	 */
-	ServerName(String.class),
+/**
+ * Host name of server to associate with activity.
+ */
+ServerName(String.class),
 
-	/**
-	 * IP Address of server to associate with activity.
-	 */
-	ServerIp(String.class),
+/**
+ * IP Address of server to associate with activity.
+ */
+ServerIp(String.class),
 
-	/**
-	 * Name to assign to activity entry. Examples are operation, method, API call, event, etc.
-	 */
-	EventName(String.class),
+/**
+ * Name to assign to activity entry. Examples are operation, method, API call, event, etc.
+ */
+EventName(String.class),
 
-	/**
-	 * Type of activity - value must match values in {@link com.jkoolcloud.tnt4j.core.OpType} enumeration.
-	 */
-	EventType(Enum.class),
+/**
+ * Type of activity - value must match values in {@link com.jkoolcloud.tnt4j.core.OpType} enumeration.
+ */
+EventType(Enum.class),
 
-	/**
-	 * Status of activity - value must match values in {@link com.jkoolcloud.tnt4j.core.ActivityStatus} enumeration.
-	 */
-	EventStatus(Enum.class),
+/**
+ * Status of activity - value must match values in {@link com.jkoolcloud.tnt4j.core.ActivityStatus} enumeration.
+ */
+EventStatus(Enum.class),
 
-	/**
-	 * Time action associated with activity started.
-	 */
-	StartTime(UsecTimestamp.class),
+/**
+ * Time action associated with activity started.
+ */
+StartTime(UsecTimestamp.class),
 
-	/**
-	 * Time action associated with activity ended.
-	 */
-	EndTime(UsecTimestamp.class),
+/**
+ * Time action associated with activity ended.
+ */
+EndTime(UsecTimestamp.class),
 
-	/**
-	 * Elapsed time of the activity in microseconds.
-	 */
-	ElapsedTime(Long.class),
+/**
+ * Elapsed time of the activity in microseconds.
+ */
+ElapsedTime(Long.class),
 
-	/**
-	 * Identifier of process where activity event has occurred.
-	 */
-	ProcessId(Integer.class),
+/**
+ * Identifier of process where activity event has occurred.
+ */
+ProcessId(Integer.class),
 
-	/**
-	 * Identifier of thread where activity event has occurred.
-	 */
-	ThreadId(Integer.class),
+/**
+ * Identifier of thread where activity event has occurred.
+ */
+ThreadId(Integer.class),
 
-	/**
-	 * Indicates completion status of the activity - value must match values in {@link com.jkoolcloud.tnt4j.core.OpCompCode} enumeration.
-	 */
-	CompCode(Enum.class),
+/**
+ * Indicates completion status of the activity - value must match values in {@link com.jkoolcloud.tnt4j.core.OpCompCode} enumeration.
+ */
+CompCode(Enum.class),
 
-	/**
-	 * Numeric reason/error code associated with the activity.
-	 */
-	ReasonCode(Integer.class),
+/**
+ * Numeric reason/error code associated with the activity.
+ */
+ReasonCode(Integer.class),
 
-	/**
-	 * Error/exception message associated with the activity.
-	 */
-	Exception(String.class),
+/**
+ * Error/exception message associated with the activity.
+ */
+Exception(String.class),
 
-	/**
-	 * Indicates completion status of the activity - value can either be label from {@link com.jkoolcloud.tnt4j.core.OpLevel} enumeration 
-	 * or a numeric value.
-	 */
-	Severity(Enum.class),
+/**
+ * Indicates completion status of the activity - value can either be label from {@link com.jkoolcloud.tnt4j.core.OpLevel} enumeration 
+ * or a numeric value.
+ */
+Severity(Enum.class),
 
-	/**
-	 * Location that activity occurred at.
-	 */
-	Location(String.class),
+/**
+ * Location that activity occurred at.
+ */
+Location(String.class),
 
-	/**
-	 * Identifier used to correlate/relate activity entries to group them into logical entities.
-	 */
-	Correlator(String[].class),
+/**
+ * Identifier used to correlate/relate activity entries to group them into logical entities.
+ */
+Correlator(String[].class),
 
-	/**
-	 * User-defined label to associate with the activity, generally for locating activity.
-	 */
-	Tag(String[].class),
+/**
+ * User-defined label to associate with the activity, generally for locating activity.
+ */
+Tag(String[].class),
 
-	/**
-	 * Name of user associated with the activity.
-	 */
-	UserName(String.class),
+/**
+ * Name of user associated with the activity.
+ */
+UserName(String.class),
 
-	/**
-	 * Name of resource associated with the activity.
-	 */
-	ResourceName(String.class),
+/**
+ * Name of resource associated with the activity.
+ */
+ResourceName(String.class),
 
-	/**
-	 * User data to associate with the activity.
-	 */
-	Message(String.class),
+/**
+ * User data to associate with the activity.
+ */
+Message(String.class),
 
-	/**
-	 * Identifier used to uniquely identify the data associated with this activity.
-	 */
-	TrackingId(String.class),
+/**
+ * Identifier used to uniquely identify the data associated with this activity.
+ */
+TrackingId(String.class),
 
-	/**
-	 * Length of activity event message data.
-	 */
-	MsgLength(Integer.class),
+/**
+ * Length of activity event message data.
+ */
+MsgLength(Integer.class),
 
-	/**
-	 * MIME type of activity event message data.
-	 */
-	MsgMimeType(String.class),
+/**
+ * MIME type of activity event message data.
+ */
+MsgMimeType(String.class),
 
-	/**
-	 * Encoding of activity event message data.
-	 */
-	MsgEncoding(String.class),
+/**
+ * Encoding of activity event message data.
+ */
+MsgEncoding(String.class),
 
-	/**
-	 * CharSet of activity event message data.
-	 */
-	MsgCharSet(String.class),
+/**
+ * CharSet of activity event message data.
+ */
+MsgCharSet(String.class),
 
-	/**
-	 * Age of activity event message.
-	 */
-	MessageAge(Long.class),
+/**
+ * Age of activity event message.
+ */
+MessageAge(Long.class),
 
-	/**
-	 * Activity event category name.
-	 */
-	Category(String.class),
+/**
+ * Activity event category name.
+ */
+Category(String.class),
 
-	/**
-	 * Identifier used to uniquely identify parent activity associated with this activity.
-	 */
-	ParentId(String.class),
+/**
+ * Identifier used to uniquely identify parent activity associated with this activity.
+ */
+ParentId(String.class),
 
-	/**
-	 * Identifier used to globally identify the data associated with this activity.
-	 */
-	Guid(String.class),
+/**
+ * Identifier used to globally identify the data associated with this activity.
+ */
+Guid(String.class),
 
-	/**
-	 * Stream activity entity time-to-live attribute.
-	 */
-	TTL(Long.class);
+/**
+ * Stream activity entity time-to-live attribute.
+ */
+TTL(Long.class);
 ```
 
 **NOTE:** `EventType` field is mandatory and can't have value `null`. If this field value resolves to `null` then streams automatically sets
@@ -412,22 +412,22 @@ Sample:
 ### Field locator types
 
 ```java
-    /**
-     * Indicates that raw data value is the value of a named property of the current stream.
-     */
-    StreamProp(String.class),
+/**
+ * Indicates that raw data value is the value of a named property of the current stream.
+ */
+StreamProp(String.class),
 
-	/**
-	 * Indicates that raw data value is at a specified index location, offset, etc. This is a generic index/offset value whose 
-	 * interpretation is up to the specific parser applying the locator. It also can be index of RegEx group.
-	 */
-	Index(Integer.class),
+/**
+ * Indicates that raw data value is at a specified index location, offset, etc. This is a generic index/offset value whose 
+ * interpretation is up to the specific parser applying the locator. It also can be index of RegEx group.
+ */
+Index(Integer.class),
 
-	/**
-	 * Indicates that raw data value is the value of a particular key or label. Examples of this are XPath expressions for XML elements, 
-	 * and where each element of a raw activity data string is a name/value pair. It also can be name of RegEx group.
-	 */
-	Label(String.class),
+/**
+ * Indicates that raw data value is the value of a particular key or label. Examples of this are XPath expressions for XML elements, 
+ * and where each element of a raw activity data string is a name/value pair. It also can be name of RegEx group.
+ */
+Label(String.class),
 
 /**
  * Indicates that raw data value is the value of a specific regular expression match, for parsers that interpret the
@@ -437,37 +437,37 @@ Sample:
  * @deprecated use {@link #Label} instead. 
  */
 @Deprecated
-    REMatchId(String.class),
+REMatchId(String.class),
 
-	/**
-	 * Indicates that data value is the value from stream stored cache with specified cache entry key.
-	 */
-	Cache(String.class),
+/**
+ * Indicates that data value is the value from stream stored cache with specified cache entry key.
+ */
+Cache(String.class),
 
-	/**
-	 * Indicates that data value is the value from currently processed activity data entity with specified entity field name.
-	 */
-	Activity(String.class),
+/**
+ * Indicates that data value is the value from currently processed activity data entity with specified entity field name.
+ */
+Activity(String.class),
 
-	/**
-	 * Indicates that data value shall be evaluated by using provided expression for parser context data.
-	 */
-	Expression(String.class),
+/**
+ * Indicates that data value shall be evaluated by using provided expression for parser context data.
+ */
+Expression(String.class),
 
-	/**
-	 * Indicates that raw data value is the value of a named property of the current parser.
-	 */
-	ParserProp(String.class),
+/**
+ * Indicates that raw data value is the value of a named property of the current parser.
+ */
+ParserProp(String.class),
 
-	/**
-	 * Indicates that raw data value is the value of a named JVM System property.
-	 */
-	SystemProp(String.class),
+/**
+ * Indicates that raw data value is the value of a named JVM System property.
+ */
+SystemProp(String.class),
 
-	/**
-	 * Indicates that raw data value is the value of a named OS Environment variable.
-	 */
-	EnvVariable(String.class);
+/**
+ * Indicates that raw data value is the value of a named OS Environment variable.
+ */
+EnvVariable(String.class);
 ```
 
 **NOTE:** `Index` is default value and may be suppressed in field/locator definition:
@@ -809,14 +809,14 @@ You may also define your own customized XPath functions. To do this your API has
 e.g.:
 ```java
 public class YourTransform implements XPathFunction {
-	@Override
-	public Object evaluate (List args) {
-		// retrieve expression code provided arguments and make transformation here.
-	}
+    @Override
+    public Object evaluate (List args) {
+        // retrieve expression code provided arguments and make transformation here.
+    }
 }
 ...
-	StreamsXMLUtils.registerCustomFunction("yourTransformation",new YourTransform());
-	...
+    StreamsXMLUtils.registerCustomFunction("yourTransformation",new YourTransform());
+    ...
 ```
 then you can use it from stream configuration:
 ```xml
@@ -4452,7 +4452,7 @@ Configuration requires two steps:
 #### Kafka sink configuration
 
 ```properties
-    #### Kafka event sink factory configuration ####
+#### Kafka event sink factory configuration ####
 event.sink.factory:com.jkoolcloud.tnt4j.sink.impl.kafka.KafkaEventSinkFactory
 event.sink.factory.propFile:<YOUR PATH>/tnt4j-kafka.properties
 event.sink.factory.topic:<YOUR TOPIC>
@@ -4462,7 +4462,7 @@ event.sink.factory.topic:<YOUR TOPIC>
 #### MQTT sink configuration
 
 ```properties
-    #### MQTT event sink factory configuration ####
+#### MQTT event sink factory configuration ####
 event.sink.factory:com.jkoolcloud.tnt4j.sink.impl.mqtt.MqttEventSinkFactory
 event.sink.factory.mqtt-server-url:<YOUR MQTT SERVER ULR> #
 event.sink.factory.mqtt-topic:<YOUR TOPIC> #
@@ -5425,73 +5425,73 @@ Sample:
 </scenario>
 <!-- Sample scenario for SOAP services request -->
 <scenario name="Sample WS stream scenario">
-	<step name="Step 1"
-	      url="http://wsdot.wa.gov/traffic/api/WeatherInformation/WeatherInformation.svc">
-	    <schedule-simple interval="35" units="Seconds" repeatCount="10"/>
-	    <request>
-	        <![CDATA[
-	                SOAPAction:http://tempuri.org/IWeatherInformation/GetCurrentWeatherInformationByStationID
-	                <tem:GetCurrentWeatherInformationByStationID xmlns:tem="http://tempuri.org/">
-	                    <tem:AccessCode>aeb652b7-f6f5-49e6-9bdb-e2b737ebd507</tem:AccessCode>
-	                    <tem:StationID>1909</tem:StationID>
-	                </tem:GetCurrentWeatherInformationByStationID>
-	            ]]>
-	    </request>
-	</step>
+    <step name="Step 1"
+          url="http://wsdot.wa.gov/traffic/api/WeatherInformation/WeatherInformation.svc">
+        <schedule-simple interval="35" units="Seconds" repeatCount="10"/>
+        <request>
+            <![CDATA[
+                    SOAPAction:http://tempuri.org/IWeatherInformation/GetCurrentWeatherInformationByStationID
+                    <tem:GetCurrentWeatherInformationByStationID xmlns:tem="http://tempuri.org/">
+                        <tem:AccessCode>aeb652b7-f6f5-49e6-9bdb-e2b737ebd507</tem:AccessCode>
+                        <tem:StationID>1909</tem:StationID>
+                    </tem:GetCurrentWeatherInformationByStationID>
+                ]]>
+        </request>
+    </step>
 </scenario>
 <!-- Sample scenario for System Cmd invocation -->
 <scenario name="Sample CMD stream scenario">
-	<step name="Step Windows">
-	    <request>typeperf "\Processor(_Total)\% Processor Time" -sc 1</request>
-	    <schedule-simple interval="25" units="Seconds" repeatCount="-1"/>
-	</step>
+    <step name="Step Windows">
+        <request>typeperf "\Processor(_Total)\% Processor Time" -sc 1</request>
+        <schedule-simple interval="25" units="Seconds" repeatCount="-1"/>
+    </step>
 </scenario>
 <!-- Sample of request and parser mapping -->
 <scenario name="RabbitMQ Sampling scenario">
-	<step name="All RabbitMQ metrics">
-	    <schedule-simple interval="30" units="Seconds" repeatCount="-1"/>
+    <step name="All RabbitMQ metrics">
+        <schedule-simple interval="30" units="Seconds" repeatCount="-1"/>
 
-	    <request>
-	        python rabbitmqadmin -f raw_json list users
+        <request>
+            python rabbitmqadmin -f raw_json list users
 
-	        <parser-ref name="UsersRespParser"/>
-	    </request>
-	    <request>
-	        python rabbitmqadmin -f raw_json list vhosts
+            <parser-ref name="UsersRespParser"/>
+        </request>
+        <request>
+            python rabbitmqadmin -f raw_json list vhosts
 
-	        <parser-ref name="HostsRespParser"/>
-	    </request>
-	    <request>
-	        python rabbitmqadmin -f raw_json list overview
+            <parser-ref name="HostsRespParser"/>
+        </request>
+        <request>
+            python rabbitmqadmin -f raw_json list overview
 
-	        <parser-ref name="OverviewRespParser"/>
-	    </request>
-	</step>
+            <parser-ref name="OverviewRespParser"/>
+        </request>
+    </step>
 </scenario>
 <!-- Sample scenario for JDBC query invocation -->
 <scenario name="Sample DB2-JDBC stream scenario">
-	<step name="Step Query1" url="jdbc:db2://[HOST]:50000/SB2BIDB" username="[USER_NAME]" password="[USER_PASS]">
-	    <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="3" startDelayUnits="Minutes"/>
+    <step name="Step Query1" url="jdbc:db2://[HOST]:50000/SB2BIDB" username="[USER_NAME]" password="[USER_PASS]">
+        <schedule-simple interval="60" units="Seconds" repeatCount="-1" startDelay="3" startDelayUnits="Minutes"/>
 
-	    <request>
-	        <![CDATA[
-	            SELECT *
-	            FROM TRANS_DATA
-	            WHERE CREATION_DATE > ?
-	            ORDER by CREATION_DATE DESC
-	            FETCH FIRST 100 ROWS ONLY
-	        ]]>
-	        <req-param id="1" value="${LastRecordCDate}" type="TIMESTAMP"/>
+        <request>
+            <![CDATA[
+                SELECT *
+                FROM TRANS_DATA
+                WHERE CREATION_DATE > ?
+                ORDER by CREATION_DATE DESC
+                FETCH FIRST 100 ROWS ONLY
+            ]]>
+            <req-param id="1" value="${LastRecordCDate}" type="TIMESTAMP"/>
 
-	        <condition id="When to stop stream" resolution="STOP">
-	            <matchExp><![CDATA[
-	                {LastRecordIndex} > 2000
-	            ]]></matchExp>
-	        </condition>
+            <condition id="When to stop stream" resolution="STOP">
+                <matchExp><![CDATA[
+                    {LastRecordIndex} > 2000
+                ]]></matchExp>
+            </condition>
 
-	        <parser-ref name="SampleResultSetParser"/>
-	    </request>
-	</step>
+            <parser-ref name="SampleResultSetParser"/>
+        </request>
+    </step>
 </scenario>
 ```
 
@@ -5882,7 +5882,7 @@ or defining named RegEx group mapping for log pattern token:
 RegEx group names and log pattern tokens mapping:
 
 |    Label (RegEx group name)    |    Format String    |    Description    |
-|	---	|	---	|	---	|
+|    ---    |    ---    |    ---    |
 |    address    |    %a    |    Client IP address of the request (see the mod_remoteip module).    |
 |    local_address    |    %A    |    Local IP-address.    |
 |    size    |    %B    |    Size of response in bytes, excluding HTTP headers.    |
