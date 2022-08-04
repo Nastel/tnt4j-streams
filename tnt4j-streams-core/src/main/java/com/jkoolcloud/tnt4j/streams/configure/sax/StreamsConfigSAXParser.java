@@ -152,7 +152,7 @@ public final class StreamsConfigSAXParser {
 	 *             if there is an error reading the configuration data
 	 */
 	public static Map<OpLevel, List<SAXParseException>> validate(InputStream config) throws SAXException, IOException {
-		Map<OpLevel, List<SAXParseException>> validationErrors = new HashMap<>();
+		Map<OpLevel, List<SAXParseException>> validationErrors = new EnumMap<>(OpLevel.class);
 		try {
 			SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			Schema schema = factory.newSchema();
@@ -174,11 +174,8 @@ public final class StreamsConfigSAXParser {
 				}
 
 				private void handleValidationError(OpLevel level, SAXParseException exception) {
-					List<SAXParseException> lErrorsList = validationErrors.get(level);
-					if (lErrorsList == null) {
-						lErrorsList = new ArrayList<>();
-						validationErrors.put(level, lErrorsList);
-					}
+					List<SAXParseException> lErrorsList = validationErrors.computeIfAbsent(level,
+							k -> new ArrayList<>());
 
 					lErrorsList.add(exception);
 				}
