@@ -26,6 +26,7 @@ import java.util.concurrent.CountDownLatch;
 import org.apache.commons.collections4.CollectionUtils;
 import org.xml.sax.SAXException;
 
+import com.jkoolcloud.tnt4j.config.TrackerConfigStore;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.core.Trackable;
 import com.jkoolcloud.tnt4j.sink.EventSink;
@@ -34,13 +35,14 @@ import com.jkoolcloud.tnt4j.streams.configure.OutputProperties;
 import com.jkoolcloud.tnt4j.streams.configure.StreamsConfigLoader;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.inputs.*;
+import com.jkoolcloud.tnt4j.streams.management.MBeansManager;
 import com.jkoolcloud.tnt4j.streams.outputs.OutputStreamListener;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
- * This class implements a default directory files streaming job. In general it defines stream configuration attributes
+ * This class implements a default directory files streaming job. In general, it defines stream configuration attributes
  * and initiates new stream thread when job gets invoked by executor service.
  *
  * @version $Revision: 1 $
@@ -53,7 +55,7 @@ public class DefaultStreamingJob implements StreamingJob {
 	private File streamCfgFile;
 	private UUID jobId;
 
-	private String tnt4jCfgFilePath;
+	private String tnt4jCfgFilePath = System.getProperty(TrackerConfigStore.TNT4J_PROPERTIES_KEY);
 
 	private Collection<TNTInputStream<?, ?>> streams;
 	private Collection<StreamingJobListener> jobListeners;
@@ -114,23 +116,35 @@ public class DefaultStreamingJob implements StreamingJob {
 						"StreamsAgent.no.activity.streams"));
 			}
 
+			MBeansManager.registerMBeans();
+
 			StreamThread ft;
-			DefaultStreamListener dsl = new DefaultStreamListener();
+			StreamEventsRedirectListener serl = new StreamEventsRedirectListener();
 
 			for (TNTInputStream<?, ?> stream : streams) {
-				stream.addStreamListener(dsl);
+				stream.addStreamListener(serl);
 
 				stream.output().setProperty(OutputProperties.PROP_TNT4J_CONFIG_FILE, tnt4jCfgFilePath);
-				stream.output().addOutputListener(dsl);
+				stream.output().addOutputListener(serl);
 				ft = new StreamThread(streamThreads, stream,
 						String.format("%s:%s", stream.getClass().getSimpleName(), stream.getName())); // NON-NLS
 				ft.start();
 			}
 		} catch (SAXException | IllegalStateException e) {
 			LOGGER.log(OpLevel.ERROR, Utils.getExceptionMessages(e));
+			notifyError(e, "STREAM_INIT_FAIL"); // NON-NLS
 		} catch (Throwable e) {
 			Utils.logThrowable(LOGGER, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"StreamsAgent.start.failed", e);
+			notifyError(e, "STREAM_RUNTIME_FAIL"); // NON-NLS
+		}
+	}
+
+	private void notifyError(Throwable exc, String code) {
+		if (jobListeners != null) {
+			for (StreamingJobListener l : jobListeners) {
+				l.onFailure(this, null, exc.getMessage(), exc, code);
+			}
 		}
 	}
 
@@ -215,6 +229,8 @@ public class DefaultStreamingJob implements StreamingJob {
 		if (managerRef != null) {
 			managerRef.get().removeRunningTask(this);
 		}
+
+		MBeansManager.unregisterMBeans();
 	}
 
 	/**
@@ -247,7 +263,7 @@ public class DefaultStreamingJob implements StreamingJob {
 		}
 	}
 
-	private class DefaultStreamListener implements InputStreamListener, OutputStreamListener {
+	private class StreamEventsRedirectListener implements InputStreamListener, OutputStreamListener {
 
 		@Override
 		public void onProgressUpdate(TNTInputStream<?, ?> stream, int current, int total) {
