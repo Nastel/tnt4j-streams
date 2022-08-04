@@ -61,6 +61,8 @@ public class DefaultStreamingJob implements StreamingJob {
 	private Collection<StreamingJobListener> jobListeners;
 	private WeakReference<DirStreamingManager> managerRef;
 
+	private boolean completed = false;
+
 	/**
 	 * Constructs a new DefaultStreamingJob.
 	 *
@@ -137,14 +139,8 @@ public class DefaultStreamingJob implements StreamingJob {
 			Utils.logThrowable(LOGGER, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"StreamsAgent.start.failed", e);
 			notifyError(e, "STREAM_RUNTIME_FAIL"); // NON-NLS
-		}
-	}
-
-	private void notifyError(Throwable exc, String code) {
-		if (jobListeners != null) {
-			for (StreamingJobListener l : jobListeners) {
-				l.onFailure(this, null, exc.getMessage(), exc, code);
-			}
+		} finally {
+			cleanup();
 		}
 	}
 
@@ -222,6 +218,12 @@ public class DefaultStreamingJob implements StreamingJob {
 	}
 
 	private void cleanup() {
+		if (completed) {
+			return;
+		}
+
+		completed = true;
+
 		if (jobListeners != null) {
 			jobListeners.clear();
 		}
@@ -231,6 +233,14 @@ public class DefaultStreamingJob implements StreamingJob {
 		}
 
 		MBeansManager.unregisterMBeans();
+	}
+
+	private void notifyError(Throwable exc, String code) {
+		if (jobListeners != null) {
+			for (StreamingJobListener l : jobListeners) {
+				l.onFailure(this, null, exc.getMessage(), exc, code);
+			}
+		}
 	}
 
 	/**
