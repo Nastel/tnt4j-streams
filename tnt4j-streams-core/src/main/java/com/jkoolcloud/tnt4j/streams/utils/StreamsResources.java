@@ -126,7 +126,7 @@ public final class StreamsResources {
 		}
 
 		try {
-			return MessageFormat.format(getResourceString(bundleName, key), args);
+			return Utils.format(getResourceString(bundleName, key), args);
 		} catch (MissingResourceException mre) {
 			return key;
 		}
