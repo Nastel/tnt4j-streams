@@ -33,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
+import com.jkoolcloud.tnt4j.streams.management.MBeansManager;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
@@ -189,6 +190,8 @@ public class DirStreamingManager {
 			}
 		});
 
+		MBeansManager.registerMBeans();
+
 		LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 				"DirStreamingManager.dir.monitoring.started", dirPath, fileWildcardName);
 	}
@@ -247,6 +250,8 @@ public class DirStreamingManager {
 		}
 
 		shutdownExecutors();
+
+		MBeansManager.unregisterMBeans();
 	}
 
 	/**

@@ -35,7 +35,6 @@ import com.jkoolcloud.tnt4j.streams.configure.OutputProperties;
 import com.jkoolcloud.tnt4j.streams.configure.StreamsConfigLoader;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.inputs.*;
-import com.jkoolcloud.tnt4j.streams.management.MBeansManager;
 import com.jkoolcloud.tnt4j.streams.outputs.OutputStreamListener;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
@@ -117,8 +116,6 @@ public class DefaultStreamingJob implements StreamingJob {
 				throw new IllegalStateException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
 						"StreamsAgent.no.activity.streams"));
 			}
-
-			MBeansManager.registerMBeans();
 
 			StreamThread ft;
 			StreamEventsRedirectListener serl = new StreamEventsRedirectListener();
@@ -231,8 +228,6 @@ public class DefaultStreamingJob implements StreamingJob {
 		if (managerRef != null) {
 			managerRef.get().removeRunningTask(this);
 		}
-
-		MBeansManager.unregisterMBeans();
 	}
 
 	private void notifyError(Throwable exc, String code) {
