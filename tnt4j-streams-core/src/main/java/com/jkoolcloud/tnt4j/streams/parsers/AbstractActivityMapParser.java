@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.streams.configure.ParserProperties;
@@ -89,7 +90,13 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * Parser supported functions:
  * <ul>
  * <li>{@code .size()} or {@code .length()} - returns size of prefix locator expression resolved value: array,
- * collection or map. Example: {@code events.size()} will return size of events list.</li>
+ * collection or map. Example: {@code events.size()} will return size of {@code events} list.</li>
+ * <li>{@code .keys()} - returns key set for prefix locator expression resolved map. Example: {@code timeseries.keys()}
+ * will return keys of {@code timeseries} map.</li>
+ * <li>{@code .values()} - returns values collection for prefix locator expression resolved map. Example:
+ * {@code timeseries.values()} will return values collection of {@code timeseries} map.</li>
+ * <li>{@code .entries()} - returns entry set for prefix locator expression resolved map. Example:
+ * {@code timeseries.entries()} will return entry set of {@code timeseries} map.</li>
  * </ul>
  * <p>
  * This parser supports the following configuration properties (in addition to those supported by
@@ -134,6 +141,18 @@ public abstract class AbstractActivityMapParser extends GenericActivityParser<Ma
 	 * Constant defining locator "length" function. Stands as alias for {@link #SIZE_FUNCTION}.
 	 */
 	protected static final String LENGTH_FUNCTION = ".length()"; // NON-NLS
+	/**
+	 * Constant defining locator "keys" function to get key set for prefix locator expression resolved map.
+	 */
+	protected static final String KEYS_FUNCTION = ".keys()"; // NON-NLS
+	/**
+	 * Constant defining locator "values" function to get values collection for prefix locator expression resolved map.
+	 */
+	protected static final String VALUES_FUNCTION = ".values()"; // NON-NLS
+	/**
+	 * Constant defining locator "entries" function to get entry set for prefix locator expression resolved map.
+	 */
+	protected static final String ENTRIES_FUNCTION = ".entries()"; // NON-NLS
 
 	/**
 	 * Constructs a new AbstractActivityMapParser.
@@ -245,13 +264,30 @@ public abstract class AbstractActivityMapParser extends GenericActivityParser<Ma
 		String locStr = locator.getLocator();
 		Set<String[]> accessedPaths = (Set<String[]>) cData.get(ACCESSED_PATHS_KEY);
 
-		if (locStr.endsWith(SIZE_FUNCTION) || locStr.endsWith(LENGTH_FUNCTION)) {
-			locStr = locStr.substring(0, locStr.lastIndexOf('.'));
-			val = Utils.getMapValueByPath(locStr, nodePathDelim, cData.getData(), accessedPaths);
-			try {
-				val = CollectionUtils.size(val);
-			} catch (Throwable exc) {
-				val = 0;
+		if (StringUtils.endsWithAny(locStr, SIZE_FUNCTION, LENGTH_FUNCTION, KEYS_FUNCTION, VALUES_FUNCTION,
+				ENTRIES_FUNCTION)) {
+			String pLocStr = locStr.substring(0, locStr.lastIndexOf('.'));
+			pLocStr = pLocStr.replace(LOC_FOR_COMPLETE_ACTIVITY_DATA, "*"); // NON-NLS
+			val = Utils.getMapValueByPath(pLocStr, nodePathDelim, cData.getData(), accessedPaths);
+
+			if (locStr.endsWith(SIZE_FUNCTION) || locStr.endsWith(LENGTH_FUNCTION)) {
+				try {
+					val = CollectionUtils.size(val);
+				} catch (Throwable exc) {
+					val = 0;
+				}
+			} else if (locStr.endsWith(KEYS_FUNCTION)) {
+				if (val instanceof Map) {
+					val = ((Map<?, ?>) val).keySet();
+				}
+			} else if (locStr.endsWith(VALUES_FUNCTION)) {
+				if (val instanceof Map) {
+					val = ((Map<?, ?>) val).values();
+				}
+			} else if (locStr.endsWith(ENTRIES_FUNCTION)) {
+				if (val instanceof Map) {
+					val = ((Map<?, ?>) val).entrySet();
+				}
 			}
 		} else {
 			val = Utils.getMapValueByPath(locStr, nodePathDelim, cData.getData(), accessedPaths);
@@ -289,5 +325,20 @@ public abstract class AbstractActivityMapParser extends GenericActivityParser<Ma
 	@Override
 	protected EnumSet<ActivityFieldLocatorType> getUnsupportedLocatorTypes() {
 		return UNSUPPORTED_LOCATOR_TYPES;
+	}
+
+	/**
+	 * List built-in types of activity data delimiters within RAW map data.
+	 */
+	protected enum ActivityDelim {
+		/**
+		 * Activity data is map entry.
+		 */
+		Entry,
+
+		/**
+		 * Activity data is complete map.
+		 */
+		Map,
 	}
 }

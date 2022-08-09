@@ -765,7 +765,7 @@ definitions, and you need to split them into separate events maintaining some `t
 
 ### Field value transformations
 
-In streams configuration you can define field or locator resolved values transformations. In general transformations performs resolved
+In streams configuration you can define field or locator resolved values transformations. In general, transformations performs resolved
 activity value post-processing before sending it to [jKoolCloud](https://www.jkoolcloud.com/): e.g., extracts file name from resolved
 activity file path.
 
@@ -4268,7 +4268,7 @@ See [`Readme.md`](tnt4j-streams-samples/README.md) of `tnt4j-streams-samples` mo
 <dependency>
     <groupId>com.jkoolcloud.tnt4j.logger</groupId>
     <artifactId>tnt4j-log4j</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
     <scope>runtime</scope>
 </dependency>
 ```
@@ -5966,6 +5966,11 @@ Using `#` locator without any manual map entry mapping is equivalent to `*` loca
 ##### Functional Locators
 * `.size()` (or `.length()`) - returns size of prefix locator expression resolved value being of type: `array`, `collection` or `map`.
   Example: `events.size()` will return size of `events` list.
+* `.keys()` - returns key set for prefix locator expression resolved map. Example: `timeseries.keys()` will return keys of `timeseries` map.
+* `.values()` - returns values collection for prefix locator expression resolved map. Example: `timeseries.values()` will return values 
+  collection of `timeseries` map.
+* `.entries()` - returns entry set for prefix locator expression resolved map. Example: `timeseries.entries()` will return entry set of 
+  `timeseries` map.
 
 #### Activity JSON parser
 
@@ -6905,7 +6910,7 @@ Maven tests run is disabled by default. To enable Maven to run tests set Maven c
 * in `msoffice` module run JUnit test suite named `AllMsOfficeStreamTests`
 * in `chronicle` module run JUnit test suite named `AllChronicleStreamTests`
 * in `servlet` module run JUnit test suite named `AllServletStreamTests`
-* in `snappy` module run JUnit test suite named `AllSnappyStreamTests` 
+* in `snappy` module run JUnit test suite named `AllSnappyStreamTests`
 
 Known Projects Using TNT4J-STREAMS
 ===============================================
