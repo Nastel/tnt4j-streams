@@ -57,7 +57,9 @@
 
         <field name="keyTokens" value="" datatype="AsInput" transparent="true">
             <field-transform lang="groovy"><![CDATA[
-                ${key}.split("_")
+                StringUtils.isEmpty(${key})
+                    ? new String[0]
+                    : ${key}.split("_")
             ]]></field-transform>
         </field>
         <field name="Category" locator="domain" locator-type="Activity"/>
