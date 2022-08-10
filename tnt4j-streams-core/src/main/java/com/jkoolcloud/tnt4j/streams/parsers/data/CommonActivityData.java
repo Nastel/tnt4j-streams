@@ -82,7 +82,7 @@ public class CommonActivityData<T> implements ActivityData<T> {
 	public String toString() {
 		StringBuilder sb = new StringBuilder("CommonActivityData{"); // NON-NLS
 		sb.append("data=").append(Utils.toString(data)); // NON-NLS
-		sb.append(", metadata=").append(metaData.toString()); // NON-NLS
+		sb.append(", metadata=").append(Utils.toString(metaData)); // NON-NLS
 		sb.append('}'); // NON-NLS
 		return sb.toString();
 	}
