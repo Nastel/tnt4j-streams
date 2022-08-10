@@ -16,6 +16,8 @@
 
 package com.jkoolcloud.tnt4j.streams.transform;
 
+import com.jkoolcloud.tnt4j.streams.configure.NamedObject;
+
 /**
  * Base class for abstract data value transformation.
  *
@@ -26,7 +28,7 @@ package com.jkoolcloud.tnt4j.streams.transform;
  *
  * @version $Revision: 1 $
  */
-public abstract class AbstractValueTransformation<V, T> implements ValueTransformation<V, T> {
+public abstract class AbstractValueTransformation<V, T> implements ValueTransformation<V, T>, NamedObject {
 	private String name;
 	private Phase phase;
 

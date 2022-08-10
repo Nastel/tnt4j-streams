@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import com.jkoolcloud.tnt4j.streams.configure.NamedObject;
 import com.jkoolcloud.tnt4j.utils.Utils;
 
 /**
@@ -29,7 +30,7 @@ import com.jkoolcloud.tnt4j.utils.Utils;
  *
  * @version $Revision: 2 $
  */
-public abstract class WsScenarioEntity {
+public abstract class WsScenarioEntity implements NamedObject {
 	private String name;
 
 	private String urlStr;
@@ -46,6 +47,11 @@ public abstract class WsScenarioEntity {
 	 *            scenario entity name
 	 */
 	protected WsScenarioEntity(String name) {
+		setName(name);
+	}
+
+	@Override
+	public void setName(String name) {
 		this.name = name;
 	}
 
@@ -54,6 +60,7 @@ public abstract class WsScenarioEntity {
 	 *
 	 * @return scenario entity name
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}

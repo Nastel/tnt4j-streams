@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.nio.ByteBuffer;
 
+import com.jkoolcloud.tnt4j.streams.configure.NamedObject;
+
 /**
  * Base class for abstract activity RAW data value pre-parser.
  *
@@ -30,7 +32,7 @@ import java.nio.ByteBuffer;
  *
  * @version $Revision: 1 $
  */
-public abstract class AbstractPreParser<V, O> implements ActivityDataPreParser<V, O> {
+public abstract class AbstractPreParser<V, O> implements ActivityDataPreParser<V, O>, NamedObject {
 
 	private String name;
 
