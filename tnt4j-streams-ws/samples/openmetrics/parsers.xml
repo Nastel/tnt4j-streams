@@ -56,7 +56,7 @@
         <field name="Value" locator-type="Label" locator="value"/>
 
         <field name="keyTokens" value="" datatype="AsInput" transparent="true">
-            <field-transform lang="groovy"><![CDATA[
+            <field-transform lang="groovy" phase="aggregated"><![CDATA[
                 StringUtils.isEmpty(${key})
                     ? new String[0]
                     : ${key}.split("_")
