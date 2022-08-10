@@ -106,7 +106,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	private Scheduler scheduler;
 	private boolean synchronizeRequests = false;
 	private boolean dropRecurrentRequests = true;
-	private Properties quartzProperties = new Properties();
+	private final Properties quartzProperties = new Properties();
 
 	private final Set<String> parsedRequests = new HashSet<>();
 
