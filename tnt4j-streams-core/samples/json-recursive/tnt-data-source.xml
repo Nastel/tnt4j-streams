@@ -57,7 +57,7 @@
         <field name="InlineTXEntrySum" locator="$.result.calls.[?(@.type=='CALL')].value" locator-type="Label">
             <field-transform name="ETHTokenSymbolTransform" lang="groovy"><![CDATA[
                 if ($fieldValue != null && $fieldValue.getClass().isArray()) {
-                    BigInteger[] numbers= new BigInteger[$fieldValue.size()]
+                    BigInteger[] numbers = new BigInteger[$fieldValue.size()]
                     for(int n = 0; n < $fieldValue.size(); n++) {
                         numbers[n] = new BigInteger($fieldValue[n].substring(2), 16);
                     }

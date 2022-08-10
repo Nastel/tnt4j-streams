@@ -35,24 +35,28 @@
         <param name="charsetName" type="java.lang.String" value="UTF-8"/>
     </java-object>
 
-    <parser name="SnappyCompressedMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
+    <parser name="MetricsParserStr" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
+        <!-- fields mapping goes here ...  -->
+    </parser>
+
+    <parser name="SnappyCompressedMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser">
         <reference name="SnappyToStringPreParser"/>
 
         <!-- fields mapping goes here ... -->
-    </parser>
 
-    <parser name="MetricsParserStr" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
-        <!-- fields mapping goes here ...  -->
+        <embedded-activity name="MetricsData" locator="$DATA$" locator-type="Label">
+            <parser-ref name="MetricsParserStr"/>
+        </embedded-activity>
     </parser>
 
     <parser name="MetricsRequestParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <property name="ActivityDelim" value="EOF"/>
 
         <field name="EventType" value="NOOP"/>
-        <field name="MetricsData" locator="ActivityData" locator-type="Label" datatype="AsInput" transparent="true">
+        <field name="RAWMetricsData" locator="ActivityData" locator-type="Label" datatype="AsInput" transparent="true">
             <parser-ref name="SnappyCompressedMetricsParser" aggregation="Merge">
                 <matchExp><![CDATA[groovy:
-                    $fieldValue != null && $fieldValue.getClass().isArray()
+                    $fieldValue instanceof byte[]
                 ]]></matchExp>
             </parser-ref>
             <parser-ref name="MetricsParserStr" aggregation="Merge"/>
