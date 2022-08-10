@@ -649,7 +649,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		ActivityContext cData = prepareItem(stream, data.getData());
 		if (cData == null || !cData.isValid()) {
 			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ActivityParser.nothing.to.parse");
+					"ActivityParser.nothing.to.parse", getName());
 			return null;
 		}
 
