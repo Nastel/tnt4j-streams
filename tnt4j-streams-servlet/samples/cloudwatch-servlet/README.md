@@ -3,15 +3,15 @@
 ## Quick setup steps
 
 1. See [CloudwatchMetrics document](docs/CloudwatchMetrics.md) how to configure AWS to feed metrics data.
-2. You must have HTTPS enabled web server. AWS allows sending metrics only to **HTTPS enabled and having valid certificate** (not expired, 
+1. You must have HTTPS enabled web server. AWS allows sending metrics only to **HTTPS enabled and having valid certificate** (not expired, 
    not self-signed) web endpoint.
-3. Copy configuration files to your web server configuration dir, e.g. `<TOMCAT_DIR>/conf`. By default, TNT4J-Streams will try to use 
+1. Copy configuration files to your web server configuration dir, e.g. `<TOMCAT_DIR>/conf`. By default, TNT4J-Streams will try to use 
    internal configuration dir path `/Catalina/localhost/tnt4j-streams`:
    1. [log4j2.xml](../../config/log4j2.xml) - log4j V2 configuration used by TNT4J-Streams
-   2. [tnt4j.properties](../../config/tnt4j.properties) - base TNT4J configuration
-   3. [tnt4j-common.properties](../../config/tnt4j-common.properties) - common TNT4J configuration
-   4. [tnt4j-streams.properties](../../config/tnt4j-streams.properties) - TNT4J-Streams dedicated TNT4J configuration
-   5. [tnt-data-source.xml](tnt-data-source.xml) - TNT4J-Streams data source (stream) configuration, having stream dedicated TNT4J 
+   1. [tnt4j.properties](../../config/tnt4j.properties) - base TNT4J configuration
+   1. [tnt4j-common.properties](../../config/tnt4j-common.properties) - common TNT4J configuration
+   1. [tnt4j-streams.properties](../../config/tnt4j-streams.properties) - TNT4J-Streams dedicated TNT4J configuration
+   1. [tnt-data-source.xml](tnt-data-source.xml) - TNT4J-Streams data source (stream) configuration, having stream dedicated TNT4J 
       properties configuration section:
       1. note that default configuration broadcasts CloudWatch metrics to AutoPilot (sink id `ap`) and jKool/XRay (sink id `jkool`) 
          simultaneously. If you are willing to use just one of these sinks, then change `<tnt4j-properties>` configuration line:
@@ -27,21 +27,21 @@
             <...>
          </tnt4j-properties>
          ```
-      2. change AutoPilot sink host value (property `event.sink.factory.EventSinkFactory.ap.Host`) to match your AutoPilot instance. Default
+      1. change AutoPilot sink host value (property `event.sink.factory.EventSinkFactory.ap.Host`) to match your AutoPilot instance. Default
          is `localhost`.
-      3. change AutoPilot sink port value (property `event.sink.factory.EventSinkFactory.ap.Port`) to match your AutoPilot instance. Default
+      1. change AutoPilot sink port value (property `event.sink.factory.EventSinkFactory.ap.Port`) to match your AutoPilot instance. Default
          is `6060`.
-      4. change `https://data.jkoolcloud.com` to your jKool/XRay streaming endpoint URL. 
-      5. change `jkool-access-token` placeholder to your jKool/XRay streaming token if you are willing to stream into that repo
-   6. [parsers.xml](parsers.xml) - TNT4J-Streams parsers configuration
+      1. change `https://data.jkoolcloud.com` to your jKool/XRay streaming endpoint URL. 
+      1. change `jkool-access-token` placeholder to your jKool/XRay streaming token if you are willing to stream into that repo
+   1. [parsers.xml](parsers.xml) - TNT4J-Streams parsers configuration
 
    **NOTE:** for most general case there is no need for you to change `log4j2.xml`, `tnt4j*.propeties` and `parsers.xml` files. The only
    file requiring to make your changes is `tnt-data-source.xml`.
-4. Download TNT4J-Streams `war` package latest version release from [GitHub releases](https://github.com/Nastel/tnt4j-streams/releases). It 
+1. Download TNT4J-Streams `war` package latest version release from [GitHub releases](https://github.com/Nastel/tnt4j-streams/releases). It 
    shall be available in the `assets` section of release.
-5. Deploy `tnt4j-streams-<VERSION>.war` or `tnt4j-streams-servlet-<VERSION>.war` file to your web sever web-apps dir, e.g. 
+1. Deploy `tnt4j-streams-<VERSION>.war` or `tnt4j-streams-servlet-<VERSION>.war` file to your web sever web-apps dir, e.g. 
    `<TOMCAT_DIR>/webapps`. **NOTE:** remove version token from `war` package file name to preserve web-app context on every deployment.
-6. Start web sever, if it is not already running.
+1. Start web sever, if it is not already running.
 
 # TL;DR
 
@@ -50,7 +50,7 @@
 There are two ways to build TNT4J-Streams `war` package:
 1. When building whole `tnt4j-streams` project, maven will produce `tnt4j-streams-<VERSION>.war` package where all reactor enabled modules 
    and dependencies are built in into that `war` package. 
-2. When individually building `tnt4j-streams-servlet` module, maven will produce `tnt4j-streams-servlet-<VERSION>.war` package where all 
+1. When individually building `tnt4j-streams-servlet` module, maven will produce `tnt4j-streams-servlet-<VERSION>.war` package where all 
    module dependencies are build in into that `war` package.
 
 Building either way `war` package contains classes and resources (like `web.xml`) provided by `tnt4j-streams-servlet` module.
@@ -82,14 +82,14 @@ Defines servlet initialization parameters set and servlet mapping:
 
 ### log4j2
 
-In general configuration is same as for common TNT4-Streams logging except this config uses `${sys:catalina.base}/logs` dir to locate 
+In general, configuration is same as for common TNT4-Streams logging except this config uses `${sys:catalina.base}/logs` dir to locate 
 produced log files.
 
 Also note loggers are named to match stream configuration defined broadcasting sink ids: `ap` and `jkool` instead of `prod` and `qa`.
 
 ### TNT4J
 
-In general configuration is same as common TNT4-Streams TNT4J configuration except streams scope (`tnt4j-streams.properties` file) defines 
+In general, configuration is same as common TNT4-Streams TNT4J configuration except streams scope (`tnt4j-streams.properties` file) defines 
 broadcasting sink ids `ap` and `jkool` to match sink target endpoint.
 
 Individual TNT4J streams scope configuration is made in `tnt-data-source.xml` file section `<tnt4j-properties>`.
@@ -102,9 +102,9 @@ Major entities in stream configuration are
 * `ResponseTemplate` property defining stream servlet response template. AWS Kinesis FireHose requires particular JSON response to ensure 
   successful communication
 * `tnt4j-properties` section defining individual stream TNT4J configuration:
-  * property `event.sink.factory.BroadcastSequence` defines produced activities broadcasting sinks. Default set of sinks is for AutoPilot 
-    (sink id `ap`) and for jKool/XRay (sink id `jkool`). Default set of sinks to broadcast stream produced activities is `ap,jkool`. If you 
-    are willing to use just one of these sinks, then change configuration line as this:
+  * property `event.sink.factory.BroadcastSequence` defines produced activities broadcasting sinks. Default configuration contains 
+    configuration for AutoPilot (sink id `ap`) and for jKool/XRay (sink id `jkool`) sinks. Default set of sinks to broadcast stream produced
+    activities is `ap,jkool`. If you are willing to use just one of these sinks, then change configuration line as this:
     ```xml
     <tnt4j-properties>
     <...>
@@ -129,11 +129,12 @@ Major entities in stream configuration are
       jKool/XRay streaming token if you are willing to stream into that repo. Placeholder value is `jkool-access-token`.
 * `KinesisFirehoseParser` parser reference to bootstrap incoming metrics data package
 
-### Parsers
+### Parsers (`parsers.xml`)
 
 Unwraps WAS Kinesis FireHose sent metrics data package into metrics JSON lines. Then allows metrics filtering (see 
-[Metrics filtering](#metrics-filtering) section) and performs metric lines fields values parsing into TNT4J activities and snapshots. This 
-file defines these parsers:
+[Metrics filtering](#metrics-filtering) section) and performs metric lines fields values parsing into TNT4J activities and snapshots.
+
+This file defines these parsers:
 * `KinesisFirehoseParser` - bootstrap parser recognizing received metrics data package format.
 * `KinesisFirehoseParserStr` - parses Kinesis FireHose JSON metrics batch package where metrics data package is Base64 encoded string.
 * `MetricsParserStr` - performs metric lines filtering before passing them for further parsing.
@@ -202,7 +203,7 @@ For CloudWatch provided metrics package TNT4J-Streams produces `ACTIVITY` entity
 * `StartTime`/`EndTime` having current stream runtime timestamp
 * `DataCenter` has value `Amazon_AWS`
 
-Metrics lines are placed as child `SNAPSHOT` into that `ACTIVITY` entity. Snapshot contains such set of fields:
+Metrics lines are placed as child `SNAPSHOT`s of that `ACTIVITY` entity. Snapshot contains such set of fields:
 
 ### jKool/XRay activities
 
@@ -212,7 +213,7 @@ Metrics lines are placed as child `SNAPSHOT` into that `ACTIVITY` entity. Snapsh
   * `StartTime`/`EndTime` having current stream runtime timestamp
   * `DataCenter` has value `Amazon_AWS`
 
-* Metrics lines are placed as child `SNAPSHOT` into that `ACTIVITY` entity. Snapshot contains such set of fields:
+* Metrics lines are placed as child `SNAPSHOT`s of that `ACTIVITY` entity. Snapshot contains such set of fields:
   * `MetricStreamName` value from metrics line field `metric_stream_name`
   * `UserName` value from metrics line field `account_id`
   * `Region` value from metrics line field `region`
