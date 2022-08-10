@@ -17,6 +17,8 @@
 package com.jkoolcloud.tnt4j.streams.matchers;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
@@ -94,7 +96,7 @@ public class StringMatcher implements Matcher {
 		boolean invert = expression.charAt(0) == '!';
 		String methodName = expression.substring(invert ? 1 : 0, expression.indexOf("(")); // NON-NLS
 		String[] arguments = expression.substring(expression.indexOf("(") + 1, expression.lastIndexOf(")")).split(","); // NON-NLS
-		Object[] convertedArguments = new Object[arguments.length];
+		List<Object> convertedArguments = new ArrayList<>();
 		Method method = null;
 
 		boolean hasNoArguments = hasNoArguments(arguments);
@@ -110,7 +112,7 @@ public class StringMatcher implements Matcher {
 			} else {
 				// Arrays.
 				Object[] predefinedArgs = { String.valueOf(data) };
-				Object[] allArgs = ArrayUtils.addAll(predefinedArgs, convertedArguments);
+				Object[] allArgs = ArrayUtils.addAll(predefinedArgs, convertedArguments.toArray());
 				boolean result = returnBoolean(method.invoke(null, allArgs));
 				return invert != result;
 			}
@@ -121,22 +123,29 @@ public class StringMatcher implements Matcher {
 	}
 
 	private static Method findMatchingMethodAndConvertArgs(Object methodName, String[] arguments,
-			Object[] convertedArguments, Method[] methods) {
+			List<Object> convertedArguments, Method[] methods) {
 		for (Method method : methods) {
-			if (method.getName().equals(methodName) && method.getParameterTypes().length == arguments.length + 1) {
+			if (method.getName().equals(methodName)
+					&& (method.isVarArgs() || method.getParameterTypes().length == arguments.length + 1)) {
 				boolean methodMatch = true;
 				Class<?>[] parameterTypes = method.getParameterTypes();
 				for (int i = 1; i < parameterTypes.length; i++) {
 					Class<?> parameterType = parameterTypes[i];
-					if (CharSequence.class.isAssignableFrom(parameterType)) {
-						convertedArguments[i - 1] = arguments[i - 1];
+
+					if (i == parameterTypes.length - 1 && method.isVarArgs() && parameterType.isArray()) {
+						Object[] varArgs = initArray(parameterType.getComponentType(), arguments.length - (i - 1));
+						convertedArguments.add(varArgs);
+						for (int ai = i - 1, vi = 0; ai < arguments.length; ai++, vi++) {
+							try {
+								varArgs[vi] = convertArg(parameterType.getComponentType(), arguments[ai]);
+							} catch (Exception e) {
+								methodMatch = false;
+								break;
+							}
+						}
 					} else {
 						try {
-							if (parameterType.isPrimitive()) {
-								parameterType = ClassUtils.primitiveToWrapper(parameterType);
-							}
-							Method converterMethod = parameterType.getMethod("valueOf", String.class);
-							convertedArguments[i - 1] = converterMethod.invoke(null, arguments[i - 1]);
+							convertedArguments.add(convertArg(parameterType, arguments[i - 1]));
 						} catch (Exception e) {
 							methodMatch = false;
 							break;
@@ -150,6 +159,23 @@ public class StringMatcher implements Matcher {
 			}
 		}
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> T[] initArray(Class<T> clazz, int size) {
+		return (T[]) java.lang.reflect.Array.newInstance(clazz, size);
+	}
+
+	private static Object convertArg(Class<?> parameterType, String argument) throws Exception {
+		if (CharSequence.class.isAssignableFrom(parameterType)) {
+			return argument;
+		} else {
+			if (parameterType.isPrimitive()) {
+				parameterType = ClassUtils.primitiveToWrapper(parameterType);
+			}
+			Method converterMethod = parameterType.getMethod("valueOf", String.class);
+			return converterMethod.invoke(null, argument);
+		}
 	}
 
 	private static boolean returnBoolean(Object result) {
