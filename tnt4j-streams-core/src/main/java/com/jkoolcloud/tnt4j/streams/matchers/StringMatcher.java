@@ -93,6 +93,7 @@ public class StringMatcher implements Matcher {
 	 */
 	@Override
 	public boolean evaluate(String expression, Object data) throws Exception {
+		expression = expression.trim();
 		boolean invert = expression.charAt(0) == '!';
 		String methodName = expression.substring(invert ? 1 : 0, expression.indexOf("(")); // NON-NLS
 		String[] arguments = expression.substring(expression.indexOf("(") + 1, expression.lastIndexOf(")")).split(","); // NON-NLS

@@ -287,9 +287,7 @@
         <field name="EventType" value="NOOP"/>
         <field name="RAWMetricsData" locator="ActivityData" locator-type="Label" datatype="AsInput" transparent="true">
             <!--parser-ref name="OpenTelemetryParser" aggregation="Merge">
-                <matchExp><![CDATA[groovy:
-                    $fieldValue instanceof byte[]
-                ]]></matchExp>
+                <matchExp>groovy: $fieldValue instanceof byte[]</matchExp>
             </parser-ref-->
             <parser-ref name="KinesisFirehoseParserStr" aggregation="Merge">
                 <matchExp>string:contains("records":)</matchExp>
