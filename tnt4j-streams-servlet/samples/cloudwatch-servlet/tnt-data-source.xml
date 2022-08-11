@@ -44,6 +44,12 @@
             }
         ]]></property>
 
+        <property name="UseExecutors" value="true"/>
+        <property name="ExecutorThreadsQuantity" value="5"/>
+        <property name="ExecutorsTerminationTimeout" value="20"/>
+        <property name="ExecutorsBoundedModel" value="true"/>
+        <property name="ExecutorRejectedTaskOfferTimeout" value="20"/>
+
         <tnt4j-properties>
             <!-- Set your CloudWatch data center name -->
             <property name="source.factory.DATACENTER" value="Amazon_AWS"/>
@@ -59,7 +65,8 @@
 
             <!-- Socket sink to AutoPilot -->
             <property name="event.sink.factory.EventSinkFactory.ap" value="com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory"/>
-            <property name="event.sink.factory.EventSinkFactory.ap.LogSink" value="file:${sys:catalina.base}/logs/tnt4j-streams_samples_socket.log"/>
+            <property name="event.sink.factory.EventSinkFactory.ap.LogSink"
+                      value="file:${sys:catalina.base}/logs/tnt4j-streams_samples_socket.log"/>
             <!-- Change to your AP machine host/IP -->
             <property name="event.sink.factory.EventSinkFactory.ap.Host" value="localhost"/>
             <!-- Change to your Ap machine port - default one is 6060 -->
