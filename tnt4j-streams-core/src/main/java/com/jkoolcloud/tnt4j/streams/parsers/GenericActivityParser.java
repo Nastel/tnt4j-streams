@@ -26,6 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
@@ -732,7 +733,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		} catch (Exception exc) {
 			Utils.logThrowable(logger(), OpLevel.ERROR,
 					StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ActivityParser.pre.parsing.failed", exc);
+					"ActivityParser.pre.parsing.failed", ClassUtils.getName(data, "null"), exc); // NON-NLS
 		}
 
 		return data;
