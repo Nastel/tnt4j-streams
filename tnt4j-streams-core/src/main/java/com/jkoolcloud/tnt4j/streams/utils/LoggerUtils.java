@@ -20,8 +20,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
@@ -266,6 +268,107 @@ public class LoggerUtils {
 		if (StringUtils.isEmpty(lProp)) {
 			System.setProperty(DefaultEventSinkFactory.DEFAULT_EVENT_FACTORY_KEY,
 					"com.jkoolcloud.tnt4j.sink.impl.slf4j.SLF4JEventSinkFactory");
+		}
+	}
+
+	private static void processLogArgs(Object... args) {
+		if (ArrayUtils.isNotEmpty(args)) {
+			for (int i = 0; i < args.length; i++) {
+				if (!(args[i] instanceof Throwable)) {
+					args[i] = Utils.toStringDump(args[i]);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Log a given string message with a specified severity and {@link java.lang.Throwable} details.
+	 * 
+	 * @param logger
+	 *            logger instance to use for logging
+	 * @param sev
+	 *            log entry severity
+	 * @param msg
+	 *            log message pattern
+	 * @param args
+	 *            log message formatting arguments
+	 * 
+	 * @see com.jkoolcloud.tnt4j.streams.utils.Utils#logThrowable(com.jkoolcloud.tnt4j.sink.EventSink,
+	 *      com.jkoolcloud.tnt4j.core.OpLevel, String, Object...)
+	 */
+	public static void logThrowable(EventSink logger, OpLevel sev, String msg, Object... args) {
+		if (logger.isSet(sev)) {
+			processLogArgs(args);
+			Utils.logThrowable(logger, sev, msg, args);
+		}
+	}
+
+	/**
+	 * Log a given resource bundle message with a specified severity and {@link java.lang.Throwable} details.
+	 * 
+	 * @param logger
+	 *            logger instance to use for logging
+	 * @param sev
+	 *            log entry severity
+	 * @param rb
+	 *            resource bundle to use
+	 * @param key
+	 *            resource bundle entry key
+	 * @param args
+	 *            log message formatting arguments
+	 * 
+	 * @see Utils#logThrowable(com.jkoolcloud.tnt4j.sink.EventSink, com.jkoolcloud.tnt4j.core.OpLevel,
+	 *      java.util.ResourceBundle, String, Object...)
+	 */
+	public static void logThrowable(EventSink logger, OpLevel sev, ResourceBundle rb, String key, Object... args) {
+		if (logger.isSet(sev)) {
+			processLogArgs(args);
+			Utils.logThrowable(logger, sev, rb, key, args);
+		}
+	}
+
+	/**
+	 * Log a given string message with a specified severity.
+	 * 
+	 * @param logger
+	 *            logger instance to use for logging
+	 * @param sev
+	 *            log entry severity
+	 * @param msg
+	 *            log message pattern
+	 * @param args
+	 *            log message formatting arguments
+	 * 
+	 * @see com.jkoolcloud.tnt4j.sink.EventSink#log(com.jkoolcloud.tnt4j.core.OpLevel, String, Object...)
+	 */
+	public static void log(EventSink logger, OpLevel sev, String msg, Object... args) {
+		if (logger.isSet(sev)) {
+			processLogArgs(args);
+			logger.log(sev, msg, args);
+		}
+	}
+
+	/**
+	 * Log a given resource bundle entry with a specified severity.
+	 * 
+	 * @param logger
+	 *            logger instance to use for logging
+	 * @param sev
+	 *            log entry severity
+	 * @param rb
+	 *            resource bundle to use
+	 * @param key
+	 *            resource bundle entry key
+	 * @param args
+	 *            log message formatting arguments
+	 * 
+	 * @see com.jkoolcloud.tnt4j.sink.EventSink#log(com.jkoolcloud.tnt4j.core.OpLevel, java.util.ResourceBundle, String,
+	 *      Object...)
+	 */
+	public static void log(EventSink logger, OpLevel sev, ResourceBundle rb, String key, Object... args) {
+		if (logger.isSet(sev)) {
+			processLogArgs(args);
+			logger.log(sev, rb, key, args);
 		}
 	}
 }

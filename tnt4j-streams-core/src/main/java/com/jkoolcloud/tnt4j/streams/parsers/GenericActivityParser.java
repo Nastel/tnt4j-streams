@@ -980,27 +980,16 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 
 	private static void reviewTempFieldsNames(List<ActivityField> tFieldsList) {
 		if (tFieldsList != null) {
+			Set<String> namesSet = new HashSet<>();
 			int tid = 0;
-			for (int tfi = 0; tfi < tFieldsList.size() - 1; tfi++) {
-				ActivityField tField = tFieldsList.get(tfi);
+			for (ActivityField tField : tFieldsList) {
 				String tFieldName = tField.getFieldTypeName();
-				String newName = null;
-
-				for (int ntfi = tfi + 1; ntfi < tFieldsList.size(); ntfi++) {
-					ActivityField ntField = tFieldsList.get(ntfi);
-					String ntFieldName = ntField.getFieldTypeName();
-					if (tFieldName.equals(ntFieldName)) {
-						if (newName == null) {
-							newName = tFieldName + (tid++);
-						}
-
-						ntField.setFieldTypeName(ntFieldName + (tid++));
-					}
+				if (namesSet.contains(tFieldName)) {
+					tFieldName += (++tid);
+					tField.setFieldTypeName(tFieldName);
 				}
 
-				if (StringUtils.isNotEmpty(newName)) {
-					tField.setFieldTypeName(newName);
-				}
+				namesSet.add(tFieldName);
 			}
 		}
 	}

@@ -541,7 +541,7 @@ public class ActivityField extends AbstractFieldEntity {
 				stackedParsers = new LinkedHashSet<>(5);
 			}
 
-			LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+			LoggerUtils.log(LOGGER, OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityField.adding.stacked.parser", fieldTypeName, parserReference.getParser().getName());
 			FieldParserReference pRef = new FieldParserReference(parserReference, aggregationType, applyOn);
 			stackedParsers.add(pRef);
@@ -826,8 +826,8 @@ public class ActivityField extends AbstractFieldEntity {
 	 * @see #filterFieldValue(Object, ActivityInfo)
 	 */
 	public Object aggregateFieldValue(Object value, ActivityInfo ai) throws ParseException {
-		LOGGER.log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"ActivityField.aggregating.field", this, Utils.toString(value));
+		LoggerUtils.log(LOGGER, OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+				"ActivityField.aggregating.field", this, value);
 		Object[] values = Utils.makeArray(Utils.simplifyValue(value));
 
 		if (values != null && CollectionUtils.isNotEmpty(locators)) {
@@ -863,16 +863,17 @@ public class ActivityField extends AbstractFieldEntity {
 
 		Object fieldValue = Utils.simplifyValue(values);
 
-		LOGGER.log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"ActivityField.aggregating.field.value", this, Utils.toString(fieldValue));
+		LoggerUtils.log(LOGGER, OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+				"ActivityField.aggregating.field.value", this, fieldValue);
 
 		fieldValue = transform(fieldValue, ai);
 		fieldValue = filterFieldValue(fieldValue, ai);
 
 		if (fieldValue != null) {
 			if (fieldValue != null && isEmptyAsNull() && Utils.isEmptyContent(fieldValue, true)) {
-				LOGGER.log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"ActivityField.field.empty.as.null", this, Utils.toStringDump(fieldValue));
+				LoggerUtils.log(LOGGER, OpLevel.TRACE,
+						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						"ActivityField.field.empty.as.null", this, fieldValue);
 				fieldValue = null;
 			}
 		}
@@ -903,9 +904,9 @@ public class ActivityField extends AbstractFieldEntity {
 		try {
 			fieldValue = transformValue(fieldValue, ai, ValueTransformation.Phase.AGGREGATED);
 		} catch (Exception exc) {
-			Utils.logThrowable(LOGGER, OpLevel.WARNING,
+			LoggerUtils.logThrowable(LOGGER, OpLevel.WARNING,
 					StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ActivityField.transformation.failed", fieldTypeName, Utils.toString(fieldValue), exc);
+					"ActivityField.transformation.failed", fieldTypeName, fieldValue, exc);
 		}
 
 		return fieldValue;
@@ -931,9 +932,9 @@ public class ActivityField extends AbstractFieldEntity {
 				return null;
 			}
 		} catch (Exception exc) {
-			Utils.logThrowable(LOGGER, OpLevel.WARNING,
+			LoggerUtils.logThrowable(LOGGER, OpLevel.WARNING,
 					StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "ActivityField.filtering.failed",
-					fieldTypeName, Utils.toString(value), exc);
+					fieldTypeName, value, exc);
 		}
 
 		return value;
