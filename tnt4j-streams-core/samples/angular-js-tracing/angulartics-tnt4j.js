@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -18,7 +18,7 @@
 
 var plugin = angular.module ('angulartics.tnt4j', ['angulartics']);
 
-plugin.factory('Tnt4jStreamsService', function ($http, $document) {
+plugin.factory ('Tnt4jStreamsService', function ($http, $document) {
     return {
         sendPath: function (path) {
             this.sendEventToStream (this.event (path, null, null));
@@ -34,8 +34,8 @@ plugin.factory('Tnt4jStreamsService', function ($http, $document) {
                 url: "path",
                 eventName: "pageVisit",
                 properties: "",
-                rid: ((document.getElementById('corrid') || {}).value) || "",
-                sid: ((document.getElementById('rcorrid') || {}).value) || "",
+                rid: ((document.getElementById ('corrid') || {}).value) || "",
+                sid: ((document.getElementById ('rcorrid') || {}).value) || "",
                 pageLoad: (window.performance.timing.domComplete - window.performance.timing.fetchStart),
                 timestamp: Date.now ()
             };
@@ -58,15 +58,15 @@ plugin.factory('Tnt4jStreamsService', function ($http, $document) {
     }
 });
 
-plugin.config(['$analyticsProvider', 'Tnt4jStreamsServiceProvider', function ($analyticsProvider, Tnt4jStreamsServiceProvider) {
+plugin.config (['$analyticsProvider', 'Tnt4jStreamsServiceProvider', function ($analyticsProvider, Tnt4jStreamsServiceProvider) {
         var Tnt4jStreamsService = Tnt4jStreamsServiceProvider.$get ();
-    $analyticsProvider.registerPageTrack(function (path) {
-                                                  Tnt4jStreamsService.sendPath (path);
-                                              });
+        $analyticsProvider.registerPageTrack (function (path) {
+            Tnt4jStreamsService.sendPath (path);
+        });
 
-    $analyticsProvider.registerEventTrack(function (action, properties) {
-                                                   Tnt4jStreamsService.sendAction (action, properties);
-                                               });
+        $analyticsProvider.registerEventTrack (function (action, properties) {
+            Tnt4jStreamsService.sendAction (action, properties);
+        });
     }]);
 
  

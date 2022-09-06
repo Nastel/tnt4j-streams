@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -657,11 +657,8 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			return null;
 		}
 
-		if (StringUtils.isEmpty(charsetName)) {
-			return new String(strBytes, Charset.defaultCharset());
-		} else {
-			return new String(strBytes, Charset.forName(charsetName));
-		}
+		return getString(strBytes,
+				StringUtils.isEmpty(charsetName) ? Charset.defaultCharset() : Charset.forName(charsetName));
 	}
 
 	/**

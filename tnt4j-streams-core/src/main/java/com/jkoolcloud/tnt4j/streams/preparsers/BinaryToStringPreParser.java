@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2020 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public class BinaryToStringPreParser extends AbstractPreParser<byte[], String> {
 	 * Constructs a new BinaryToStringPreParser.
 	 * 
 	 * @param charsetName
-	 *            RAW activity data charset
+	 *            charset name used to convert binary data to string
 	 */
 	public BinaryToStringPreParser(String charsetName) {
 		try {

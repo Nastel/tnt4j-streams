@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,12 +60,12 @@ public class ZipLineStreamTest {
 	public void initializeTest() throws Exception {
 		TestFileList testFiles = new TestFileList(true);
 		byte[] buffer = new byte[1024];
-		final File zipFile = File.createTempFile("testZip", ".zip");
+		File zipFile = File.createTempFile("testZip", ".zip");
 		zipFile.deleteOnExit();
 		OutputStream os = new FileOutputStream(zipFile);
 		ZipOutputStream zos = new ZipOutputStream(os);
 		for (File testfile : testFiles) {
-			final ZipEntry zipEntry = new ZipEntry(testfile.getName());
+			ZipEntry zipEntry = new ZipEntry(testfile.getName());
 			zos.putNextEntry(zipEntry);
 			FileInputStream fis = new FileInputStream(testfile);
 			int length;

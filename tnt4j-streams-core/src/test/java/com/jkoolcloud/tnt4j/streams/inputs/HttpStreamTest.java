@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ public class HttpStreamTest {
 
 		post.setEntity(multipart);
 
-		final HttpResponse returned = client.execute(post);
+		HttpResponse returned = client.execute(post);
 		assertNotNull(returned);
 
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
 public class ActivityJsonParserTest {
 
 	ActivityJsonParser parser = new ActivityJsonParser();
-	AbstractBufferedStream<?> stream = Mockito.mock(TestUtils.SimpleTestStream.class, Mockito.CALLS_REAL_METHODS);
+	AbstractBufferedStream<?> stream = new TestUtils.SimpleTestStream();
 
 	@Test
 	public void setPropertiesWhenNullTest() {

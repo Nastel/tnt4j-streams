@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ public class ZKConnection implements Closeable {
 	 *             if the current thread is interrupted while waiting
 	 */
 	public ZooKeeper connect(String connStr, int timeout) throws IOException, InterruptedException {
-		final CountDownLatch connectedSignal = new CountDownLatch(1);
+		CountDownLatch connectedSignal = new CountDownLatch(1);
 		zk = new ZooKeeper(connStr, timeout, new Watcher() {
 			@Override
 			public void process(WatchedEvent we) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +71,7 @@ public enum CacheProperties {
 	 */
 	@XmlEnumValue("Persisted")
 	PERSISTED("Persisted");
+
 	private final String value;
 
 	CacheProperties(String v) {

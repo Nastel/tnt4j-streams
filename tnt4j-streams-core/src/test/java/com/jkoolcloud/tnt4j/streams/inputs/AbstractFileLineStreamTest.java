@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public class AbstractFileLineStreamTest {
 		Map<String, String> props = new HashMap<>(1);
 		props.put(StreamProperties.PROP_FILENAME, fileName);
 		afls.setProperties(props.entrySet());
-		final Object property = afls.getProperty(StreamProperties.PROP_FILENAME);
+		Object property = afls.getProperty(StreamProperties.PROP_FILENAME);
 		assertEquals(fileName, property);
 	}
 

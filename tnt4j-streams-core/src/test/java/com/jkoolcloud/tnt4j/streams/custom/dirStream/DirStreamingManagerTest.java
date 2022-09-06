@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,15 +35,15 @@ public class DirStreamingManagerTest {
 
 	@Before
 	public void prepare() throws IOException {
-		final File tmpFile = File.createTempFile("TEST", ".TST");
+		File tmpFile = File.createTempFile("TEST", ".TST");
 		tmpFile.deleteOnExit();
-		final File parentFile = tmpFile.getParentFile();
+		File parentFile = tmpFile.getParentFile();
 		dsm = new DirStreamingManager(parentFile.getAbsolutePath(), "tnt-data-source*.xml"); // NON-NLS
 	}
 
 	@Test
 	public void testStart() throws IOException {
-		final StreamingJobListener mock = mock(StreamingJobListener.class);
+		StreamingJobListener mock = mock(StreamingJobListener.class);
 		File tmpFile = File.createTempFile("tnt-data-source_" + UUID.randomUUID().toString(), ".XML");
 		tmpFile.deleteOnExit();
 		dsm.addStreamingJobListener(mock);

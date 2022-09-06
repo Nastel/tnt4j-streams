@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
  * <p>
  * This activity stream supports configuration properties from {@link CharacterStream} (and higher hierarchy streams) in
  * combination with properties from {@link com.jkoolcloud.tnt4j.streams.inputs.FileSystemAdapter}. It allows use of
- * {@code "FileName"} property in common with with {@code "Port"} property when accessing remote files.
+ * {@code "FileName"} property in common with {@code "Port"} property when accessing remote files.
  * 
  * @version $Revision: 1 $
  *
@@ -45,7 +45,7 @@ import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 public class FileSystemCharacterStream extends CharacterStream {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(FileSystemCharacterStream.class);
 
-	private FileSystemAdapter fsAdapter;
+	private final FileSystemAdapter fsAdapter;
 
 	/**
 	 * Constructs an empty FileSystemCharacterStream. Requires configuration settings to set input stream source.

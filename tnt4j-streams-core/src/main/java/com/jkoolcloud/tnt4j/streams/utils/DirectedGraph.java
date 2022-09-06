@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ public class DirectedGraph<T> implements Iterable<T> {
 		}
 
 		/* Otherwise, add the node with an empty set of outgoing edges. */
-		mGraph.put(node, new LinkedHashSet<T>());
+		mGraph.put(node, new LinkedHashSet<> ());
 		return true;
 	}
 

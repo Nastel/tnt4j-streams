@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,14 +66,14 @@ public class TopologicalSort {
 		 * Maintain two structures - a set of visited nodes (so that once we've added a node to the list, we don't label
 		 * it again), and a list of nodes that actually holds the topological ordering.
 		 */
-		List<T> result = new ArrayList<T>();
-		Set<T> visited = new HashSet<T>();
+		List<T> result = new ArrayList<> ();
+		Set<T> visited = new HashSet<> ();
 
 		/*
 		 * We'll also maintain a third set consisting of all nodes that have been fully expanded. If the graph contains
 		 * a cycle, then we can detect this by noting that a node has been explored but not fully expanded.
 		 */
-		Set<T> expanded = new HashSet<T>();
+		Set<T> expanded = new HashSet<> ();
 
 		/* Fire off a DFS from each node in the graph. */
 		for (T node : gRev) {
@@ -140,7 +140,7 @@ public class TopologicalSort {
 	 * @return the reverse of that graph
 	 */
 	private static <T> DirectedGraph<T> reverseGraph(DirectedGraph<T> g) {
-		DirectedGraph<T> result = new DirectedGraph<T>();
+		DirectedGraph<T> result = new DirectedGraph<> ();
 
 		/* Add all the nodes from the original graph. */
 		for (T node : g) {

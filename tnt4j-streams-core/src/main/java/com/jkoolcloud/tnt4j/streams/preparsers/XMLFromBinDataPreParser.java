@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -361,7 +361,7 @@ public class XMLFromBinDataPreParser extends AbstractPreParser<Object, Document>
 				try {
 					is.skip(lPos);
 					is.read(buffer);
-					String text = new String(buffer, charset);
+					String text = Utils.getString(buffer, charset);
 					characters(text.toCharArray(), 0, text.length());
 				} finally {
 					is.reset();
