@@ -52,7 +52,6 @@ Why TNT4J-Streams
     * Artemis Broker or Producer/Consumer interceptor
     * Snappy compressed binary data or input stream
     * Protobuf messages
-    * Prometheus Remote-Write messages
 
 * Files (including provided by HDFS and JSR-203 FileSystem) can be streamed:
     * as "whole at once" - when a stream starts, it reads file contents line by line meaning a single file line holds data of a single
@@ -76,6 +75,7 @@ Why TNT4J-Streams
     * Nagios
     * Elastic Beats
     * AWS CloudWatch metrics over Kinesis FireHose
+    * Prometheus Remote-Write over Snappy compressed protobuf messages
 
   just by applying configuration and without additional coding.
 
@@ -3236,6 +3236,10 @@ Sample stream configuration is same as in ['Node.js'](#nodejs) sample.
 #### AWS CloudWatch metrics over Kinesis FireHose
 
 See [CloudWatch metrics sample README](tnt4j-streams-servlet/samples/cloudwatch-servlet/README.md) for details.
+
+#### Prometheus Remote-Write
+
+See [Prometheus remote-write sample README](tnt4j-streams-servlet/samples/prometheus-servlet/README.md) for details.
 
 #### JAX-WS
 

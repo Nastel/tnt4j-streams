@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2014-2022 JKOOL, LLC.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
+
+    <!--  Pre-parser to decompress Snappy packet of binary data -->
+    <java-object name="SnappyBinPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.SnappyBinaryPreParser"/>
+
+    <!--  Pre-parser to deserialize binary Prometheus Remote-Write protobuf message to map -->
+    <java-object name="PrometheusReqMapPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.PrometheusRWToMapPreParser"/>
+    <!--  Pre-parser to deserialize binary Prometheus Remote-Write protobuf message to  JSON string -->
+    <!--java-object name="PrometheusReqStringPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.PrometheusRWToStringPreParser"/-->
+
+    <parser name="LabelsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <field name="__Name__" locator="__name__" locator-type="Label" transparent="true"/>
+        <field name="Instance" locator="instance" locator-type="Label"/>
+        <field name="Job" locator="job" locator-type="Label"/>
+        <field name="Type" locator="type" locator-type="Label"/>
+        <field name="Name" locator="name" locator-type="Label"/>
+
+        <field name="Rest" locator="#" locator-type="Label"/>
+    </parser>
+
+    <parser name="SamplesParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <field name="StartTime" locator="timestamp" locator-type="Label" datatype="Timestamp"/>
+        <field name="EndTime" locator="StartTime" locator-type="Activity" datatype="Timestamp"/>
+
+        <field name="Value" locator="value" locator-type="Label" datatype="AsInput"/>
+
+        <field name="Rest" locator="#" locator-type="Label"/>
+    </parser>
+
+    <parser name="ExemplarsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <field name="Timestamp" locator="timestamp" locator-type="Label" datatype="Timestamp"/>
+        <field name="Value" locator="value" locator-type="Label" datatype="AsInput"/>
+
+        <field name="Rest" locator="#" locator-type="Label"/>
+    </parser>
+
+    <parser name="MetricsMetaDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <field name="MetricType" locator="type" locator-type="Label"/>
+        <field name="Help" locator="help" locator-type="Label"/>
+        <field name="MetricFamilyName" locator="family" locator-type="Label"/>
+        <field name="Unit" locator="unit" locator-type="Label"/>
+
+        <field name="Rest" locator="#" locator-type="Label"/>
+    </parser>
+
+    <parser name="TimeSeriesEntryParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser" manualFieldsOrder="true">
+        <field name="EventType" value="Snapshot"/>
+
+        <embedded-activity name="MetaData" locator="metadata" locator-type="Label">
+            <parser-ref name="MetricsMetaDataParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="Labels" locator="labels" locator-type="Label">
+            <parser-ref name="LabelsParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="Samples" locator="samples" locator-type="Label">
+            <parser-ref name="SamplesParser" aggregation="Merge"/>
+        </embedded-activity>
+        <!--embedded-activity name="Exemplars" locator="exemplars.values()" locator-type="Label">
+            <parser-ref name="ExemplarsParser" aggregation="Merge"/>
+        </embedded-activity-->
+
+        <field name="metricNameTokens" value="" datatype="AsInput" transparent="true">
+            <field-transform lang="groovy" phase="aggregated"><![CDATA[
+                StringUtils.isEmpty(${__Name__})
+                    ? new String[0]
+                    : ${__Name__}.split("_")
+            ]]></field-transform>
+        </field>
+
+        <field name="domain" value="domain" transparent="true">
+            <field-transform lang="groovy"><![CDATA[
+                if (StringUtils.startsWith (${__Name__}, "com_jkoolcloud_tnt4j_streams_")) {
+                    return "com.jkoolcloud.tnt4j.streams"
+                } else if (StringUtils.startsWith (${__Name__}, "com_sun_management_")) {
+                    return "com.sun.management"
+                } else if (StringUtils.startsWith (${__Name__}, "java_lang_")) {
+                    return "java.lang"
+                } else if (StringUtils.startsWith (${__Name__}, "java_nio_")) {
+                    return "java.nio"
+                } else if (StringUtils.startsWith (${__Name__}, "java_util_logging_")) {
+                    return "java.util.logging"
+                } else if (StringUtils.startsWith (${__Name__}, "kafka_consumer_")) {
+                    return "kafka.consumer"
+                } else if (StringUtils.startsWith (${__Name__}, "kafka_producer_")) {
+                    return "kafka.producer"
+                } else if (StringUtils.startsWith (${__Name__}, "kafka_")) {
+                    return "kafka"
+                } else {
+                    return ${metricNameTokens}.length > 2
+                                ? ${metricNameTokens}[0] + "." + ${metricNameTokens}[1]
+                                : ${metricNameTokens}[0]
+                }
+            ]]></field-transform>
+        </field>
+
+        <field name="EventName" locator="__Name__" locator-type="Activity"/>
+        <field name="Category" locator="domain" locator-type="Activity"/>
+    </parser>
+
+    <parser name="TimeSeriesParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Activity"/>
+        <field name="EventName" value="PrometheusTimeSeries"/>
+
+        <field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
+        <field name="EndTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
+
+        <embedded-activity name="MetricDataAP" locator="$DATA$" locator-type="Label">
+            <parser-ref name="TimeSeriesEntryParser" aggregation="Relate"/>
+        </embedded-activity>
+    </parser>
+
+    <parser name="SnappyCompressedMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <reference name="SnappyBinPreParser"/>
+        <reference name="PrometheusReqMapPreParser"/>
+
+        <field name="EventType" value="Activity"/>
+        <field name="EventName" value="PrometheusTimeSeries"/>
+        <field name="ParserName" locator="ParserName" locator-type="ParserProp" transparent="true"/>
+
+        <field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
+        <field name="EndTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
+
+        <embedded-activity name="MetricsDataProto" locator="$DATA$" locator-type="Label">
+            <field-transform lang="groovy"><![CDATA[
+                Collection<Map<String, ?>> tsColl = new ArrayList<>();
+
+		        for (Map.Entry<String, Collection<Map<String, ?>>> tsCollE : $fieldValue.entrySet()) {
+			        tsColl.addAll(tsCollE.getValue());
+		        }
+
+		        return tsColl;
+            ]]></field-transform>
+            <parser-ref name="TimeSeriesEntryParser" aggregation="Relate"/>
+        </embedded-activity>
+    </parser>
+
+    <parser name="MetricsParserStr" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
+        <field name="EventType" value="NOOP"/>
+        <field name="ParserName" locator="ParserName" locator-type="ParserProp" transparent="true"/>
+
+        <embedded-activity name="MetricsDataJSON" locator="$.[*].timeseries" locator-type="Label">
+            <parser-ref name="TimeSeriesParser" aggregation="Merge"/>
+        </embedded-activity>
+    </parser>
+
+    <parser name="PrometheusParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+        <field name="MetricsDataRAW" locator="ActivityData" locator-type="Label" datatype="AsInput" transparent="true">
+            <parser-ref name="SnappyCompressedMetricsParser" aggregation="Merge">
+                <matchExp>groovy: $fieldValue instanceof byte[]</matchExp>
+            </parser-ref>
+            <parser-ref name="MetricsParserStr" aggregation="Merge">
+                <matchExp>string:startsWithAny([,{)</matchExp>
+            </parser-ref>
+        </field>
+    </parser>
+</tnt-data-source>

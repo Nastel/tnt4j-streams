@@ -117,6 +117,13 @@
 
         <dependency>
             <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+            <artifactId>tnt4j-streams-prometheus</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jkoolcloud.tnt4j.streams</groupId>
             <artifactId>tnt4j-streams-core</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>

@@ -20,9 +20,13 @@
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xsi:schemaLocation="http://logging.apache.org/log4j/2.0/config">
     <Properties>
-        <Property name="tnt4j.streams.log.filename">${sys:catalina.base}/logs/tnt4j-streams.log</Property>
-        <Property name="tnt4j.activities.jkool.log.filename">${sys:catalina.base}/logs/tnt4j-streams-jkool-activities.log</Property>
-        <Property name="tnt4j.activities.ap.log.filename">${sys:catalina.base}/logs/tnt4j-streams-ap-activities.log</Property>
+        <!--        <Property name="tnt4j.webapp.id">tnt4j-streams-cw</Property>-->
+        <Property name="tnt4j.webapp.id">tnt4j-streams-servlet</Property>
+        <!--        <Property name="tnt4j.webapp.id">${web:contextPathName}</Property>-->
+        <Property name="tnt4j.log.dir">${sys:catalina.base}/logs</Property>
+        <Property name="tnt4j.streams.log.filename">${tnt4j.log.dir}/${tnt4j.webapp.id}.log</Property>
+        <Property name="tnt4j.activities.jkool.log.filename">${tnt4j.log.dir}/${tnt4j.webapp.id}-jkool-activities.log</Property>
+        <Property name="tnt4j.activities.ap.log.filename">${tnt4j.log.dir}/${tnt4j.webapp.id}-ap-activities.log</Property>
     </Properties>
     <Appenders>
         <!-- ### direct log messages to console ### -->
@@ -40,7 +44,7 @@
                 <OnStartupTriggeringPolicy/>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
-            <DefaultRolloverStrategy max="30" fileIndex="min">
+            <DefaultRolloverStrategy max="10" fileIndex="min">
                 <Delete basePath="${baseDir}" maxDepth="1">
                     <IfFileName glob="${tnt4j.streams.log.filename}.*.gz"/>
                     <IfLastModified age="30d"/>
@@ -60,7 +64,7 @@
                 <OnStartupTriggeringPolicy/>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
-            <DefaultRolloverStrategy max="30" fileIndex="min">
+            <DefaultRolloverStrategy max="5" fileIndex="min">
                 <Delete basePath="${baseDir}" maxDepth="1">
                     <IfFileName glob="${tnt4j.activities.jkool.log.filename}.*.gz"/>
                     <IfLastModified age="30d"/>
@@ -80,7 +84,7 @@
                 <OnStartupTriggeringPolicy/>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
-            <DefaultRolloverStrategy max="10" fileIndex="min">
+            <DefaultRolloverStrategy max="5" fileIndex="min">
                 <Delete basePath="${baseDir}" maxDepth="1">
                     <IfFileName glob="${tnt4j.activities.ap.log.filename}.*.gz"/>
                     <IfLastModified age="30d"/>
@@ -95,7 +99,7 @@
     <Loggers>
         <!-- ### jKool LLC TNT4J Streams log level and appenders used -->
         <asyncRoot level="INFO">
-            <AppenderRef ref="console"/>
+            <!--AppenderRef ref="console"/-->
             <AppenderRef ref="file"/>
         </asyncRoot>
         <!-- ### streams API logger -->
