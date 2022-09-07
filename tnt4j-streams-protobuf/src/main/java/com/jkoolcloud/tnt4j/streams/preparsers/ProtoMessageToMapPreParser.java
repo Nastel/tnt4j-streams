@@ -26,7 +26,7 @@ import com.google.protobuf.Message;
 
 /**
  * RAW activity data pre-parser capable to deserialize incoming activity data from protobuf message
- * {@link com.google.protobuf.Message} to map.
+ * {@link com.google.protobuf.Message} to string keyed map.
  * 
  * @version $Revision: 1 $
  */

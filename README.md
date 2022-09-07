@@ -52,6 +52,7 @@ Why TNT4J-Streams
     * Artemis Broker or Producer/Consumer interceptor
     * Snappy compressed binary data or input stream
     * Protobuf messages
+    * Prometheus Remote-Write messages
 
 * Files (including provided by HDFS and JSR-203 FileSystem) can be streamed:
     * as "whole at once" - when a stream starts, it reads file contents line by line meaning a single file line holds data of a single
@@ -6819,6 +6820,14 @@ Modules list:
          <version>1.14.1</version>
      </dependency>
   ```
+* `Prometheus` (O) - Prometheus Remote-Write protobuf messages pre-parsers module. Maven dependency:
+  ```xml
+     <dependency>
+         <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+         <artifactId>tnt4j-streams-prometheus</artifactId>
+         <version>1.14.1</version>
+     </dependency>
+  ```
 * `Samples` (O) - integration into custom API sample module. Maven dependency:
   ```xml
      <dependency>
@@ -6921,6 +6930,7 @@ Maven tests run is disabled by default. To enable Maven to run tests set Maven c
 * in `servlet` module run JUnit test suite named `AllServletStreamTests`
 * in `snappy` module run JUnit test suite named `AllSnappyStreamTests`
 * in `protobuf` module run JUnit test suite named `AllProtobufStreamTests`
+* in `prometheus` module run JUnit test suite named `AllPrometheusStreamTests`
 
 Known Projects Using TNT4J-STREAMS
 ===============================================

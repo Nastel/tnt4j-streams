@@ -36,7 +36,7 @@
         <param name="partial" type="boolean" value="false"/>
     </java-object>
 
-    <!--  Pre-parser to deserialize protobuf message as map -->
+    <!--  Pre-parser to deserialize protobuf message as string keyed map -->
     <java-object name="ProtoMessageToMapPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.ProtoMessageToMapPreParser"/>
 
     <!--  Pre-parser to deserialize protobuf message as JSON or TEXT string -->
