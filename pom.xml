@@ -324,6 +324,7 @@
         <module>tnt4j-streams-elastic-beats</module>
         <module>tnt4j-streams-samples</module>
         <module>tnt4j-streams-snappy</module>
+        <module>tnt4j-streams-protobuf</module>
         <module>tnt4j-streams--distribution</module>
     </modules>
 </project>

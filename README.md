@@ -51,6 +51,7 @@ Why TNT4J-Streams
     * [Chronicle Queue](https://chronicle.software/products/queue/)
     * Artemis Broker or Producer/Consumer interceptor
     * Snappy compressed binary data or input stream
+    * Protobuf messages
 
 * Files (including provided by HDFS and JSR-203 FileSystem) can be streamed:
     * as "whole at once" - when a stream starts, it reads file contents line by line meaning a single file line holds data of a single
@@ -6794,7 +6795,7 @@ Modules list:
          <version>1.14.1</version>
      </dependency>
   ```
-* `Servlet` (M) - integration into custom API sample module. Maven dependency:
+* `Servlet` (M) - packaging streams as servlet module. Maven dependency:
   ```xml
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
@@ -6802,11 +6803,19 @@ Modules list:
          <version>1.14.1</version>
      </dependency>
   ```
-* `Snappy` (O) - integration into custom API sample module. Maven dependency:
+* `Snappy` (O) - Snappy compressed data pre-parsers module. Maven dependency:
   ```xml
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
          <artifactId>tnt4j-streams-snappy</artifactId>
+         <version>1.14.1</version>
+     </dependency>
+  ```
+* `Protobuf` (O) - Protobuf messages pre-parsers module. Maven dependency:
+  ```xml
+     <dependency>
+         <groupId>com.jkoolcloud.tnt4j.streams</groupId>
+         <artifactId>tnt4j-streams-protobuf</artifactId>
          <version>1.14.1</version>
      </dependency>
   ```
@@ -6911,6 +6920,7 @@ Maven tests run is disabled by default. To enable Maven to run tests set Maven c
 * in `chronicle` module run JUnit test suite named `AllChronicleStreamTests`
 * in `servlet` module run JUnit test suite named `AllServletStreamTests`
 * in `snappy` module run JUnit test suite named `AllSnappyStreamTests`
+* in `protobuf` module run JUnit test suite named `AllProtobufStreamTests`
 
 Known Projects Using TNT4J-STREAMS
 ===============================================
