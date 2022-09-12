@@ -24,8 +24,6 @@
 
     <!--  Pre-parser to deserialize binary Prometheus Remote-Write protobuf message to map -->
     <java-object name="PrometheusReqMapPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.PrometheusRWToMapPreParser"/>
-    <!--  Pre-parser to deserialize binary Prometheus Remote-Write protobuf message to  JSON string -->
-    <!--java-object name="PrometheusReqStringPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.PrometheusRWToStringPreParser"/-->
 
     <parser name="LabelsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="NOOP"/>
