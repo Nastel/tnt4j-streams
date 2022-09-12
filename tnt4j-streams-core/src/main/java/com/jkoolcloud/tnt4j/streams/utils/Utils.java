@@ -1501,7 +1501,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		try (ByteArrayOutputStream bos = new ByteArrayOutputStream(b.length * 2)) {
 			if (len > 0 && len < b.length) {
 				byte[] bc = Arrays.copyOfRange(b, offset, offset + len);
-				HexDump.dump(bc, 0, bos, offset);
+				HexDump.dump(bc, 0, bos, 0);
 			} else {
 				HexDump.dump(b, 0, bos, offset);
 			}
