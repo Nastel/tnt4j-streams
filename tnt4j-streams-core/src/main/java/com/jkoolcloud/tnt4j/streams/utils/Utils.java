@@ -3241,11 +3241,13 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			if (CollectionUtils.isNotEmpty(exprVars)) {
 				for (String eVar : exprVars) {
 					String varName = Utils.getVarName(eVar);
-					if (varName.startsWith("sys:")) { // NON-NLS
-						String val = System.getProperty(varName.substring("sys:".length())); // NON-NLS
-						fValue = fValue.replace(eVar, val);
-					} else if (varName.startsWith("env:")) { // NON-NLS
-						String val = System.getenv(varName.substring("env:".length())); // NON-NLS
+					String val = null;
+					if (varName.startsWith(StreamsConstants.VAR_SCOPE_SYSTEM)) {
+						val = System.getProperty(varName.substring(StreamsConstants.VAR_SCOPE_SYSTEM.length()));
+					} else if (varName.startsWith(StreamsConstants.VAR_SCOPE_ENVIRONMENT)) {
+						val = System.getenv(varName.substring(StreamsConstants.VAR_SCOPE_ENVIRONMENT.length()));
+					}
+					if (val != null) {
 						fValue = fValue.replace(eVar, val);
 					}
 				}

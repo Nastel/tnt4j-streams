@@ -96,6 +96,16 @@ public final class StreamsConstants {
 	 */
 	public static final String VALUE_ORDINAL_INDEX = "$index"; // NON-NLS
 
+	/**
+	 * The constant defining prefix for JVM System property referenced variables: {@value}
+	 */
+	public static final String VAR_SCOPE_SYSTEM = "sys:"; // NON-NLS
+
+	/**
+	 * The constant defining prefix for OS Environment referenced variables: {@value}
+	 */
+	public static final String VAR_SCOPE_ENVIRONMENT = "env:"; // NON-NLS
+
 	private StreamsConstants() {
 	}
 

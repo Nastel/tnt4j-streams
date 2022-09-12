@@ -27,14 +27,6 @@
         <param name="charsetName" type="java.lang.String" value="UTF-8"/>
     </java-object>
 
-    <!--  Pre-parser to decompress Snappy input stream of binary data -->
-    <java-object name="SnappyInputStreamPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.SnappyInputStreamPreParser"/>
-
-    <!--  Pre-parser to decompress Snappy input stream of text data -->
-    <java-object name="SnappyInputStreamToStringPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.SnappyInputStreamPreParser">
-        <param name="charsetName" type="java.lang.String" value="UTF-8"/>
-    </java-object>
-
     <parser name="MetricsParserStr" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
         <!-- fields mapping goes here ...  -->
     </parser>

@@ -16,11 +16,21 @@
 
 package com.jkoolcloud.tnt4j.streams.preparsers;
 
-import org.xerial.snappy.Snappy;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
+
+import org.apache.commons.compress.compressors.snappy.SnappyCompressorInputStream;
+import org.apache.commons.io.IOUtils;
+
+import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
- * RAW activity data pre-parser capable to decompress incoming Snappy compressed activity data from {@code byte[]} to
- * selected format: binary or text.
+ * RAW activity data pre-parser capable to decompress incoming Snappy compressed activity data from {@code byte[]} or
+ * Snappy compressor input stream {@link org.apache.commons.compress.compressors.snappy.SnappyCompressorInputStream} fed
+ * data to selected format: binary or text.
  * <p>
  * Default decompressed data type is {@link com.jkoolcloud.tnt4j.streams.preparsers.UncompressedType#BINARY}.
  * <p>
@@ -30,13 +40,23 @@ import org.xerial.snappy.Snappy;
  *
  * @version $Revision: 1 $
  */
-public class SnappyBinaryPreParser extends AbstractSnappyPreParser<byte[]> {
+public class SnappyBinaryPreParser extends AbstractPreParser<Object, Object> {
+
+	/**
+	 * Decompressed data type.
+	 */
+	protected final UncompressedType uncompressedType;
+
+	/**
+	 * Charset used to convert binary data to string.
+	 */
+	protected Charset charset;
 
 	/**
 	 * Constructs a new SnappyBinaryPreParser.
 	 */
 	public SnappyBinaryPreParser() {
-		super(UncompressedType.BINARY);
+		this(UncompressedType.BINARY);
 	}
 
 	/**
@@ -46,7 +66,7 @@ public class SnappyBinaryPreParser extends AbstractSnappyPreParser<byte[]> {
 	 *            decompressed data type
 	 */
 	public SnappyBinaryPreParser(UncompressedType uncompressedType) {
-		super(uncompressedType);
+		this.uncompressedType = uncompressedType;
 	}
 
 	/**
@@ -56,7 +76,15 @@ public class SnappyBinaryPreParser extends AbstractSnappyPreParser<byte[]> {
 	 *            charset name used to convert binary data to string
 	 */
 	public SnappyBinaryPreParser(String charsetName) {
-		super(charsetName);
+		this(UncompressedType.STRING);
+
+		try {
+			this.charset = Charset.forName(charsetName);
+		} catch (UnsupportedCharsetException | IllegalCharsetNameException e) {
+			throw e;
+		} catch (IllegalArgumentException e) {
+			this.charset = Charset.defaultCharset();
+		}
 	}
 
 	/**
@@ -64,22 +92,45 @@ public class SnappyBinaryPreParser extends AbstractSnappyPreParser<byte[]> {
 	 * <p>
 	 * This pre-parser supports the following class types (and all classes extending/implementing any of these):
 	 * <ul>
+	 * <li>{@link java.io.InputStream}</li>
 	 * <li>{@code byte[]}</li>
 	 * </ul>
 	 */
 	@Override
 	public boolean isDataClassSupported(Object data) {
-		return data instanceof byte[];
+		return data instanceof InputStream || data instanceof byte[];
 	}
 
 	@Override
-	public Object preParse(byte[] data) throws Exception {
+	public Object preParse(Object data) throws Exception {
+		InputStream din;
+
+		if (data instanceof InputStream) {
+			din = (InputStream) data;
+		} else {
+			din = new ByteArrayInputStream((byte[]) data);
+		}
+
+		SnappyCompressorInputStream in = new SnappyCompressorInputStream(din);
+		byte[] uncompressed = IOUtils.toByteArray(in);
+
 		switch (uncompressedType) {
 		case STRING:
-			return Snappy.uncompressString(data, charset);
+			return Utils.getString(uncompressed, charset);
 		case BINARY:
 		default:
-			return Snappy.uncompress(data);
+			return uncompressed;
+		}
+	}
+
+	@Override
+	public String dataTypeReturned() {
+		switch (uncompressedType) {
+		case STRING:
+			return "TEXT"; // NON-NLS
+		case BINARY:
+		default:
+			return "BINARY"; // NON-NLS
 		}
 	}
 }
