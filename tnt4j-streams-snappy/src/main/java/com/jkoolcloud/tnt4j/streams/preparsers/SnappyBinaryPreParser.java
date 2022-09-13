@@ -17,6 +17,7 @@
 package com.jkoolcloud.tnt4j.streams.preparsers;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
@@ -25,6 +26,8 @@ import java.nio.charset.UnsupportedCharsetException;
 import org.apache.commons.compress.compressors.snappy.SnappyCompressorInputStream;
 import org.apache.commons.io.IOUtils;
 
+import com.jkoolcloud.tnt4j.sink.EventSink;
+import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
@@ -41,6 +44,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * @version $Revision: 1 $
  */
 public class SnappyBinaryPreParser extends AbstractPreParser<Object, Object> {
+	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(SnappyBinaryPreParser.class);
 
 	/**
 	 * Decompressed data type.
@@ -111,8 +115,18 @@ public class SnappyBinaryPreParser extends AbstractPreParser<Object, Object> {
 			din = new ByteArrayInputStream((byte[]) data);
 		}
 
-		SnappyCompressorInputStream in = new SnappyCompressorInputStream(din);
-		byte[] uncompressed = IOUtils.toByteArray(in);
+		byte[] uncompressed;
+		try {
+			SnappyCompressorInputStream in = new SnappyCompressorInputStream(din);
+			uncompressed = IOUtils.toByteArray(in);
+		} catch (IOException exc) {
+			if ("Premature end of stream reading size".equals(exc.getMessage())) { // NON-NLS
+				// stream closed
+				return null;
+			}
+
+			throw exc;
+		}
 
 		switch (uncompressedType) {
 		case STRING:
