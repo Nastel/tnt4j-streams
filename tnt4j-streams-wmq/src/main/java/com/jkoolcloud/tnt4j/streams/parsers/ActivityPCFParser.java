@@ -735,11 +735,11 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 
 		if (mqiStruct != null) {
 			mqiStruct.readFromBuffer(structData, 0, 4, true, env.getNativeCharSet(), new JmqiTls());
-			if (logger().isSet(OpLevel.DEBUG)) {
-				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
-						"ActivityPCFParser.built.structure", structParam.getParameterName(), structParam.getParameter(),
-						mqiToString(mqiStruct, env));
-			}
+			MqiStructure logMqiStruct = mqiStruct;
+			LoggerUtils.log(logger(), OpLevel.DEBUG,
+					StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
+					"ActivityPCFParser.built.structure", () -> Utils.args(structParam.getParameterName(),
+							structParam.getParameter(), mqiToString(logMqiStruct, env)));
 
 			return mqiStruct;
 		}

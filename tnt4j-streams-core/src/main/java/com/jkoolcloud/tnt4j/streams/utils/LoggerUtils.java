@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.function.Supplier;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -367,6 +368,54 @@ public class LoggerUtils {
 	 */
 	public static void log(EventSink logger, OpLevel sev, ResourceBundle rb, String key, Object... args) {
 		if (logger.isSet(sev)) {
+			processLogArgs(args);
+			logger.log(sev, rb, key, args);
+		}
+	}
+
+	/**
+	 * Log a given string message with a specified severity.
+	 *
+	 * @param logger
+	 *            logger instance to use for logging
+	 * @param sev
+	 *            log entry severity
+	 * @param msg
+	 *            log message pattern
+	 * @param argsSupplier
+	 *            log message formatting arguments supplier
+	 *
+	 * @see com.jkoolcloud.tnt4j.sink.EventSink#log(com.jkoolcloud.tnt4j.core.OpLevel, String, Object...)
+	 */
+	public static void log(EventSink logger, OpLevel sev, String msg, Supplier<Object[]> argsSupplier) {
+		if (logger.isSet(sev)) {
+			Object[] args = argsSupplier.get();
+			processLogArgs(args);
+			logger.log(sev, msg, args);
+		}
+	}
+
+	/**
+	 * Log a given resource bundle entry with a specified severity.
+	 *
+	 * @param logger
+	 *            logger instance to use for logging
+	 * @param sev
+	 *            log entry severity
+	 * @param rb
+	 *            resource bundle to use
+	 * @param key
+	 *            resource bundle entry key
+	 * @param argsSupplier
+	 *            log message formatting arguments supplier
+	 *
+	 * @see com.jkoolcloud.tnt4j.sink.EventSink#log(com.jkoolcloud.tnt4j.core.OpLevel, java.util.ResourceBundle, String,
+	 *      Object...)
+	 */
+	public static void log(EventSink logger, OpLevel sev, ResourceBundle rb, String key,
+			Supplier<Object[]> argsSupplier) {
+		if (logger.isSet(sev)) {
+			Object[] args = argsSupplier.get();
 			processLogArgs(args);
 			logger.log(sev, rb, key, args);
 		}

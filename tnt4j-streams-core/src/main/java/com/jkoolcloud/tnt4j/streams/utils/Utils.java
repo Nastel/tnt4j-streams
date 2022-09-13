@@ -3258,4 +3258,15 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 		return propertyValue;
 	}
+
+	/**
+	 * Converts var-arg array to conventional object array.
+	 * 
+	 * @param args
+	 *            var-arg array to convert
+	 * @return conventional arguments array
+	 */
+	public static Object[] args(Object... args) {
+		return args;
+	}
 }

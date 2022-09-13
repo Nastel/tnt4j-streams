@@ -28,6 +28,7 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.core.Property;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
+import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
@@ -240,16 +241,13 @@ public abstract class AbstractScriptTransformation<V> extends AbstractValueTrans
 	 * @param tValue
 	 *            transformation evaluation result
 	 *
-	 * @see com.jkoolcloud.tnt4j.sink.EventSink#isSet(com.jkoolcloud.tnt4j.core.OpLevel)
 	 * @see com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils#describeExpression(String, java.util.Map, String,
 	 *      java.util.Collection, java.util.Map)
 	 */
 	protected void logEvaluationResult(Map<String, Object> varsMap, Object tValue) {
-		if (getLogger().isSet(OpLevel.TRACE)) {
-			getLogger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ScriptTransformation.evaluation.result", StreamsScriptingUtils.describeExpression(scriptCode,
-							varsMap, getHandledLanguage(), exprVars, placeHoldersMap),
-					Utils.toString(tValue));
-		}
+		LoggerUtils.log(getLogger(), OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+				"ScriptTransformation.evaluation.result",
+				() -> Utils.args(StreamsScriptingUtils.describeExpression(scriptCode, varsMap, getHandledLanguage(),
+						exprVars, placeHoldersMap), Utils.toString(tValue)));
 	}
 }

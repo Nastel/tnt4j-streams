@@ -83,10 +83,9 @@ public class StreamFeed extends AbstractFeed<BufferedInputStream> {
 			try {
 				int b = super.read();
 
-				String line = b == -1 ? "EOF" : String.format("%02X ", b); // NON-NLS
-
-				LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"AbstractFeed.read.bytes", line);
+				LoggerUtils.log(LOGGER, OpLevel.DEBUG,
+						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "AbstractFeed.read.bytes",
+						() -> Utils.args(b == -1 ? "EOF" : String.format("%02X ", b))); // NON-NLS
 
 				if (b == -1) {
 					close();
@@ -114,10 +113,9 @@ public class StreamFeed extends AbstractFeed<BufferedInputStream> {
 			try {
 				int total = super.read(b, off, len);
 
-				String line = total == -1 ? "EOF" : Utils.toHexDump(b, off, total); // NON-NLS
-
-				LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"AbstractFeed.read.bytes", line);
+				LoggerUtils.log(LOGGER, OpLevel.DEBUG,
+						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "AbstractFeed.read.bytes",
+						() -> Utils.args(total == -1 ? "EOF" : Utils.toHexDump(b, off, total)));
 
 				if (total == -1) {
 					close();

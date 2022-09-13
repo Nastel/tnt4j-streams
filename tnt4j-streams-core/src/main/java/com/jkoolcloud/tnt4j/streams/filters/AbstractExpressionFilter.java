@@ -28,6 +28,7 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.core.Property;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
+import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
@@ -243,16 +244,13 @@ public abstract class AbstractExpressionFilter<T> extends AbstractEntityFilter<T
 	 * @param match
 	 *            expression match result
 	 *
-	 * @see com.jkoolcloud.tnt4j.sink.EventSink#isSet(com.jkoolcloud.tnt4j.core.OpLevel)
 	 * @see com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils#describeExpression(String, java.util.Map, String,
 	 *      java.util.Collection, java.util.Map)
 	 */
 	protected void logEvaluationResult(Map<String, ?> varsMap, boolean match) {
-		if (getLogger().isSet(OpLevel.TRACE)) {
-			getLogger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ExpressionFilter.evaluation.result", StreamsScriptingUtils.describeExpression(filterExpression,
-							varsMap, getHandledLanguage(), exprVars, placeHoldersMap),
-					match);
-		}
+		LoggerUtils.log(getLogger(), OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+				"ExpressionFilter.evaluation.result",
+				() -> Utils.args(StreamsScriptingUtils.describeExpression(filterExpression, varsMap,
+						getHandledLanguage(), exprVars, placeHoldersMap), match));
 	}
 }

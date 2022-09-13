@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 
 	/**
 	 * Parameter defining activities delimiter symbol used by parsers. Default value is {@code "EOL"} - end of line.
-	 * Also can be {@code "EOF"} - end of file/stream.
+	 * Also, can be {@code "EOF"} - end of file/stream.
 	 */
 	protected String activityDelim = ActivityDelim.EOL.name();
 
@@ -595,7 +595,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 *
 	 * @param rdr
 	 *            reader to use for reading
-	 * @return non empty RAW activity data text string, or {@code null} if the end of the stream has been reached
+	 * @return non-empty RAW activity data text string, or {@code null} if the end of the stream has been reached
 	 */
 	protected String readNextActivity(BufferedReader rdr) {
 		String str = null;
@@ -662,10 +662,8 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 			cData.setMetadata(pContextData.getMetadata());
 		}
 
-		if (logger().isSet(OpLevel.DEBUG)) {
-			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ActivityParser.parsing.data", getLogString(getDataAsMessage(cData)));
-		}
+		LoggerUtils.log(logger(), OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+				"ActivityParser.parsing.data", () -> Utils.args(getLogString(getDataAsMessage(cData))));
 
 		ActivityInfo ai = parsePreparedItem(cData);
 		fillInMessageData(ai, cData);
