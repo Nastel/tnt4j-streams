@@ -323,14 +323,6 @@
         <!--<scope>runtime</scope>-->
         <!--</dependency>-->
 
-        <!-- uncomment if log4j logger shall be used -->
-        <!--<dependency>-->
-        <!--<groupId>org.apache.logging.log4j</groupId>-->
-        <!--<artifactId>log4j-core</artifactId>-->
-        <!--<version>${log4j.version}</version>-->
-        <!--<scope>runtime</scope>-->
-        <!--</dependency>-->
-
         <!-- uncomment if tnt4j-log4j logger shall be used -->
         <!--<dependency>-->
         <!--<groupId>com.jkoolcloud.tnt4j.logger</groupId>-->
