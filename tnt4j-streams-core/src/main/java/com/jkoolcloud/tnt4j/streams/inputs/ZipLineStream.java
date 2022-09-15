@@ -18,6 +18,8 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.jar.JarInputStream;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -181,7 +183,7 @@ public class ZipLineStream extends TNTParseableInputStream<String> {
 	 *             If path defined file is not found
 	 */
 	protected InputStream loadFile(String zipPath) throws Exception {
-		return new FileInputStream(zipPath);
+		return Files.newInputStream(Paths.get(zipPath));
 	}
 
 	/**

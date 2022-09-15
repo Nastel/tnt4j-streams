@@ -16,7 +16,9 @@
 
 package com.jkoolcloud.tnt4j.streams.inputs;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.util.HashMap;
@@ -244,9 +246,9 @@ public class MqttStream extends AbstractBufferedStream<Map<String, ?>> {
 				SSLContext sslContext = SSLContext.getInstance(SSL_PROTOCOL);
 
 				KeyStore keyStore = KeyStore.getInstance(KEYSTORE_TYPE);
-				FileInputStream fis = null;
+				InputStream fis = null;
 				try {
-					fis = new FileInputStream(keystore);
+					fis = Files.newInputStream(Paths.get(keystore));
 					keyStore.load(fis, keystorePass.toCharArray());
 				} finally {
 					Utils.close(fis);

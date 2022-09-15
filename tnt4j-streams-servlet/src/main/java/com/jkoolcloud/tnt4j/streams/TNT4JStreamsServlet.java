@@ -19,6 +19,8 @@ package com.jkoolcloud.tnt4j.streams;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import javax.servlet.ServletConfig;
@@ -302,7 +304,7 @@ public class TNT4JStreamsServlet extends HttpServlet {
 		InputStream in = Utils.getResourceAsStream(resource);
 		if (in == null) {
 			try {
-				in = new FileInputStream(resource);
+				in = Files.newInputStream(Paths.get(resource));
 			} catch (FileNotFoundException | SecurityException e) {
 				LOGGER.log(OpLevel.ERROR, StreamsResources.getString(ServletStreamConstants.RESOURCE_BUNDLE_NAME,
 						"TNT4JStreamsServlet.input.open.fail.file"), e);

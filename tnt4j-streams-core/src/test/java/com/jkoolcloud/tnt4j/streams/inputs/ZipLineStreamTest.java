@@ -20,9 +20,9 @@ import static com.jkoolcloud.tnt4j.streams.TestUtils.testPropertyList;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -62,12 +62,12 @@ public class ZipLineStreamTest {
 		byte[] buffer = new byte[1024];
 		File zipFile = File.createTempFile("testZip", ".zip");
 		zipFile.deleteOnExit();
-		OutputStream os = new FileOutputStream(zipFile);
+		OutputStream os = Files.newOutputStream(zipFile.toPath());
 		ZipOutputStream zos = new ZipOutputStream(os);
 		for (File testfile : testFiles) {
 			ZipEntry zipEntry = new ZipEntry(testfile.getName());
 			zos.putNextEntry(zipEntry);
-			FileInputStream fis = new FileInputStream(testfile);
+			InputStream fis = Files.newInputStream(testfile.toPath());
 			int length;
 			while ((length = fis.read(buffer)) > 0) {
 				zos.write(buffer, 0, length);

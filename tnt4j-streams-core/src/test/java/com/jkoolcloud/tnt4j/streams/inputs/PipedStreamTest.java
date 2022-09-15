@@ -19,8 +19,8 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.Reader;
+import java.nio.file.Files;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -50,7 +50,7 @@ public class PipedStreamTest {
 
 	@Test(timeout = 1000L)
 	public void testPipeFlow() throws Exception {
-		System.setIn(new FileInputStream(new File(samplesDir, "/piping-stream/orders.log")));
+		System.setIn(Files.newInputStream(new File(samplesDir, "/piping-stream/orders.log").toPath()));
 
 		PipedStream pipedStream = new PipedStream();
 		pipedStream.startStream();

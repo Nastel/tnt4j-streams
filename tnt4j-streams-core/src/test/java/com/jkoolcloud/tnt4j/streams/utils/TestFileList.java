@@ -17,8 +17,9 @@
 package com.jkoolcloud.tnt4j.streams.utils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
 /**
@@ -45,7 +46,7 @@ public class TestFileList extends ArrayList<File> {
 		for (Integer i = 0; i < count; i++) {
 			File tempFile = File.createTempFile(prefix, SUFFIX);
 			if (fill) {
-				FileOutputStream fos = new FileOutputStream(tempFile);
+				OutputStream fos = Files.newOutputStream(tempFile.toPath());
 				fos.write("TEST".getBytes()); // NON-NLS
 				fos.write(String.valueOf(i).getBytes());
 				fos.close();

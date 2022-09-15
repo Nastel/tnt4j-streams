@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.configure.sax;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -1294,7 +1295,7 @@ public class ConfigParserHandler extends DefaultHandler {
 			if (file.exists()) {
 				LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"ConfigParserHandler.resource.ref.load", id, file.getAbsolutePath());
-				return new FileInputStream(file);
+				return Files.newInputStream(file.toPath());
 			} else {
 				// try use uri as streams cfg. file relative path
 				if (!StringUtils.isEmpty(StreamsConfigSAXParser.cfgFilePath)) {
@@ -1303,7 +1304,7 @@ public class ConfigParserHandler extends DefaultHandler {
 					if (file.exists()) {
 						LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 								"ConfigParserHandler.resource.ref.load", id, file.getAbsolutePath());
-						return new FileInputStream(file);
+						return Files.newInputStream(file.toPath());
 					}
 				}
 			}

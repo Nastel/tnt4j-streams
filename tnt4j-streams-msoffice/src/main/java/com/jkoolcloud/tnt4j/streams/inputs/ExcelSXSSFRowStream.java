@@ -17,9 +17,9 @@
 package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -255,7 +255,7 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 					FileMagic fm;
 
 					try {
-						is = new FileInputStream(inputFile);
+						is = Files.newInputStream(inputFile.toPath());
 						is = FileMagic.prepareToCheckMagic(is);
 						fm = FileMagic.valueOf(is);
 					} finally {

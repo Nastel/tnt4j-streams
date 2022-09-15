@@ -18,6 +18,8 @@ package com.jkoolcloud.tnt4j.streams.configure;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Map;
@@ -105,8 +107,8 @@ public class StreamsConfigLoader {
 
 	private static InputStream openCfgFile(String path) {
 		try {
-			return new FileInputStream(path);
-		} catch (FileNotFoundException e) {
+			return Files.newInputStream(Paths.get(path));
+		} catch (IOException e) {
 		}
 		return Utils.getResourceAsStream(path);
 	}
@@ -146,7 +148,7 @@ public class StreamsConfigLoader {
 	 *             if there is an error reading the file
 	 */
 	public StreamsConfigLoader(String configFileName) throws SAXException, ParserConfigurationException, IOException {
-		load(new FileInputStream(configFileName));
+		load(Files.newInputStream(Paths.get(configFileName)));
 	}
 
 	/**
@@ -162,7 +164,7 @@ public class StreamsConfigLoader {
 	 *             if there is an error reading the file
 	 */
 	public StreamsConfigLoader(File configFile) throws SAXException, ParserConfigurationException, IOException {
-		load(new FileInputStream(configFile));
+		load(Files.newInputStream(configFile.toPath()));
 	}
 
 	/**

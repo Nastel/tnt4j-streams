@@ -1665,7 +1665,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 		Properties fProps = new Properties();
 
-		try (InputStream is = new FileInputStream(propFile)) {
+		try (InputStream is = Files.newInputStream(Paths.get(propFile))) {
 			fProps.load(is);
 		}
 

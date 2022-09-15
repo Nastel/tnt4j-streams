@@ -17,10 +17,11 @@
 package com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.reporters.trace;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.time.Duration;
 import java.util.*;
@@ -263,7 +264,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 			if (configFile.exists()) {
 				LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 						"MsgTraceReporter.loading.parsers.config", nameTokens[1], nameTokens[0]);
-				is = new FileInputStream(nameTokens[0]);
+				is = Files.newInputStream(Paths.get(nameTokens[0]));
 			} else {
 				String interceptorsPropFile = InterceptionsManager.getInterceptorsConfigFile();
 				configFile = new File(interceptorsPropFile);
@@ -272,7 +273,7 @@ public class MsgTraceReporter implements InterceptionsReporter {
 				if (configFile.exists()) {
 					LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 							"MsgTraceReporter.loading.parsers.config", nameTokens[1], cfgFilePath);
-					is = new FileInputStream(cfgFilePath);
+					is = Files.newInputStream(Paths.get(cfgFilePath));
 				}
 			}
 

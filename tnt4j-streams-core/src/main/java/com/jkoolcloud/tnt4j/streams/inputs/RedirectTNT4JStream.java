@@ -19,6 +19,8 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -222,7 +224,7 @@ public class RedirectTNT4JStream extends TNTInputStream<String, String> {
 			}
 
 			if (fileName != null) {
-				setStream(new FileInputStream(fileName));
+				setStream(Files.newInputStream(Paths.get(fileName)));
 			} else if (socketPort != null) {
 				feedsProducer = new ServerSocketFeedsProducer(socketPort);
 			} else {
