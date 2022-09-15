@@ -75,8 +75,7 @@ public class LoggerUtils {
 			loggerMask |= LOGBACK;
 		} else if (shc.getName().startsWith("java.util.logging.")) { // NON-NLS
 			loggerMask |= JUL;
-		} else if (shc.getName().startsWith("org.apache.logging.log4j.")
-				|| shc.getName().startsWith("org.apache.logging.slf4j.")) { // NON-NLS
+		} else if (StringUtils.startsWithAny(shc.getName(), "org.apache.logging.log4j.", "org.apache.logging.slf4j.")) { // NON-NLS
 			loggerMask |= LOG4J2;
 		} else if (shc.getName().startsWith("org.slf4j.")) { // NON-NLS
 			loggerMask |= SLF4J;
@@ -155,18 +154,18 @@ public class LoggerUtils {
 					"LoggerUtils.log4j2.reconfiguring");
 			// org.apache.logging.log4j.core.config.ConfigurationSource source =
 			// new org.apache.logging.log4j.core.config.ConfigurationSource (is);
-			Object source = Utils.createInstance("org.apache.logging.log4j.core.config.ConfigurationSource",
-					new Object[] { is }, InputStream.class); // NON-NLS
+			Object source = Utils.createInstance("org.apache.logging.log4j.core.config.ConfigurationSource", // NON-NLS
+					new Object[] { is }, InputStream.class);
 			// org.apache.logging.log4j.core.LoggerContext ctx = (org.apache.logging.log4j.core.LoggerContext)
 			// LogManager.getContext(false);
-			Object ctx = invoke("org.apache.logging.log4j.LogManager", "getContext", new Class[] { boolean.class },
-					false); // NON-NLS
+			Object ctx = invoke("org.apache.logging.log4j.LogManager", "getContext", new Class[] { boolean.class }, // NON-NLS
+					false);
 			// Configuration cfg = new XmlConfiguration((LoggerContext) ctx, (ConfigurationSource) source);
 			Object cfg = Utils.createInstance("org.apache.logging.log4j.core.config.xml.XmlConfiguration",
 					new Object[] { ctx, source }, ctx.getClass(), source.getClass()); // NON-NLS
 			// ctx.reconfigure(cfg);
-			invoke(ctx, "reconfigure",
-					new Class[] { Class.forName("org.apache.logging.log4j.core.config.Configuration") }, cfg); // NON-NLS
+			invoke(ctx, "reconfigure", // NON-NLS
+					new Class[] { Class.forName("org.apache.logging.log4j.core.config.Configuration") }, cfg);
 		} catch (Exception exc) {
 			Utils.logThrowable(logger, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"LoggerUtils.log4j2.reconfiguring.fail", exc);
@@ -174,6 +173,27 @@ public class LoggerUtils {
 
 		logger.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 				"LoggerUtils.log4j2.reconfiguring.end");
+	}
+
+	/**
+	 * Loads LOG4J2 configuration from provided {@link java.io.InputStream}.
+	 * 
+	 * @param is
+	 *            input stream to read log4j2 configuration
+	 * @throws Exception
+	 *             if fails to read log4j2 configuration from provided input stream or log42j2 API classes can't be
+	 *             found in classpath
+	 */
+	public static void loadLog4j2Config(InputStream is) throws Exception {
+		// org.apache.logging.log4j.core.config.ConfigurationSource source =
+		// new org.apache.logging.log4j.core.config.ConfigurationSource (is);
+		Object source = Utils.createInstance("org.apache.logging.log4j.core.config.ConfigurationSource",
+				new Object[] { is }, InputStream.class); // NON-NLS
+		// org.apache.logging.log4j.core.config.Configurator.initialize(null, source);
+		invoke("org.apache.logging.log4j.core.config.Configurator", "initialize", // NON-NLS
+				new Class[] { java.lang.ClassLoader.class,
+						Class.forName("org.apache.logging.log4j.core.config.ConfigurationSource") },
+				source);
 	}
 
 	private static void setJULConfig(byte[] data, EventSink logger) {

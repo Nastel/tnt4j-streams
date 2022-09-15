@@ -17,17 +17,14 @@
 package com.jkoolcloud.tnt4j.streams.custom.interceptors.jms.artemis;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.core.config.ConfigurationSource;
-import org.apache.logging.log4j.core.config.Configurator;
 
 import com.jkoolcloud.tnt4j.config.TrackerConfigStore;
 import com.jkoolcloud.tnt4j.core.OpLevel;
@@ -117,15 +114,14 @@ public class InterceptionsManager {
 			// LOG4J
 			File log4jCfg = new File(cfgPath, "log4j2.xml");
 			if (log4jCfg.exists()) {
-				try (InputStream fis = new FileInputStream(log4jCfg)) {
-					ConfigurationSource source = new ConfigurationSource(fis);
-					Configurator.initialize(null, source);
-				} catch (IOException exc) {
-					LOGGER.log(OpLevel.ERROR, StreamsResources.getString(JMSStreamConstants.RESOURCE_BUNDLE_NAME,
-							"InterceptionsManager.init.fail.log4j"), exc);
+				try (InputStream is = Files.newInputStream(log4jCfg.toPath())) {
+					LoggerUtils.loadLog4j2Config(is);
 				} catch (NoClassDefFoundError exc) {
 					LOGGER.log(OpLevel.WARNING, StreamsResources.getString(JMSStreamConstants.RESOURCE_BUNDLE_NAME,
 							"InterceptionsManager.init.log4j.no.class"));
+				} catch (Exception exc) {
+					LOGGER.log(OpLevel.ERROR, StreamsResources.getString(JMSStreamConstants.RESOURCE_BUNDLE_NAME,
+							"InterceptionsManager.init.fail.log4j"), exc);
 				}
 			}
 
@@ -173,7 +169,7 @@ public class InterceptionsManager {
 			// TNT4J-Streams data source
 			File dataSourceCfg = new File(cfgPath, "tnt-data-source.xml");
 			if (dataSourceCfg.exists()) {
-				try (InputStream fis = new FileInputStream(dataSourceCfg)) {
+				try (InputStream fis = Files.newInputStream(dataSourceCfg.toPath())) {
 					StreamsBuilder streamsBuilder = new CfgStreamsBuilder().setConfig(fis);
 					StreamsConfigLoader cfgLoader = ((CfgStreamsBuilder) streamsBuilder).loadConfig(false, true);
 

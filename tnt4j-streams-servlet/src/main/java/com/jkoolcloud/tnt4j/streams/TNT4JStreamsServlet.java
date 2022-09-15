@@ -34,8 +34,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
-import org.apache.logging.log4j.core.config.ConfigurationSource;
-import org.apache.logging.log4j.core.config.Configurator;
 
 import com.jkoolcloud.tnt4j.config.TrackerConfigStore;
 import com.jkoolcloud.tnt4j.core.OpCompCode;
@@ -147,9 +145,8 @@ public class TNT4JStreamsServlet extends HttpServlet {
 		System.setProperty(TrackerConfigStore.TNT4J_PROPERTIES_KEY, cfgFileTnt4j);
 
 		try (InputStream is = openStream(cfgFileLog4j)) {
-			ConfigurationSource source = new ConfigurationSource(is);
-			Configurator.initialize(null, source);
-		} catch (IOException exc) {
+			LoggerUtils.loadLog4j2Config(is);
+		} catch (Exception exc) {
 			throw new ServletException(StreamsResources.getString(ServletStreamConstants.RESOURCE_BUNDLE_NAME,
 					"TNT4JStreamsServlet.init.fail.log4j"), exc);
 		}
