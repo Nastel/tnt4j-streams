@@ -642,12 +642,18 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 				"ActivityParser.activity.raw.data", getLogString(data.getData()));
 
-		data.setData(preParse(stream, data.getData()));
+		Object pData = preParse(stream, data.getData());
 
 		logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"ActivityParser.preparsed.data", getLogString(data.getData()));
+				"ActivityParser.preparsed.data", getLogString(pData));
 
-		ActivityContext cData = prepareItem(stream, data.getData());
+		if (pData == null) {
+			return null;
+		}
+
+		data.setData(pData);
+
+		ActivityContext cData = prepareItem(stream, pData);
 		if (cData == null || !cData.isValid()) {
 			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityParser.nothing.to.parse", getName());

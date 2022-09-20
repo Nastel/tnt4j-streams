@@ -30,7 +30,7 @@ import prometheus.Remote;
 import prometheus.Types;
 
 /**
- * RAW activity data pre-parser capable to deserialize incoming activity data from binary data {@code byte[]} of *
+ * RAW activity data pre-parser capable to deserialize incoming activity data from binary data {@code byte[]} of
  * Prometheus Remote-Write protobuf message to string keyed map.
  *
  * @version $Revision: 1 $
@@ -73,9 +73,10 @@ public class PrometheusRWToMapPreParser extends AbstractPreParser<byte[], Map<St
 
 		List<Types.TimeSeries> timeSeriesList = writeRequest.getTimeseriesList();
 
-		Map<String, Object> reqMap = new LinkedHashMap<>();
+		Map<String, Object> reqMap = null;
 
 		if (CollectionUtils.isNotEmpty(timeSeriesList)) {
+			reqMap = new HashMap<>();
 			for (Types.TimeSeries ts : timeSeriesList) {
 				Map<String, Object> tsMap = new LinkedHashMap<>();
 
