@@ -105,7 +105,7 @@ public abstract class AbstractHttpStream extends AbstractWsStream<String, String
 			} };
 
 			// Install the all-trusting trust manager
-			SSLContext sc = SSLContext.getInstance("SSL"); // NON-NLS
+			SSLContext sc = SSLContext.getInstance("TLS"); // NON-NLS
 			sc.init(null, trustAllCerts, new java.security.SecureRandom());
 			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 

@@ -78,7 +78,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
 public class MqttStream extends AbstractBufferedStream<Map<String, ?>> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(MqttStream.class);
 
-	private static final String SSL_PROTOCOL = "SSL"; // NON-NLS
+	private static final String SSL_PROTOCOL = "TLS"; // NON-NLS
 	private static final String KEYSTORE_TYPE = KeyStore.getDefaultType();
 
 	// Stream properties
