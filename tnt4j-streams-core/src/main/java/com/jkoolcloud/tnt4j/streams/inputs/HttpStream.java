@@ -16,28 +16,28 @@
 
 package com.jkoolcloud.tnt4j.streams.inputs;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
 
-import org.apache.http.*;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.config.SocketConfig;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.bootstrap.HttpServer;
-import org.apache.http.impl.bootstrap.ServerBootstrap;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.HttpRequestHandler;
-import org.apache.http.ssl.SSLContexts;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.impl.bootstrap.HttpServer;
+import org.apache.hc.core5.http.impl.bootstrap.ServerBootstrap;
+import org.apache.hc.core5.http.io.HttpRequestHandler;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.net.URIAuthority;
+import org.apache.hc.core5.ssl.SSLContexts;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
@@ -91,7 +91,7 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 	private static final int DEFAULT_HTTP_PORT = 8080;
 	private static final int DEFAULT_HTTPS_PORT = 8443;
 
-	private static final int SOCKET_TIMEOUT = 15000;
+	private static final long SOCKET_TIMEOUT = TimeUnit.SECONDS.toMillis(15);
 	private static final boolean TCP_NO_DELAY = true;
 
 	private Integer serverPort = null;
@@ -201,15 +201,15 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 		return 0;
 	}
 
-	private static class HttpStreamExceptionLogger implements ExceptionLogger {
+	private static class HttpStreamExceptionLogger implements ExceptionListener {
 		@Override
-		public void log(Exception ex) {
+		public void onError(Exception ex) {
 			if (ex instanceof SocketTimeoutException) {
 				LOGGER.log(OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"HttpStream.connection.timed.out");
 			} else if (ex instanceof ConnectionClosedException) {
 				LOGGER.log(OpLevel.ERROR, Utils.getExceptionMessages(ex));
-			} else if (ex instanceof SocketException && ex.getMessage().contains("closed")) {
+			} else if (ex instanceof SocketException && ex.getMessage().contains("closed")) { // NON-NLS
 				LOGGER.log(OpLevel.WARNING, ex.getMessage());
 			} else if (ex instanceof javax.net.ssl.SSLHandshakeException) {
 				LOGGER.log(OpLevel.ERROR, Utils.getExceptionMessages(ex));
@@ -219,11 +219,16 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 						"HttpStream.http.server.exception", ex);
 			}
 		}
+
+		@Override
+		public void onError(HttpConnection conn, Exception ex) {
+			onError(ex);
+		}
 	}
 
 	/**
-	 * Runs {@link org.apache.http.impl.bootstrap.HttpServer} and handles server received
-	 * {@link org.apache.http.HttpRequest}s.
+	 * Runs {@link org.apache.hc.core5.http.impl.bootstrap.HttpServer} and handles server received
+	 * {@link org.apache.hc.core5.http.HttpRequest}s.
 	 */
 	protected class HttpStreamRequestHandler extends InputProcessor implements HttpRequestHandler {
 
@@ -266,11 +271,11 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 				port = serverPort;
 			}
 
-			SocketConfig socketConfig = SocketConfig.custom().setSoTimeout(SOCKET_TIMEOUT).setTcpNoDelay(TCP_NO_DELAY)
-					.build();
-			server = ServerBootstrap.bootstrap().setListenerPort(port).setServerInfo("TNT4J-Streams-HttpStream") // NON-NLS
-					.setSocketConfig(socketConfig).setSslContext(sslcontext)
-					.setExceptionLogger(new HttpStreamExceptionLogger()).registerHandler("*", this).create(); // NON-NLS
+			SocketConfig socketConfig = SocketConfig.custom().setSoTimeout((int) SOCKET_TIMEOUT, TimeUnit.MILLISECONDS)
+					.setTcpNoDelay(TCP_NO_DELAY).build();
+			server = ServerBootstrap.bootstrap().setListenerPort(port).setSocketConfig(socketConfig)
+					.setSslContext(sslcontext).setExceptionListener(new HttpStreamExceptionLogger()).register("*", this)
+					.create();
 		}
 
 		/**
@@ -321,83 +326,72 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 		 * </ul>
 		 */
 		@Override
-		public void handle(HttpRequest request, HttpResponse response, HttpContext context)
+		public void handle(ClassicHttpRequest request, ClassicHttpResponse response, HttpContext context)
 				throws HttpException, IOException {
+			HttpEntity reqEntity = request.getEntity();
+			boolean activityAvailable = false;
+			boolean added = false;
 
-			if (!(request instanceof HttpEntityEnclosingRequest)) {
-				response.setStatusCode(HttpStatus.SC_BAD_REQUEST);
-				String msg = StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
-						"HttpStream.bad.http.request");
-				response.setEntity(createHtmlStringEntity(msg));
-				logger().log(OpLevel.DEBUG, msg);
-			} else {
-				HttpEntity reqEntity = ((HttpEntityEnclosingRequest) request).getEntity();
-				boolean activityAvailable = false;
-				boolean added = false;
-
-				if (reqEntity != null) {
-					try {
-						Map<String, Object> reqMap = new HashMap<>();
-						if (URLEncodedUtils.isEncoded(reqEntity)) {
-							List<NameValuePair> reqParams = URLEncodedUtils.parse(reqEntity);
-							if (reqParams != null) {
-								for (NameValuePair param : reqParams) {
-									reqMap.put(param.getName(), param.getValue());
-								}
+			if (reqEntity != null) {
+				try {
+					Map<String, Object> reqMap = new HashMap<>();
+					if (ContentType.parse(reqEntity.getContentType()).equals(ContentType.APPLICATION_FORM_URLENCODED)) {
+						List<NameValuePair> reqParams = EntityUtils.parse(reqEntity);
+						if (reqParams != null) {
+							for (NameValuePair param : reqParams) {
+								reqMap.put(param.getName(), param.getValue());
 							}
+						}
+					} else {
+						ContentType reqContType = ContentType.parse(reqEntity.getContentType());
+						if (reqContType != null && reqContType.getCharset() == null) {
+							ContentType defaultContType = ContentType.getByMimeType(reqContType.getMimeType());
+							if (defaultContType != null) {
+								reqContType = defaultContType;
+							}
+						}
+						Object entityData;
+						if (reqContType == null || reqContType.getCharset() == null) {
+							entityData = EntityUtils.toByteArray(reqEntity);
 						} else {
-							ContentType reqContType = ContentType.get(reqEntity);
-							if (reqContType != null && reqContType.getCharset() == null) {
-								ContentType defaultContType = ContentType.getByMimeType(reqContType.getMimeType());
-								if (defaultContType != null) {
-									reqContType = defaultContType;
-								}
-							}
-							Object entityData;
-							if (reqContType == null || reqContType.getCharset() == null) {
-								entityData = EntityUtils.toByteArray(reqEntity);
-							} else {
-								entityData = EntityUtils.toString(reqEntity, reqContType.getCharset());
-							}
-							if (entityData != null) {
-								reqMap.put(StreamsConstants.ACTIVITY_DATA_KEY, entityData);
-							}
+							entityData = EntityUtils.toString(reqEntity, reqContType.getCharset());
 						}
-
-						if (!reqMap.isEmpty()) {
-							activityAvailable = true;
-
-							collectRequestMetadata(request, reqEntity, reqMap);
-
-							reqMap.put(StreamsConstants.TRANSPORT_KEY, StreamsConstants.TRANSPORT_HTTP);
-							added = addInputToBuffer(reqMap);
-						}
-					} finally {
-						EntityUtils.consumeQuietly(reqEntity);
-						if (reqEntity instanceof Closeable) {
-							((Closeable) reqEntity).close();
+						if (entityData != null) {
+							reqMap.put(StreamsConstants.ACTIVITY_DATA_KEY, entityData);
 						}
 					}
-				}
 
-				if (!activityAvailable) {
-					response.setStatusCode(HttpStatus.SC_NO_CONTENT);
-					String msg = StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
-							"HttpStream.no.activity");
-					response.setEntity(createHtmlStringEntity(msg));
-					logger().log(OpLevel.DEBUG, msg);
-				} else if (!added) {
-					response.setStatusCode(HttpStatus.SC_INSUFFICIENT_STORAGE);
-					String msg = StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
-							"HttpStream.activities.buffer.size.limit");
-					response.setEntity(createHtmlStringEntity(msg));
-					logger().log(OpLevel.WARNING, msg);
-				} else {
-					response.setStatusCode(HttpStatus.SC_OK);
-					String msg = StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "HttpStream.ok");
-					response.setEntity(createHtmlStringEntity(msg));
-					logger().log(OpLevel.DEBUG, msg);
+					if (!reqMap.isEmpty()) {
+						activityAvailable = true;
+
+						collectRequestMetadata(request, reqEntity, reqMap);
+
+						reqMap.put(StreamsConstants.TRANSPORT_KEY, StreamsConstants.TRANSPORT_HTTP);
+						added = addInputToBuffer(reqMap);
+					}
+				} finally {
+					EntityUtils.consumeQuietly(reqEntity);
+					reqEntity.close();
 				}
+			}
+
+			if (!activityAvailable) {
+				response.setCode(HttpStatus.SC_NO_CONTENT);
+				String msg = StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+						"HttpStream.no.activity");
+				response.setEntity(createHtmlStringEntity(msg));
+				logger().log(OpLevel.DEBUG, msg);
+			} else if (!added) {
+				response.setCode(HttpStatus.SC_INSUFFICIENT_STORAGE);
+				String msg = StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+						"HttpStream.activities.buffer.size.limit");
+				response.setEntity(createHtmlStringEntity(msg));
+				logger().log(OpLevel.WARNING, msg);
+			} else {
+				response.setCode(HttpStatus.SC_OK);
+				String msg = StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "HttpStream.ok");
+				response.setEntity(createHtmlStringEntity(msg));
+				logger().log(OpLevel.DEBUG, msg);
 			}
 		}
 
@@ -409,10 +403,10 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 
 		private void collectRequestMetadata(HttpRequest request, HttpEntity reqEntity, Map<String, Object> reqMap) {
 			Map<String, Object> headersMap = new HashMap<>();
-			HeaderIterator hIterator = request.headerIterator();
+			Iterator<Header> hIterator = request.headerIterator();
 			if (hIterator != null) {
 				while (hIterator.hasNext()) {
-					Header header = hIterator.nextHeader();
+					Header header = hIterator.next();
 					headersMap.put(header.getName(), header.getValue());
 				}
 			}
@@ -420,23 +414,26 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 				reqMap.put(StreamsConstants.HEADERS_KEY, headersMap);
 			}
 
-			RequestLine reqLine = request.getRequestLine();
 			Map<String, Object> lineMap = new HashMap<>();
-			lineMap.put("Method", reqLine.getMethod()); // NON-NLS
-			lineMap.put("Protocol", reqLine.getProtocolVersion().toString()); // NON-NLS
-			lineMap.put("Uri", reqLine.getUri()); // NON-NLS
+			lineMap.put("Method", request.getMethod()); // NON-NLS
+			lineMap.put("Protocol", request.getVersion().toString()); // NON-NLS
+			try {
+				lineMap.put("Uri", request.getUri().toString()); // NON-NLS
+			} catch (Exception e) {
+			}
+			lineMap.put("ReqUri", request.getRequestUri()); // NON-NLS
+			URIAuthority uriAuth = request.getAuthority();
+			if (uriAuth != null) {
+				lineMap.put("Authority", uriAuth.toString()); // NON-NLS
+			}
+			lineMap.put("Path", request.getPath()); // NON-NLS
+			lineMap.put("Scheme", request.getScheme()); // NON-NLS
 			reqMap.put("Line", lineMap); // NON-NLS
 
 			Map<String, Object> entityMap = new HashMap<>();
-			entityMap.put("Content-Length", reqEntity.getContentLength()); // NON-NLS
-			Header reHeader = reqEntity.getContentEncoding();
-			if (reHeader != null) {
-				entityMap.put(reHeader.getName(), reHeader.getValue());
-			}
-			reHeader = reqEntity.getContentType();
-			if (reHeader != null) {
-				entityMap.put(reHeader.getName(), reHeader.getValue());
-			}
+			entityMap.put(HttpHeaders.CONTENT_LENGTH, reqEntity.getContentLength()); // NON-NLS
+			entityMap.put(HttpHeaders.CONTENT_ENCODING, reqEntity.getContentEncoding());
+			entityMap.put(HttpHeaders.CONTENT_TYPE, reqEntity.getContentType());
 			entityMap.put("Chunked", reqEntity.isChunked()); // NON-NLS
 			entityMap.put("Repeatable", reqEntity.isRepeatable()); // NON-NLS
 			entityMap.put("Streaming", reqEntity.isStreaming()); // NON-NLS

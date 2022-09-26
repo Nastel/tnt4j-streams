@@ -33,7 +33,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.entity.ContentType;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpStatus;
 
 import com.jkoolcloud.tnt4j.config.TrackerConfigStore;
 import com.jkoolcloud.tnt4j.core.OpCompCode;
@@ -430,7 +431,7 @@ public class TNT4JStreamsServlet extends HttpServlet {
 		byte[] bytes = IOUtils.toByteArray(req.getInputStream());
 		if (ArrayUtils.isNotEmpty(bytes)) {
 			String reqContType = req.getContentType();
-			ContentType contType = ContentType.getByMimeType(reqContType);
+			ContentType contType = ContentType.parse(reqContType);
 			Object entityData = bytes;
 			if (contType != null && contType.getCharset() != null) {
 				entityData = new String(bytes, contType.getCharset());
@@ -486,7 +487,7 @@ public class TNT4JStreamsServlet extends HttpServlet {
 			setResponse(resp, req, msg, OpCompCode.ERROR, responseTemplate);
 			LOGGER.log(OpLevel.DEBUG, msg);
 		} else if (!added) {
-			resp.setStatus(507); // SC_INSUFFICIENT_STORAGE
+			resp.setStatus(HttpStatus.SC_INSUFFICIENT_STORAGE);
 			String msg = StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
 					"HttpStream.activities.buffer.size.limit");
 			setResponse(resp, req, msg, OpCompCode.ERROR, responseTemplate);

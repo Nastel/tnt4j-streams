@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,27 +17,30 @@
 package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.*;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.net.URLEncodedUtils;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -58,10 +61,10 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  * activity or event which should be recorded.
  * <p>
  * Service call is performed by invoking
- * {@link org.apache.http.client.HttpClient#execute(org.apache.http.client.methods.HttpUriRequest, org.apache.http.protocol.HttpContext)}
+ * {@link org.apache.hc.client5.http.classic.HttpClient#execute(org.apache.hc.core5.http.ClassicHttpRequest, org.apache.hc.core5.http.protocol.HttpContext)}
  * with GET or POST method request depending on scenario step configuration parameter 'method'. Default method is GET.
- * Stream uses {@link org.apache.http.impl.conn.PoolingHttpClientConnectionManager} to handle connections pool used by
- * HTTP client.
+ * Stream uses {@link org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager} to handle connections pool
+ * used by HTTP client.
  * <p>
  * This activity stream requires parsers that can support {@link String} data to parse
  * {@link com.jkoolcloud.tnt4j.streams.scenario.WsResponse#getData()} provided string.
@@ -78,7 +81,8 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  * @version $Revision: 3 $
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
- * @see org.apache.http.client.HttpClient#execute(HttpUriRequest, HttpContext)
+ * @see org.apache.hc.client5.http.classic.HttpClient#execute(org.apache.hc.core5.http.ClassicHttpRequest,
+ *      org.apache.hc.core5.http.protocol.HttpContext)
  */
 public class RestStream extends AbstractHttpStream {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(RestStream.class);
@@ -251,10 +255,9 @@ public class RestStream extends AbstractHttpStream {
 				"RestStream.invoking.post.request", uriStr, reqData);
 
 		HttpPost post = new HttpPost(uriStr);
-		StringEntity reqEntity = new StringEntity(reqData);
-
 		// here instead of JSON you can also have XML
-		reqEntity.setContentType("application/json"); // NON-NLS
+		StringEntity reqEntity = new StringEntity(reqData, ContentType.APPLICATION_JSON);
+
 		post.setEntity(reqEntity);
 
 		String respStr = executeRequest(client, post, reqParams);
@@ -266,7 +269,7 @@ public class RestStream extends AbstractHttpStream {
 	}
 
 	private static String executeRequest(CloseableHttpClient client, HttpUriRequest req,
-			Map<String, WsRequest.Parameter> reqParams) throws IOException {
+			Map<String, WsRequest.Parameter> reqParams) throws Exception {
 		if (client == null) {
 			throw new IllegalArgumentException(
 					StreamsResources.getString(WsStreamConstants.RESOURCE_BUNDLE_NAME, "RestStream.client.null"));
@@ -299,14 +302,13 @@ public class RestStream extends AbstractHttpStream {
 		}
 	}
 
-	private static String processResponse(CloseableHttpResponse response) throws IOException {
+	private static String processResponse(CloseableHttpResponse response) throws IOException, ParseException {
 		HttpEntity entity = null;
 		try {
-			StatusLine sLine = response.getStatusLine();
-			int responseCode = sLine.getStatusCode();
+			int responseCode = response.getCode();
 
 			if (responseCode >= HttpStatus.SC_MULTIPLE_CHOICES) {
-				throw new HttpResponseException(sLine);
+				throw new HttpResponseException(responseCode, response.getReasonPhrase());
 			}
 
 			entity = response.getEntity();
@@ -528,6 +530,16 @@ public class RestStream extends AbstractHttpStream {
 	 */
 	protected String uriForGET(WsRequest<String> request) throws VoidRequestException {
 		String uri = request.getData();
+
+		Map<String, String> qMap;
+		try {
+			URI url = new URI(uri);
+			qMap = getQueryMap(url.getQuery());
+			// uri = url.getPath();
+		} catch (URISyntaxException e) {
+			qMap = new HashMap<>();
+		}
+
 		StringBuilder uriBuilder = new StringBuilder();
 		uriBuilder.append(uri);
 
@@ -547,6 +559,21 @@ public class RestStream extends AbstractHttpStream {
 		}
 
 		return uriBuilder.toString();
+	}
+
+	public static Map<String, String> getQueryMap(String query) {
+		Map<String, String> map = new HashMap<>();
+
+		if (StringUtils.isNotEmpty(query)) {
+			String[] params = query.split("&");
+			for (String param : params) {
+				String name = param.split("=")[0];
+				String value = param.split("=")[1];
+				map.put(name, value);
+			}
+		}
+
+		return map;
 	}
 
 	/**

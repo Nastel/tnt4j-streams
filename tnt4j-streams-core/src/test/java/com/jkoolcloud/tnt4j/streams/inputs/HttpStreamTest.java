@@ -26,19 +26,19 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.HttpResponseException;
-import org.apache.http.client.entity.EntityBuilder;
-import org.apache.http.client.fluent.Form;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.HttpResponseException;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.EntityBuilder;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.fluent.Form;
+import org.apache.hc.client5.http.fluent.Request;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpVersion;
+import org.apache.hc.core5.net.URIBuilder;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -129,13 +129,13 @@ public class HttpStreamTest {
 
 		try {
 			Thread.sleep(100);
-			Request.Get(makeURI()).execute().returnContent();
+			Request.get(makeURI()).execute().returnContent();
 		} catch (HttpResponseException ex) {
 
 		}
-		HttpResponse resp = Request.Post(makeURI()).version(HttpVersion.HTTP_1_1).bodyForm(form.build()).execute()
+		HttpResponse resp = Request.post(makeURI()).version(HttpVersion.HTTP_1_1).bodyForm(form.build()).execute()
 				.returnResponse();
-		assertEquals(200, resp.getStatusLine().getStatusCode());
+		assertEquals(200, resp.getCode());
 	}
 
 	private URI makeURI() throws URISyntaxException {
@@ -148,7 +148,7 @@ public class HttpStreamTest {
 
 	@Test
 	public void httpHtmlGetTest() throws Exception {
-		HttpResponse response = Request.Get(makeURI()).execute().returnResponse();
+		HttpResponse response = Request.get(makeURI()).execute().returnResponse();
 		assertNotNull(response);
 	}
 

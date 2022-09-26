@@ -17,14 +17,13 @@
 package com.jkoolcloud.tnt4j.streams.inputs;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.StatusLine;
 
 /**
  * This exception encapsulates HTTP response errors, status codes.
  *
  * @version $Revision: 1 $
  */
-public class HttpResponseException extends org.apache.http.client.HttpResponseException {
+public class HttpResponseException extends org.apache.hc.client5.http.HttpResponseException {
 
 	/**
 	 * Constructs a new HttpResponseException.
@@ -36,16 +35,6 @@ public class HttpResponseException extends org.apache.http.client.HttpResponseEx
 	 */
 	public HttpResponseException(int statusCode, String statusReason) {
 		super(statusCode, statusReason);
-	}
-
-	/**
-	 * Constructs a new HttpResponseException.
-	 * 
-	 * @param sLine
-	 *            status line of response
-	 */
-	public HttpResponseException(StatusLine sLine) {
-		super(sLine.getStatusCode(), sLine.getReasonPhrase());
 	}
 
 	@Override
