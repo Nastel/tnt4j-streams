@@ -15,7 +15,7 @@
 
     <properties>
         <kafka.clients.version>3.2.3</kafka.clients.version>
-        <kafka.sink.version>2.16-SNAPSHOT</kafka.sink.version>
+        <kafka.sink.version>2.15.2</kafka.sink.version>
     </properties>
 
     <build>
