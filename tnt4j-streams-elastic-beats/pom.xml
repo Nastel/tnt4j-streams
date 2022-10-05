@@ -14,12 +14,6 @@
     <artifactId>tnt4j-streams-elastic-beats</artifactId>
 
     <properties>
-        <module.java.version>1.8</module.java.version>
-
-        <java.source.version>${module.java.version}</java.source.version>
-        <java.target.version>${module.java.version}</java.target.version>
-        <java.compiler.version>${module.java.version}</java.compiler.version>
-
         <logstash.input.beats.version>6.4.1</logstash.input.beats.version> <!-- new available: 6.2.6, 6.3.1, 6.4.1 -->
     </properties>
 

@@ -43,7 +43,7 @@
         <profile>
             <id>java9-plus</id>
             <activation>
-                <jdk>[9.0,)</jdk>
+                <jdk>[9,)</jdk>
             </activation>
             <dependencies>
                 <!-- JAXB dependencies for Java9+ -->
@@ -51,7 +51,6 @@
                     <groupId>jakarta.annotation</groupId>
                     <artifactId>jakarta.annotation-api</artifactId>
                     <version>${jakarta.annotaions.api.version}</version>
-                    <scope>compile</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.glassfish.jaxb</groupId>

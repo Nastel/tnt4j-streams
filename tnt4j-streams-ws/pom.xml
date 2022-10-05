@@ -25,7 +25,7 @@
         <profile>
             <id>java9-plus</id>
             <activation>
-                <jdk>[9.0,)</jdk>
+                <jdk>[9,)</jdk>
             </activation>
             <dependencies>
                 <!-- JAX-WS dependencies for Java9+ -->
