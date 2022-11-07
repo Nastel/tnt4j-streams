@@ -97,11 +97,11 @@ Individual TNT4J streams scope configuration is made in `tnt-data-source.xml` fi
 ### Stream (`tnt-data-source.xml`)
 
 Major entities in stream configuration are
-* `CloudWatchMetricsStream` of class `com.jkoolcloud.tnt4j.streams.inputs.HttpServletStream` picking HTTP POST transmitted request payload 
-  as stream input data
-* `ResponseTemplate` property defining stream servlet response template. AWS Kinesis FireHose requires particular JSON response to ensure 
+* `CloudWatchMetricsStream` of class `com.jkoolcloud.tnt4j.streams.inputs.HttpServletStream` picks up the HTTP POST transmitted request 
+  payload as stream input data
+* `ResponseTemplate` property defines stream servlet response template. AWS Kinesis FireHose requires particular JSON response to ensure 
   successful communication
-* `tnt4j-properties` section defining individual stream TNT4J configuration:
+* `tnt4j-properties` section defines individual stream TNT4J configuration:
   * property `event.sink.factory.BroadcastSequence` defines produced activities broadcasting sinks. Default configuration contains 
     configuration for AutoPilot (sink id `ap`) and for jKool/XRay (sink id `jkool`) sinks. Default set of sinks to broadcast stream produced
     activities is `ap,jkool`. If you are willing to use just one of these sinks, then change configuration line as this:
@@ -127,7 +127,7 @@ Major entities in stream configuration are
       instance. Default is `https://data.jkoolcloud.com`.
     * change jKool/XRay sink (id `jkool`) token placeholder value (property `event.sink.factory.EventSinkFactory.jkool.Token`) to your 
       jKool/XRay streaming token if you are willing to stream into that repo. Placeholder value is `jkool-access-token`.
-* `KinesisFirehoseParser` parser reference to bootstrap incoming metrics data package
+* `KinesisFirehoseParser` reference to bootstrap parser of incoming metrics data package
 
 ### Parsers (`parsers.xml`)
 
@@ -197,13 +197,35 @@ if (StringUtils.contains(line, "AWS/Kafka")) {
 
 ### AutoPilot facts
 
-For CloudWatch provided metrics package TNT4J-Streams produces `ACTIVITY` entity containing such fields:
-* `Name` has value `AWSCloudWatchMetrics`
-* `RoutePath` has value `ap`
-* `StartTime`/`EndTime` having current stream runtime timestamp
-* `DataCenter` has value `Amazon_AWS`
+* For CloudWatch provided metrics package TNT4J-Streams produces `ACTIVITY` entity containing such fields:
+  * `Name` has value `AWSCloudWatchMetrics`
+  * `RoutePath` has value `ap`
+  * `StartTime`/`EndTime` having current stream runtime timestamp
+  * `DataCenter` has value `Amazon_AWS`
 
-Metrics lines are placed as child `SNAPSHOT`s of that `ACTIVITY` entity. Snapshot contains such set of fields:
+* Metrics lines are placed as child `SNAPSHOT`s of that `ACTIVITY` entity. Snapshot contains such set of fields:
+  * `StartTime`/`EndTime` value from metrics line field `timestamp`
+  * `Unit` value from metrics line field `unit`
+  * `EventName` provides stream name and set of properties key/value pairs used to layout AP tree nodes (see property 
+    `event.sink.factory.EventSinkFactory.ap.Formatter.PathLevelAttributes`):
+    * `MetricStreamName` value from metrics line field `metric_stream_name` as metrics `domain`
+    * `namespace=${Namespace}` value from metrics line field `namespace`
+    * `region=${Region}` value from metrics line field `region`
+    * `cluster=${ClusterName}` value from `dimensions` group field `Cluster Name`
+    * `broker=${BrokerId}` value from `dimensions` group field `Broker ID`. If value is numeric - then number is prefixed by `b-`  
+    * `topic=${Topic}` value from `dimensions` group field `Topic`
+    * `streamName=${DeliveryStreamName}` value from `dimensions` group field `DeliveryStreamName`
+    * `cGroup=${ConsumerGroup}` value from `dimensions` group field `Consumer Group`
+    * `cAuth=${ClientAuth}` value from `dimensions` group field `Client Authentication`
+    * `metric=${MetricName}` value from metrics line field `metric_name`
+  * Metrics line field group `value` produces such fields:
+    * `Max` value from group field `max`
+    * `Min` value from group field `min`
+    * `Sum` value from group field `sum`
+    * `Count` value from group field `count`
+    * `P99` value from group field `p99`
+    * `P99_9` value from group field `p99.9`
+    * `Median` value from group field `TM(25%:75%)`
 
 ### jKool/XRay activities
 
