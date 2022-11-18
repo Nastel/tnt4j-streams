@@ -30,7 +30,7 @@
     <artifactId>tnt4j-streams-servlet</artifactId>
 
     <properties>
-        <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
+        <javax.servlet-api.version>4.0.4</javax.servlet-api.version>
     </properties>
 
     <build>
@@ -109,8 +109,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <version>${javax.servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>

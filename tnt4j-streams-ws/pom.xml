@@ -23,7 +23,7 @@
 
     <profiles>
         <profile>
-            <id>java9-plus</id>
+            <id>java9-plus-dep</id>
             <activation>
                 <jdk>[9,)</jdk>
             </activation>
