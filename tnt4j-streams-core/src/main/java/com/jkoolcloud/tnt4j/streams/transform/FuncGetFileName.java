@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.transform;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -85,6 +86,6 @@ public class FuncGetFileName extends AbstractFunction<String> {
 			}
 		}
 
-		return Utils.getFileName(filePath);
+		return StringUtils.trim(Utils.getFileName(filePath));
 	}
 }

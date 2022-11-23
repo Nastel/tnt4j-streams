@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.transform;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -100,7 +101,7 @@ public class FuncGetObjectName extends AbstractFunction<String> {
 			}
 		}
 
-		return Utils.resolveObjectName(objectFQN, toArray(args));
+		return StringUtils.trim(Utils.resolveObjectName(objectFQN, toArray(args)));
 	}
 
 	private static String[] toArray(List<?> args) {
