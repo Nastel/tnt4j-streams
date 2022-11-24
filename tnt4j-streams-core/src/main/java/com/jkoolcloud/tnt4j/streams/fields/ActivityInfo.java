@@ -1090,7 +1090,7 @@ public class ActivityInfo {
 	 * entity.
 	 * <p>
 	 * If no child relatives are available, only this (parent) activity build trackable is added to {@code childMap}
-	 * collation.
+	 * map.
 	 *
 	 * @param tracker
 	 *            communication gateway to use to record activity
@@ -1100,7 +1100,7 @@ public class ActivityInfo {
 	 * @see #merge(ActivityInfo)
 	 */
 	public void buildSplitRelatives(Tracker tracker, Map<Trackable, ActivityInfo> childMap) {
-		List<ActivityInfo> childList = getChildren(true);
+		List<ActivityInfo> childList = getFinalChildren();
 		for (ActivityInfo child : childList) {
 			if (!child.isDeliverable()) {
 				LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
@@ -1109,7 +1109,7 @@ public class ActivityInfo {
 			}
 
 			child.determineTrackingId(childList.size() > 1 ? null : this.trackingId);
-			child.merge(this);
+			child.mergeAllParents();
 			verifyDuplicates(child, childMap);
 			Trackable trackable = child.buildTrackable(tracker);
 			if (childMap != null) {
@@ -1459,8 +1459,8 @@ public class ActivityInfo {
 	}
 
 	/**
-	 * Merges activity info data fields values. Values of fields are changed only if they currently hold default
-	 * (initial) value.
+	 * Merges provided activity info data fields values into this activity info. Matching fields value is changed only
+	 * if it currently holds default (initial) value.
 	 *
 	 * @param otherAi
 	 *            activity info object to merge into this one
@@ -1587,8 +1587,8 @@ public class ActivityInfo {
 	}
 
 	/**
-	 * Merges activity info data fields values and child activity entities. Values of fields are changed only if they
-	 * currently hold default (initial) value.
+	 * Merges provided activity info data fields values and child entities into this activity info. Matching fields
+	 * value is changed only if it currently holds default (initial) value.
 	 *
 	 * @param otherAi
 	 *            activity info object to merge into this one
@@ -1605,6 +1605,29 @@ public class ActivityInfo {
 
 			children.putAll(otherAi.children);
 			parent = otherAi.parent;
+		}
+	}
+
+	/**
+	 * Merges all parent activities info data fields values into this activity info. Matching fields value is changed
+	 * only if it currently holds default (initial) value.
+	 * 
+	 * @see #isDeliverable()
+	 * @see #merge(ActivityInfo)
+	 */
+	public void mergeAllParents() {
+		if (!this.isDeliverable()) {
+			return;
+		}
+
+		ActivityInfo pAi = parent;
+
+		while (pAi != null) {
+			if (pAi.isDeliverable()) {
+				this.merge(pAi);
+			}
+
+			pAi = pAi.parent;
 		}
 	}
 
@@ -2003,7 +2026,7 @@ public class ActivityInfo {
 	}
 
 	/**
-	 * Returns list of all child activity entities.
+	 * Returns list of all child activity entities for this activity info.
 	 *
 	 * @return list of child activity entities
 	 *
@@ -2014,7 +2037,7 @@ public class ActivityInfo {
 	}
 
 	/**
-	 * Returns list of all child activity entities.
+	 * Returns list of all child activity entities for this activity info.
 	 *
 	 * @param deepCollect
 	 *            indicates if all children of children entities shall be added to returned list (flattened children
@@ -2054,6 +2077,47 @@ public class ActivityInfo {
 					chList.add(child);
 					if (deepCollect) {
 						collectChildren(child, chList, deepCollect);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Returns list of all child activity entities having no children for this activity info.
+	 *
+	 * @return list of child activity entities having no children
+	 *
+	 * @see #collectFinalChildren(ActivityInfo, java.util.Collection)
+	 */
+	public List<ActivityInfo> getFinalChildren() {
+		List<ActivityInfo> chList = new ArrayList<>();
+
+		collectFinalChildren(this, chList);
+
+		return chList;
+	}
+
+	/**
+	 * Collects provided entity {@code ai} child entities having no children to {@code chList} collection.
+	 * 
+	 * @param ai
+	 *            entity to collect children
+	 * @param chList
+	 *            list to add child activity entities
+	 */
+	protected static void collectFinalChildren(ActivityInfo ai, Collection<ActivityInfo> chList) {
+		if (ai.children == null) {
+			return;
+		}
+
+		for (List<ActivityInfo> children : ai.children.values()) {
+			if (children != null) {
+				for (ActivityInfo child : children) {
+					if (child.children == null) {
+						chList.add(child);
+					} else {
+						collectFinalChildren(child, chList);
 					}
 				}
 			}
