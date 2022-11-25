@@ -18,24 +18,31 @@
         <field name="HopNum" locator="4" locator-type="Index"/>
     </parser>
 
-    <parser name="TransferSetParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
-        <field name="EventType" locator="name(//*[1])" locator-type="Label">
+    <parser name="TransferSourceDestinationParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
+        <field name="Direction" locator="name(//*[1])" locator-type="Label" transparent="true"/>
+
+        <field name="EventType" locator="Direction" locator-type="Activity">
             <field-map-ref resource="MFT_MAPPINGS.EventType"/>
         </field>
-        <field name="EventName" locator="name(//*[1])" locator-type="Label">
+        <field name="EventName" locator="Direction" locator-type="Activity">
             <field-map-ref resource="MFT_MAPPINGS.EventName"/>
         </field>
 
-        <field name="Direction" locator="name(//*[1])" locator-type="Label" transparent="true"/>
+        <!-- Example to retrieve file name from provided file path using TNT4J-Streams
+             predefined functions : 'ts:getFileName' & 'ts:getObjectName'.
+             Extracts only file & queue name -->
+        <!-- <field-locator locator="ts:getFileName(/${Direction}/file)"
+            locator-type="Label" required="false"/>
+            <field-locator locator="ts:getObjectName(/${Direction}/queue)" locator-type="Label" required="false"/>
+         -->
+        <field name="FileName" locator="ts:getFileName(/${Direction}/file)" locator-type="Label" transparent="true"/>
+        <field name="QueueName" locator="ts:getObjectName(/${Direction}/queue)" locator-type="Label" transparent="true"/>
+        <field name="MsgId" locator="/${Direction}/queue/@messageId" locator-type="Label" transparent="true"/>
 
-        <!-- correlation ID assembly -->
-        <field name="Correlator2" transparent="true">
-            <field-locator locator="ts:getFileName(/${Direction}/file)" locator-type="Label" required="false"/>
-            <!--field-locator locator="ts:getObjectName(/${Direction}/queue)" locator-type="Label" required="false"/-->
-        </field>
         <field name="Correlator">
-            <field-locator locator="//*/checksum" locator-type="Label" required="false"/>
-            <field-locator locator="Correlator2" locator-type="Activity" required="false"/>
+            <field-locator locator="Checksum" locator-type="Activity" required="false"/>
+            <field-locator locator="FileName" locator-type="Activity" required="false"/>
+            <field-locator locator="MsgId" locator-type="Activity" required="false"/>
         </field>
 
         <field name="ResourceName" formattingPattern="{0}={1};Agent={2}">
@@ -46,27 +53,27 @@
             </field-locator>
             <!--resolves file or queue name -->
 
-            <!-- Example to retrieve file name from provided file path using TNT4J-Streams
-                 predefined functions : 'ts:getFileName' & 'ts:getObjectName'.
-                 Extracts only file & queue name -->
-            <!-- <field-locator locator="ts:getFileName(/${Direction}/file)"
-                locator-type="Label" required="false"/>
-                <field-locator locator="ts:getObjectName(/${Direction}/queue)" locator-type="Label" required="false"/>
-             -->
             <!-- to extract file name & file path and queue name only -->
-            <field-locator locator="ts:getFileName(/${Direction}/file)" locator-type="Label" required="false"/>
-            <field-locator locator="ts:getObjectName(/${Direction}/queue)" locator-type="Label" required="false"/>
+            <field-locator locator="FileName" locator-type="Activity" required="false"/>
+            <field-locator locator="QueueName" locator-type="Activity" required="false"/>
             <!-- agent-->
             <field-locator locator="^./transaction/${Direction}Agent/@agent" locator-type="Label" required="false"/>
         </field>
 
-        <field name="TrackingId" value-type="signature">
-            <field-locator locator="ts:getFileName(/${Direction}/file)" locator-type="Label" required="false"/>
-            <field-locator locator="/${Direction}/queue/@messageId" locator-type="Label" required="false"/>
+        <field name="TrackingId" value="" value-type="signature">
+            <field-transform lang="groovy"><![CDATA[
+                String objName = StringUtils.isEmpty(${FileName}) ? ${QueueName} : ${FileName}
+                String tId = StringUtils.isEmpty(${MsgId}) ? objName : ${MsgId}
+
+                if (StringUtils.isNotEmpty(${Checksum})) {
+                    tId += "@" + ${Checksum}
+                }
+
+                return tId
+            ]]></field-transform>
         </field>
 
         <field name="Size" locator="//*/file/@size" locator-type="Label" required="false"/>
-        <field name="LastModified" locator="//*/file/@last-modified" locator-type="Label" required="false"/>
         <field name="Checksum" locator="//*/checksum" locator-type="Label" required="false"/>
         <field name="ChecksumMethod" locator="//*/checksum/@method" locator-type="Label" required="false"/>
 
@@ -77,9 +84,7 @@
     <parser name="TransferSetItemParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
         <field name="ResultCode" locator="/item/status/@resultCode" locator-type="Label" datatype="Number" transparent="true"/>
 
-        <field name="ReasonCode" separator="">
-            <field-locator locator="ResultCode" locator-type="Activity" datatype="Number"/>
-        </field>
+        <field name="ReasonCode" locator="ResultCode" locator-type="Activity" datatype="Number"/>
         <field name="CompCode" locator="ResultCode" locator-type="Activity">
             <field-map-ref resource="MFT_MAPPINGS.CompCode"/>
         </field>
@@ -87,9 +92,7 @@
             <field-map-ref resource="MFT_MAPPINGS.CompCode3"/>
         </field>
 
-        <field name="Exception" separator="">
-            <field-locator locator="/item/status/supplement" locator-type="Label" required="false"/>
-        </field>
+        <field name="Exception" locator="/item/status/supplement" locator-type="Label" required="false"/>
 
         <!-- Example of mapping custom fields -->
         <field name="Source_Filename" locator="ts:getFileName(/item/source/file)" locator-type="Label"/>
@@ -98,13 +101,15 @@
         <field name="Destination_Queuename" locator="ts:getObjectName(/item/destination/queue, 'FULL')" locator-type="Label"/>
 
         <!-- Example of mapping custom fields -->
-        <field name="MFT_SRC_FILE_NAME" locator="ts:getFileName(/item/source/file)" locator-type="Label"/>
-        <field name="MFT_DST_FILE_NAME" locator="ts:getFileName(/item/destination/file)" locator-type="Label"/>
+        <field name="MFT_SRC_FILE_NAME" locator="Source_Filename" locator-type="Activity"/>
+        <field name="MFT_DST_FILE_NAME" locator="Destination_Filename" locator-type="Activity"/>
         <field name="MFT_SRC_QUEUE_NAME" locator="ts:getObjectName(/item/source/queue)" locator-type="Label"/>
         <field name="MFT_DST_QUEUE_NAME" locator="ts:getObjectName(/item/destination/queue)" locator-type="Label"/>
 
+        <field name="FileMode" locator="/item/@mode" locator-type="Label"/>
+
         <embedded-activity name="TS_ITEM" locator="/item/*[name(.) = 'source' or name(.) = 'destination']" locator-type="Label">
-            <parser-ref name="TransferSetParser" aggregation="Relate"/>
+            <parser-ref name="TransferSourceDestinationParser" aggregation="Relate"/>
         </embedded-activity>
     </parser>
 
@@ -169,9 +174,14 @@
     <parser name="StartedEventParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
         <property name="RequireDefault" value="true"/>
 
-        <field name="EventType" value="EVENT"/>
+        <field name="EventType" value="START"/>
+
+        <field name="TrackingId" value-type="signature">
+            <field-locator locator="/transaction/@ID" locator-type="Label"/>
+        </field>
+
         <field name="Correlator" locator="/transaction/@ID" locator-type="Label"/>
-        <field name="EventName" value="Started"/>
+        <field name="EventName" value="started"/>
         <field name="UserName" locator="/transaction/originator/userID" locator-type="Label"/>
         <field name="Location" locator="/transaction/originator/hostName" locator-type="Label"/>
         <field name="ApplName" separator=":">
@@ -195,16 +205,12 @@
         <field name="MFT_JOB_NAME" locator="/transaction/job/name" locator-type="Label" required="false">
             <parser-ref name="JobNameParser" aggregation="Merge"/>
         </field>
-
-        <field name="TrackingId" value-type="signature">
-            <field-locator locator="/transaction/@ID" locator-type="Label"/>
-        </field>
     </parser>
 
     <parser name="CompletedEventParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
         <property name="RequireDefault" value="true"/>
 
-        <field name="EventType" value="END"/>
+        <field name="EventType" value="STOP"/>
 
         <field name="TrackingId" value-type="signature">
             <field-locator locator="/transaction/@ID" locator-type="Label"/>
@@ -222,9 +228,7 @@
         <field name="ResMgrType" value="MESSAGING_SERVER"/>
 
         <!-- Map fields from mft_trf status "completed"-->
-        <field name="Message" separator="">
-            <field-locator locator="/transaction/status/supplement" locator-type="Label" required="false"/>
-        </field>
+        <field name="Message" locator="/transaction/status/supplement" locator-type="Label" required="false"/>
         <field name="ServerName" locator="/transaction/originator/hostName" locator-type="Label"/>
         <field name="ServerOs" locator="/transaction/sourceAgent/systemInfo/@name" locator-type="Label"/>
         <field name="StartTime" formattingPattern="{0}" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSSX">
@@ -239,18 +243,14 @@
         </field>
         <field name="ResultCode" locator="/transaction/status/@resultCode" locator-type="Label" datatype="Number" transparent="true"/>
 
-        <field name="ReasonCode" separator="">
-            <field-locator locator="ResultCode" locator-type="Activity" datatype="Number"/>
-        </field>
+        <field name="ReasonCode" locator="ResultCode" locator-type="Activity" datatype="Number"/>
         <field name="CompCode" locator="ResultCode" locator-type="Activity">
             <field-map-ref resource="MFT_MAPPINGS.CompCode"/>
         </field>
         <field name="Severity" locator="ResultCode" locator-type="Activity">
             <field-map-ref resource="MFT_MAPPINGS.CompCode3"/>
         </field>
-        <field name="Exception" separator="">
-            <field-locator locator="/transaction/status/supplement" locator-type="Label" required="false"/>
-        </field>
+        <field name="Exception" locator="/transaction/status/supplement" locator-type="Label" required="false"/>
         <field name="MFT_JOB_NAME" locator="/transaction/job/name" locator-type="Label" required="false">
             <parser-ref name="JobNameParser" aggregation="Merge"/>
         </field>

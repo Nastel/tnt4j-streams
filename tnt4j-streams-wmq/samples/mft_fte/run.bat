@@ -1,1 +1,1 @@
-..\..\bin\tnt4j-streams.bat -f:tnt-data-source-multiplication.xml
+..\..\bin\tnt4j-streams.bat -f:tnt-data-source.xml
