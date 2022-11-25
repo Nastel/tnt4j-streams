@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018 JKOOL, LLC.
+ * Copyright 2014-2022 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.jkoolcloud.tnt4j.streams;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -123,7 +124,14 @@ public final class StreamsAgent {
 			boolean loadedZKConfig = loadZKConfig(zookeeperCfgFile, zookeeperStreamId);
 
 			if (!loadedZKConfig) {
-				loadConfigAndRun(new CfgStreamsBuilder().setConfig(cfgFileName));
+				try {
+					loadConfigAndRun(new CfgStreamsBuilder().setConfig(cfgFileName));
+				} catch (IOException exc) {
+					LOGGER.log(OpLevel.ERROR, StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+							"StreamsAgent.cfg.load.failed"), Utils.getExceptionMessages(exc));
+
+					System.exit(1);
+				}
 				// DefaultTNTStreamListener dsl = new DefaultTNTStreamListener(LOGGER);
 				// loadConfigAndRun(new
 				// CfgStreamsBuilder().setConfig(cfgFileName).setStreamListener(dsl).setTaskListener(dsl));

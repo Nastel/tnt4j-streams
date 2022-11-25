@@ -32,7 +32,6 @@ import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
-import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
  * Build streams and streaming context from provided configuration sources: files, resource, strings, readers, input
@@ -54,8 +53,11 @@ public class CfgStreamsBuilder extends POJOStreamsBuilder {
 	 * @param cfgFileName
 	 *            streams configuration file path
 	 * @return instance of this streams builder
+	 * 
+	 * @throws java.io.FileNotFoundException
+	 *             if streams configuration file is not found
 	 */
-	public CfgStreamsBuilder setConfig(String cfgFileName) {
+	public CfgStreamsBuilder setConfig(String cfgFileName) throws FileNotFoundException {
 		return setConfig(StringUtils.isEmpty(cfgFileName) ? null : new File(cfgFileName));
 	}
 
@@ -65,14 +67,12 @@ public class CfgStreamsBuilder extends POJOStreamsBuilder {
 	 * @param cfgFile
 	 *            streams configuration file
 	 * @return instance of this streams builder
+	 * 
+	 * @throws java.io.FileNotFoundException
+	 *             if streams configuration file is not found
 	 */
-	public CfgStreamsBuilder setConfig(File cfgFile) {
-		try {
-			return setConfig(cfgFile == null ? null : new FileReader(cfgFile));
-		} catch (FileNotFoundException e) {
-			LOGGER.log(OpLevel.ERROR, Utils.getExceptionMessages(e));
-			return this;
-		}
+	public CfgStreamsBuilder setConfig(File cfgFile) throws FileNotFoundException {
+		return setConfig(cfgFile == null ? null : new FileReader(cfgFile));
 	}
 
 	/**
@@ -127,7 +127,7 @@ public class CfgStreamsBuilder extends POJOStreamsBuilder {
 	public StreamsConfigLoader loadConfig(boolean osPipeInput, boolean haltOnUnparsed) throws Exception {
 		if (cfgReader == null) {
 			LOGGER.log(OpLevel.WARNING, StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
-					"CfgStreamsBuilder.switching.to.default.cfg"), StreamsConfigLoader.getDefaultFile());
+					"CfgStreamsBuilder.will.use.default.cfg"), StreamsConfigLoader.getDefaultFile());
 		}
 		StreamsConfigLoader cfg = cfgReader == null ? new StreamsConfigLoader() : new StreamsConfigLoader(cfgReader);
 

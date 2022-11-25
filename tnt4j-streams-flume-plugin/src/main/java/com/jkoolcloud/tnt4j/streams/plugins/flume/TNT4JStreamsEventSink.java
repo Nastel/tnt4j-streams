@@ -146,7 +146,12 @@ public class TNT4JStreamsEventSink extends AbstractSink implements Configurable 
 		if (StringUtils.isEmpty(hostname) || hostname.equals(DEFAULT_HOST)) {
 			LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(FlumeConstants.RESOURCE_BUNDLE_NAME),
 					"TNT4JStreamsEventSink.streams.starting");
-			StreamsAgent.runFromAPI(new CfgStreamsBuilder().setConfig(streamConfig));
+			try {
+				StreamsAgent.runFromAPI(new CfgStreamsBuilder().setConfig(streamConfig));
+			} catch (IOException exc) {
+				LOGGER.log(OpLevel.ERROR, StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+						"TNT4JStreamsEventSink.failed.load.config"), Utils.getExceptionMessages(exc));
+			}
 		}
 		try {
 			openSocket();

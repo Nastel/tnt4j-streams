@@ -16,6 +16,7 @@
 
 package com.jkoolcloud.tnt4j.streams;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -76,7 +77,15 @@ public class StreamsDaemon implements Daemon {
 	public void start() throws Exception {
 		LOGGER.log(OpLevel.INFO,
 				StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsDaemon.starting"));
-		StreamsAgent.loadConfigAndRun(new CfgStreamsBuilder().setConfig(StreamsAgent.getCfgFileName()));
+		try {
+			StreamsAgent.loadConfigAndRun(new CfgStreamsBuilder().setConfig(StreamsAgent.getCfgFileName()));
+		} catch (IOException exc) {
+			LOGGER.log(OpLevel.ERROR,
+					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsDaemon.cfg.load.failed"),
+					Utils.getExceptionMessages(exc));
+
+			return;
+		}
 		LOGGER.log(OpLevel.INFO,
 				StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsDaemon.streams.started"));
 		while (StreamsAgent.isStreamsRunning()) {
