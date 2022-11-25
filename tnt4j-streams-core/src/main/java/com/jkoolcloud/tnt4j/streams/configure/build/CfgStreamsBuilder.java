@@ -125,6 +125,10 @@ public class CfgStreamsBuilder extends POJOStreamsBuilder {
 	 *             if configuration is malformed or streams can't be initiated
 	 */
 	public StreamsConfigLoader loadConfig(boolean osPipeInput, boolean haltOnUnparsed) throws Exception {
+		if (cfgReader == null) {
+			LOGGER.log(OpLevel.WARNING, StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+					"CfgStreamsBuilder.switching.to.default.cfg"), StreamsConfigLoader.getDefaultFile());
+		}
 		StreamsConfigLoader cfg = cfgReader == null ? new StreamsConfigLoader() : new StreamsConfigLoader(cfgReader);
 
 		if (cfg != null) {
