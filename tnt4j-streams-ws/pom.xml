@@ -41,6 +41,15 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>java11-plus-dep</id>
+            <activation>
+                <jdk>[11,)</jdk>
+            </activation>
+            <properties>
+                <hikaricp.version>5.0.1</hikaricp.version>
+            </properties>
+        </profile>
     </profiles>
 
     <build>

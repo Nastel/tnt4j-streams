@@ -19,10 +19,23 @@
 
         <activemq.version>5.16.5</activemq.version>   <!-- 5.17.x requires java 11 -->
         <solace.version>10.16.0</solace.version>
-        <rabbitmq.version>2.6.0</rabbitmq.version>
+        <rabbitmq.version>2.7.0</rabbitmq.version> <!-- 3.0.x changes javax packages to jakarta -->
         <zeromq.version>3.0.1-RELEASE</zeromq.version>
-        <rocketmq.version>4.9.4</rocketmq.version>
+        <rocketmq.version>5.0.0</rocketmq.version>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>java11-plus-dep</id>
+            <activation>
+                <jdk>[11,)</jdk>
+            </activation>
+            <properties>
+                <artemis.version>2.27.0</artemis.version>
+                <activemq.version>5.17.2</activemq.version>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <resources>
