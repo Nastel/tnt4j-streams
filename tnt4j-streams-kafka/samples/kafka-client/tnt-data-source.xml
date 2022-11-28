@@ -98,7 +98,7 @@
         <property name="ssl.truststore.password" value="test1234"/>
         <property name="ssl.keystore.location" value="/var/private/ssl/kafka.server.keystore.jks"/>
         <property name="ssl.keystore.password" value="test1234"/>
-        <property name="ssl.key.password" value="test1234"/-->            
+        <property name="ssl.key.password" value="test1234"/-->
 
         <parser-ref name="KafkaMessageParser"/>
     </stream>
