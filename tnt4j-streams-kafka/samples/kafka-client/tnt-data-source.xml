@@ -93,6 +93,13 @@
         <property name="session.timeout.ms" value="30000"/>
         <property name="client.id" value="tnt4j-streams-kafka-consumer-stream"/>
 
+        <!-- SSL configuration sample section -->
+        <!--property name="ssl.truststore.location" value="/var/private/ssl/kafka.server.truststore.jks"/>
+        <property name="ssl.truststore.password" value="test1234"/>
+        <property name="ssl.keystore.location" value="/var/private/ssl/kafka.server.keystore.jks"/>
+        <property name="ssl.keystore.password" value="test1234"/>
+        <property name="ssl.key.password" value="test1234"/-->            
+
         <parser-ref name="KafkaMessageParser"/>
     </stream>
 </tnt-data-source>
