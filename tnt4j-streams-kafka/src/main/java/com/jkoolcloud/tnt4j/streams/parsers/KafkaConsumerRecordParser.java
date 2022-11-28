@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.header.Headers;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
@@ -46,13 +47,13 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>serializedValueSize - size of the serialized, uncompressed value in bytes</li>
  * <li>key - record key</li>
  * <li>value - record data</li>
- * <li>headers - record headers map</li>
+ * <li>headers - record headers array</li>
  * <li>leaderEpoch - record leader epoch</li>
  * </ul>
  * <p>
  * If {@code key} or {@code value} contains complex data, use stacked parsers to parse that data. Or if it can be
  * treated as simple Java object (POJO), particular field value can be resolved defining class field names within
- * locator path string. Locator path string should be used resolving particular {@code headers} collection contained
+ * locator path string. Locator path string may be used resolving particular {@code headers} collection contained
  * value: path element should define header key or index.
  * <p>
  * This activity parser supports configuration properties from {@link GenericActivityParser} (and higher hierarchy
@@ -182,7 +183,12 @@ public class KafkaConsumerRecordParser extends GenericActivityParser<ConsumerRec
 		} else if ("serializedValueSize".equalsIgnoreCase(propStr)) { // NON-NLS
 			val = cRecord.serializedValueSize();
 		} else if ("headers".equalsIgnoreCase(propStr)) { // NON-NLS
-			val = KafkaUtils.getHeadersValue(path, cRecord.headers(), i + 1);
+			if (i < path.length - 1) {
+				val = KafkaUtils.getHeadersValue(path, cRecord.headers(), i + 1);
+			} else {
+				Headers headers = cRecord.headers();
+				val = headers == null ? null : headers.toArray();
+			}
 		} else if ("key".equalsIgnoreCase(propStr)) { // NON-NLS
 			val = Utils.getFieldValue(path, cRecord.key(), i + 1);
 		} else if ("value".equalsIgnoreCase(propStr)) { // NON-NLS
