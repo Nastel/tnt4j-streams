@@ -49,9 +49,9 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * This parser supports the following configuration properties (in addition to those supported by
  * {@link GenericActivityParser}):
  * <ul>
- * <li>SupportedClass - defines class name of parser supported objects. Parser can have multiple definitions of this
- * property. It is useful when just some specific set of objects has to be handled by this parser instead of all passed
- * objects. (Optional)</li>
+ * <li>SupportedClass - defines class/interface name of parser supported objects. Parser can have multiple definitions
+ * of this property. It is useful when just some specific set of objects has to be handled by this parser instead of all
+ * passed objects. (Optional)</li>
  * </ul>
  * <p>
  * This activity parser supports those activity field locator types:
@@ -135,8 +135,26 @@ public class ActivityJavaObjectParser extends GenericActivityParser<Object> {
 		if (data == null || CollectionUtils.isEmpty(supportedClasses)) {
 			return data instanceof Object;
 		} else {
-			return supportedClasses.contains(data.getClass());
+			return isDataClassSupported(data.getClass());
 		}
+	}
+
+	/**
+	 * Checks if set of custom supported classes has class or interface assignable from data object class.
+	 * 
+	 * @param objCls
+	 *            data object class
+	 * @return {@code true} if set of custom supported classes has class or interface assignable from data object class,
+	 *         {@code false} - otherwise
+	 */
+	protected boolean isDataClassSupported(Class<?> objCls) {
+		for (Class<?> sClass : supportedClasses) {
+			if (sClass.isAssignableFrom(objCls)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override
