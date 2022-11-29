@@ -30,7 +30,7 @@
     <artifactId>tnt4j-streams-servlet</artifactId>
 
     <properties>
-        <javax.servlet-api.version>4.0.4</javax.servlet-api.version>
+        <javax.servlet-api.version>6.0.0</javax.servlet-api.version>
     </properties>
 
     <build>
