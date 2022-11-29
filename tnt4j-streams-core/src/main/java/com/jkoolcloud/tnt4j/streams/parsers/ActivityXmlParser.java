@@ -390,7 +390,7 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 
 				if (val instanceof Node) {
 					val = getTextOnDemand((Node) val, locator, cData, formattingNeeded);
-				} else if (Utils.isCollection(val)) {
+				} else if (Utils.isObjCollection(val)) {
 					Object[] nodes = Utils.makeArray(val, Object.class);
 					for (int i = 0; i < nodes.length; i++) {
 						if (nodes[i] instanceof Node) {

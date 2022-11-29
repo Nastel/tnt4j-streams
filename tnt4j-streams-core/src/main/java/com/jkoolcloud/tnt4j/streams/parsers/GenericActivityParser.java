@@ -25,6 +25,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -899,7 +900,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 				"ActivityParser.applying.field", getName(), field, Utils.toString(value));
 
-		if (field.isDynamic() || (field.isSplitCollection() && Utils.isCollection(value))) {
+		if (field.isDynamic() || (field.isSplitCollection() && Utils.isIterable(value))) {
 			applyDynamicValue(cData, field, value);
 		} else {
 			super.applyFieldValue(field, value, cData);
@@ -950,11 +951,16 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 *      com.jkoolcloud.tnt4j.streams.parsers.ActivityParser.ActivityParserContext)
 	 */
 	protected void applyDynamicValue(ActivityContext cData, ActivityField field, Object value) throws ParseException {
-		Map<String, Object> dValMap = parseDynamicValues(cData, field.getDynamicLocators());
-		Object[] fValues = value == null ? new Object[] { null } : Utils.makeArray(value, true);
+		if (value == null) {
+			return;
+		}
 
-		List<ActivityField> tFieldsList = new ArrayList<>(fValues.length);
-		for (int vi = 0; vi < fValues.length; vi++) {
+		Map<String, Object> dValMap = parseDynamicValues(cData, field.getDynamicLocators());
+		Iterable<?> fValues = Utils.makeIterable(value, true);
+
+		int valuesCount = IterableUtils.size(fValues);
+		List<ActivityField> tFieldsList = new ArrayList<>(valuesCount);
+		for (int vi = 0; vi < valuesCount; vi++) {
 			dValMap.put(ActivityField.VALUE_INDEX_ENTRY_KEY, vi);
 			ActivityField tField = field.createTempField(dValMap);
 			tFieldsList.add(tField);
@@ -965,9 +971,10 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		ActivityField tField = null;
 		try {
 			Object fValue;
-			for (int tfi = 0; tfi < tFieldsList.size(); tfi++) {
-				tField = tFieldsList.get(tfi);
-				fValue = fValues[tfi];
+			Iterator<?> vIterator = fValues.iterator();
+			for (ActivityField activityField : tFieldsList) {
+				tField = activityField;
+				fValue = vIterator.next();
 				boolean filteredOut = tField.filterValue(fValue, null);
 				if (filteredOut) {
 					fValue = null;

@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.header.Headers;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
@@ -47,14 +46,14 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>serializedValueSize - size of the serialized, uncompressed value in bytes</li>
  * <li>key - record key</li>
  * <li>value - record data</li>
- * <li>headers - record headers array</li>
+ * <li>headers - record headers iterable</li>
  * <li>leaderEpoch - record leader epoch</li>
  * </ul>
  * <p>
  * If {@code key} or {@code value} contains complex data, use stacked parsers to parse that data. Or if it can be
  * treated as simple Java object (POJO), particular field value can be resolved defining class field names within
- * locator path string. Locator path string may be used resolving particular {@code headers} collection contained
- * value: path element should define header key or index.
+ * locator path string. Locator path string may be used resolving particular {@code headers} collection contained value:
+ * path element should define header key or index.
  * <p>
  * This activity parser supports configuration properties from {@link GenericActivityParser} (and higher hierarchy
  * parsers).
@@ -186,8 +185,7 @@ public class KafkaConsumerRecordParser extends GenericActivityParser<ConsumerRec
 			if (i < path.length - 1) {
 				val = KafkaUtils.getHeadersValue(path, cRecord.headers(), i + 1);
 			} else {
-				Headers headers = cRecord.headers();
-				val = headers == null ? null : headers.toArray();
+				val = cRecord.headers();
 			}
 		} else if ("key".equalsIgnoreCase(propStr)) { // NON-NLS
 			val = Utils.getFieldValue(path, cRecord.key(), i + 1);

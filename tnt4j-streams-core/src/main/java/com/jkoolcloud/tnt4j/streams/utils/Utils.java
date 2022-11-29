@@ -42,6 +42,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.HexDump;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -530,7 +531,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			return toArray((String) tagsData);
 		} else if (tagsData instanceof String[]) {
 			return (String[]) tagsData;
-		} else if (isCollection(tagsData)) {
+		} else if (isObjCollection(tagsData)) {
 			Object[] tagsArray = makeArray(tagsData);
 
 			if (ArrayUtils.isNotEmpty(tagsArray)) {
@@ -543,7 +544,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 					}
 				}
 
-				return tags.toArray(new String[tags.size()]);
+				return tags.toArray(new String[0]);
 			}
 		} else if (tagsData != null) {
 			return new String[] { toString(tagsData) };
@@ -1012,7 +1013,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *
 	 * @param obj
 	 *            object instance to make an array
-	 * @return array made of provided object, or {@code null} if obj is {@code null}
+	 * @return array made of provided object, or {@code null} if {@code obj} is {@code null}
 	 *
 	 * @see #makeArray(Object, boolean)
 	 */
@@ -1028,8 +1029,8 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @param obj
 	 *            object instance to make an array
 	 * @param splitPrimitives
-	 *            flag indicating whether to split primitives array into element objects array
-	 * @return array made of provided object, or {@code null} if obj is {@code null}
+	 *            flag indicating whether to split primitives array into object elements array
+	 * @return array made of provided object, or {@code null} if {@code obj} is {@code null}
 	 * 
 	 * @see #makeArray(Object, Class, boolean)
 	 */
@@ -1047,7 +1048,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @param cls
 	 *            desired array type class, can be {@code null} - then array type will be the most common class of all
 	 *            array/collection elements
-	 * @return array made of provided object, or {@code null} if obj is {@code null}
+	 * @return array made of provided object, or {@code null} if {@code obj} is {@code null}
 	 * 
 	 * @see #makeArray(Object, Class, boolean)
 	 */
@@ -1062,6 +1063,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * <li>If {@code obj} is {@code Object[]}, then method {@link #makeArray(Object[], Class)} is called.</li>
 	 * <li>If {@code obj} is {@link java.util.Collection}, then method {@link #makeArray(java.util.Collection, Class)}
 	 * is called.</li>
+	 * <li>If {@code obj} is {@link java.lang.Iterable}, then all elements of iterable are recollected into array.</li>
 	 * <li>In all other cases - new single item array is created.</li>
 	 * </ul>
 	 * <p>
@@ -1074,8 +1076,8 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *            desired array type class, can be {@code null} - then array type will be the most common class of all
 	 *            array/collection elements
 	 * @param splitPrimitives
-	 *            flag indicating whether to split primitives array into element objects array
-	 * @return array made of provided object, or {@code null} if obj is {@code null}
+	 *            flag indicating whether to split primitives array into object elements array
+	 * @return array made of provided object, or {@code null} if {@code obj} is {@code null}
 	 *
 	 * @see #makeArray(Object[], Class)
 	 * @see #makeArray(java.util.Collection, Class)
@@ -1094,6 +1096,13 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		}
 		if (obj instanceof Collection) {
 			return makeArray((Collection<?>) obj, cls);
+		}
+		if (obj instanceof Iterable) {
+			Collection<Object> iColl = new ArrayList<>();
+			for (Object t : (Iterable<?>) obj) {
+				iColl.add(t);
+			}
+			return iColl.toArray();
 		}
 
 		return makeArray(new Object[] { obj }, cls);
@@ -1127,7 +1136,6 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *
 	 * @see #determineCommonClass(Iterable, Class)
 	 */
-	@SuppressWarnings("unchecked")
 	public static Object[] makeArray(Collection<?> coll, Class<?> cls) {
 		if (coll == null) {
 			return null;
@@ -1148,7 +1156,6 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *
 	 * @see #makeArray(Object[], Class)
 	 */
-	@SuppressWarnings("unchecked")
 	public static Object[] makeArray(Object[] array) {
 		return makeArray(array, null);
 	}
@@ -1167,7 +1174,6 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *
 	 * @see #determineCommonClass(Object[], Class)
 	 */
-	@SuppressWarnings("unchecked")
 	public static Object[] makeArray(Object[] array, Class<?> cls) {
 		if (array == null) {
 			return null;
@@ -1213,6 +1219,62 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Makes {@link Iterable} type object from provided object instance.
+	 * <p>
+	 * Acts same as {@link #makeIterable(Object, boolean)}, where {@code makeIterable(obj, false)}.
+	 * 
+	 * @param obj
+	 *            object instance to make an iterable
+	 * @return iterable made of provided object, or {@code null} if {@code obj} is {@code null}
+	 * 
+	 * @see #makeIterable(Object, boolean)
+	 */
+	public static Iterable<?> makeIterable(Object obj) {
+		return makeIterable(obj, false);
+	}
+
+	/**
+	 * Makes {@link Iterable} type object from provided object instance.
+	 * <p>
+	 * <ul>
+	 * <li>If {@code obj} is {@link java.lang.Iterable}, then simple casting is performed.</li>
+	 * <li>If {@code obj} is {@code Object[]}, then method {@link java.util.Arrays#asList(Object[])} is called.</li>
+	 * <li>If {@code obj} is primitives array and {@code splitPrimitives} is set to {@code true}, then method
+	 * {@link #primitiveArrayToObject(Object)} is used to convert them into object elements array and method
+	 * {@link java.util.Arrays#asList(Object[])} an iterable.</li>
+	 * <li>In all other cases - new single item iterator is created using
+	 * {@link java.util.Collections#singleton(Object)}</li>
+	 * </ul>
+	 * 
+	 * @param obj
+	 *            object instance to make an iterable
+	 * @param splitPrimitives
+	 *            flag indicating whether to split primitives array into object elements array
+	 * @return iterable made of provided object, or {@code null} if {@code obj} is {@code null}
+	 * 
+	 * @see Arrays#asList(Object[])
+	 * @see #primitiveArrayToObject(Object)
+	 * @see Collections#singleton(Object)
+	 */
+	public static Iterable<?> makeIterable(Object obj, boolean splitPrimitives) {
+		if (obj == null) {
+			return null;
+		}
+
+		if (obj instanceof Iterable) {
+			return (Iterable<?>) obj;
+		}
+		if (isArray(obj)) {
+			return Arrays.asList((Object[]) obj);
+		}
+		if (isPrimitiveArray(obj) && splitPrimitives) {
+			return Arrays.asList(primitiveArrayToObject(obj));
+		}
+
+		return Collections.singleton(obj);
 	}
 
 	/**
@@ -1301,13 +1363,30 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
+	 * Checks if provided object is {@link java.util.Collection} or any type of array.
+	 *
+	 * @param obj
+	 *            object to check
+	 * @return {@code true} if {@code obj} is {@link java.util.Collection} or any type of array, {@code false} -
+	 *         otherwise
+	 *
+	 * @see #isArray(Object)
+	 */
+	public static boolean isCollection(Object obj) {
+		return isArray(obj) || obj instanceof Collection;
+	}
+
+	/**
 	 * Checks if provided object is {@link java.util.Collection} or {@code Object[]}.
 	 *
 	 * @param obj
 	 *            object to check
-	 * @return {@code true} if obj is {@link java.util.Collection} or {@code Object[]}, {@code false} - otherwise
+	 * @return {@code true} if {@code obj} is {@link java.util.Collection} or {@code Object[]}, {@code false} -
+	 *         otherwise
+	 *
+	 * @see #isObjArray(Object)
 	 */
-	public static boolean isCollection(Object obj) {
+	public static boolean isObjCollection(Object obj) {
 		return isObjArray(obj) || obj instanceof Collection;
 	}
 
@@ -1324,20 +1403,46 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
+	 * Checks if provided object is {@link java.lang.Iterable} or any type of array.
+	 * 
+	 * @param obj
+	 *            object to check
+	 * @return {@code true} if {@code obj} is {@link java.lang.Iterable} or any type of array, {@code false} - otherwise
+	 * 
+	 * @see #isArray(Object)
+	 */
+	public static boolean isIterable(Object obj) {
+		return isArray(obj) || obj instanceof Iterable;
+	}
+
+	/**
+	 * Checks if provided object is {@link java.lang.Iterable} or {@code Object[]}..
+	 *
+	 * @param obj
+	 *            object to check
+	 * @return {@code true} if {@code obj} is {@link java.lang.Iterable} or {@code Object[]}., {@code false} - otherwise
+	 *
+	 * @see #isObjArray(Object)
+	 */
+	public static boolean isObjIterable(Object obj) {
+		return isObjArray(obj) || obj instanceof Iterable;
+	}
+
+	/**
 	 * Wraps provided object item seeking by index.
 	 * <p>
-	 * If obj is not {@link java.util.Collection} or {@code Object[]}, then same object is returned.
+	 * If {@code obj} is not {@link java.util.Collection} or {@code Object[]}, then same object is returned.
 	 * <p>
 	 * In case of {@link java.util.Collection} - it is transformed to {@code Object[]}.
 	 * <p>
-	 * When obj is {@code Object[]} - array item referenced by index is returned if {@code index < array.length}, first
-	 * array item if {@code array.length == 1}, or {@code null} in all other cases.
+	 * When {@code obj} is {@code Object[]} - array item referenced by index is returned if
+	 * {@code index < array.length}, first array item if {@code array.length == 1}, or {@code null} in all other cases.
 	 *
 	 * @param obj
 	 *            object instance containing item
 	 * @param index
 	 *            item index
-	 * @return item found, or {@code null} if obj is {@code null} or {@code index >= array.length}
+	 * @return item found, or {@code null} if {@code obj} is {@code null} or {@code index >= array.length}
 	 */
 	public static Object getItem(Object obj, int index) {
 		if (obj instanceof Collection) {
@@ -1534,7 +1639,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 				}
 			}
 
-			return pList.toArray(new String[pList.size()]);
+			return pList.toArray(new String[0]);
 		}
 
 		return null;
@@ -1545,7 +1650,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *
 	 * @param obj
 	 *            object to check
-	 * @return {@code true} if obj is an array, {@code false} - otherwise
+	 * @return {@code true} if {@code obj} is an array, {@code false} - otherwise
 	 */
 	public static boolean isObjArray(Object obj) {
 		return obj instanceof Object[];
@@ -1556,7 +1661,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * 
 	 * @param obj
 	 *            object to check
-	 * @return {@code true} if obj is an array of primitives, {@code false} - otherwise
+	 * @return {@code true} if {@code obj} is an array of primitives, {@code false} - otherwise
 	 */
 	public static boolean isPrimitiveArray(Object obj) {
 		return obj != null && obj.getClass().isArray();
@@ -1567,7 +1672,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *
 	 * @param obj
 	 *            object to check
-	 * @return {@code true} if obj is an array, {@code false} - otherwise
+	 * @return {@code true} if {@code obj} is an array, {@code false} - otherwise
 	 *
 	 * @see #isObjArray(Object)
 	 * @see #isPrimitiveArray(Object)
@@ -2028,7 +2133,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			}
 		}
 
-		Collections.sort(files, new Comparator<Path>() {
+		files.sort(new Comparator<Path>() {
 			@Override
 			public int compare(Path o1, Path o2) {
 				try {
@@ -2040,7 +2145,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			}
 		});
 
-		return files.toArray(new Path[files.size()]);
+		return files.toArray(new Path[0]);
 	}
 
 	/**
@@ -2313,20 +2418,20 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * 
 	 * @param obj
 	 *            object to check
-	 * @return {@code true} if obj is {@link java.util.List} or array, {@code false} - otherwise
+	 * @return {@code true} if {@code obj} is {@link java.util.List} or array, {@code false} - otherwise
 	 */
 	public static boolean isIndexedCollection(Object obj) {
 		return isArray(obj) || obj instanceof List;
 	}
 
 	/**
-	 * Returns the element at the specified position in provided array/list object instance {@code obj}.
+	 * Returns the element at the specified position in provided array/collection/iterable object instance {@code obj}.
 	 * 
 	 * @param obj
 	 *            array/list instance to get element
 	 * @param index
 	 *            index of the element to return
-	 * @return the value of the indexed component in the specified array/list
+	 * @return the value of the indexed component in the specified array/collection/iterable
 	 * 
 	 * @throws IllegalArgumentException
 	 *             if the specified object is not an array
@@ -2343,8 +2448,11 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		if (obj instanceof List) {
 			return ((List<?>) obj).get(index);
 		}
+		if (obj instanceof Iterable) {
+			return IterableUtils.get((Iterable<?>) obj, index);
+		}
 
-		return null;
+		return CollectionUtils.get(obj, index);
 	}
 
 	private static String getItemIndexStr(String indexToken) {
@@ -2597,6 +2705,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * <li>{@code Array} - is {@code null} or length is {@code 0}</li>
 	 * <li>{@link Collection} - is {@code null} or length is {@code 0}</li>
 	 * <li>{@link Map} - is {@code null} or length is {@code 0}</li>
+	 * <li>{@link Iterable} - is {@code null} or has no any accessible element</li>
 	 * <li>{@link Object} - is {@code null}</li>
 	 * </ul>
 	 *
@@ -2619,6 +2728,9 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		}
 		if (obj instanceof Map) {
 			return MapUtils.isEmpty((Map<?, ?>) obj);
+		}
+		if (obj instanceof Iterable) {
+			return IterableUtils.isEmpty((Iterable<?>) obj);
 		}
 
 		return false;
