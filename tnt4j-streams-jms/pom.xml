@@ -21,7 +21,7 @@
         <solace.version>10.16.0</solace.version>
         <rabbitmq.version>2.7.0</rabbitmq.version> <!-- 3.0.x changes javax packages to jakarta -->
         <zeromq.version>3.0.1-RELEASE</zeromq.version>
-        <rocketmq.version>5.0.0</rocketmq.version>
+        <rocketmq.version>5.0.0-PREVIEW</rocketmq.version>
     </properties>
 
     <profiles>
