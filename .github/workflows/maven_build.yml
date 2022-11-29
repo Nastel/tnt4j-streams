@@ -39,7 +39,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java-version }}
-          distribution: 'microsoft'
+          distribution: 'zulu'
       - name: Build with Maven
         run: mvn -B clean package --file pom.xml --no-transfer-progress
       - name: Get POM version
@@ -181,7 +181,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 8
-          distribution: 'microsoft'
+          distribution: 'zulu'
           server-id: oss.sonatype.org
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
