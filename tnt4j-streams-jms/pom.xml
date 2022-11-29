@@ -14,7 +14,7 @@
     <artifactId>tnt4j-streams-jms</artifactId>
 
     <properties>
-        <jakarta.jms.version>2.0.3</jakarta.jms.version> <!-- 3.0.x changes javax packages to jakarta -->
+        <jakarta.jms.version>3.1.0</jakarta.jms.version> <!-- 3.0.x changes javax packages to jakarta -->
         <artemis.version>2.19.1</artemis.version>   <!-- 2.20.x requires java 11 -->
 
         <activemq.version>5.16.5</activemq.version>   <!-- 5.17.x requires java 11 -->
