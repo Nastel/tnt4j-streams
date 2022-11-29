@@ -5,6 +5,11 @@ updates:
     schedule:
       interval: "daily"
     open-pull-requests-limit: 10  
+    ignore:
+      - dependency-name: "HikariCP"
+        versions: ["5.x"]        
+      - dependency-name: "activemq-client"
+        versions: ["5.17.x"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
