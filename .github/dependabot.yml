@@ -10,6 +10,10 @@ updates:
         versions: ["5.x"]        
       - dependency-name: "activemq-client"
         versions: ["5.17.x"]
+      - dependency-name: "slf4j*"
+        versions: ["2.x"] 
+      - dependency-name: "artemis*"
+        versions: ["2.27.x"]  
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
