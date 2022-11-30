@@ -29,12 +29,12 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="ResourceReferenceType">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="ValuesMap"/>
- *     &lt;enumeration value="Parser"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="ResourceReferenceType"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="ValuesMap"/&gt;
+ *     &lt;enumeration value="Parser"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

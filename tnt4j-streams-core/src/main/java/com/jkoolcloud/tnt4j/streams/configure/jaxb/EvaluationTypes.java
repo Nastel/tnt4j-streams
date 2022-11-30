@@ -29,14 +29,14 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="EvaluationTypes">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="is"/>
- *     &lt;enumeration value="contains"/>
- *     &lt;enumeration value="wildcard"/>
- *     &lt;enumeration value="regex"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="EvaluationTypes"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="is"/&gt;
+ *     &lt;enumeration value="contains"/&gt;
+ *     &lt;enumeration value="wildcard"/&gt;
+ *     &lt;enumeration value="regex"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

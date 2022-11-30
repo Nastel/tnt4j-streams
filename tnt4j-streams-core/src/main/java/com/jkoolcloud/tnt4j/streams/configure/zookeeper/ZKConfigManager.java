@@ -269,6 +269,12 @@ public class ZKConfigManager implements ZKConfigConstants {
 	 * @param zkCfgChangeListener
 	 *            zookeeper node data change listener instance
 	 *
+	 * @throws java.io.IOException
+	 *             if I/O exception occurs while initializing ZooKeeper connection
+	 * @throws java.lang.InterruptedException
+	 *             if the current thread is interrupted while waiting
+	 * 
+	 * @see #zk()
 	 * @see #handleZKStoredConfiguration(org.apache.zookeeper.ZooKeeper, String, ZKConfigChangeListener)
 	 */
 	public static void handleZKStoredConfiguration(String path, ZKConfigChangeListener zkCfgChangeListener)
@@ -287,7 +293,8 @@ public class ZKConfigManager implements ZKConfigConstants {
 	 * @param zkCfgChangeListener
 	 *            zookeeper node data change listener instance
 	 */
-	public static void handleZKStoredConfiguration(ZooKeeper zk, String path, ZKConfigChangeListener zkCfgChangeListener) {
+	public static void handleZKStoredConfiguration(ZooKeeper zk, String path,
+			ZKConfigChangeListener zkCfgChangeListener) {
 		Watcher watch = new Watcher() {
 			@Override
 			public void process(WatchedEvent watchedEvent) {

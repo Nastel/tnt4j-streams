@@ -712,6 +712,9 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 * @param data
 	 *            raw activity data to prepare
 	 * @return activity data context package
+	 * 
+	 * @throws java.text.ParseException
+	 *             if an error occurs parsing raw data string
 	 */
 	@SuppressWarnings("unchecked")
 	protected ActivityContext prepareItem(TNTInputStream<?, ?> stream, Object data) throws ParseException {
@@ -861,7 +864,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 * @param cData
 	 *            parsing context data package
 	 * @throws ParseException
-	 *             if an error parsing the specified value
+	 *             if an error occurs parsing the specified value
 	 */
 	protected void fillInMessageData(ActivityInfo ai, ActivityContext cData) throws ParseException {
 		if (useActivityAsMessage && ai.getMessage() == null) {
@@ -888,7 +891,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 * @throws IllegalStateException
 	 *             if parser has not been properly initialized
 	 * @throws ParseException
-	 *             if an error parsing the specified value
+	 *             if an error occurs parsing the specified value
 	 *
 	 * @see #applyDynamicValue(com.jkoolcloud.tnt4j.streams.parsers.GenericActivityParser.ActivityContext,
 	 *      com.jkoolcloud.tnt4j.streams.fields.ActivityField, Object)
@@ -945,7 +948,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 * @throws IllegalStateException
 	 *             if parser has not been properly initialized
 	 * @throws ParseException
-	 *             if an error parsing the specified value
+	 *             if an error occurs parsing the specified value
 	 *
 	 * @see #applyFieldValue(com.jkoolcloud.tnt4j.streams.fields.ActivityField, Object,
 	 *      com.jkoolcloud.tnt4j.streams.parsers.ActivityParser.ActivityParserContext)

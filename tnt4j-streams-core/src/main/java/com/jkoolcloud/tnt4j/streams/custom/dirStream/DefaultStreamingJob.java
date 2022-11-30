@@ -69,6 +69,8 @@ public class DefaultStreamingJob implements StreamingJob {
 	 *            unique job identifier
 	 * @param streamCfgFile
 	 *            stream configuration file
+	 * @param manager
+	 *            files streaming manager instance to use
 	 */
 	public DefaultStreamingJob(UUID jobId, File streamCfgFile, DirStreamingManager manager) {
 		this.jobId = jobId;

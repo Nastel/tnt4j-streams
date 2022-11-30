@@ -54,7 +54,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <ul>
  * <li>ActivityData - JMS message payload data. In case of {@link javax.jms.MapMessage} this entry is omitted, because
  * message contained map entries are copied to data map.</li>
- * <li>MsgMetadata - JMS message metadata map containing those fields:</li>
+ * <li>MsgMetadata - JMS message metadata map containing those fields:
  * <ul>
  * <li>Correlator - message correlation identifier</li>
  * <li>CorrelatorBytes - message correlation identifier bytes value</li>
@@ -71,6 +71,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>CustomMsgProps - map of properties accessible over keys enumeration {@link javax.jms.Message#getPropertyNames()}
  * and values resolved over {@link javax.jms.Message#getObjectProperty(String)}</li>
  * </ul>
+ * </li>
  * <li>ActivityTransport - value is always
  * {@value com.jkoolcloud.tnt4j.streams.utils.JMSStreamConstants#TRANSPORT_JMS}.</li>
  * </ul>

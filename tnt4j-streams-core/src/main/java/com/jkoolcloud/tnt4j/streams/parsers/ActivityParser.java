@@ -131,7 +131,7 @@ public abstract class ActivityParser implements NamedObject {
 	 * @throws IllegalStateException
 	 *             if parser has not been properly initialized
 	 * @throws ParseException
-	 *             if an error parsing raw data string
+	 *             if an error occurs parsing raw data string
 	 * @see #isDataClassSupported(Object)
 	 * @see GenericActivityParser#parsePreparedItem(com.jkoolcloud.tnt4j.streams.parsers.GenericActivityParser.ActivityContext)
 	 */
@@ -162,7 +162,7 @@ public abstract class ActivityParser implements NamedObject {
 	 * @throws IllegalStateException
 	 *             if parser has not been properly initialized
 	 * @throws ParseException
-	 *             if an error parsing raw data string
+	 *             if an error occurs parsing raw data string
 	 * @see #isDataClassSupported(Object)
 	 * @see GenericActivityParser#parsePreparedItem(com.jkoolcloud.tnt4j.streams.parsers.GenericActivityParser.ActivityContext)
 	 */

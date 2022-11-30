@@ -33,14 +33,14 @@ import javax.xml.bind.annotation.XmlType;
  * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="FieldParserReference">
- *   &lt;complexContent>
- *     &lt;extension base="{}ParserReference">
- *       &lt;attribute name="aggregation" type="{}AggregationTypes" default="Merge" />
- *       &lt;attribute name="applyOn" type="{}ParserApplyTypes" default="Field" />
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="FieldParserReference"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{}ParserReference"&gt;
+ *       &lt;attribute name="aggregation" type="{}AggregationTypes" default="Merge" /&gt;
+ *       &lt;attribute name="applyOn" type="{}ParserApplyTypes" default="Field" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 

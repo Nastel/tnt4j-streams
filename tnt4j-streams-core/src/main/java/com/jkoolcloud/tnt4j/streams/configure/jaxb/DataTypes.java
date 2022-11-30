@@ -29,17 +29,17 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="DataTypes">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="String"/>
- *     &lt;enumeration value="Binary"/>
- *     &lt;enumeration value="Number"/>
- *     &lt;enumeration value="DateTime"/>
- *     &lt;enumeration value="Timestamp"/>
- *     &lt;enumeration value="Generic"/>
- *     &lt;enumeration value="AsInput"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="DataTypes"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="String"/&gt;
+ *     &lt;enumeration value="Binary"/&gt;
+ *     &lt;enumeration value="Number"/&gt;
+ *     &lt;enumeration value="DateTime"/&gt;
+ *     &lt;enumeration value="Timestamp"/&gt;
+ *     &lt;enumeration value="Generic"/&gt;
+ *     &lt;enumeration value="AsInput"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

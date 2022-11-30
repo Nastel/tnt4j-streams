@@ -75,8 +75,8 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * then using parser configuration:
  * 
  * <pre>
- * <field name="Message" locator="key2" locator-type="Label"/>
- * <field name="AllRestMapEntries" locator="#" locator-type="Label"/>
+ * &lt;field name="Message" locator="key2" locator-type="Label"/&gt;
+ * &lt;field name="AllRestMapEntries" locator="#" locator-type="Label"/&gt;
  * </pre>
  * 
  * you'll get such results:

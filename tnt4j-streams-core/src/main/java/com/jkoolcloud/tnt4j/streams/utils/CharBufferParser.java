@@ -205,6 +205,7 @@ public abstract class CharBufferParser<I, O> {
 	 *
 	 * @param cb
 	 *            char buffer containing text to read
+	 * @return an integer value
 	 *
 	 * @see #read(CharBuffer)
 	 * @see #unread(CharBuffer)
@@ -251,6 +252,7 @@ public abstract class CharBufferParser<I, O> {
 	 *
 	 * @param cb
 	 *            char buffer containing text to read
+	 * @return an integer value
 	 *
 	 * @see #read(CharBuffer)
 	 * @see #unread(CharBuffer, int)

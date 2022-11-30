@@ -29,13 +29,13 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="ScriptLangs">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="javascript"/>
- *     &lt;enumeration value="groovy"/>
- *     &lt;enumeration value="xpath"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="ScriptLangs"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="javascript"/&gt;
+ *     &lt;enumeration value="groovy"/&gt;
+ *     &lt;enumeration value="xpath"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

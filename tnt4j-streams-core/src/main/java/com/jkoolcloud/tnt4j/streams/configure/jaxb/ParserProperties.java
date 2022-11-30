@@ -29,24 +29,24 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="ParserProperties">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="Pattern"/>
- *     &lt;enumeration value="FieldDelim"/>
- *     &lt;enumeration value="ValueDelim"/>
- *     &lt;enumeration value="StripQuotes"/>
- *     &lt;enumeration value="RequireDefault"/>
- *     &lt;enumeration value="StripHeaders"/>
- *     &lt;enumeration value="Namespace"/>
- *     &lt;enumeration value="ReadLines"/>
- *     &lt;enumeration value="LocPathDelim"/>
- *     &lt;enumeration value="UseActivityDataAsMessageForUnset"/>
- *     &lt;enumeration value="EntryPattern"/>
- *     &lt;enumeration value="ActivityDelim"/>
- *     &lt;enumeration value="NamespaceAware"/>
- *     &lt;enumeration value="MatchStrategy"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="ParserProperties"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="Pattern"/&gt;
+ *     &lt;enumeration value="FieldDelim"/&gt;
+ *     &lt;enumeration value="ValueDelim"/&gt;
+ *     &lt;enumeration value="StripQuotes"/&gt;
+ *     &lt;enumeration value="RequireDefault"/&gt;
+ *     &lt;enumeration value="StripHeaders"/&gt;
+ *     &lt;enumeration value="Namespace"/&gt;
+ *     &lt;enumeration value="ReadLines"/&gt;
+ *     &lt;enumeration value="LocPathDelim"/&gt;
+ *     &lt;enumeration value="UseActivityDataAsMessageForUnset"/&gt;
+ *     &lt;enumeration value="EntryPattern"/&gt;
+ *     &lt;enumeration value="ActivityDelim"/&gt;
+ *     &lt;enumeration value="NamespaceAware"/&gt;
+ *     &lt;enumeration value="MatchStrategy"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

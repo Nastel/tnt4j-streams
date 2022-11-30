@@ -2902,7 +2902,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * <ul>
 	 * <li>value is {@link Boolean} object</li>
 	 * <li>value is {@link String}, where {@code 'true'}, {@code 'on'}, {@code 'y'}, {@code 't'} or {@code 'yes'}
-	 * (case-insensitive) will return {@code true}/li>
+	 * (case-insensitive) will return {@code true}</li>
 	 * </ul>
 	 * In all other cases {@code null} is returned.
 	 *

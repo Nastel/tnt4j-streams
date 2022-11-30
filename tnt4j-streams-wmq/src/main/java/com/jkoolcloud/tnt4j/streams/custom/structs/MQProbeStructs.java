@@ -2254,22 +2254,22 @@ public class MQProbeStructs {
 	 * <li>JobName (String)</li>
 	 * <li>AddressSpaceId (byte[])</li>
 	 * <li>Flags (byte[])</li>
-	 * <li>MQCallsByName (Map<String, Integer>)</li>
+	 * <li>MQCallsByName (Map&lt;String, Integer&gt;)</li>
 	 * <li>MqCalls (int[])</li>
 	 * <li>MqSkipCount (int)</li>
 	 * <li>MqAbendCount (int)</li>
 	 * <li>MqTotalCount (int)</li>
-	 * <li>ExcCallsByName (Map<String, Integer>)</li>
+	 * <li>ExcCallsByName (Map&lt;String, Integer&gt;)</li>
 	 * <li>ExcCalls (int[])</li>
 	 * <li>ExcSkipCount (int)</li>
 	 * <li>ExcAbendCount (int)</li>
 	 * <li>ExcTotalCount (int)</li>
-	 * <li>SqlCallsByName (Map<String, Integer>)</li>
+	 * <li>SqlCallsByName (Map&lt;String, Integer&gt;)</li>
 	 * <li>SqlCalls (int[])</li>
 	 * <li>SqlSkipCount (int)</li>
 	 * <li>SqlAbendCount (int)</li>
 	 * <li>SqlTotalCount (int)</li>
-	 * <li>TcpCallsByName (Map<String, Integer>)</li>
+	 * <li>TcpCallsByName (Map&lt;String, Integer&gt;)</li>
 	 * <li>TcpCalls (int[])</li>
 	 * <li>TcpSkipCount (int)</li>
 	 * <li>TcpAbendCount (int)</li>

@@ -29,13 +29,13 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="AggregationTypes">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="Merge"/>
- *     &lt;enumeration value="Join"/>
- *     &lt;enumeration value="Relate"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="AggregationTypes"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="Merge"/&gt;
+ *     &lt;enumeration value="Join"/&gt;
+ *     &lt;enumeration value="Relate"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

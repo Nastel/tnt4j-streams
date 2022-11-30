@@ -29,17 +29,17 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="UnitsTypes">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="Days"/>
- *     &lt;enumeration value="Hours"/>
- *     &lt;enumeration value="Minutes"/>
- *     &lt;enumeration value="Seconds"/>
- *     &lt;enumeration value="Milliseconds"/>
- *     &lt;enumeration value="Microseconds"/>
- *     &lt;enumeration value="Nanoseconds"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="UnitsTypes"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="Days"/&gt;
+ *     &lt;enumeration value="Hours"/&gt;
+ *     &lt;enumeration value="Minutes"/&gt;
+ *     &lt;enumeration value="Seconds"/&gt;
+ *     &lt;enumeration value="Milliseconds"/&gt;
+ *     &lt;enumeration value="Microseconds"/&gt;
+ *     &lt;enumeration value="Nanoseconds"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

@@ -29,15 +29,15 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="DataFormats">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="base64Binary"/>
- *     &lt;enumeration value="hexBinary"/>
- *     &lt;enumeration value="string"/>
- *     &lt;enumeration value="[DateTime-specification]"/>
- *     &lt;enumeration value="[Decimal-specification]"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="DataFormats"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="base64Binary"/&gt;
+ *     &lt;enumeration value="hexBinary"/&gt;
+ *     &lt;enumeration value="string"/&gt;
+ *     &lt;enumeration value="[DateTime-specification]"/&gt;
+ *     &lt;enumeration value="[Decimal-specification]"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

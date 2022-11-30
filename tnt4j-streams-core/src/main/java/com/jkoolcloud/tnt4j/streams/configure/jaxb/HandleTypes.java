@@ -29,12 +29,12 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="HandleTypes">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="include"/>
- *     &lt;enumeration value="exclude"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="HandleTypes"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="include"/&gt;
+ *     &lt;enumeration value="exclude"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */
@@ -60,6 +60,7 @@ public enum HandleTypes {
 	 */
 	@XmlEnumValue("exclude")
 	EXCLUDE("exclude");
+
 	private final String value;
 
 	HandleTypes(String v) {

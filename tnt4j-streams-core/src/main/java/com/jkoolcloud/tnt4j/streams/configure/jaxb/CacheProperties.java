@@ -30,13 +30,13 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="CacheProperties">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="MaxSize"/>
- *     &lt;enumeration value="ExpireDuration"/>
- *     &lt;enumeration value="Persisted"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="CacheProperties"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="MaxSize"/&gt;
+ *     &lt;enumeration value="ExpireDuration"/&gt;
+ *     &lt;enumeration value="Persisted"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

@@ -29,12 +29,12 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  *
  * <pre>
- * &lt;simpleType name="ParserApplyTypes">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="Field"/>
- *     &lt;enumeration value="Activity"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="ParserApplyTypes"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="Field"/&gt;
+ *     &lt;enumeration value="Activity"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  *
  */
@@ -61,6 +61,7 @@ public enum ParserApplyTypes {
 	@XmlEnumValue("Activity")
 	@Deprecated
 	ACTIVITY("Activity");
+
 	private final String value;
 
 	ParserApplyTypes(String v) {

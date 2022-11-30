@@ -29,40 +29,40 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="FieldNames">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="ApplName"/>
- *     &lt;enumeration value="ServerName"/>
- *     &lt;enumeration value="ServerIp"/>
- *     &lt;enumeration value="EventName"/>
- *     &lt;enumeration value="EventType"/>
- *     &lt;enumeration value="StartTime"/>
- *     &lt;enumeration value="EndTime"/>
- *     &lt;enumeration value="ElapsedTime"/>
- *     &lt;enumeration value="ProcessId"/>
- *     &lt;enumeration value="ThreadId"/>
- *     &lt;enumeration value="CompCode"/>
- *     &lt;enumeration value="ReasonCode"/>
- *     &lt;enumeration value="Exception"/>
- *     &lt;enumeration value="Severity"/>
- *     &lt;enumeration value="Location"/>
- *     &lt;enumeration value="Correlator"/>
- *     &lt;enumeration value="Tag"/>
- *     &lt;enumeration value="UserName"/>
- *     &lt;enumeration value="ResourceName"/>
- *     &lt;enumeration value="Message"/>
- *     &lt;enumeration value="TrackingId"/>
- *     &lt;enumeration value="MsgLength"/>
- *     &lt;enumeration value="MsgMimeType"/>
- *     &lt;enumeration value="MsgEncoding"/>
- *     &lt;enumeration value="MsgCharSet"/>
- *     &lt;enumeration value="MessageAge"/>
- *     &lt;enumeration value="Category"/>
- *     &lt;enumeration value="ParentId"/>
- *     &lt;enumeration value="Guid"/>
- *     &lt;enumeration value="TTL"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="FieldNames"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="ApplName"/&gt;
+ *     &lt;enumeration value="ServerName"/&gt;
+ *     &lt;enumeration value="ServerIp"/&gt;
+ *     &lt;enumeration value="EventName"/&gt;
+ *     &lt;enumeration value="EventType"/&gt;
+ *     &lt;enumeration value="StartTime"/&gt;
+ *     &lt;enumeration value="EndTime"/&gt;
+ *     &lt;enumeration value="ElapsedTime"/&gt;
+ *     &lt;enumeration value="ProcessId"/&gt;
+ *     &lt;enumeration value="ThreadId"/&gt;
+ *     &lt;enumeration value="CompCode"/&gt;
+ *     &lt;enumeration value="ReasonCode"/&gt;
+ *     &lt;enumeration value="Exception"/&gt;
+ *     &lt;enumeration value="Severity"/&gt;
+ *     &lt;enumeration value="Location"/&gt;
+ *     &lt;enumeration value="Correlator"/&gt;
+ *     &lt;enumeration value="Tag"/&gt;
+ *     &lt;enumeration value="UserName"/&gt;
+ *     &lt;enumeration value="ResourceName"/&gt;
+ *     &lt;enumeration value="Message"/&gt;
+ *     &lt;enumeration value="TrackingId"/&gt;
+ *     &lt;enumeration value="MsgLength"/&gt;
+ *     &lt;enumeration value="MsgMimeType"/&gt;
+ *     &lt;enumeration value="MsgEncoding"/&gt;
+ *     &lt;enumeration value="MsgCharSet"/&gt;
+ *     &lt;enumeration value="MessageAge"/&gt;
+ *     &lt;enumeration value="Category"/&gt;
+ *     &lt;enumeration value="ParentId"/&gt;
+ *     &lt;enumeration value="Guid"/&gt;
+ *     &lt;enumeration value="TTL"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

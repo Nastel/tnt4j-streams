@@ -83,7 +83,7 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
  * <tr><td>line</td><td>%r</td><td>First line of request.</td></tr>
  * <tr><td>respHandler</td><td>%R</td><td>The handler generating the response (if any).</td></tr>
  * <tr><td>status</td><td>%s</td><td>Status. For requests that have been internally redirected, this is the status of the original request.
- * Use %>s for the final status.</td></tr>
+ * Use %&gt;s for the final status.</td></tr>
  * <tr><td>time</td><td>%{format}t</td><td>The time, in the form given by format, which should be in an extended strftime(3) format (potentially localized).
  * If the format starts with begin: (default) the time is taken at the beginning of the request processing. If it starts
  * with end: it is the time when the log entry gets written, close to the end of the request processing. In addition to

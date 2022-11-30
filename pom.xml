@@ -183,6 +183,10 @@
                     <nodeprecated>false</nodeprecated>
                     <failOnError>false</failOnError>
                     <doclint>all</doclint>
+                    <!-- Ignore generated code -->
+                    <excludePackageNames>
+                        prometheus:com.google.protobuf
+                    </excludePackageNames>
                 </configuration>
                 <executions>
                     <execution>

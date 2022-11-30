@@ -37,15 +37,15 @@ import javax.xml.bind.annotation.XmlType;
  * The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
- * &lt;complexType name="ParserReference">
- *   &lt;complexContent>
- *     &lt;extension base="{}Reference">
- *       &lt;sequence>
- *         &lt;element name="matchExp" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="ParserReference"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{}Reference"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="matchExp" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  *
  *

@@ -29,48 +29,48 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="StreamProperties">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="DateTime"/>
- *     &lt;enumeration value="FileName"/>
- *     &lt;enumeration value="Host"/>
- *     &lt;enumeration value="Port"/>
- *     &lt;enumeration value="QueueManager"/>
- *     &lt;enumeration value="Queue"/>
- *     &lt;enumeration value="Topic"/>
- *     &lt;enumeration value="Subscription"/>
- *     &lt;enumeration value="TopicString"/>
- *     &lt;enumeration value="Channel"/>
- *     &lt;enumeration value="StripHeaders"/>
- *     &lt;enumeration value="StartFromLatest"/>
- *     &lt;enumeration value="FileReadDelay"/>
- *     &lt;enumeration value="HaltIfNoParser"/>
- *     &lt;enumeration value="UseExecutors"/>
- *     &lt;enumeration value="ExecutorThreadsQuantity"/>
- *     &lt;enumeration value="ExecutorRejectedTaskOfferTimeout"/>
- *     &lt;enumeration value="ExecutorsTerminationTimeout"/>
- *     &lt;enumeration value="ExecutorsBoundedModel"/>
- *     &lt;enumeration value="Keystore"/>
- *     &lt;enumeration value="KeystorePass"/>
- *     &lt;enumeration value="KeyPass"/>
- *     &lt;enumeration value="JNDIFactory"/>
- *     &lt;enumeration value="JMSConnFactory"/>
- *     &lt;enumeration value="ServerURI"/>
- *     &lt;enumeration value="UserName"/>
- *     &lt;enumeration value="Password"/>
- *     &lt;enumeration value="UseSSL"/>
- *     &lt;enumeration value="RestartOnInputClose"/>
- *     &lt;enumeration value="ArchType"/>
- *     &lt;enumeration value="BufferSize"/>
- *     &lt;enumeration value="BufferDropWhenFull"/>
- *     &lt;enumeration value="FilePolling"/>
- *     &lt;enumeration value="RestoreState"/>
- *     &lt;enumeration value="StartServer"/>
- *     &lt;enumeration value="InputCloseable"/>
- *     &lt;enumeration value="RangeToStream"/>
- *     &lt;enumeration value="StreamReconnectDelay"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="StreamProperties"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="DateTime"/&gt;
+ *     &lt;enumeration value="FileName"/&gt;
+ *     &lt;enumeration value="Host"/&gt;
+ *     &lt;enumeration value="Port"/&gt;
+ *     &lt;enumeration value="QueueManager"/&gt;
+ *     &lt;enumeration value="Queue"/&gt;
+ *     &lt;enumeration value="Topic"/&gt;
+ *     &lt;enumeration value="Subscription"/&gt;
+ *     &lt;enumeration value="TopicString"/&gt;
+ *     &lt;enumeration value="Channel"/&gt;
+ *     &lt;enumeration value="StripHeaders"/&gt;
+ *     &lt;enumeration value="StartFromLatest"/&gt;
+ *     &lt;enumeration value="FileReadDelay"/&gt;
+ *     &lt;enumeration value="HaltIfNoParser"/&gt;
+ *     &lt;enumeration value="UseExecutors"/&gt;
+ *     &lt;enumeration value="ExecutorThreadsQuantity"/&gt;
+ *     &lt;enumeration value="ExecutorRejectedTaskOfferTimeout"/&gt;
+ *     &lt;enumeration value="ExecutorsTerminationTimeout"/&gt;
+ *     &lt;enumeration value="ExecutorsBoundedModel"/&gt;
+ *     &lt;enumeration value="Keystore"/&gt;
+ *     &lt;enumeration value="KeystorePass"/&gt;
+ *     &lt;enumeration value="KeyPass"/&gt;
+ *     &lt;enumeration value="JNDIFactory"/&gt;
+ *     &lt;enumeration value="JMSConnFactory"/&gt;
+ *     &lt;enumeration value="ServerURI"/&gt;
+ *     &lt;enumeration value="UserName"/&gt;
+ *     &lt;enumeration value="Password"/&gt;
+ *     &lt;enumeration value="UseSSL"/&gt;
+ *     &lt;enumeration value="RestartOnInputClose"/&gt;
+ *     &lt;enumeration value="ArchType"/&gt;
+ *     &lt;enumeration value="BufferSize"/&gt;
+ *     &lt;enumeration value="BufferDropWhenFull"/&gt;
+ *     &lt;enumeration value="FilePolling"/&gt;
+ *     &lt;enumeration value="RestoreState"/&gt;
+ *     &lt;enumeration value="StartServer"/&gt;
+ *     &lt;enumeration value="InputCloseable"/&gt;
+ *     &lt;enumeration value="RangeToStream"/&gt;
+ *     &lt;enumeration value="StreamReconnectDelay"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

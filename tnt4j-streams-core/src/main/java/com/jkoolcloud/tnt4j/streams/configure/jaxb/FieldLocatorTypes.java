@@ -28,21 +28,21 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="FieldLocatorTypes">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="StreamProp"/>
- *     &lt;enumeration value="Index"/>
- *     &lt;enumeration value="Label"/>
- *     &lt;enumeration value="REMatchId"/>
- *     &lt;enumeration value="Range"/>
- *     &lt;enumeration value="Cache"/>
- *     &lt;enumeration value="Activity"/>
- *     &lt;enumeration value="Expression"/>
- *     &lt;enumeration value="ParserProp"/>
- *     &lt;enumeration value="SystemProp"/>
- *     &lt;enumeration value="EnvVariable"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="FieldLocatorTypes"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="StreamProp"/&gt;
+ *     &lt;enumeration value="Index"/&gt;
+ *     &lt;enumeration value="Label"/&gt;
+ *     &lt;enumeration value="REMatchId"/&gt;
+ *     &lt;enumeration value="Range"/&gt;
+ *     &lt;enumeration value="Cache"/&gt;
+ *     &lt;enumeration value="Activity"/&gt;
+ *     &lt;enumeration value="Expression"/&gt;
+ *     &lt;enumeration value="ParserProp"/&gt;
+ *     &lt;enumeration value="SystemProp"/&gt;
+ *     &lt;enumeration value="EnvVariable"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

@@ -29,13 +29,13 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="FieldMapTypes">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="Value"/>
- *     &lt;enumeration value="Range"/>
- *     &lt;enumeration value="Calc"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="FieldMapTypes"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="Value"/&gt;
+ *     &lt;enumeration value="Range"/&gt;
+ *     &lt;enumeration value="Calc"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */
@@ -70,6 +70,7 @@ public enum FieldMapTypes {
 	 */
 	@XmlEnumValue("Calc")
 	CALC("Calc");
+
 	private final String value;
 
 	FieldMapTypes(String v) {

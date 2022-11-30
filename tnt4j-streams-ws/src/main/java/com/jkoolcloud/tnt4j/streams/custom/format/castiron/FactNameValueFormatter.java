@@ -341,6 +341,8 @@ public class FactNameValueFormatter extends DefaultFormatter {
 	 *
 	 * @param nvString
 	 *            string builder instance to append
+	 * @param t
+	 *            snapshot parent entity
 	 * @param snap
 	 *            snapshot instance to represent as string
 	 * @return appended string builder reference

@@ -29,13 +29,13 @@ import javax.xml.bind.annotation.XmlType;
  * <p>
  * 
  * <pre>
- * &lt;simpleType name="ValueResolutionPhases">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="raw"/>
- *     &lt;enumeration value="formatted"/>
- *     &lt;enumeration value="aggregated"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="ValueResolutionPhases"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="raw"/&gt;
+ *     &lt;enumeration value="formatted"/&gt;
+ *     &lt;enumeration value="aggregated"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

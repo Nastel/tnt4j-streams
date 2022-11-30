@@ -33,36 +33,36 @@ import javax.xml.bind.annotation.*;
  * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="Filter">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;choice maxOccurs="unbounded">
- *         &lt;element name="value" maxOccurs="unbounded" minOccurs="0">
- *           &lt;complexType>
- *             &lt;simpleContent>
- *               &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
- *                 &lt;attribute name="handle" use="required" type="{}HandleTypes" />
- *                 &lt;attribute name="evaluation" type="{}EvaluationTypes" default="is" />
- *                 &lt;attribute name="format" type="{}DataFormatsAll" />
- *               &lt;/extension>
- *             &lt;/simpleContent>
- *           &lt;/complexType>
- *         &lt;/element>
- *         &lt;element name="expression" maxOccurs="unbounded" minOccurs="0">
- *           &lt;complexType>
- *             &lt;simpleContent>
- *               &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
- *                 &lt;attribute name="handle" use="required" type="{}HandleTypes" />
- *                 &lt;attribute name="lang" use="required" type="{}ScriptLangs" />
- *               &lt;/extension>
- *             &lt;/simpleContent>
- *           &lt;/complexType>
- *         &lt;/element>
- *       &lt;/choice>
- *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="Filter"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;choice maxOccurs="unbounded"&gt;
+ *         &lt;element name="value" maxOccurs="unbounded" minOccurs="0"&gt;
+ *           &lt;complexType&gt;
+ *             &lt;simpleContent&gt;
+ *               &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
+ *                 &lt;attribute name="handle" use="required" type="{}HandleTypes" /&gt;
+ *                 &lt;attribute name="evaluation" type="{}EvaluationTypes" default="is" /&gt;
+ *                 &lt;attribute name="format" type="{}DataFormatsAll" /&gt;
+ *               &lt;/extension&gt;
+ *             &lt;/simpleContent&gt;
+ *           &lt;/complexType&gt;
+ *         &lt;/element&gt;
+ *         &lt;element name="expression" maxOccurs="unbounded" minOccurs="0"&gt;
+ *           &lt;complexType&gt;
+ *             &lt;simpleContent&gt;
+ *               &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
+ *                 &lt;attribute name="handle" use="required" type="{}HandleTypes" /&gt;
+ *                 &lt;attribute name="lang" use="required" type="{}ScriptLangs" /&gt;
+ *               &lt;/extension&gt;
+ *             &lt;/simpleContent&gt;
+ *           &lt;/complexType&gt;
+ *         &lt;/element&gt;
+ *       &lt;/choice&gt;
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -201,14 +201,14 @@ public class Filter {
 	 * The following schema fragment specifies the expected content contained within this class.
 	 * 
 	 * <pre>
-	 * &lt;complexType>
-	 *   &lt;simpleContent>
-	 *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
-	 *       &lt;attribute name="handle" use="required" type="{}HandleTypes" />
-	 *       &lt;attribute name="lang" use="required" type="{}ScriptLangs" />
-	 *     &lt;/extension>
-	 *   &lt;/simpleContent>
-	 * &lt;/complexType>
+	 * &lt;complexType&gt;
+	 *   &lt;simpleContent&gt;
+	 *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
+	 *       &lt;attribute name="handle" use="required" type="{}HandleTypes" /&gt;
+	 *       &lt;attribute name="lang" use="required" type="{}ScriptLangs" /&gt;
+	 *     &lt;/extension&gt;
+	 *   &lt;/simpleContent&gt;
+	 * &lt;/complexType&gt;
 	 * </pre>
 	 * 
 	 * 
@@ -321,15 +321,15 @@ public class Filter {
 	 * The following schema fragment specifies the expected content contained within this class.
 	 * 
 	 * <pre>
-	 * &lt;complexType>
-	 *   &lt;simpleContent>
-	 *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
-	 *       &lt;attribute name="handle" use="required" type="{}HandleTypes" />
-	 *       &lt;attribute name="evaluation" type="{}EvaluationTypes" default="is" />
-	 *       &lt;attribute name="format" type="{}DataFormatsAll" />
-	 *     &lt;/extension>
-	 *   &lt;/simpleContent>
-	 * &lt;/complexType>
+	 * &lt;complexType&gt;
+	 *   &lt;simpleContent&gt;
+	 *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
+	 *       &lt;attribute name="handle" use="required" type="{}HandleTypes" /&gt;
+	 *       &lt;attribute name="evaluation" type="{}EvaluationTypes" default="is" /&gt;
+	 *       &lt;attribute name="format" type="{}DataFormatsAll" /&gt;
+	 *     &lt;/extension&gt;
+	 *   &lt;/simpleContent&gt;
+	 * &lt;/complexType&gt;
 	 * </pre>
 	 * 
 	 * 

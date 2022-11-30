@@ -34,24 +34,24 @@ import javax.xml.bind.annotation.*;
  * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="Parser">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;choice maxOccurs="unbounded">
- *         &lt;element name="property" type="{}ParserProperty" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="reference" type="{}Reference" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="field" type="{}Field" maxOccurs="unbounded"/>
- *         &lt;element name="embedded-activity" type="{}EmbeddedActivity" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="filter" type="{}Filter" minOccurs="0"/>
- *       &lt;/choice>
- *       &lt;attGroup ref="{}EntityAttributeGroup"/>
- *       &lt;attribute name="tags" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="manualFieldsOrder" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
- *       &lt;attribute name="default-data-type" type="{}DataTypes" default="String" />
- *       &lt;attribute name="default-emptyAsNull" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true"  />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="Parser"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;choice maxOccurs="unbounded"&gt;
+ *         &lt;element name="property" type="{}ParserProperty" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="reference" type="{}Reference" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="field" type="{}Field" maxOccurs="unbounded"/&gt;
+ *         &lt;element name="embedded-activity" type="{}EmbeddedActivity" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="filter" type="{}Filter" minOccurs="0"/&gt;
+ *       &lt;/choice&gt;
+ *       &lt;attGroup ref="{}EntityAttributeGroup"/&gt;
+ *       &lt;attribute name="tags" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="manualFieldsOrder" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="default-data-type" type="{}DataTypes" default="String" /&gt;
+ *       &lt;attribute name="default-emptyAsNull" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true"  /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 

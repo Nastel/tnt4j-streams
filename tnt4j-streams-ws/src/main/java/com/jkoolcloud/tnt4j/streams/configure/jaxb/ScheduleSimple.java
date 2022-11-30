@@ -32,16 +32,16 @@ import javax.xml.bind.annotation.*;
  * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="ScheduleSimple">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attGroup ref="{}SchedulerAttributeGroup"/>
- *       &lt;attribute name="interval" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
- *       &lt;attribute name="units" type="{}UnitsTypes" default="Seconds" />
- *       &lt;attribute name="repeatCount" type="{http://www.w3.org/2001/XMLSchema}integer" default="1" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="ScheduleSimple"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;attGroup ref="{}SchedulerAttributeGroup"/&gt;
+ *       &lt;attribute name="interval" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
+ *       &lt;attribute name="units" type="{}UnitsTypes" default="Seconds" /&gt;
+ *       &lt;attribute name="repeatCount" type="{http://www.w3.org/2001/XMLSchema}integer" default="1" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
