@@ -15,7 +15,14 @@ updates:
       - dependency-name: "org.apache.activemq:artemis*"
         versions: "[2.20.x,)"
       - dependency-name: "*"
-        versions: ["*preview*","*alpha*","*beta*","*ea*"]
+        versions: 
+          - *preview*
+          - *alpha*
+          - *beta*
+          - *ea*
+      # Maven plugins
+      - dependency-name: "org.apache.maven.plugins:maven-assembly-plugin"
+        versions: "[3.1.1,)"  
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
