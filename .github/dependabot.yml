@@ -11,9 +11,11 @@ updates:
       - dependency-name: "org.apache.activemq:activemq-client"
         versions: "[5.17.x,)"
       - dependency-name: "org.slf4j:slf4j*"
-        versions: "[2.x,)" 
+        versions: "[2.x,)"
       - dependency-name: "org.apache.activemq:artemis*"
-        versions: "[2.20.x,)"  
+        versions: "[2.20.x,)"
+      - dependency-name: "*"
+        versions: ["*preview*","*alpha*","*beta*","*ea*"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
