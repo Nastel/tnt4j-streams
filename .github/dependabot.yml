@@ -18,6 +18,8 @@ updates:
         versions: "[3.x,)"
       - dependency-name: "jakarta.annotation:jakarta.annotation-api"
         versions: "[2.x,)"
+      - dependency-name: "jakarta.jms:jakarta.jms-api"
+        versions: "[3.x,)"  
       # Maven plugins
       - dependency-name: "org.apache.maven.plugins:maven-assembly-plugin"
         versions: "[3.1.1,)"
