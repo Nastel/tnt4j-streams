@@ -156,7 +156,7 @@ public class KafkaConsumerRecordParser extends GenericActivityParser<ConsumerRec
 	 * @throws java.lang.RuntimeException
 	 *             if field can't be found or accessed
 	 *
-	 * @see KafkaUtils#getHeadersValue(String[], org.apache.kafka.common.header.Headers, int)
+	 * @see KafkaUtils#getHeaders(String[], org.apache.kafka.common.header.Headers, int)
 	 * @see Utils#getFieldValue(String[], Object, int)
 	 */
 	protected Object getRecordValue(String[] path, ConsumerRecord<?, ?> cRecord, int i) throws RuntimeException {
@@ -182,11 +182,7 @@ public class KafkaConsumerRecordParser extends GenericActivityParser<ConsumerRec
 		} else if ("serializedValueSize".equalsIgnoreCase(propStr)) { // NON-NLS
 			val = cRecord.serializedValueSize();
 		} else if ("headers".equalsIgnoreCase(propStr)) { // NON-NLS
-			if (i < path.length - 1) {
-				val = KafkaUtils.getHeadersValue(path, cRecord.headers(), i + 1);
-			} else {
-				val = cRecord.headers();
-			}
+			val = KafkaUtils.getHeaders(path, cRecord.headers(), i);
 		} else if ("key".equalsIgnoreCase(propStr)) { // NON-NLS
 			val = Utils.getFieldValue(path, cRecord.key(), i + 1);
 		} else if ("value".equalsIgnoreCase(propStr)) { // NON-NLS

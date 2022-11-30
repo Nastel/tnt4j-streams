@@ -42,7 +42,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>timestamp - record timestamp value</li>
  * <li>key - record key</li>
  * <li>value - record data</li>
- * <li>headers - record headers map</li>
+ * <li>headers - record headers iterable</li>
  * </ul>
  * <p>
  * If {@code key} or {@code value} contains complex data, use stacked parsers to parse that data. Or if it can be
@@ -151,7 +151,7 @@ public class KafkaProducerRecordParser extends GenericActivityParser<ProducerRec
 	 * @throws java.lang.RuntimeException
 	 *             if field can't be found or accessed
 	 *
-	 * @see KafkaUtils#getHeadersValue(String[], org.apache.kafka.common.header.Headers, int)
+	 * @see KafkaUtils#getHeaders(String[], org.apache.kafka.common.header.Headers, int)
 	 * @see Utils#getFieldValue(String[], Object, int)
 	 */
 	protected Object getRecordValue(String[] path, ProducerRecord<?, ?> pRecord, int i) throws RuntimeException {
@@ -169,7 +169,7 @@ public class KafkaProducerRecordParser extends GenericActivityParser<ProducerRec
 		} else if ("timestamp".equalsIgnoreCase(propStr)) { // NON-NLS
 			val = pRecord.timestamp();
 		} else if ("headers".equalsIgnoreCase(propStr)) { // NON-NLS
-			val = KafkaUtils.getHeadersValue(path, pRecord.headers(), i + 1);
+			val = KafkaUtils.getHeaders(path, pRecord.headers(), i);
 		} else if ("key".equalsIgnoreCase(propStr)) { // NON-NLS
 			val = Utils.getFieldValue(path, pRecord.key(), i + 1);
 		} else if ("value".equalsIgnoreCase(propStr)) { // NON-NLS

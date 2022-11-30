@@ -6094,7 +6094,7 @@ List of predefined locators for this parser:
 * `serializedValueSize` - size of the serialized, uncompressed value in bytes
 * `key` - record key
 * `value` - record data
-* `headers` - record headers map
+* `headers` - record headers iterable
 * `leaderEpoch` - record leader epoch
 
 #### Kafka Producer Record parser
@@ -6108,7 +6108,7 @@ List of predefined locators for this parser:
 * `timestamp` - record timestamp value
 * `key` - record key
 * `value` - record data
-* `headers` - record headers map
+* `headers` - record headers iterable
 
 #### Activity PCF parser
 

@@ -26,17 +26,43 @@ import org.apache.kafka.common.header.Headers;
  * @version $Revision: 1 $
  */
 public class KafkaUtils {
+
+	/**
+	 * Resolves {@link org.apache.kafka.common.header.Headers} contained header value defined by {@code headers}
+	 * keys/indices {@code path} array.
+	 * <p>
+	 * If path last element is token {@code "headers"}, then {@code headers} instance is returned.
+	 * 
+	 * @param path
+	 *            keys/indices path as array of record headers
+	 * @param headers
+	 *            record headers to resolve value
+	 * @param i
+	 *            processed locator path element index
+	 * @return resolved record headers value, or {@code null} if value is not resolved
+	 * 
+	 * @throws RuntimeException
+	 *             if field can't be found or accessed
+	 */
+	public static Object getHeaders(String[] path, Headers headers, int i) throws RuntimeException {
+		if (i < path.length - 1) {
+			return getHeadersValue(path, headers, i + 1);
+		} else {
+			return headers;
+		}
+	}
+
 	/**
 	 * Resolves {@link org.apache.kafka.common.header.Headers} contained header value defined by {@code headers}
 	 * keys/indices {@code path} array.
 	 *
 	 * @param path
-	 *            keys/indices path as array of consumer record headers
+	 *            keys/indices path as array of record headers
 	 * @param headers
-	 *            consumer record headers to resolve value
+	 *            record headers to resolve value
 	 * @param i
 	 *            processed locator path element index
-	 * @return resolved consumer record headers value, or {@code null} if value is not resolved
+	 * @return resolved record headers value, or {@code null} if value is not resolved
 	 * @throws java.lang.RuntimeException
 	 *             if field can't be found or accessed
 	 *
@@ -67,12 +93,12 @@ public class KafkaUtils {
 	 * keys/indices {@code path} array.
 	 *
 	 * @param path
-	 *            keys/indices path as array of consumer record headers
+	 *            keys/indices path as array of record headers
 	 * @param headers
-	 *            consumer record headers collection to resolve value
+	 *            record header collection to resolve value
 	 * @param i
 	 *            processed locator path element index
-	 * @return resolved consumer record header value, or {@code null} if value is not resolved
+	 * @return resolved record header value, or {@code null} if value is not resolved
 	 * @throws java.lang.RuntimeException
 	 *             if field can't be found or accessed
 	 */
@@ -98,16 +124,16 @@ public class KafkaUtils {
 	}
 
 	/**
-	 * Resolves consumer record header value defined by header index {@code hIdx}.
+	 * Resolves record header value defined by header index {@code hIdx}.
 	 * <p>
 	 * Value gets resolved only if {@code headers} is not {@code null} and {@code hIdx} is less than size of
 	 * {@code headers} collection.
 	 *
 	 * @param headers
-	 *            consumer record headers collection to resolve value
+	 *            record header collection to resolve value
 	 * @param hIdx
 	 *            header index to get value
-	 * @return resolved consumer record header value, or {@code null} if value is not resolved
+	 * @return resolved record header value, or {@code null} if value is not resolved
 	 */
 	public static byte[] resolveHeaderByIndex(Iterable<Header> headers, int hIdx) {
 		if (headers != null) {
