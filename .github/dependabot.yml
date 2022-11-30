@@ -22,7 +22,7 @@ updates:
         versions: "[3.x,)"
       - dependency-name: "jakarta.servlet:jakarta.servlet-api"
         versions: "[5.x,)"   
-      - dependency-name: "com.sun.xml.ws:jaxws-rt'
+      - dependency-name: "com.sun.xml.ws:jaxws-rt"
         versions: "[3.x,)"   
       # Maven plugins
       - dependency-name: "org.apache.maven.plugins:maven-assembly-plugin"
