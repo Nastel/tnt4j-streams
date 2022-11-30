@@ -25,7 +25,9 @@ updates:
       - dependency-name: "com.sun.xml.ws:jaxws-rt"
         versions: "[3.x,)"   
       - dependency-name: "com.rabbitmq.jms:rabbitmq-jms"
-        versions: "[3.x,)" 
+        versions: "[3.x,)"
+      - dependency-name: "org.glassfish.jaxb:jaxb-runtime"
+        versions: "[3.x,)"   
       # Maven plugins
       - dependency-name: "org.apache.maven.plugins:maven-assembly-plugin"
         versions: "[3.1.1,)"
