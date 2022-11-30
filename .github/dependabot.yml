@@ -13,13 +13,7 @@ updates:
       - dependency-name: "org.slf4j:slf4j*"
         versions: "[2.x,)"
       - dependency-name: "org.apache.activemq:artemis*"
-        versions: "[2.20.x,)"
-      - dependency-name: "*"
-        versions: 
-          - "*preview*"
-          - "*alpha*"
-          - "*beta*"
-          - "*ea*"
+        versions: "[2.20.x,)"      
       # Maven plugins
       - dependency-name: "org.apache.maven.plugins:maven-assembly-plugin"
         versions: "[3.1.1,)"  
