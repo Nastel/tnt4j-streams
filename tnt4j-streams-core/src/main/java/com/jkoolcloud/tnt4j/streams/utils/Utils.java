@@ -1267,7 +1267,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		if (obj instanceof Iterable) {
 			return (Iterable<?>) obj;
 		}
-		if (isArray(obj)) {
+		if (isObjArray(obj)) {
 			return Arrays.asList((Object[]) obj);
 		}
 		if (isPrimitiveArray(obj) && splitPrimitives) {
