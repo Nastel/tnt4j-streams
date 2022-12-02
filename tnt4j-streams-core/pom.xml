@@ -41,6 +41,13 @@
 
     <profiles>
         <profile>
+            <id>jakartaee-dep</id>
+            <properties>
+                <jakarta.annotaions.api.version>2.1.1</jakarta.annotaions.api.version>
+                <jaxb.version>4.0.1</jaxb.version>
+            </properties>
+        </profile>
+        <profile>
             <id>java9-plus-dep</id>
             <activation>
                 <jdk>[9,)</jdk>

@@ -26,6 +26,12 @@
 
     <profiles>
         <profile>
+            <id>jakartaee-dep</id>
+            <properties>
+                <jakarta.jms.version>3.1.0</jakarta.jms.version>
+            </properties>
+        </profile>
+        <profile>
             <id>java11-plus-dep</id>
             <activation>
                 <jdk>[11,)</jdk>
@@ -215,6 +221,7 @@
             <groupId>jakarta.jms</groupId>
             <artifactId>jakarta.jms-api</artifactId>
             <version>${jakarta.jms.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

@@ -33,6 +33,15 @@
         <javax.servlet-api.version>4.0.4</javax.servlet-api.version>
     </properties>
 
+    <profiles>
+        <profile>
+            <id>jakartaee-dep</id>
+            <properties>
+                <javax.servlet-api.version>6.0.0</javax.servlet-api.version>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <resources>
             <resource>

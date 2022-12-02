@@ -23,6 +23,13 @@
 
     <profiles>
         <profile>
+            <id>jakartaee-dep</id>
+            <properties>
+                <jaxws.api.version>4.0.0</jaxws.api.version>
+                <jaxws.rt.version>4.0.0</jaxws.rt.version>
+            </properties>
+        </profile>
+        <profile>
             <id>java9-plus-dep</id>
             <activation>
                 <jdk>[9,)</jdk>
