@@ -48,127 +48,33 @@ jobs:
           VERSION=$( mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout --file pom.xml --no-transfer-progress )
           echo "Found project version: $VERSION"
           echo "pom-version=$VERSION" >> $GITHUB_OUTPUT
+          
+  build-jakartaee:
+    runs-on: ubuntu-latest
 
-  #  cleanup:
-  #    needs: build
-  #    runs-on: ubuntu-latest
-  #    continue-on-error: true
-  #    if: ${{ contains(needs.build.outputs.pom-version, 'SNAPSHOT') }}
-  #
-  #    steps:
-  #      - name: Remove tnt4j-streams package assets
-  #        uses: abrkn/delete-old-github-package-versions@v1
-  #        with:
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          owner: Nastel
-  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams
-  #          minAge: 30s
-  #        continue-on-error: true
-  #      - name: Remove tnt4j-streams-chronicle package assets
-  #        uses: abrkn/delete-old-github-package-versions@v1
-  #        with:
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          owner: Nastel
-  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-chronicle
-  #          minAge: 30s
-  #        continue-on-error: true
-  #      - name: Remove tnt4j-streams-core package assets
-  #        uses: abrkn/delete-old-github-package-versions@v1
-  #        with:
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          owner: Nastel
-  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-core
-  #          minAge: 30s
-  #        continue-on-error: true
-  #      - name: Remove tnt4j-streams-elastic-beats package assets
-  #        uses: abrkn/delete-old-github-package-versions@v1
-  #        with:
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          owner: Nastel
-  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-elastic-beats
-  #          minAge: 30s
-  #        continue-on-error: true
-  #      - name: Remove tnt4j-streams-flume-plugin package assets
-  #        uses: abrkn/delete-old-github-package-versions@v1
-  #        with:
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          owner: Nastel
-  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-flume-plugin
-  #          minAge: 30s
-  #        continue-on-error: true
-  #      - name: Remove tnt4j-streams-fs package assets
-  #        uses: abrkn/delete-old-github-package-versions@v1
-  #        with:
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          owner: Nastel
-  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-fs
-  #          minAge: 30s
-  #        continue-on-error: true
-  #      - name: Remove tnt4j-streams-hdfs package assets
-  #        uses: abrkn/delete-old-github-package-versions@v1
-  #        with:
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          owner: Nastel
-  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-hdfs
-  #          minAge: 30s
-  #        continue-on-error: true
-  #      - name: Remove tnt4j-streams-jms package assets
-  #        uses: abrkn/delete-old-github-package-versions@v1
-  #        with:
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          owner: Nastel
-  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-jms
-  #          minAge: 30s
-  #        continue-on-error: true
-  #      - name: Remove tnt4j-streams-kafka package assets
-  #        uses: abrkn/delete-old-github-package-versions@v1
-  #        with:
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          owner: Nastel
-  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-kafka
-  #          minAge: 30s
-  #        continue-on-error: true
-  #      - name: Remove tnt4j-streams-mqtt package assets
-  #        uses: abrkn/delete-old-github-package-versions@v1
-  #        with:
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          owner: Nastel
-  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-mqtt
-  #          minAge: 30s
-  #        continue-on-error: true
-  #      - name: Remove tnt4j-streams-msoffice package assets
-  #        uses: abrkn/delete-old-github-package-versions@v1
-  #        with:
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          owner: Nastel
-  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-msoffice
-  #          minAge: 30s
-  #        continue-on-error: true
-  #      - name: Remove tnt4j-streams-samples package assets
-  #        uses: abrkn/delete-old-github-package-versions@v1
-  #        with:
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          owner: Nastel
-  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-samples
-  #          minAge: 30s
-  #        continue-on-error: true
-  #      - name: Remove tnt4j-streams-wmq package assets
-  #        uses: abrkn/delete-old-github-package-versions@v1
-  #        with:
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          owner: Nastel
-  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-wmq
-  #          minAge: 30s
-  #        continue-on-error: true
-  #      - name: Remove tnt4j-streams-ws package assets
-  #        uses: abrkn/delete-old-github-package-versions@v1
-  #        with:
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          owner: Nastel
-  #          packageName: com.jkoolcloud.tnt4j.streams.tnt4j-streams-ws
-  #          minAge: 30s
-  #        continue-on-error: true
+    strategy:
+      matrix:
+        java-version: [ 8, 11, 17 ]
 
+    outputs:
+      pom-version: ${{ steps.get-pom-version.outputs.pom-version }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'zulu'
+      - name: Build with Maven
+        run: mvn -B clean package --file pom.xml --no-transfer-progress -P jakartaee-dep
+      - name: Get POM version
+        id: get-pom-version
+        run: |
+          VERSION=$( mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout --file pom.xml --no-transfer-progress )
+          echo "Found project version: $VERSION"
+          echo "pom-version=$VERSION" >> $GITHUB_OUTPUT        
+  
   publish-snapshot:
     needs: build
     runs-on: ubuntu-latest
