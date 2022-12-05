@@ -78,7 +78,7 @@ jobs:
   publish-snapshot:
     needs: build
     runs-on: ubuntu-latest
-    if: ${{ contains(needs.build.outputs.pom-version, 'SNAPSHOT') && github.event_name != 'pull_request'}}
+    if: ${{ contains(needs.build.outputs.pom-version, 'SNAPSHOT') && github.event_name != 'pull_request' }}
 
     steps:
       - uses: actions/checkout@v3
