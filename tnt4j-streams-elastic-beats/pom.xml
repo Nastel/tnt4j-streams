@@ -14,7 +14,7 @@
     <artifactId>tnt4j-streams-elastic-beats</artifactId>
 
     <properties>
-        <logstash.input.beats.version>6.4.3</logstash.input.beats.version> <!-- new available: 6.2.6, 6.3.1, 6.4.1 -->
+        <logstash.input.beats.version>6.4.3</logstash.input.beats.version> <!-- new available: 6.2.6, 6.3.1, 6.4.3 -->
     </properties>
 
     <build>
@@ -95,21 +95,7 @@
         <dependency>
             <groupId>com.github.logstash-plugins</groupId>
             <artifactId>logstash-input-beats</artifactId>
-            <version>${logstash.input.beats.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jackson-databind</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-annotations</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-core</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-            </exclusions>
+            <version>${logstash.input.beats.version}</version>           
         </dependency>
 
         <dependency>
