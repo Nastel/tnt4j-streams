@@ -126,10 +126,10 @@
         <property name="ActivityDelim" value="EOF"/>
 
         <field name="EventType" value="Activity"/>
-        <field name="DataCenter" value="$METADATA$.dataCenter"/>
-        <field name="ServiceName" value="$METADATA$.serviceName"/>
-        <field name="RegionId" value="$METADATA$.region"/>
-        <field name="ClusterName" value="$METADATA$.cluster"/>
+        <field name="DataCenter" locator="$METADATA$.dataCenter" locator-type="Label"/>
+        <field name="ServiceName" locator="$METADATA$.serviceName" locator-type="Label"/>
+        <field name="RegionId" locator="$METADATA$.region" locator-type="Label"/>
+        <field name="ClusterName" locator="$METADATA$.cluster" locator-type="Label"/>
         <field name="BrokerId" locator="$METADATA$.brokerId" locator-type="Label"/>
         <field name="ApplName" locator="$METADATA$.applId" locator-type="Label"/>
         <field name="EventName" value="Amazon_MSK_Metrics"/>
