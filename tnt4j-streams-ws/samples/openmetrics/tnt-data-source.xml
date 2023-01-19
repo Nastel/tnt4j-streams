@@ -63,10 +63,10 @@
             <property name="serviceName" value="MSK"/>
             <!-- Set your MSK region -->
             <property name="region" value="us-east-1"/>
-            <!-- Set your MSK cluster host base -->
-            <property name="mskUrl" value="wzohq7.c24.kafka.us-east-1.amazonaws.com"/>
+            <!-- Set your MSK cluster host base, like xxxx.xxx.kafka.us-east-1.amazonaws.com -->
+            <property name="mskUrl" value="[YOUR_MSK_CLUSTER_URL]"/>
             <!-- Set your MSK cluster name -->
-            <property name="cluster" value="demo-cluster-1"/>
+            <property name="cluster" value="[YOUR_MSK_CLUSTER_NAME]"/>
 
             <step name="B1_Metrics"
                   method="GET">
