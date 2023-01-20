@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 JKOOL, LLC.
+ * Copyright 2014-2023 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ public class DirStreamingManager {
 	private String fileWildcardName;
 
 	private ThreadPoolExecutor executorService;
-	private List<Runnable> runningJobs = Collections.synchronizedList(new ArrayList<> ());
+	private List<Runnable> runningJobs = Collections.synchronizedList(new ArrayList<>());
 	private DirWatchdog dirWatchdog;
 
 	private String tnt4jCfgFilePath;
@@ -151,7 +151,7 @@ public class DirStreamingManager {
 
 	private void initialize() {
 		executorService = new ThreadPoolExecutor(CORE_TREAD_POOL_SIZE, MAX_TREAD_POOL_SIZE, KEEP_ALIVE_TIME,
-				TimeUnit.SECONDS, new LinkedBlockingQueue<> (MAX_TREAD_POOL_SIZE * 2),
+				TimeUnit.SECONDS, new LinkedBlockingQueue<>(MAX_TREAD_POOL_SIZE * 2),
 				new TNTInputStream.StreamsThreadFactory("DirStreamingManagerExecutorThread-")); // NON-NLS
 
 		executorService.setRejectedExecutionHandler(new RejectedExecutionHandler() {

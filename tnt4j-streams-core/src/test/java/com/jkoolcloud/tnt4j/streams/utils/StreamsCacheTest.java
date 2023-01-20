@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 JKOOL, LLC.
+ * Copyright 2014-2023 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public class StreamsCacheTest {
 
 		StreamsCache.setProperties(props.entrySet());
 
-		final Date date = new Date();
+		Date date = new Date();
 		StreamsCache.addEntry("string", "string", "${string}", null);
 		StreamsCache.addEntry("double", "double", "${double}", null);
 		StreamsCache.addEntry("byteArray", "byteArray", "${byteArray}", null);

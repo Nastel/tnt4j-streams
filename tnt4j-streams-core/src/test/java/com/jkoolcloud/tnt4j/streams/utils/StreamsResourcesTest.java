@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 JKOOL, LLC.
+ * Copyright 2014-2023 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,8 +46,8 @@ public class StreamsResourcesTest {
 			assertNotNull(resource);
 			if (resource.contains("{1}") && !resource.contains("{2}")) { // NON-NLS
 				final String testVar = "TEST"; // NON-NLS
-				String formatted = StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
-						resource, testVar);
+				String formatted = StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME, resource,
+						testVar);
 				MessageFormat.format(resource, testVar);
 				assertEquals(String.format(resource, testVar), formatted);
 			}

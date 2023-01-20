@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 JKOOL, LLC.
+ * Copyright 2014-2023 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ public class JMSStreamTest {
 		Destination q2 = (Destination) initialContext.lookup("JMS\\T2");
 		MessageProducer producer = session.createProducer(q1);
 
-		final CountDownLatch latch = new CountDownLatch(1);
+		CountDownLatch latch = new CountDownLatch(1);
 		MessageConsumer messageConsumer = session.createConsumer(q1);
 
 		messageConsumer.setMessageListener(new MessageListener() {

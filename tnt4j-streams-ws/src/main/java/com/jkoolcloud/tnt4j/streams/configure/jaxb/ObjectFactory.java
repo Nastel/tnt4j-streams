@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 JKOOL, LLC.
+ * Copyright 2014-2023 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -313,7 +313,7 @@ public class ObjectFactory {
 	 */
 	@XmlElementDecl(namespace = "", name = "parser-ref", scope = OriginalStream.class)
 	public JAXBElement<Reference> createOriginalStreamParserRef(Reference value) {
-		return new JAXBElement<Reference>(_OriginalStreamParserRef_QNAME, Reference.class, OriginalStream.class, value);
+		return new JAXBElement<> (_OriginalStreamParserRef_QNAME, Reference.class, OriginalStream.class, value);
 	}
 
 	/**
@@ -323,8 +323,7 @@ public class ObjectFactory {
 	@XmlElementDecl(namespace = "", name = "tnt4j-properties", scope = OriginalStream.class)
 	public JAXBElement<OriginalStream.Tnt4JProperties> createOriginalStreamTnt4JProperties(
 			OriginalStream.Tnt4JProperties value) {
-		return new JAXBElement<OriginalStream.Tnt4JProperties>(_OriginalStreamTnt4JProperties_QNAME,
-				OriginalStream.Tnt4JProperties.class, OriginalStream.class, value);
+		return new JAXBElement<> (_OriginalStreamTnt4JProperties_QNAME, OriginalStream.Tnt4JProperties.class, OriginalStream.class, value);
 	}
 
 	/**
@@ -333,8 +332,7 @@ public class ObjectFactory {
 	 */
 	@XmlElementDecl(namespace = "", name = "property", scope = OriginalStream.class)
 	public JAXBElement<StreamProperty> createOriginalStreamProperty(StreamProperty value) {
-		return new JAXBElement<StreamProperty>(_OriginalStreamProperty_QNAME, StreamProperty.class,
-				OriginalStream.class, value);
+		return new JAXBElement<> (_OriginalStreamProperty_QNAME, StreamProperty.class, OriginalStream.class, value);
 	}
 
 	/**
@@ -343,7 +341,7 @@ public class ObjectFactory {
 	 */
 	@XmlElementDecl(namespace = "", name = "reference", scope = OriginalStream.class)
 	public JAXBElement<Reference> createOriginalStreamReference(Reference value) {
-		return new JAXBElement<Reference>(_OriginalStreamReference_QNAME, Reference.class, OriginalStream.class, value);
+		return new JAXBElement<> (_OriginalStreamReference_QNAME, Reference.class, OriginalStream.class, value);
 	}
 
 	/**
@@ -352,8 +350,7 @@ public class ObjectFactory {
 	 */
 	@XmlElementDecl(namespace = "", name = "field-transform", scope = FieldLocator.class)
 	public JAXBElement<FieldTransform> createFieldLocatorFieldTransform(FieldTransform value) {
-		return new JAXBElement<FieldTransform>(_FieldLocatorFieldTransform_QNAME, FieldTransform.class,
-				FieldLocator.class, value);
+		return new JAXBElement<> (_FieldLocatorFieldTransform_QNAME, FieldTransform.class, FieldLocator.class, value);
 	}
 
 	/**
@@ -362,7 +359,7 @@ public class ObjectFactory {
 	 */
 	@XmlElementDecl(namespace = "", name = "field-map", scope = FieldLocator.class)
 	public JAXBElement<FieldMap> createFieldLocatorFieldMap(FieldMap value) {
-		return new JAXBElement<FieldMap>(_FieldLocatorFieldMap_QNAME, FieldMap.class, FieldLocator.class, value);
+		return new JAXBElement<> (_FieldLocatorFieldMap_QNAME, FieldMap.class, FieldLocator.class, value);
 	}
 
 	/**
@@ -371,8 +368,7 @@ public class ObjectFactory {
 	 */
 	@XmlElementDecl(namespace = "", name = "field-map-ref", scope = FieldLocator.class)
 	public JAXBElement<FieldMapRef> createFieldLocatorFieldMapRef(FieldMapRef value) {
-		return new JAXBElement<FieldMapRef>(_FieldLocatorFieldMapRef_QNAME, FieldMapRef.class, FieldLocator.class,
-				value);
+		return new JAXBElement<> (_FieldLocatorFieldMapRef_QNAME, FieldMapRef.class, FieldLocator.class, value);
 	}
 
 	/**
@@ -381,7 +377,7 @@ public class ObjectFactory {
 	 */
 	@XmlElementDecl(namespace = "", name = "filter", scope = FieldLocator.class)
 	public JAXBElement<Filter> createFieldLocatorFilter(Filter value) {
-		return new JAXBElement<Filter>(_FieldLocatorFilter_QNAME, Filter.class, FieldLocator.class, value);
+		return new JAXBElement<> (_FieldLocatorFilter_QNAME, Filter.class, FieldLocator.class, value);
 	}
 
 }

@@ -19,8 +19,8 @@
         </license>
     </licenses>
     <organization>
-        <name>jKool, LLC</name>
-        <url>https://www.jkoolcloud.com/</url>
+        <name>${project.organization.name}</name>
+        <url>${project.organization.url}</url>
     </organization>
     <developers>
         <developer>
@@ -51,11 +51,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.resources.encoding>UTF-8</project.resources.encoding>
+        <project.organization.name>jKool, LLC</project.organization.name>
+        <project.organization.url>https://www.jkoolcloud.com/</project.organization.url>
         <product.vendor>${project.organization.name}</product.vendor>
         <product.name>${project.name}</product.name>
         <product.name.hr>TNT4J Streams</product.name.hr>
         <product.copyright.html>
-            <![CDATA[<font size="-1">Copyright &#169; 2014-2022 ${project.organization.name}. All Rights Reserved.</font>]]></product.copyright.html>
+            <![CDATA[<font size="-1">Copyright &#169; 2014-2023 ${project.organization.name}. All Rights Reserved.</font>]]></product.copyright.html>
 
         <project.java.version>8</project.java.version>
         <maven.compiler.source>${project.java.version}</maven.compiler.source>
