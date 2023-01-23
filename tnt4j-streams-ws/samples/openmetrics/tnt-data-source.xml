@@ -50,7 +50,7 @@
             <property name="event.formatter.ValueReplacements">"\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"
             </property>
             <property name="event.formatter.PathLevelAttributes">
-                domain;device,fstype,mountpoint;mType;name;request,error;mName;mToken4;quantile;version;cpu;mode;collector;code;mToken5;mToken6;mToken7;mToken8
+                domain;device,fstype,mountpoint;mType;topic;name;request,error;mName;mToken4;quantile;version;cpu;mode;collector;code;mToken5;mToken6;mToken7;mToken8
             </property>
         </tnt4j-properties>
 
