@@ -18,7 +18,7 @@
         <artemis.version>2.19.1</artemis.version>   <!-- 2.20.x requires java 11 -->
 
         <activemq.version>5.16.5</activemq.version>   <!-- 5.17.x requires java 11 -->
-        <solace.version>10.17.0</solace.version>
+        <solace.version>10.18.0</solace.version>
         <rabbitmq.version>2.8.0</rabbitmq.version> <!-- 3.0.x changes javax packages to jakarta -->
         <zeromq.version>3.0.1-RELEASE</zeromq.version>
         <rocketmq.version>5.0.0</rocketmq.version>
