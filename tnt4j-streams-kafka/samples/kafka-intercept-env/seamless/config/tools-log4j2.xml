@@ -18,7 +18,8 @@
 <Configuration strict="true"
                xmlns="http://logging.apache.org/log4j/2.0/config"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xsi:schemaLocation="http://logging.apache.org/log4j/2.0/config">
+               xsi:schemaLocation="http://logging.apache.org/log4j/2.0/config
+                                   https://raw.githubusercontent.com/apache/logging-log4j2/main/log4j-core/src/main/resources/Log4j-config.xsd">
     <Properties>
         <Property name="tnt4j.streams.log.filename">${kafka.logs.dir}/tnt4j-streams.log</Property>
         <Property name="tnt4j.activities.log.filename">${kafka.logs.dir}/tnt4j-streams-activities.log</Property>
@@ -37,6 +38,9 @@
                      fileName="${tnt4j.streams.log.filename}"
                      filePattern="${tnt4j.streams.log.filename}.%i.gz"
                      ignoreExceptions="false">
+            <PatternLayout>
+                <Pattern>%d{ISO8601} %-5p [%t!%c{1}] - %m%n</Pattern>
+            </PatternLayout>
             <Policies>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
             </Policies>
@@ -47,15 +51,15 @@
                     <!--IfAccumulatedFileCount exceeds="10"/-->
                 </Delete>
             </DefaultRolloverStrategy>
-            <PatternLayout>
-                <Pattern>%d{ISO8601} %-5p [%t!%c{1}] - %m%n</Pattern>
-            </PatternLayout>
         </RollingFile>
         <!--  ### branch for sink written activity entities logger ### -->
         <RollingFile name="activities_log"
                      fileName="${tnt4j.activities.log.filename}"
                      filePattern="${tnt4j.activities.log.filename}.%i.gz"
                      ignoreExceptions="false" createOnDemand="true">
+            <PatternLayout>
+                <Pattern>%m%n</Pattern>
+            </PatternLayout>
             <Policies>
                 <OnStartupTriggeringPolicy/>
                 <SizeBasedTriggeringPolicy size="10 MB"/>
@@ -67,9 +71,6 @@
                     <!--IfAccumulatedFileCount exceeds="15"/-->
                 </Delete>
             </DefaultRolloverStrategy>
-            <PatternLayout>
-                <Pattern>%m%n</Pattern>
-            </PatternLayout>
         </RollingFile>
     </Appenders>
     <Loggers>
@@ -81,16 +82,16 @@
         <!-- ######################## TNT4J ######################## -->
         <!-- ### streams API logger -->
         <!-- ### if streams are not subject to be added to main kafka log, streams will be logged to dedicated log only ### -->
-        <asyncLogger name="com.jkoolcloud.tnt4j.streams" level="DEBUG" additivity="false">
+        <AsyncLogger name="com.jkoolcloud.tnt4j.streams" level="DEBUG" additivity="false">
             <AppenderRef ref="tnt4jAppender"/>
-        </asyncLogger>
+        </AsyncLogger>
         <!-- ### tnt4j API logger -->
-        <!-- <asyncLogger name="com.jkoolcloud.tnt4j" level="DEBUG"/> -->
+        <!-- <AsyncLogger name="com.jkoolcloud.tnt4j" level="DEBUG"/> -->
         <!-- ### jesl API logger -->
-        <!-- <asyncLogger name="com.jkoolcloud.jesl" level="DEBUG"/> -->
+        <!-- <AsyncLogger name="com.jkoolcloud.jesl" level="DEBUG"/> -->
         <!-- #### Streamed activity entities logger #### -->
-        <asyncLogger name="com.jkoolcloud.tnt4j.streams.activities_log" level="INFO" additivity="false">
+        <AsyncLogger name="com.jkoolcloud.tnt4j.streams.activities_log" level="INFO" additivity="false">
             <AppenderRef ref="activities_log"/>
-        </asyncLogger>
+        </AsyncLogger>
     </Loggers>
 </Configuration>
