@@ -237,12 +237,8 @@ public final class StreamsAgent {
 		if (MapUtils.isNotEmpty(zooProps)) {
 			try {
 				ZKConfigManager.openConnection(zooProps);
-				Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-					@Override
-					public void run() {
-						ZKConfigManager.close();
-					}
-				}, "ZKConfigManager_ShutdownHookThread"));
+				Runtime.getRuntime().addShutdownHook(
+						new Thread(() -> ZKConfigManager.close(), "ZKConfigManager_ShutdownHookThread"));
 
 				String path = zooProps.getProperty(ZKConfigManager.PROP_CONF_PATH_STREAM);
 				if (StringUtils.isEmpty(path) && StringUtils.isNotEmpty(zookeeperStreamId)) {

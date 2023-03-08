@@ -89,23 +89,15 @@ public class InterceptorsTest {
 
 		Consumer<String, String> consumer = initConsumer();
 
-		Thread pt = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					produce();
-				} catch (Exception exc) {
-					exc.printStackTrace();
-				}
+		Thread pt = new Thread(() -> {
+			try {
+				produce();
+			} catch (Exception exc) {
+				exc.printStackTrace();
 			}
 		}, "InterceptProducerThread");
 
-		Thread ct = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				consume(consumer);
-			}
-		}, "InterceptConsumerThread");
+		Thread ct = new Thread(() -> consume(consumer), "InterceptConsumerThread");
 		ct.start();
 
 		pt.start();
@@ -143,12 +135,7 @@ public class InterceptorsTest {
 	 */
 	public static void consume() throws Exception {
 		Consumer<String, String> consumer = initConsumer();
-		Thread ct = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				consume(consumer);
-			}
-		}, "InterceptConsumerThread");
+		Thread ct = new Thread(() -> consume(consumer), "InterceptConsumerThread");
 		ct.start();
 		TimeUnit.SECONDS.sleep(2);
 		consumer.wakeup();

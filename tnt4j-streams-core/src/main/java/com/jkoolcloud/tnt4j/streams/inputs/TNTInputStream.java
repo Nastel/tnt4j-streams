@@ -377,12 +377,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 		StreamsCache.referStream();
 
-		sh = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				stop();
-			}
-		}, getName() + "_ShutdownHookThread");
+		sh = new Thread(() -> stop(), getName() + "_ShutdownHookThread");
 		Runtime.getRuntime().addShutdownHook(sh);
 	}
 

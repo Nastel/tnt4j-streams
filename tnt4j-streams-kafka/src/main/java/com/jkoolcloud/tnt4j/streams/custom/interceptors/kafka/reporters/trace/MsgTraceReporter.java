@@ -218,12 +218,8 @@ public class MsgTraceReporter implements InterceptionsReporter {
 			traceConfig.put(TraceCommandDeserializer.MASTER_CONFIG, new TraceCommandDeserializer.TopicTraceCommand());
 
 			Properties consumerConfig = extractKafkaProperties(interceptorProperties);
-			Thread traceConfigPollThread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					pollConfigQueue(consumerConfig, cfgTopic, traceConfig);
-				}
-			}, stream.getName() + "_TraceConfigPollThread");
+			Thread traceConfigPollThread = new Thread(() -> pollConfigQueue(consumerConfig, cfgTopic, traceConfig),
+					stream.getName() + "_TraceConfigPollThread");
 			traceConfigPollThread.start();
 		}
 	}

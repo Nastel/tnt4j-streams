@@ -245,40 +245,37 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 	protected void initialize() throws Exception {
 		super.initialize();
 
-		Thread excelFileReader = new Thread(new Runnable() {
-			@Override
-			public void run() {
+		Thread excelFileReader = new Thread(() -> {
+			try {
+				File inputFile = new File(fileName);
+				totalBytes = inputFile.length();
+				InputStream is = null;
+				FileMagic fm;
+
 				try {
-					File inputFile = new File(fileName);
-					totalBytes = inputFile.length();
-					InputStream is = null;
-					FileMagic fm;
-
-					try {
-						is = Files.newInputStream(inputFile.toPath());
-						is = FileMagic.prepareToCheckMagic(is);
-						fm = FileMagic.valueOf(is);
-					} finally {
-						Utils.close(is);
-					}
-
-					if (fm == FileMagic.OOXML) {
-						readXLXS(inputFile);
-					} else if (fm == FileMagic.OLE2) {
-						readXLS(inputFile);
-					} else {
-						throw new IOException(
-								StreamsResources.getStringFormatted(MsOfficeStreamConstants.RESOURCE_BUNDLE_NAME,
-										"ExcelSXSSFRowStream.unsupported.format", fileName));
-					}
-				} catch (Exception e) {
-					Utils.logThrowable(LOGGER, OpLevel.ERROR,
-							StreamsResources.getBundle(MsOfficeStreamConstants.RESOURCE_BUNDLE_NAME),
-							"ExcelSXSSFRowStream.file.read.failed", fileName, e);
+					is = Files.newInputStream(inputFile.toPath());
+					is = FileMagic.prepareToCheckMagic(is);
+					fm = FileMagic.valueOf(is);
+				} finally {
+					Utils.close(is);
 				}
-				ended = true;
-				offerDieMarker();
+
+				if (fm == FileMagic.OOXML) {
+					readXLXS(inputFile);
+				} else if (fm == FileMagic.OLE2) {
+					readXLS(inputFile);
+				} else {
+					throw new IOException(
+							StreamsResources.getStringFormatted(MsOfficeStreamConstants.RESOURCE_BUNDLE_NAME,
+									"ExcelSXSSFRowStream.unsupported.format", fileName));
+				}
+			} catch (Exception e) {
+				Utils.logThrowable(LOGGER, OpLevel.ERROR,
+						StreamsResources.getBundle(MsOfficeStreamConstants.RESOURCE_BUNDLE_NAME),
+						"ExcelSXSSFRowStream.file.read.failed", fileName, e);
 			}
+			ended = true;
+			offerDieMarker();
 		}, getName() + "FileReaderThread");
 		excelFileReader.start();
 	}
