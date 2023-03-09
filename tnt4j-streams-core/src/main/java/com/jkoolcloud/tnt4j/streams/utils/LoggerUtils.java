@@ -193,7 +193,7 @@ public class LoggerUtils {
 		invoke("org.apache.logging.log4j.core.config.Configurator", "initialize", // NON-NLS
 				new Class[] { java.lang.ClassLoader.class,
 						Class.forName("org.apache.logging.log4j.core.config.ConfigurationSource") },
-				source);
+				null, source);
 	}
 
 	private static void setJULConfig(byte[] data, EventSink logger) {
