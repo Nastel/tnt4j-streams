@@ -1307,6 +1307,11 @@ public class ConfigParserHandler extends DefaultHandler {
 						return Files.newInputStream(file.toPath());
 					}
 				}
+
+				InputStream is = Utils.getResourceAsStream(uri);
+				if (is != null) {
+					return is;
+				}
 			}
 
 			throw new IOException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,

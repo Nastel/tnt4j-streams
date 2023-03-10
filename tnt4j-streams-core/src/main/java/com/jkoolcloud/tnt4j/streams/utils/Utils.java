@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.*;
@@ -64,6 +65,8 @@ import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.NamedObject;
 
 import groovy.util.CharsetToolkit;
+import sun.nio.ch.ChannelInputStream;
+import sun.nio.ch.FileChannelImpl;
 
 /**
  * General utility methods used by TNT4J-Streams.
@@ -2757,6 +2760,8 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			return resolveInputFilePath((ReaderInputStream) is);
 		} else if (is instanceof FilterInputStream) {
 			return resolveInputFilePath((FilterInputStream) is);
+		} else if (is instanceof ChannelInputStream) {
+			return resolveInputFilePath((ChannelInputStream) is);
 		}
 
 		return null;
@@ -2793,6 +2798,51 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			InputStream is = (InputStream) inField.get(fis);
 
 			return resolveInputFilePath(is);
+		} catch (Exception exc) {
+		}
+
+		return null;
+	}
+
+	private static String resolveInputFilePath(ChannelInputStream cis) {
+		try {
+			Field chField = ChannelInputStream.class.getDeclaredField("ch");
+			chField.setAccessible(true);
+			ReadableByteChannel rbc = (ReadableByteChannel) chField.get(cis);
+
+			return resolveInputFilePath(rbc);
+		} catch (Exception exc) {
+		}
+
+		return null;
+	}
+
+	private static String resolveInputFilePath(ReadableByteChannel rbc) {
+		if (rbc instanceof FileChannelImpl) {
+			return resolveInputFilePath((FileChannelImpl) rbc);
+		}
+
+		return null;
+	}
+
+	private static String resolveInputFilePath(FileChannelImpl fc) {
+		try {
+			Field pathField = FileChannelImpl.class.getDeclaredField("path");
+			pathField.setAccessible(true);
+			String path = (String) pathField.get(fc);
+			if (StringUtils.isNotEmpty(path)) {
+				return path;
+			}
+
+			Field parentField = FileChannelImpl.class.getDeclaredField("parent");
+			parentField.setAccessible(true);
+			Object parent = parentField.get(fc);
+
+			if (parent instanceof InputStream) {
+				return resolveInputFilePath((InputStream) parent);
+			} else if (parent instanceof Reader) {
+				return resolveReaderFilePath((Reader) parent);
+			}
 		} catch (Exception exc) {
 		}
 
