@@ -16,7 +16,6 @@
 
 package com.jkoolcloud.tnt4j.streams.inputs;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -24,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -470,9 +470,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 
 	private void traceOff(boolean off) {
 		try {
-			Field f = Trace.class.getDeclaredField("ffstSuppressionProbeIDs");
-			f.setAccessible(true);
-			Object obj = f.get(null);
+			Object obj = FieldUtils.readDeclaredStaticField(Trace.class, "ffstSuppressionProbeIDs", true); // NON-NLS
 
 			Method m = obj.getClass().getMethod(off ? "add" : "remove", Object.class);
 			m.invoke(obj, "01"); // NON-NLS

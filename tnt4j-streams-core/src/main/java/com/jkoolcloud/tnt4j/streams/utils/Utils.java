@@ -53,6 +53,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -2765,9 +2766,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 	private static String resolveInputFilePath(FileInputStream fis) {
 		try {
-			Field pathField = fis.getClass().getDeclaredField("path");
-			pathField.setAccessible(true);
-			return (String) pathField.get(fis);
+			return (String) FieldUtils.readDeclaredField(fis, "path", true); // NON-NLS
 		} catch (Exception exc) {
 		}
 
@@ -2776,9 +2775,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 	private static String resolveInputFilePath(ReaderInputStream ris) {
 		try {
-			Field readerField = ris.getClass().getDeclaredField("reader");
-			readerField.setAccessible(true);
-			Reader reader = (Reader) readerField.get(ris);
+			Reader reader = (Reader) FieldUtils.readDeclaredField(ris, "reader", true); // NON-NLS
 
 			return resolveReaderFilePath(reader);
 		} catch (Exception exc) {
@@ -2789,9 +2786,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 	private static String resolveInputFilePath(FilterInputStream fis) {
 		try {
-			Field inField = fis.getClass().getDeclaredField("in");
-			inField.setAccessible(true);
-			InputStream is = (InputStream) inField.get(fis);
+			InputStream is = (InputStream) FieldUtils.readDeclaredField(fis, "in", true); // NON-NLS
 
 			return resolveInputFilePath(is);
 		} catch (Exception exc) {
@@ -2803,9 +2798,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	private static String resolveInputFilePath_(InputStream cis) {
 		// ChannelInputStream resolution
 		try {
-			Field chField = cis.getClass().getDeclaredField("ch");
-			chField.setAccessible(true);
-			ReadableByteChannel rbc = (ReadableByteChannel) chField.get(cis);
+			ReadableByteChannel rbc = (ReadableByteChannel) FieldUtils.readDeclaredField(cis, "ch", true); // NON-NLS
 
 			return resolveInputFilePath(rbc);
 		} catch (Exception exc) {
@@ -2817,9 +2810,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	private static String resolveInputFilePath(ReadableByteChannel rbc) {
 		// FileChannelImpl resolution
 		try {
-			Field pathField = rbc.getClass().getDeclaredField("path");
-			pathField.setAccessible(true);
-			String path = (String) pathField.get(rbc);
+			String path = (String) FieldUtils.readDeclaredField(rbc, "path", true); // NON-NLS
 			if (StringUtils.isNotEmpty(path)) {
 				return path;
 			}
@@ -2828,9 +2819,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 		// FileChannelImpl resolution
 		try {
-			Field parentField = rbc.getClass().getDeclaredField("parent");
-			parentField.setAccessible(true);
-			Object parent = parentField.get(rbc);
+			Object parent = FieldUtils.readDeclaredField(rbc, "parent", true); // NON-NLS
 
 			if (parent instanceof InputStream) {
 				return resolveInputFilePath((InputStream) parent);
@@ -2857,9 +2846,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 */
 	public static String resolveReaderFilePath(Reader rdr) {
 		try {
-			Field lockField = rdr.getClass().getDeclaredField("lock");
-			lockField.setAccessible(true);
-			Object lock = lockField.get(rdr);
+			Object lock = FieldUtils.readDeclaredField(rdr, "lock", true);
 
 			if (lock instanceof InputStream) {
 				return resolveInputFilePath((InputStream) lock);
@@ -2907,12 +2894,10 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 		try {
 			Object fVal = null;
-			NoSuchFieldException fExc = null;
+			IllegalArgumentException fExc = null;
 			try {
-				Field f = dataObj.getClass().getDeclaredField(path[i]);
-				f.setAccessible(true);
-				fVal = f.get(dataObj);
-			} catch (NoSuchFieldException nfe) {
+				fVal = FieldUtils.readDeclaredField(dataObj, path[i], true);
+			} catch (IllegalArgumentException nfe) {
 				fExc = nfe;
 			}
 

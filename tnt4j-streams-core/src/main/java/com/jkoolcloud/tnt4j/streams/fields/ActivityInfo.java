@@ -29,6 +29,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.jkoolcloud.tnt4j.core.*;
 import com.jkoolcloud.tnt4j.format.JSONFormatter;
@@ -485,13 +486,10 @@ public class ActivityInfo {
 		MessageFormat mf = new MessageFormat(pattern);
 
 		try {
-			Field f = mf.getClass().getDeclaredField("maxOffset");
-			f.setAccessible(true);
+			Field f = FieldUtils.getDeclaredField(mf.getClass(), "maxOffset", true);
 			int maxOffset = f.getInt(mf);
 			if (maxOffset >= 0) {
-				f = mf.getClass().getDeclaredField("argumentNumbers");
-				f.setAccessible(true);
-				int[] ana = (int[]) f.get(mf);
+				int[] ana = (int[]) FieldUtils.readDeclaredField(mf, "argumentNumbers", true);
 				int maxIndex = ana[maxOffset];
 				int arrayLength = ArrayUtils.getLength(vArray);
 
