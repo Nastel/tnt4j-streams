@@ -65,8 +65,6 @@ import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.NamedObject;
 
 import groovy.util.CharsetToolkit;
-import sun.nio.ch.ChannelInputStream;
-import sun.nio.ch.FileChannelImpl;
 
 /**
  * General utility methods used by TNT4J-Streams.
@@ -2760,16 +2758,14 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			return resolveInputFilePath((ReaderInputStream) is);
 		} else if (is instanceof FilterInputStream) {
 			return resolveInputFilePath((FilterInputStream) is);
-		} else if (is instanceof ChannelInputStream) {
-			return resolveInputFilePath((ChannelInputStream) is);
+		} else {
+			return resolveInputFilePath_(is);
 		}
-
-		return null;
 	}
 
 	private static String resolveInputFilePath(FileInputStream fis) {
 		try {
-			Field pathField = FileInputStream.class.getDeclaredField("path");
+			Field pathField = fis.getClass().getDeclaredField("path");
 			pathField.setAccessible(true);
 			return (String) pathField.get(fis);
 		} catch (Exception exc) {
@@ -2780,7 +2776,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 	private static String resolveInputFilePath(ReaderInputStream ris) {
 		try {
-			Field readerField = ReaderInputStream.class.getDeclaredField("reader");
+			Field readerField = ris.getClass().getDeclaredField("reader");
 			readerField.setAccessible(true);
 			Reader reader = (Reader) readerField.get(ris);
 
@@ -2793,7 +2789,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 	private static String resolveInputFilePath(FilterInputStream fis) {
 		try {
-			Field inField = FilterInputStream.class.getDeclaredField("in");
+			Field inField = fis.getClass().getDeclaredField("in");
 			inField.setAccessible(true);
 			InputStream is = (InputStream) inField.get(fis);
 
@@ -2804,9 +2800,10 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		return null;
 	}
 
-	private static String resolveInputFilePath(ChannelInputStream cis) {
+	private static String resolveInputFilePath_(InputStream cis) {
+		// ChannelInputStream resolution
 		try {
-			Field chField = ChannelInputStream.class.getDeclaredField("ch");
+			Field chField = cis.getClass().getDeclaredField("ch");
 			chField.setAccessible(true);
 			ReadableByteChannel rbc = (ReadableByteChannel) chField.get(cis);
 
@@ -2818,25 +2815,22 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	private static String resolveInputFilePath(ReadableByteChannel rbc) {
-		if (rbc instanceof FileChannelImpl) {
-			return resolveInputFilePath((FileChannelImpl) rbc);
-		}
-
-		return null;
-	}
-
-	private static String resolveInputFilePath(FileChannelImpl fc) {
+		// FileChannelImpl resolution
 		try {
-			Field pathField = FileChannelImpl.class.getDeclaredField("path");
+			Field pathField = rbc.getClass().getDeclaredField("path");
 			pathField.setAccessible(true);
-			String path = (String) pathField.get(fc);
+			String path = (String) pathField.get(rbc);
 			if (StringUtils.isNotEmpty(path)) {
 				return path;
 			}
+		} catch (Exception exc) {
+		}
 
-			Field parentField = FileChannelImpl.class.getDeclaredField("parent");
+		// FileChannelImpl resolution
+		try {
+			Field parentField = rbc.getClass().getDeclaredField("parent");
 			parentField.setAccessible(true);
-			Object parent = parentField.get(fc);
+			Object parent = parentField.get(rbc);
 
 			if (parent instanceof InputStream) {
 				return resolveInputFilePath((InputStream) parent);
@@ -2863,7 +2857,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 */
 	public static String resolveReaderFilePath(Reader rdr) {
 		try {
-			Field lockField = Reader.class.getDeclaredField("lock");
+			Field lockField = rdr.getClass().getDeclaredField("lock");
 			lockField.setAccessible(true);
 			Object lock = lockField.get(rdr);
 

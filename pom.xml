@@ -15,7 +15,7 @@
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
     <organization>
@@ -66,6 +66,7 @@
         <maven.compiler.debuglevel>source,lines,vars</maven.compiler.debuglevel>
         <maven.compiler.verbose>false</maven.compiler.verbose>
         <maven.compiler.fork>false</maven.compiler.fork>
+        <maven.compiler.args></maven.compiler.args>
 
         <maven.source.skip>true</maven.source.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
@@ -175,6 +176,7 @@
                     <target>${maven.compiler.target}</target>
                     <debuglevel>${maven.compiler.debuglevel}</debuglevel>
                     <fork>${maven.compiler.fork}</fork>
+                    <compilerArgument>${maven.compiler.args}</compilerArgument>
                 </configuration>
             </plugin>
             <plugin>
@@ -331,19 +333,6 @@
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- may be used instead of mockito -->
-        <!--<dependency>-->
-        <!--<groupId>org.jmockit</groupId>-->
-        <!--<artifactId>jmockit</artifactId>-->
-        <!--<version>1.46</version>-->
-        <!--<scope>test</scope>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>org.jmockit</groupId>-->
-        <!--<artifactId>jmockit-coverage</artifactId>-->
-        <!--<version>1.23</version>-->
-        <!--<scope>test</scope>-->
-        <!--</dependency>-->
     </dependencies>
 
     <modules>
