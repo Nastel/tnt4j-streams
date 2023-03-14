@@ -2753,54 +2753,25 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @return the path of the {@code is} referenced file
 	 */
 	public static String resolveInputFilePath(InputStream is) {
-		if (is instanceof FileInputStream) {
-			return resolveInputFilePath((FileInputStream) is);
-		} else if (is instanceof ReaderInputStream) {
-			return resolveInputFilePath((ReaderInputStream) is);
-		} else if (is instanceof FilterInputStream) {
-			return resolveInputFilePath((FilterInputStream) is);
-		} else {
-			return resolveInputFilePath_(is);
-		}
-	}
-
-	private static String resolveInputFilePath(FileInputStream fis) {
 		try {
-			return (String) FieldUtils.readDeclaredField(fis, "path", true); // NON-NLS
-		} catch (Exception exc) {
-		}
+			if (is instanceof FileInputStream) {
+				return (String) FieldUtils.readDeclaredField(is, "path", true); // NON-NLS
+			} else if (is instanceof ReaderInputStream) {
+				Reader reader = (Reader) FieldUtils.readDeclaredField(is, "reader", true); // NON-NLS
 
-		return null;
-	}
+				return resolveReaderFilePath(reader);
+			} else if (is instanceof FilterInputStream) {
+				InputStream in = (InputStream) FieldUtils.readDeclaredField(is, "in", true); // NON-NLS
 
-	private static String resolveInputFilePath(ReaderInputStream ris) {
-		try {
-			Reader reader = (Reader) FieldUtils.readDeclaredField(ris, "reader", true); // NON-NLS
+				if (is != in) {
+					return resolveInputFilePath(in);
+				}
+			} else if (is.getClass().getPackage().getName().equals("sun.nio.ch")) { // NON-NLS
+				// ChannelInputStream resolution
+				ReadableByteChannel rbc = (ReadableByteChannel) FieldUtils.readDeclaredField(is, "ch", true); // NON-NLS
 
-			return resolveReaderFilePath(reader);
-		} catch (Exception exc) {
-		}
-
-		return null;
-	}
-
-	private static String resolveInputFilePath(FilterInputStream fis) {
-		try {
-			InputStream is = (InputStream) FieldUtils.readDeclaredField(fis, "in", true); // NON-NLS
-
-			return resolveInputFilePath(is);
-		} catch (Exception exc) {
-		}
-
-		return null;
-	}
-
-	private static String resolveInputFilePath_(InputStream cis) {
-		// ChannelInputStream resolution
-		try {
-			ReadableByteChannel rbc = (ReadableByteChannel) FieldUtils.readDeclaredField(cis, "ch", true); // NON-NLS
-
-			return resolveInputFilePath(rbc);
+				return resolveInputFilePath(rbc);
+			}
 		} catch (Exception exc) {
 		}
 
