@@ -384,7 +384,7 @@ public class TNT4JStreamsServlet extends HttpServlet {
 	 * <li>{@value StreamsConstants#ACTIVITY_DATA_KEY} - raw activity data as {@code byte[]} retrieved from http
 	 * request.</li>
 	 * <li>HTTP form data parameters entries.</li>
-	 * <li>Metadata - request metadata values map. See {@link #getMetadataMap(jakarta.servlet.http.HttpServletRequest)}
+	 * <li>Metadata - request metadata values map. See {@link #getMetadataMap(javax.servlet.http.HttpServletRequest)}
 	 * for entries set.</li>
 	 * <li>{@value StreamsConstants#HEADERS_KEY} - request header entries map.</li>
 	 * <li>Attributes - request attribute entries map.</li>
