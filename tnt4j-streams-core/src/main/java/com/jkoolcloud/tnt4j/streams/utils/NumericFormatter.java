@@ -120,10 +120,10 @@ public class NumericFormatter {
 	 * performed using plain Java API, in some cases resulting significant value loss.
 	 * <p>
 	 * {@code "^"} prefixed number type enumerator (except {@value FormatterContext#ANY}) means if value can't be cast
-	 * to defined type, closest upper bound type shall be used to maintain value without significant loss.
+	 * to defined type, the closest upper bound type shall be used to maintain value without significant loss.
 	 * <p>
-	 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to target
-	 * type, original value is kept.
+	 * By default, exact casting (without significant value loss) is be performed. In case number can't be cast to
+	 * target type, original value is kept.
 	 *
 	 * @param pattern
 	 *            format pattern - can be set to {@code null} to use default representation
@@ -224,10 +224,10 @@ public class NumericFormatter {
 	 * performed using plain Java API, in some cases resulting significant value loss.
 	 * <p>
 	 * {@code "^"} prefixed number type enumerator (except {@value FormatterContext#ANY}) means if value can't be cast
-	 * to defined type, closest upper bound type shall be used to maintain value without significant loss.
+	 * to defined type, the closest upper bound type shall be used to maintain value without significant loss.
 	 * <p>
-	 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to target
-	 * type, original value is kept.
+	 * By default, exact casting (without significant value loss) is be performed. In case number can't be cast to
+	 * target type, original value is kept.
 	 *
 	 * @param value
 	 *            value to convert
@@ -344,10 +344,10 @@ public class NumericFormatter {
 	 * performed using plain Java API, in some cases resulting significant value loss.
 	 * <p>
 	 * {@code "^"} prefixed number type enumerator (except {@value FormatterContext#ANY}) means if value can't be cast
-	 * to defined type, closest upper bound type shall be used to maintain value without significant loss.
+	 * to defined type, the closest upper bound type shall be used to maintain value without significant loss.
 	 * <p>
-	 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to target
-	 * type, original value is kept.
+	 * By default, exact casting (without significant value loss) is be performed. In case number can't be cast to
+	 * target type, original value is kept.
 	 * 
 	 * @param num
 	 *            number value to cast
@@ -717,9 +717,9 @@ public class NumericFormatter {
 		 * using plain Java API, in some cases resulting significant value loss.
 		 * <p>
 		 * {@code "^"} prefixed number type enumerator (except {@value ANY}) means if value can't be cast to defined
-		 * type, closest upper bound type shall be used to maintain value without significant loss.
+		 * type, the closest upper bound type shall be used to maintain value without significant loss.
 		 * <p>
-		 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to
+		 * By default, exact casting (without significant value loss) is be performed. In case number can't be cast to
 		 * target type, original value is kept.
 		 *
 		 * @param pattern
@@ -741,9 +741,9 @@ public class NumericFormatter {
 		 * using plain Java API, in some cases resulting significant value loss.
 		 * <p>
 		 * {@code "^"} prefixed number type enumerator (except {@value ANY}) means if value can't be cast to defined
-		 * type, closest upper bound type shall be used to maintain value without significant loss.
+		 * type, the closest upper bound type shall be used to maintain value without significant loss.
 		 * <p>
-		 * By default exact casting (without significant value loss) is be performed. In case number can't be cast to
+		 * By default, exact casting (without significant value loss) is be performed. In case number can't be cast to
 		 * target type, original value is kept.
 		 * 
 		 * @param pattern

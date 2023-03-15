@@ -337,11 +337,11 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 	/**
 	 * Cleans up activity data item remaining on input buffer on stream {@link #cleanup()} call.
 	 * <p>
-	 * By default it does nothing, but if item is of {@link java.io.Closeable} resource type, it shall be properly
+	 * By default, it does nothing, but if item is of {@link java.io.Closeable} resource type, it shall be properly
 	 * handled (closed) before dropping it, even if item was not used by the stream.
 	 *
 	 * @param item
-	 *            activity data item to cleanup
+	 *            activity data item to clean up
 	 * 
 	 * @see #cleanup()
 	 */

@@ -66,7 +66,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>OpenOptions - defines open options value used to access queue or topic. It can define numeric options value or
  * concatenation of MQ constant names/values delimited by {@code '|'} symbol. If options definition starts with
  * {@value #FORCE_OPEN_OPTION}, it means that this options set should be used as complete and passed to Queue Manager
- * without changes. By default these open options are appended to predefined set of: <br>
+ * without changes. By default, these open options are appended to predefined set of: <br>
  * Predefined set of open options for queue:
  * <ul>
  * <li>MQOO_FAIL_IF_QUIESCING</li>
@@ -260,7 +260,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 	 * Initiates open options value used to access queue or topic. {@code optionsStr} can define numeric options value
 	 * or concatenation of MQ constant names/values delimited by {@code '|'} symbol. If {@code optionsStr} starts with
 	 * {@value #FORCE_OPEN_OPTION}, it means that this options set should be used as complete and passed to Queue
-	 * Manager without changes. By default these open options are appended to predefined set of:
+	 * Manager without changes. By default, these open options are appended to predefined set of:
 	 * <p>
 	 * Predefined set of open options for queue:
 	 * <ul>

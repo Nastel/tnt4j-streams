@@ -36,7 +36,7 @@ latency.
   * Provide your HTTP endpoint URL
   * Provide Access key Contact the endpoint owner(optional)
   * Content encoding, kinesis Data Firehose uses the content encoding to compress the body of a request before sending the request to the 
-    destination (By default Disabled)
+    destination (Disabled by default)
   * Retry duration, time period during which Kinesis Data Firehose retries sending data to the selected HTTP endpoint.
   * Parameters, Kinesis Data Firehose includes these key-value pairs in each HTTP call. (Optional)
   * Buffer hints, Kinesis Data Firehose buffers incoming records before delivering them to your HTTP endpoint domain which accepts only 
