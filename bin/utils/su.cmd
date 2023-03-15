@@ -4,7 +4,7 @@ setlocal
 set RUNDIR=%~dp0
 set LIBPATH=%LIBPATH%;%RUNDIR%..\..\*;%RUNDIR%..\..\lib\*
 
-set MAINCLASS=com.jkoolcloud.tnt4j.streams.utils.SecurityUtils
+set MAINCLASS=com.jkoolcloud.tnt4j.utils.SecurityUtils
 
 set JAVA_EXEC="java"
 IF ["%JAVA_HOME%"] EQU [""] (

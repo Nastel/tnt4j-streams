@@ -6,7 +6,7 @@ else
 fi
 
 LIBPATH="$LIBPATH:$SCRIPTPATH/../../*:$SCRIPTPATH/../../lib/*"
-MAINCLASS="com.jkoolcloud.tnt4j.streams.utils.SecurityUtils"
+MAINCLASS="com.jkoolcloud.tnt4j.utils.SecurityUtils"
 
 JAVA_EXEC="java"
 if [[ "$JAVA_HOME" == "" ]]; then

@@ -31,6 +31,7 @@ import com.jkoolcloud.tnt4j.streams.configure.NamedObject;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
 import com.jkoolcloud.tnt4j.streams.outputs.TNTStreamOutput;
 import com.jkoolcloud.tnt4j.streams.utils.*;
+import com.jkoolcloud.tnt4j.utils.SecurityUtils;
 
 /**
  * Base class that all activity streams must extend. It provides some base functionality useful for all activity
@@ -1333,7 +1334,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 * @return decrypted password string, or original password string value if decryption fails or provided password
 	 *         string is {@code null}
 	 *
-	 * @see com.jkoolcloud.tnt4j.streams.utils.SecurityUtils#getPass2(String)
+	 * @see SecurityUtils#getPass2(String)
 	 */
 	protected static String decPassword(String passStr) {
 		return SecurityUtils.getPass2(passStr);

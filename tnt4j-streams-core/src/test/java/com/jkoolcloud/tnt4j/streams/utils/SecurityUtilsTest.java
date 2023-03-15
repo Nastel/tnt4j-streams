@@ -23,6 +23,8 @@ import java.security.GeneralSecurityException;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.jkoolcloud.tnt4j.utils.SecurityUtils;
+
 /**
  * @author akausinis
  * @version 1.0
