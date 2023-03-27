@@ -16,26 +16,30 @@
 
 package com.jkoolcloud.tnt4j.streams.utils;
 
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.format.JSONFormatter;
 import com.jkoolcloud.tnt4j.source.Source;
 import com.jkoolcloud.tnt4j.streams.inputs.RedirectTNT4JStream;
 
-import net.minidev.json.JSONValue;
-
 /**
  * JSON formatter extension used with {@link RedirectTNT4JStream} to redirect incoming trackable objects
  * (activities/events/snapshots) produced by other TNT4J based sources like 'tnt4j-stream-jmx' to jKoolCloud.
  * <p>
- * If object to be formatted is valid JSON, then no additional formatting is performed. JSON validity is determined by
- * invoking {@link JSONValue#isValidJson(String)}.
+ * If object to format is valid JSON, then no additional formatting is performed. JSON validity is determined by
+ * invoking {@link ObjectMapper#readTree(String)}.
  *
  * @version $Revision: 1 $
  *
  * @see RedirectTNT4JStream
- * @see JSONValue#isValidJson(String)
+ * @see ObjectMapper#readTree(String)
  */
 public class RedirectTNT4JStreamFormatter extends JSONFormatter {
+
+	private static ObjectMapper validationMapper = new ObjectMapper()
+			.enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
 
 	/**
 	 * Creates a new RedirectTNT4JStreamFormatter without newlines during formatting
@@ -83,8 +87,12 @@ public class RedirectTNT4JStreamFormatter extends JSONFormatter {
 	}
 
 	private boolean isJsonValid(String json) {
-		boolean valid = JSONValue.isValidJson(json);
+		try {
+			validationMapper.readTree(json);
+		} catch (JacksonException exc) {
+			return false;
+		}
 
-		return valid;
+		return true;
 	}
 }
