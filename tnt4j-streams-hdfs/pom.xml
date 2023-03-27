@@ -96,10 +96,6 @@
                     <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-net</artifactId>
-                    <groupId>commons-net</groupId>
-                </exclusion>
-                <exclusion>
                     <artifactId>gson</artifactId>
                     <groupId>com.google.code.gson</groupId>
                 </exclusion>
@@ -112,14 +108,6 @@
                     <groupId>commons-io</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>commons-configuration2</artifactId>
-                    <groupId>org.apache.commons</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>commons-lang3</artifactId>
-                    <groupId>org.apache.commons</groupId>
-                </exclusion>
-                <exclusion>
                     <artifactId>commons-text</artifactId>
                     <groupId>org.apache.commons</groupId>
                 </exclusion>
@@ -130,14 +118,6 @@
                 <exclusion>
                     <artifactId>*</artifactId>
                     <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>commons-logging</artifactId>
-                    <groupId>commons-logging</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>reload4j</artifactId>
-                    <groupId>ch.qos.reload4j</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>re2j</artifactId>
