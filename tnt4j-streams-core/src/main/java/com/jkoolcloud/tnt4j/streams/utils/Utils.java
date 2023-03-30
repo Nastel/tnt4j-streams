@@ -351,8 +351,8 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *             If an I/O error occurs
 	 */
 	public static int countLines(InputStream is) throws IOException {
-		InputStream bis = is instanceof BufferedInputStream ? (BufferedInputStream) is : new BufferedInputStream(is);
-		try {
+		try (InputStream bis = is instanceof BufferedInputStream ? (BufferedInputStream) is
+				: new BufferedInputStream(is)) {
 			byte[] cBuff = new byte[1024];
 			int lCount = 0;
 			int readChars = 0;
@@ -381,8 +381,6 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 				++lCount;
 			}
 			return lCount;
-		} finally {
-			close(bis);
 		}
 	}
 
