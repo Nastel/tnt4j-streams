@@ -134,11 +134,11 @@ public class DefaultStreamingJob implements StreamingJob {
 		} catch (SAXException | IllegalStateException e) {
 			LOGGER.log(OpLevel.ERROR, Utils.getExceptionMessages(e));
 			notifyError(e, "STREAM_INIT_FAIL"); // NON-NLS
+			cleanup();
 		} catch (Throwable e) {
 			Utils.logThrowable(LOGGER, OpLevel.ERROR, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"StreamsAgent.start.failed", e);
-			notifyError(e, "STREAM_RUNTIME_FAIL"); // NON-NLS
-		} finally {
+			notifyError(e, "STREAM_START_FAIL"); // NON-NLS
 			cleanup();
 		}
 	}
@@ -157,6 +157,8 @@ public class DefaultStreamingJob implements StreamingJob {
 				streamsCompletionSignal.await();
 			} catch (InterruptedException exc) {
 			}
+
+			cleanup();
 		}
 	}
 
@@ -341,7 +343,8 @@ public class DefaultStreamingJob implements StreamingJob {
 		public void onItemLogFinish(Object item) {
 			if (jobListeners != null) {
 				for (StreamingJobListener l : jobListeners) {
-					l.onStreamEvent(DefaultStreamingJob.this, null, OpLevel.INFO, "Activity item logged", item);
+					l.onStreamEvent(DefaultStreamingJob.this, null, OpLevel.INFO, StreamsResources.getString(
+							StreamsResources.RESOURCE_BUNDLE_NAME, "DefaultStreamingJob.item.log.finished"), item);
 				}
 			}
 		}
@@ -350,8 +353,8 @@ public class DefaultStreamingJob implements StreamingJob {
 		public void onItemRecorded(Object item, Trackable trackable) {
 			if (jobListeners != null) {
 				for (StreamingJobListener l : jobListeners) {
-					l.onStreamEvent(DefaultStreamingJob.this, null, OpLevel.INFO, "Activity item entity recorded",
-							item);
+					l.onStreamEvent(DefaultStreamingJob.this, null, OpLevel.INFO, StreamsResources.getString(
+							StreamsResources.RESOURCE_BUNDLE_NAME, "DefaultStreamingJob.item.recorded"), item);
 				}
 			}
 		}

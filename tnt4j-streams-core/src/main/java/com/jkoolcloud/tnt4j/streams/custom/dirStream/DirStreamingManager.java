@@ -52,7 +52,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * <p>
  * Streaming jobs are processed using {@link ThreadPoolExecutor} with 10 core threads and max 100 threads by default.
  * <p>
- * Directory monitoring is performed using {@link DirWatchdog}. Manager handles those watchdog invoked file
+ * Directory monitoring is performed using {@link DirWatchdog}. This manager handles watchdog invoked file
  * notifications:
  * <ul>
  * <li>Create - creates new streaming job and enqueues it to executor service.</li>
