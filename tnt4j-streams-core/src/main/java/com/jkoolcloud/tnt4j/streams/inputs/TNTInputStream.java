@@ -863,7 +863,11 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 		notifyFinished();
 		removeListeners();
 
-		new StreamStatisticsReporter(TNTInputStreamStatistics.getMetrics(this), null).report(logger());
+		StreamStatisticsReporter statsReporter = new StreamStatisticsReporter(TNTInputStreamStatistics.getMetrics(this),
+				null);
+		statsReporter.report(logger());
+		statsReporter.close();
+
 		TNTInputStreamStatistics.clear(this);
 
 		logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),

@@ -18,7 +18,6 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 
 import static com.jkoolcloud.tnt4j.streams.inputs.TNTInputStreamStatistics.START_TIME_KEY;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
@@ -198,6 +197,6 @@ public class StreamStatisticsReporter implements Reporter {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() {
 	}
 }

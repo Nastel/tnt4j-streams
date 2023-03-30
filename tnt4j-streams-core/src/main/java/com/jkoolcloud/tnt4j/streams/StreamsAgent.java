@@ -479,7 +479,11 @@ public final class StreamsAgent {
 	 * Performs actions on agent process completion.
 	 */
 	public static void complete() {
-		new StreamStatisticsReporter(TNTInputStreamStatistics.getMetrics(), null).report(LOGGER);
+		StreamStatisticsReporter statsReporter = new StreamStatisticsReporter(TNTInputStreamStatistics.getMetrics(),
+				null);
+		statsReporter.report(LOGGER);
+		statsReporter.close();
+
 		TNTInputStreamStatistics.clear();
 		DefaultEventSinkFactory.shutdownAll();
 		MBeansManager.unregisterMBeans();
