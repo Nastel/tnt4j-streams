@@ -17,6 +17,7 @@
 package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.LineNumberReader;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -81,8 +82,8 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 		if (ArrayUtils.isNotEmpty(activityFiles)) {
 			for (Path f : activityFiles) {
 				tbc += Files.size(f);
-				try {
-					tlc += Utils.countLines(Files.newInputStream(f, StandardOpenOption.READ));
+				try (InputStream fis = Files.newInputStream(f, StandardOpenOption.READ)) {
+					tlc += Utils.countLines(fis);
 				} catch (IOException exc) {
 				}
 			}

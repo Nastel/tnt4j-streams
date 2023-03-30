@@ -86,7 +86,7 @@ public class FilesInputStream extends InputStream {
 								"FeedInputStream.file.not.found", f);
 					} catch (IOException e) {
 						LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-								"FeedInputStream.file.not.found", f); // tODO
+								"FeedInputStream.file.not.found", f); // TODO
 					}
 				}
 			} else {

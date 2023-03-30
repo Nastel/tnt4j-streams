@@ -244,14 +244,10 @@ public class MqttStream extends AbstractBufferedStream<Map<String, ?>> {
 
 			if (useSSL) {
 				SSLContext sslContext = SSLContext.getInstance(SSL_PROTOCOL);
-
 				KeyStore keyStore = KeyStore.getInstance(KEYSTORE_TYPE);
-				InputStream fis = null;
-				try {
-					fis = Files.newInputStream(Paths.get(keystore));
+
+				try (InputStream fis = Files.newInputStream(Paths.get(keystore))) {
 					keyStore.load(fis, keystorePass.toCharArray());
-				} finally {
-					Utils.close(fis);
 				}
 
 				TrustManagerFactory trustManagerFactory = TrustManagerFactory
