@@ -14,7 +14,9 @@
     <artifactId>tnt4j-streams-fs</artifactId>
 
     <properties>
-        <!-- module dependencies versions-->
+        <jsch.version>0.2.8</jsch.version>
+        <jsch-nio.version>1.0.14</jsch-nio.version>
+        <sftp-fs.version>3.2</sftp-fs.version>
     </properties>
 
     <build>
@@ -61,12 +63,12 @@
         <dependency>
             <groupId>com.github.mwiede</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.2.8</version>
+            <version>${jsch.version}</version>
         </dependency>
         <dependency>
             <groupId>com.pastdev</groupId>
             <artifactId>jsch-nio</artifactId>
-            <version>1.0.14</version>
+            <version>${jsch-nio.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jsch</artifactId>
@@ -81,7 +83,7 @@
         <dependency>
             <groupId>com.github.robtimus</groupId>
             <artifactId>sftp-fs</artifactId>
-            <version>3.1</version>
+            <version>${sftp-fs.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jsch</artifactId>
