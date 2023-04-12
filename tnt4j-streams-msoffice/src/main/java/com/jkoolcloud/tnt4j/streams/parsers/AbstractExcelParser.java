@@ -129,7 +129,14 @@ public abstract class AbstractExcelParser<T> extends GenericActivityParser<T> {
 		case BOOLEAN:
 			return cell.getBooleanCellValue();
 		case NUMERIC:
-			return DateUtil.isCellDateFormatted(cell) ? cell.getDateCellValue() : cell.getNumericCellValue();
+			boolean dateCell = false;
+			try {
+				dateCell = DateUtil.isCellDateFormatted(cell);
+			} catch (NullPointerException npe) {
+				// POI introduced NPE starting version 5.2.3
+				dateCell = false;
+			}
+			return dateCell ? cell.getDateCellValue() : cell.getNumericCellValue();
 		case FORMULA:
 			return evaluateCellFormula(cell);
 		case STRING:
@@ -176,8 +183,14 @@ public abstract class AbstractExcelParser<T> extends GenericActivityParser<T> {
 		case BOOLEAN:
 			return cellValue.getBooleanValue();
 		case NUMERIC:
-			return DateUtil.isCellDateFormatted(cell) ? DateUtil.getJavaDate(cellValue.getNumberValue())
-					: cellValue.getNumberValue();
+			boolean dateCell = false;
+			try {
+				dateCell = DateUtil.isCellDateFormatted(cell);
+			} catch (NullPointerException npe) {
+				// POI introduced NPE starting version 5.2.3
+				dateCell = false;
+			}
+			return dateCell ? DateUtil.getJavaDate(cellValue.getNumberValue()) : cellValue.getNumberValue();
 		case STRING:
 			return cellValue.getStringValue();
 		default:

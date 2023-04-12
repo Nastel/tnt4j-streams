@@ -180,19 +180,39 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 		return totalBytes;
 	}
 
-	private static long getRowByteSize(Row activityItem) {
-		Iterator<Cell> cells = activityItem.cellIterator();
-		if (cells == null) {
-			return 0;
+	private static long getRowByteSize(Row row) {
+		int bCount = 0;
+
+		if (row != null) {
+			Iterator<Cell> cells = row.cellIterator();
+			while (cells.hasNext()) {
+				Cell c = cells.next();
+				if (c != null) {
+					String cv;
+					try {
+						cv = c.toString();
+						bCount += cv.getBytes().length;
+					} catch (NullPointerException exc) {
+						// POI introduced NPE starting version 5.2.3
+						CellType ct = c.getCellType();
+						switch (ct) {
+						case BOOLEAN:
+						case ERROR:
+							bCount += 1;
+							break;
+						case NUMERIC:
+							bCount += 8; // double
+							break;
+						default:
+							// STRING and FORMULA shall resolve
+							break;
+						}
+					}
+				}
+			}
 		}
 
-		long rowSize = 0;
-		while (cells.hasNext()) {
-			Cell cell = cells.next();
-			rowSize += cell.toString().getBytes().length;
-		}
-
-		return rowSize;
+		return bCount;
 	}
 
 	@Override
