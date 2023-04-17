@@ -4264,6 +4264,9 @@ See [`Readme.md`](tnt4j-streams-samples/README.md) of `tnt4j-streams-samples` mo
 
 ## How to use TNT4J loggers
 
+**NOTE:** when defining configuration file properties over `file:` URI notation (e.g. `configurationFile` for `log4j` or `logback`) on 
+Windows change backslashes `\ ` to slash `/` symbols for URI to get successfully parsed. 
+
 ### tnt4j-log4j
 
 * in `config/log4j.properties` file change log appender to
@@ -4278,8 +4281,8 @@ See [`Readme.md`](tnt4j-streams-samples/README.md) of `tnt4j-streams-samples` mo
     <scope>runtime</scope>
 </dependency>
 ```
-* when running `TNT4J-Streams` use system property `-Dlog4j.configuration` to define `log4j.properties` file location, e.g.:
-  `-Dlog4j.configuration="file:./config/log4j.properties"`.
+* when running `TNT4J-Streams` use system property `-Dlog4j2.configurationFile` to define `log4j2.xml` file location, e.g.:
+  `-Dlog4j2.configurationFile="file:./config/log4j2.xml"`.
 
 ### tnt4j-logback
 
@@ -4300,12 +4303,12 @@ and comment out log4j dependencies
 
 `bat` file:
 ```
-set LOGBACKOPTS=-Dlogback.configurationFile="file:%RUNDIR%..\config\logback.xml"
+set LOGBACKOPTS=-Dlogback.configurationFile="%RUNDIR%..\config\logback.xml"
 "%JAVA_HOME%\bin\java" %LOGBACKOPTS% %TNT4JOPTS% ...
 ```
 `sh` file:
 ```
-LOGBACKOPTS=-Dlogback.configurationFile="file:$RUNDIR/../config/logback.xml"
+LOGBACKOPTS=-Dlogback.configurationFile="$RUNDIR\..\config\logback.xml"
 "$JAVA_HOME/bin/java" $LOGBACKOPTS $TNT4JOPTS
 ```
 

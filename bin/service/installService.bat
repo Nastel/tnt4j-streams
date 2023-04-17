@@ -45,7 +45,7 @@ echo Classpath              %FILE_PATH%\*;%FILE_PATH%\lib\*
 echo Jvm                    %JVM_DLL_PATH%\jvm.dll     
 echo StartPath              %FILE_PATH% 
 echo StartParams            start;-f:%PARSER_CONFIG%
-echo JvmOptions             -Dlog4j2.configurationFile=file:%LOG4J_CONFIG%;-Dtnt4j.config=%TNT4J_CONFIG%
+echo JvmOptions             -Dlog4j2.configurationFile=%LOG4J_CONFIG%;-Dtnt4j.config=%TNT4J_CONFIG%
 
 SET /P AREYOUSURE=Are you sure (Y/[N])?
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO END
@@ -68,7 +68,7 @@ rem #### installing service ####
  --StopClass com.jkoolcloud.tnt4j.streams.StreamsDaemon      ^
  --StopParams "stop"  ^
  --StartParams "start;-f:%PARSER_CONFIG%"      ^
- --JvmOptions "-Dlog4j2.configurationFile=file:%LOG4J_CONFIG%;-Dtnt4j.config=%TNT4J_CONFIG%"  ^
+ --JvmOptions "-Dlog4j2.configurationFile=%LOG4J_CONFIG%;-Dtnt4j.config=%TNT4J_CONFIG%"  ^
  --JvmMs 128      ^
  --JvmMx 512
 

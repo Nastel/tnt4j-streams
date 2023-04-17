@@ -42,7 +42,7 @@
     ```
     * Windows:
     ```cmd
-    set KAFKA_OPTS=-Dtnt4j.config="../../config/tnt4j.properties" -Dinterceptors.config="../../config/interceptorsC.properties" -Dlog4j2.configurationFile="file:../../config/my_log4j2.xml"
+    set KAFKA_OPTS=-Dtnt4j.config="..\..\config\tnt4j.properties" -Dinterceptors.config="..\..\config\interceptorsC.properties" -Dlog4j2.configurationFile="..\..\config\my_log4j2.xml"
     ```
 1. Alter producer runner script file (`<KAFKA_INSTALL_DIR>/bin/kafka-console-producer`) by adding/amending `KAFKA_OPTS` environment variable
    defining JVM system properties, referring TNT4J, interceptors and optionally LOG4J configuration files, e.g. (**NOTE**: add `KAFKA_OPTS`
@@ -62,7 +62,7 @@
     ```
     * Windows:
     ```cmd
-    set KAFKA_OPTS=-Dtnt4j.config="../../config/tnt4j.properties" -Dinterceptors.config="../../config/interceptorsP.properties" -Dlog4j2.configurationFile="file:../../config/my_log4j2.xml"
+    set KAFKA_OPTS=-Dtnt4j.config="..\..\config\tnt4j.properties" -Dinterceptors.config="..\..\config\interceptorsP.properties" -Dlog4j2.configurationFile="..\..\config\my_log4j2.xml"
     ```
 1. Alter `<KAFKA_INSTALL_DIR>/config/consumer.properties` by adding:
     ```properties
