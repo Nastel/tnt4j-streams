@@ -47,21 +47,24 @@
             <property name="source.factory.RootFQN" value="DATACENTER=?"/>
 
             <!-- File sink -->
-            <property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.FileEventSinkFactory"/>
-            <property name="event.sink.factory.EventSinkFactory.prod.FileName" value="./logs/tnt4j-streams_samples.log"/>
+            <!--property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.FileEventSinkFactory"/>
+            <property name="event.sink.factory.EventSinkFactory.prod.FileName" value="./logs/tnt4j-streams_samples.log"/-->
 
             <!-- Socket sink to AutoPilot -->
-            <!--<property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory"/>-->
-            <!--<property name="event.sink.factory.EventSinkFactory.prod.LogSink" value="file:./logs/tnt4j-streams_samples_socket.log"/>-->
+            <property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory"/>
+            <property name="event.sink.factory.EventSinkFactory.prod.LogSink" value="file:./logs/tnt4j-streams_samples_socket.log"/>
             <!-- Change to your AP machine host/IP -->
-            <!--<property name="event.sink.factory.EventSinkFactory.prod.Host" value="localhost"/>-->
+            <property name="event.sink.factory.EventSinkFactory.prod.Host" value="localhost"/>
             <!-- Change to your Ap machine port - default one is 6060 -->
-            <!--<property name="event.sink.factory.EventSinkFactory.prod.Port" value="6060"/>-->
+            <property name="event.sink.factory.EventSinkFactory.prod.Port" value="6060"/>
 
             <property name="event.formatter" value="com.jkoolcloud.tnt4j.streams.custom.format.openmetrics.FactPathValueFormatter"/>
             <property name="event.formatter.AddSelfSnapshot" value="false"/>
-            <property name="event.formatter.KeyReplacements">" "->"_" "\""->"'" "/"->"%" "="->"\\" ","->"!'" "\\\\"->"\\"</property>
-            <property name="event.formatter.ValueReplacements">"\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"
+            <property name="event.formatter.KeyReplacements">
+                " "->"_" "\\\""->"" "\""->"'" "/"->"%" "="->"\\" ","->"!'" "\\\\"->"\\"
+            </property>
+            <property name="event.formatter.ValueReplacements">
+                "\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"
             </property>
             <property name="event.formatter.PathLevelAttributes">
                 domain;namespace;region;cluster;broker;metric;topic;cGroup;cAuth

@@ -46,6 +46,7 @@
             <property name="event.sink.factory.EventSinkFactory.prod.Port" value="6060"/>
 
             <property name="event.formatter" value="com.jkoolcloud.tnt4j.streams.custom.format.openmetrics.FactPathValueFormatter"/>
+            <property name="event.formatter.AddSelfSnapshot" value="false"/>
             <property name="event.formatter.KeyReplacements">
                 " "->"_" "\\\""->"" "\""->"'" "/"->"%" "="->"\\" ","->"!'" "\\\\"->"\\"
             </property>
