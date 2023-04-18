@@ -2642,7 +2642,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 */
 	public static String resolveReaderFilePath(Reader rdr) {
 		try {
-			Object lock = FieldUtils.readDeclaredField(rdr, "lock", true);
+			Object lock = FieldUtils.readField(rdr, "lock", true);
 
 			if (lock instanceof InputStream) {
 				return resolveInputFilePath((InputStream) lock);
