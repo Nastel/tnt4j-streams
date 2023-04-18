@@ -46,11 +46,14 @@
             <property name="event.sink.factory.EventSinkFactory.prod.Port" value="6060"/>
 
             <property name="event.formatter" value="com.jkoolcloud.tnt4j.streams.custom.format.openmetrics.FactPathValueFormatter"/>
-            <property name="event.formatter.KeyReplacements">" "->"_" "\""->"'" "/"->"%" "="->"\\" ","->"!'" "\\\\"->"\\"</property>
-            <property name="event.formatter.ValueReplacements">"\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"
+            <property name="event.formatter.KeyReplacements">
+                " "->"_" "\\\""->"" "\""->"'" "/"->"%" "="->"\\" ","->"!'" "\\\\"->"\\"
+            </property>
+            <property name="event.formatter.ValueReplacements">
+                "\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"
             </property>
             <property name="event.formatter.PathLevelAttributes">
-                domain;device,fstype,mountpoint;mType;topic;name;request,error;mName;mToken4;quantile;version;cpu;mode;collector;code;mToken5;mToken6;mToken7;mToken8
+                domain;device,fstype,mountpoint;mType;topic;listener;networkProcessor;name;request,error;logDirectory;mName;mToken4;quantile;version;broker_id;BrokerId;partition;fetcher_id;fetcherType;clientId;brokerHost;brokerPort;clientSoftwareName;delayedOperation;cipher;protocol;processor;cpu;mode;collector;code;mToken5;mToken6;mToken7;mToken8
             </property>
         </tnt4j-properties>
 

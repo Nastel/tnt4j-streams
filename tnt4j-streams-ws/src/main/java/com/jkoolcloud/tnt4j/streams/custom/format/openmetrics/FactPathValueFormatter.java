@@ -210,7 +210,9 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 		Properties objNameProps = new Properties();
 		loadProps(objNameProps, objCanonName, ddIdx);
 
-		return getObjNameStr(objNameProps, snap);
+		String objName = getObjNameStr(objNameProps, snap);
+
+		return Utils.replace(objName, keyReplacements);
 	}
 
 	/**

@@ -17,7 +17,7 @@
 package com.jkoolcloud.tnt4j.streams.custom.format.openmetrics;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -78,11 +78,11 @@ public class FactNameValueFormatter extends DefaultFormatter {
 	/**
 	 * Property key replacement symbols map.
 	 */
-	protected Map<String, String> keyReplacements = new HashMap<>();
+	protected Map<String, String> keyReplacements = new LinkedHashMap<>();
 	/**
 	 * Property value replacement symbols map.
 	 */
-	protected Map<String, String> valueReplacements = new HashMap<>();
+	protected Map<String, String> valueReplacements = new LinkedHashMap<>();
 
 	private boolean addSelfSnapshot = true;
 
