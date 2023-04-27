@@ -95,7 +95,7 @@ public class MetricsReporter implements InterceptionsReporter {
 
 	private final Tracker tracker;
 
-	private Map<String, TopicMetrics> topicsMetrics = new HashMap<>();
+	private final Map<String, TopicMetrics> topicsMetrics = new HashMap<>();
 
 	private boolean useObjectNameProperties = true;
 
@@ -268,7 +268,9 @@ public class MetricsReporter implements InterceptionsReporter {
 		TimerTask mrt = new TimerTask() {
 			@Override
 			public void run() {
-				reportMetrics(topicsMetrics);
+				synchronized (topicsMetrics) {
+					reportMetrics(topicsMetrics);
+				}
 			}
 		};
 		long period = TimeUnit.SECONDS.toMillis(reportingPeriod);
@@ -306,7 +308,9 @@ public class MetricsReporter implements InterceptionsReporter {
 		ConsumerTopicMetrics topicMetrics = (ConsumerTopicMetrics) topicsMetrics.get(key);
 		if (topicMetrics == null) {
 			topicMetrics = new ConsumerTopicMetrics(topic, partition, clientId, callName);
-			topicsMetrics.put(key, topicMetrics);
+			synchronized (topicsMetrics) {
+				topicsMetrics.put(key, topicMetrics);
+			}
 		}
 
 		return topicMetrics;
@@ -321,7 +325,9 @@ public class MetricsReporter implements InterceptionsReporter {
 		ProducerTopicMetrics topicMetrics = (ProducerTopicMetrics) topicsMetrics.get(key);
 		if (topicMetrics == null) {
 			topicMetrics = new ProducerTopicMetrics(topic, partition, clientId, callName);
-			topicsMetrics.put(key, topicMetrics);
+			synchronized (topicsMetrics) {
+				topicsMetrics.put(key, topicMetrics);
+			}
 		}
 
 		return topicMetrics;
@@ -387,7 +393,9 @@ public class MetricsReporter implements InterceptionsReporter {
 	@Override
 	public void shutdown() {
 		metricsReportingTimer.cancel();
-		reportMetrics(topicsMetrics);
+		synchronized (topicsMetrics) {
+			reportMetrics(topicsMetrics);
+		}
 
 		synchronized (tracker) {
 			Utils.close(tracker);
