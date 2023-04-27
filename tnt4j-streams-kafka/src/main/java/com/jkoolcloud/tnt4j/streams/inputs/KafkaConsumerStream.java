@@ -284,7 +284,7 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),
 					"KafkaConsumerStream.consumer.cfgFile.load", cfgFileName);
 			try {
-				Properties fCfgProps = Utils.loadPropertiesFile(cfgFileName);
+				Properties fCfgProps = Utils.loadProperties(cfgFileName);
 				userKafkaProps.put(PROP_SCOPE_CONSUMER, fCfgProps);
 			} catch (IOException exc) {
 				Utils.logThrowable(logger(), OpLevel.WARNING,
@@ -434,7 +434,7 @@ public class KafkaConsumerStream extends AbstractBufferedStream<ConsumerRecord<?
 		 * @param records
 		 *            records collection to add to stream input buffer
 		 *
-		 * @see #addInputToBuffer(Object)
+		 * @see #addInputToBuffer(ConsumerRecord)
 		 */
 		protected void addRecordsToBuffer(Iterable<? extends ConsumerRecord<?, ?>> records) {
 			for (ConsumerRecord<?, ?> record : records) {

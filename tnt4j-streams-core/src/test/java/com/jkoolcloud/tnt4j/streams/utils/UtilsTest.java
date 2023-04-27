@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -392,6 +393,27 @@ public class UtilsTest {
 
 		mValue = Utils.getMapValueByPath(Utils.getNodePath("additionalItem2.1.2.#", "."), map, 0, accessedPaths);
 		assertEquals(((Map<?, ?>) mValue).size(), 3);
+	}
+
+	@Test
+	public void testLoadProperties() {
+		try {
+			Properties props = Utils.loadPropertiesFile("test.file");
+		} catch (IOException exc) {
+			assertTrue(exc instanceof NoSuchFileException);
+		}
+
+		try {
+			Properties props = Utils.loadPropertiesResource("test.file");
+			assertEquals("value1", props.getProperty("key1"));
+		} catch (IOException exc) {
+		}
+
+		try {
+			Properties props = Utils.loadProperties("test.file");
+			assertEquals("value1", props.getProperty("key1"));
+		} catch (IOException exc) {
+		}
 	}
 
 }

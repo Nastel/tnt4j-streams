@@ -86,7 +86,7 @@ public class InterceptionsManager {
 		interceptorsPropFile = getInterceptorsConfigFile();
 
 		try {
-			interceptorProps = Utils.loadPropertiesFile(interceptorsPropFile);
+			interceptorProps = Utils.loadProperties(interceptorsPropFile);
 		} catch (IOException exc) {
 			Utils.logThrowable(LOGGER, OpLevel.WARNING,
 					StreamsResources.getBundle(KafkaStreamConstants.RESOURCE_BUNDLE_NAME),

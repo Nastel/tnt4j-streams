@@ -127,7 +127,7 @@ public class InterceptionsManager {
 
 			// Interceptor configuration
 			try {
-				Properties interceptorProps = Utils.loadPropertiesFile(cfgPath + "/interceptors.properties"); // NON-NLS
+				Properties interceptorProps = Utils.loadProperties(cfgPath + "/interceptors.properties"); // NON-NLS
 
 				if (interceptorProps.isEmpty()) {
 					LOGGER.log(OpLevel.INFO, StreamsResources.getBundle(JMSStreamConstants.RESOURCE_BUNDLE_NAME),

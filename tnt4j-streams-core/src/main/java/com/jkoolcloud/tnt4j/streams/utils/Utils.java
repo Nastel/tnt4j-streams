@@ -1558,22 +1558,22 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
-	 * Loads properties from file referenced by provided system property.
+	 * Loads properties from file/resource referenced by provided system property.
 	 *
 	 * @param propKey
-	 *            system property key referencing properties file path
+	 *            system property key referencing properties file path or resource name
 	 * @return properties loaded from file
 	 * @throws java.io.IOException
 	 *             if an error occurred when reading properties file
 	 * @throws java.lang.IllegalArgumentException
 	 *             if system property value is {@code null} or empty
 	 *
-	 * @see #loadPropertiesFile(String)
+	 * @see #loadProperties(String)
 	 */
 	public static Properties loadPropertiesFor(String propKey) throws IOException {
 		String propFile = System.getProperty(propKey);
 
-		return loadPropertiesFile(propFile);
+		return loadProperties(propFile);
 	}
 
 	/**
@@ -1652,6 +1652,32 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		}
 
 		return rProps;
+	}
+
+	/**
+	 * Loads properties from file or resource with the given name.
+	 * 
+	 * @param propFile
+	 *            properties file path or resource name
+	 * @return properties loaded from file/resource
+	 * @throws java.io.IOException
+	 *             if an error occurred when reading properties file
+	 * @throws java.lang.IllegalArgumentException
+	 *             if properties file path is {@code null} or empty
+	 *
+	 * @see #loadPropertiesFile(String)
+	 * @see #loadPropertiesResource(String)
+	 */
+	public static Properties loadProperties(String propFile) throws IOException {
+		try {
+			return loadPropertiesFile(propFile);
+		} catch (IOException exc) {
+			try {
+				return loadPropertiesResource(propFile);
+			} catch (IOException ioe) {
+				throw exc;
+			}
+		}
 	}
 
 	/**

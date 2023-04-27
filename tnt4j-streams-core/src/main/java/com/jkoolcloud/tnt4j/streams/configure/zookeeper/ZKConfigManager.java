@@ -348,7 +348,7 @@ public class ZKConfigManager implements ZKConfigConstants {
 					"ZKConfigManager.loading.cfg.file", zookeeperCfgFile);
 
 			try {
-				zkConfigProperties = Utils.loadPropertiesFile(zookeeperCfgFile);
+				zkConfigProperties = Utils.loadProperties(zookeeperCfgFile);
 				LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"ZKConfigManager.loaded.props", zkConfigProperties.size());
 			} catch (Exception exc) {
