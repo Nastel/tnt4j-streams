@@ -187,27 +187,24 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 			Iterator<Cell> cells = row.cellIterator();
 			while (cells.hasNext()) {
 				Cell c = cells.next();
-				if (c != null) {
-					String cv;
-					try {
-						cv = c.toString();
-						bCount += cv.getBytes().length;
-					} catch (NullPointerException exc) {
-						// POI introduced NPE starting version 5.2.3
-						CellType ct = c.getCellType();
-						switch (ct) {
-						case BOOLEAN:
-						case ERROR:
-							bCount += 1;
-							break;
-						case NUMERIC:
-							bCount += 8; // double
-							break;
-						default:
-							// STRING and FORMULA shall resolve
-							break;
-						}
-					}
+
+				CellType ct = c.getCellType();
+				switch (ct) {
+				case BOOLEAN:
+				case ERROR:
+					bCount += 1;
+					break;
+				case NUMERIC:
+					bCount += 8; // double
+					break;
+				case STRING:
+				case FORMULA:
+					bCount += c.getStringCellValue().getBytes().length;
+					break;
+				case BLANK:
+				case _NONE:
+				default:
+					break;
 				}
 			}
 		}
@@ -359,6 +356,7 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 			ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(xlsxPackage);
 			XSSFReader xssfReader = new XSSFReader(xlsxPackage);
 			StylesTable styles = xssfReader.getStylesTable();
+			SXSSFWorkbook workbook = new SXSSFWorkbook();
 			XSSFReader.SheetIterator sIter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
 			while (sIter.hasNext()) {
 				try (InputStream sStream = sIter.next()) {
@@ -368,7 +366,7 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 						continue;
 					}
 
-					SXSSFSheet sheet = new SXSSFSheet(new SXSSFWorkbook(), null);
+					SXSSFSheet sheet = workbook.createSheet();
 					processSXSSFSheet(styles, strings, new XLSXSheetContentHandler(this, sheet), sStream);
 				}
 			}
@@ -500,7 +498,7 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 		 */
 		public XLSEventListener(ExcelSXSSFRowStream stream) throws IOException {
 			this.stream = stream;
-			this.sheet = new SXSSFSheet(new SXSSFWorkbook(), null);
+			this.sheet = new SXSSFWorkbook().createSheet();
 		}
 
 		/**
