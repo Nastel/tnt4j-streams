@@ -48,6 +48,7 @@
                             <protocArtifact>com.google.protobuf:protoc:3.21.2:exe:${os.detected.classifier}</protocArtifact>
                             <outputDirectory>src/main/java</outputDirectory>
                             <clearOutputDirectory>false</clearOutputDirectory>
+                            <protoSourceRoot>src/main/proto</protoSourceRoot>
                         </configuration>
                         <executions>
                             <execution>
