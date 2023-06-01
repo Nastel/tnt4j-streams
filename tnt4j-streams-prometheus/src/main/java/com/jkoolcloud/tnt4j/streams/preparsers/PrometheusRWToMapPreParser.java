@@ -19,7 +19,6 @@ package com.jkoolcloud.tnt4j.streams.preparsers;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.cache.Cache;
@@ -57,9 +56,9 @@ public class PrometheusRWToMapPreParser extends AbstractPreParser<byte[], Map<St
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> preParse(byte[] data) throws Exception {
 		Remote.WriteRequest writeRequest = Remote.WriteRequest.parseFrom(data);
-		List<Types.MetricMetadata> metadataList = writeRequest.getMetadataList();
 
-		if (CollectionUtils.isNotEmpty(metadataList)) {
+		if (writeRequest.getMetadataCount() > 0) {
+			List<Types.MetricMetadata> metadataList = writeRequest.getMetadataList();
 			for (Types.MetricMetadata md : metadataList) {
 				Map<String, Object> mdMap = new LinkedHashMap<>(5);
 				metaDataCache.put(md.getMetricFamilyName(), mdMap); // NON-NLS
@@ -67,16 +66,16 @@ public class PrometheusRWToMapPreParser extends AbstractPreParser<byte[], Map<St
 				mdMap.put("help", md.getHelp()); // NON-NLS
 				mdMap.put("unit", md.getUnit()); // NON-NLS
 				mdMap.put("family", md.getMetricFamilyName()); // NON-NLS
-				mdMap.put("type", md.getType()); // NON-NLS
+				mdMap.put("type", md.getType().name()); // NON-NLS
+				mdMap.put("typeNumber", md.getType().getNumber()); // NON-NLS
 			}
 		}
 
-		List<Types.TimeSeries> timeSeriesList = writeRequest.getTimeseriesList();
-
 		Map<String, Object> reqMap = null;
 
-		if (CollectionUtils.isNotEmpty(timeSeriesList)) {
+		if (writeRequest.getTimeseriesCount() > 0) {
 			reqMap = new HashMap<>();
+			List<Types.TimeSeries> timeSeriesList = writeRequest.getTimeseriesList();
 			for (Types.TimeSeries ts : timeSeriesList) {
 				Map<String, Object> tsMap = new LinkedHashMap<>();
 
@@ -111,6 +110,64 @@ public class PrometheusRWToMapPreParser extends AbstractPreParser<byte[], Map<St
 					}
 				}
 
+				if (ts.getHistogramsCount() > 0) {
+					Map<String, Object> tsHistogramsMap = new LinkedHashMap<>();
+					tsMap.put("histograms", tsHistogramsMap); // NON-NLS
+
+					List<Types.Histogram> histogramsList = ts.getHistogramsList();
+					for (Types.Histogram h : histogramsList) {
+						Map<String, Object> histogramMap = new LinkedHashMap<>();
+
+						histogramMap.put("countCase", h.getCountCase().name()); // NON-NLS
+						histogramMap.put("countCaseNumber", h.getCountCase().getNumber()); // NON-NLS
+						if (h.hasCountFloat()) {
+							histogramMap.put("count", h.getCountFloat()); // NON-NLS
+						}
+						if (h.hasCountInt()) {
+							histogramMap.put("count", h.getCountInt()); // NON-NLS
+						}
+						if (h.getNegativeCountsCount() > 0) {
+							histogramMap.put("negativeCounts", h.getNegativeCountsList().toArray(new Double[0])); // NON-NLS
+						}
+						if (h.getNegativeDeltasCount() > 0) {
+							histogramMap.put("negativeDeltas", h.getNegativeDeltasList().toArray(new Long[0])); // NON-NLS
+						}
+						if (h.getNegativeSpansCount() > 0) {
+							Map<String, Object> spansMap = new LinkedHashMap<>();
+							tsMap.put("negativeSpans", spansMap); // NON-NLS
+
+							spansToMap(h.getNegativeSpansList(), spansMap);
+						}
+						if (h.getPositiveCountsCount() > 0) {
+							histogramMap.put("positiveCounts", h.getPositiveCountsList().toArray(new Double[0])); // NON-NLS
+						}
+						if (h.getPositiveDeltasCount() > 0) {
+							histogramMap.put("positiveDeltas", h.getPositiveDeltasList().toArray(new Long[0])); // NON-NLS
+						}
+						if (h.getPositiveSpansCount() > 0) {
+							Map<String, Object> spansMap = new LinkedHashMap<>();
+							tsMap.put("positiveSpans", spansMap); // NON-NLS
+
+							spansToMap(h.getPositiveSpansList(), spansMap);
+						}
+						histogramMap.put("resetHint", h.getResetHint().name()); // NON-NLS
+						histogramMap.put("resetHintValue", h.getResetHintValue()); // NON-NLS
+						histogramMap.put("schema", h.getSchema()); // NON-NLS
+						histogramMap.put("sum", h.getSum()); // NON-NLS
+						histogramMap.put("timestamp", h.getTimestamp()); // NON-NLS
+						histogramMap.put("zeroCountCase", h.getZeroCountCase().name()); // NON-NLS
+						if (h.hasZeroCountFloat()) {
+							histogramMap.put("zeroCount", h.getZeroCountFloat()); // NON-NLS
+						}
+						if (h.hasZeroCountInt()) {
+							histogramMap.put("zeroCount", h.getZeroCountInt()); // NON-NLS
+						}
+						histogramMap.put("zeroThreshold", h.getZeroThreshold()); // NON-NLS
+
+						tsHistogramsMap.put(String.valueOf(h.getTimestamp()), histogramMap);
+					}
+				}
+
 				Map<String, Object> eMap = (Map<String, Object>) tsMap.get("labels"); // NON-NLS
 				String tsName = eMap == null ? null : (String) eMap.get("__name__"); // NON-NLS
 
@@ -127,10 +184,27 @@ public class PrometheusRWToMapPreParser extends AbstractPreParser<byte[], Map<St
 				}
 
 				Map<String, ?> samplesMap = (Map<String, ?>) tsMap.get("samples"); // NON-NLS
+				Map<String, ?> exemplarsMap = (Map<String, ?>) tsMap.get("exemplars"); // NON-NLS
+				Map<String, ?> histogramsMap = (Map<String, ?>) tsMap.get("histograms"); // NON-NLS
 				if (samplesMap != null) {
 					for (Map.Entry<String, ?> se : samplesMap.entrySet()) {
 						Map<String, Object> tscMap = samplesMap.size() > 1 ? Utils.copyMap(tsMap) : tsMap;
 						tscMap.put("samples", se.getValue()); // NON-NLS
+
+						if (exemplarsMap != null) {
+							Map<String, ?> exempMap = (Map<String, ?>) exemplarsMap.get(se.getKey());
+
+							if (exempMap != null) {
+								tscMap.put("exemplars", exempMap); // NON-NLS
+							}
+						}
+						if (histogramsMap != null) {
+							Map<String, ?> histMap = (Map<String, ?>) histogramsMap.get(se.getKey());
+
+							if (histMap != null) {
+								tscMap.put("histograms", histMap); // NON-NLS
+							}
+						}
 
 						tsCollection.add(tscMap);
 					}
@@ -155,6 +229,21 @@ public class PrometheusRWToMapPreParser extends AbstractPreParser<byte[], Map<St
 
 			map.put(String.valueOf(s.getTimestamp()), sampleMap);
 		}
+	}
+
+	private static void spansToMap(List<Types.BucketSpan> spans, Map<String, Object> map) {
+		Integer[] lengths = new Integer[spans.size()];
+		Integer[] offsets = new Integer[spans.size()];
+
+		for (int i = 0; i < spans.size(); i++) {
+			Types.BucketSpan bs = spans.get(i);
+
+			lengths[i] = bs.getLength();
+			offsets[i] = bs.getOffset();
+		}
+
+		map.put("lengths", lengths); // NON-NLS
+		map.put("offsets", offsets); // NON-NLS
 	}
 
 	@Override

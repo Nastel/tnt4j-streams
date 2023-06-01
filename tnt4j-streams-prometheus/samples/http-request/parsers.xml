@@ -32,6 +32,7 @@
         <field name="Instance" locator="instance" locator-type="Label"/>
         <field name="Job" locator="job" locator-type="Label"/>
         <field name="Type" locator="type" locator-type="Label"/>
+        <field name="TypeNumber" locator="typeNumber" locator-type="Label" datatype="Number" format="int"/>
         <field name="Name" locator="name" locator-type="Label"/>
 
         <field name="Rest" locator="#" locator-type="Label"/>
@@ -53,6 +54,32 @@
 
         <field name="Timestamp" locator="timestamp" locator-type="Label" datatype="Timestamp"/>
         <field name="Value" locator="value" locator-type="Label" datatype="AsInput"/>
+
+        <field name="Rest" locator="#" locator-type="Label"/>
+    </parser>
+
+    <parser name="HistogramsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <field name="Timestamp" locator="timestamp" locator-type="Label" datatype="Timestamp"/>
+        <field name="CountCase" locator="countCase" locator-type="Label" datatype="String"/>
+        <field name="CountCaseNumber" locator="countCaseNumber" locator-type="Label" datatype="Number" format="int"/>
+        <field name="Count" locator="count" locator-type="Label" datatype="Number"/>
+        <field name="NegativeCounts" locator="negativeCounts" locator-type="Label" datatype="AsInput"/>
+        <field name="NegativeDeltas" locator="negativeDeltas" locator-type="Label" datatype="AsInput"/>
+        <field name="NegativeSpansLengths" locator="negativeSpans.lengths" locator-type="Label" datatype="AsInput"/>
+        <field name="NegativeSpansOffsets" locator="negativeSpans.offsets" locator-type="Label" datatype="AsInput"/>
+        <field name="PositiveCounts" locator="positiveCounts" locator-type="Label" datatype="AsInput"/>
+        <field name="PositiveDeltas" locator="positiveDeltas" locator-type="Label" datatype="AsInput"/>
+        <field name="PositiveSpansLengths" locator="positiveSpans.lengths" locator-type="Label" datatype="AsInput"/>
+        <field name="PositiveSpansOffsets" locator="positiveSpans.offsets" locator-type="Label" datatype="AsInput"/>
+        <field name="ResetHint" locator="resetHint" locator-type="Label" datatype="String"/>
+        <field name="ResetHintValue" locator="resetHintValue" locator-type="Label" datatype="Number" format="int"/>
+        <field name="Schema" locator="schema" locator-type="Label" datatype="Number" format="int"/>
+        <field name="Sum" locator="sum" locator-type="Label" datatype="Number" format="double"/>
+        <field name="ZeroCountCase" locator="zeroCountCase" locator-type="Label" datatype="String"/>
+        <field name="ZeroCount" locator="zeroCount" locator-type="Label" datatype="Number"/>
+        <field name="ZeroThreshold" locator="zeroThreshold" locator-type="Label" datatype="Number" format="double"/>
 
         <field name="Rest" locator="#" locator-type="Label"/>
     </parser>
@@ -80,9 +107,12 @@
         <embedded-activity name="Samples" locator="samples" locator-type="Label">
             <parser-ref name="SamplesParser" aggregation="Merge"/>
         </embedded-activity>
-        <!--embedded-activity name="Exemplars" locator="exemplars.values()" locator-type="Label">
+        <embedded-activity name="Exemplars" locator="exemplars" locator-type="Label">
             <parser-ref name="ExemplarsParser" aggregation="Merge"/>
-        </embedded-activity-->
+        </embedded-activity>
+        <embedded-activity name="Histograms" locator="histograms" locator-type="Label">
+            <parser-ref name="HistogramsParser" aggregation="Merge"/>
+        </embedded-activity>
 
         <field name="metricNameTokens" value="" datatype="AsInput" transparent="true">
             <field-transform lang="groovy" phase="aggregated"><![CDATA[
