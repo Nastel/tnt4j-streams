@@ -121,7 +121,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 	public String format(TrackingEvent event) {
 		StringBuilder nvString = new StringBuilder(1024);
 
-		nvString.append("OBJ:Streams"); // NON-NLS
+		nvString.append("OBJ:"); // NON-NLS
 		// ------------------------------------------------------------- name
 		toString(nvString, event.getSource()).append(PATH_DELIM).append("Events").append(FIELD_SEP); // NON-NLS
 
@@ -173,7 +173,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 	public String format(TrackingActivity activity) {
 		StringBuilder nvString = new StringBuilder(1024);
 
-		nvString.append("OBJ:Streams"); // NON-NLS
+		nvString.append("OBJ:"); // NON-NLS
 		toString(nvString, activity.getSource()).append(PATH_DELIM).append("Activities").append(FIELD_SEP); // NON-NLS
 
 		toString(nvString, getTrackableKey(activity, StreamFieldType.EventName.name()), activity.getName());
@@ -242,7 +242,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 	public String format(long ttl, Source source, OpLevel level, String msg, Object... args) {
 		StringBuilder nvString = new StringBuilder(1024);
 
-		nvString.append("OBJ:Streams"); // NON-NLS
+		nvString.append("OBJ:"); // NON-NLS
 		toString(nvString, source).append(PATH_DELIM).append("Message").append(FIELD_SEP); // NON-NLS
 		nvString.append("Self").append(PATH_DELIM).append("level=").append(getValueStr(level)).append(FIELD_SEP); // NON-NLS
 		nvString.append("Self").append(PATH_DELIM).append("msg-text="); // NON-NLS

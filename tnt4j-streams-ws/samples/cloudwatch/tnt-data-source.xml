@@ -26,7 +26,7 @@
         <property name="SplitRelatives" value="false"/>
         <property name="SendStreamStates" value="false"/>
         <property name="BuildSourceFQNFromStreamedData" value="false"/>
-        <!--<property name="SourceFQN" value="DATACENTER=${DataCenter}"/>-->
+        <!--<property name="SourceFQN" value="DATACENTER=${DataCenter}#GENERIC=Streams"/>-->
         <property name="RetryStateCheck" value="true"/>
         <property name="RetryInterval" value="300"/>
 
@@ -38,13 +38,14 @@
 
         <tnt4j-properties>
             <!-- Set your CloudWatch data center name -->
+            <property name="source.factory.GENERIC" value="Streams"/>
             <property name="source.factory.DATACENTER" value="Amazon_AWS"/>
             <!--            <property name="source.factory.SERVICE" value="MSK"/>-->
             <!--            <property name="source.factory.GEOADDR" value="us-east-1"/>-->
             <!--            <property name="source.factory.NETWORK" value="demo-cluster-1"/>-->
             <!--            <property name="source.factory.APPSERVER" value="b-1"/>-->
-            <!--            <property name="source.factory.RootFQN" value="APPSERVER=?#NETWORK=?#GEOADDR=?#SERVICE=?#DATACENTER=?"/>-->
-            <property name="source.factory.RootFQN" value="DATACENTER=?"/>
+            <!--            <property name="source.factory.RootFQN" value="APPSERVER=?#NETWORK=?#GEOADDR=?#SERVICE=?#DATACENTER=?#GENERIC=?"/>-->
+            <property name="source.factory.RootFQN" value="DATACENTER=?#GENERIC=?"/>
 
             <!-- File sink -->
             <!--property name="event.sink.factory.EventSinkFactory.prod" value="com.jkoolcloud.tnt4j.sink.impl.FileEventSinkFactory"/>

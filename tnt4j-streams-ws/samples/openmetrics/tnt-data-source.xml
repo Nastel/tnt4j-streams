@@ -28,7 +28,7 @@
         <property name="BuildSourceFQNFromStreamedData" value="true"/>
         <!-- Remove APPL token to have JMX and Node metrics right under broker node -->
         <property name="SourceFQN"
-                  value="APPL=${ApplName}#APPSERVER=${BrokerId}#NETWORK=${ClusterName}#GEOADDR=${RegionId}#SERVICE=${ServiceName}#DATACENTER=${DataCenter}"/>
+                  value="APPL=${ApplName}#APPSERVER=${BrokerId}#NETWORK=${ClusterName}#GEOADDR=${RegionId}#SERVICE=${ServiceName}#DATACENTER=${DataCenter}#GENERIC=Streams"/>
         <property name="RetryStateCheck" value="true"/>
         <property name="RetryInterval" value="300"/>
 
