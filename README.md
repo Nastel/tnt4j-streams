@@ -4414,7 +4414,7 @@ Configuration requires two steps:
         <!--  ### branch for sink written activity entities logger ### -->
         <RollingFile name="activities_log"
                      fileName="${tnt4j.activities.log.filename}"
-                     filePattern="${tnt4j.activities.log.filename}.%i.gz"
+                     filePattern="${tnt4j.activities.log.filename}.%d{yyyyMMdd}.%i.gz"
                      ignoreExceptions="false" createOnDemand="true">
             <Policies>
                 <OnStartupTriggeringPolicy/>

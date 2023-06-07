@@ -39,7 +39,7 @@
         <!-- ### direct log messages to file rolling on startup and size based ### -->
         <RollingFile name="file"
                      fileName="${tnt4j.streams.log.filename}"
-                     filePattern="${tnt4j.streams.log.filename}.%i.gz"
+                     filePattern="${tnt4j.streams.log.filename}.%d{yyyyMMdd}.%i.gz"
                      ignoreExceptions="false">
             <PatternLayout>
                 <Pattern>%d{ISO8601} %-5p [%t!%c{1}] - %m%n</Pattern>
@@ -59,7 +59,7 @@
         <!--  ### branch for sink written 'jkool' activity entities logger ### -->
         <RollingFile name="activities_jkool_log"
                      fileName="${tnt4j.activities.jkool.log.filename}"
-                     filePattern="${tnt4j.activities.jkool.log.filename}.%i.gz"
+                     filePattern="${tnt4j.activities.jkool.log.filename}.%d{yyyyMMdd}.%i.gz"
                      ignoreExceptions="false" createOnDemand="true">
             <PatternLayout>
                 <Pattern>%m%n</Pattern>
@@ -79,7 +79,7 @@
         <!--  ### branch for sink written 'ap' activity entities logger ### -->
         <RollingFile name="activities_ap_log"
                      fileName="${tnt4j.activities.ap.log.filename}"
-                     filePattern="${tnt4j.activities.ap.log.filename}.%i.gz"
+                     filePattern="${tnt4j.activities.ap.log.filename}.%d{yyyyMMdd}.%i.gz"
                      ignoreExceptions="false" createOnDemand="true">
             <PatternLayout>
                 <Pattern>%m%n</Pattern>
