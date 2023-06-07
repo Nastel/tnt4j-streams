@@ -36,7 +36,7 @@
         <!-- ### direct log messages to file rolling size based ### -->
         <RollingFile name="tnt4jAppender"
                      fileName="${tnt4j.streams.log.filename}"
-                     filePattern="${tnt4j.streams.log.filename}.%i.gz"
+                     filePattern="${tnt4j.streams.log.filename}.%d{yyyyMMdd}.%i.gz"
                      ignoreExceptions="false">
             <PatternLayout>
                 <Pattern>%d{ISO8601} %-5p [%t!%c{1}] - %m%n</Pattern>
@@ -55,7 +55,7 @@
         <!--  ### branch for sink written activity entities logger ### -->
         <RollingFile name="activities_log"
                      fileName="${tnt4j.activities.log.filename}"
-                     filePattern="${tnt4j.activities.log.filename}.%i.gz"
+                     filePattern="${tnt4j.activities.log.filename}.%d{yyyyMMdd}.%i.gz"
                      ignoreExceptions="false" createOnDemand="true">
             <PatternLayout>
                 <Pattern>%m%n</Pattern>
