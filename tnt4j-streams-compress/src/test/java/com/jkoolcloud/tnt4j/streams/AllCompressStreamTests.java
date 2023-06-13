@@ -27,5 +27,5 @@ import com.jkoolcloud.tnt4j.streams.configure.sax.ConfigParserHandlerTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ ConfigParserHandlerTest.class })
-public class AllSnappyStreamTests {
+public class AllCompressStreamTests {
 }

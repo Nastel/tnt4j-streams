@@ -50,7 +50,7 @@ Why TNT4J-Streams
     * JDBC
     * [Chronicle Queue](https://chronicle.software/products/queue/)
     * Artemis Broker or Producer/Consumer interceptor
-    * Snappy compressed binary data or input stream
+    * Compressed binary data or input stream
     * Protobuf messages
 
 * Files (including provided by HDFS and JSR-203 FileSystem) can be streamed:
@@ -6811,11 +6811,11 @@ Modules list:
          <version>1.15.2</version>
      </dependency>
   ```
-* `Snappy` (O) - Snappy compressed data pre-parsers module. Maven dependency:
+* `Compress` (O) - Compressed data pre-parsers module. Maven dependency:
   ```xml
      <dependency>
          <groupId>com.jkoolcloud.tnt4j.streams</groupId>
-         <artifactId>tnt4j-streams-snappy</artifactId>
+         <artifactId>tnt4j-streams-compress</artifactId>
          <version>1.15.2</version>
      </dependency>
   ```
@@ -6935,7 +6935,7 @@ Maven tests run is disabled by default. To enable Maven to run tests set Maven c
 * in `msoffice` module run JUnit test suite named `AllMsOfficeStreamTests`
 * in `chronicle` module run JUnit test suite named `AllChronicleStreamTests`
 * in `servlet` module run JUnit test suite named `AllServletStreamTests`
-* in `snappy` module run JUnit test suite named `AllSnappyStreamTests`
+* in `compress` module run JUnit test suite named `AllCompressStreamTests`
 * in `protobuf` module run JUnit test suite named `AllProtobufStreamTests`
 * in `prometheus` module run JUnit test suite named `AllPrometheusStreamTests`
 
