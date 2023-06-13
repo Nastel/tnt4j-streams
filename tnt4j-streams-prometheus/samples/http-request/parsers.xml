@@ -20,7 +20,9 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
     <!--  Pre-parser to decompress Snappy packet of binary data -->
-    <java-object name="SnappyBinPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.SnappyBinaryPreParser"/>
+    <java-object name="SnappyBinPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.CompressedBinaryPreParser">
+        <param name="compressFormat" type="java.lang.String" value="snappy"/>
+    </java-object>
 
     <!--  Pre-parser to deserialize binary Prometheus Remote-Write protobuf message to string keyed map -->
     <java-object name="PrometheusReqMapPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.PrometheusRWToMapPreParser"/>
