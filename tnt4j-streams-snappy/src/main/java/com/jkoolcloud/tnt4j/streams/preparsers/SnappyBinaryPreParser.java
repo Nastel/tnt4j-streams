@@ -116,8 +116,7 @@ public class SnappyBinaryPreParser extends AbstractPreParser<Object, Object> {
 		}
 
 		byte[] uncompressed;
-		try {
-			SnappyCompressorInputStream in = new SnappyCompressorInputStream(din);
+		try (InputStream in = new SnappyCompressorInputStream(din)) {
 			uncompressed = IOUtils.toByteArray(in);
 		} catch (IOException exc) {
 			if ("Premature end of stream reading size".equals(exc.getMessage())) { // NON-NLS
