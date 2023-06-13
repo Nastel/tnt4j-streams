@@ -17,18 +17,18 @@
 package com.jkoolcloud.tnt4j.streams.preparsers;
 
 /**
- * Defines supported Snappy decompression data types.
+ * Defines supported decompression data types.
  *
  * @version $Revision: 1 $
  */
 public enum UncompressedType {
 	/**
-	 * Uncompress the Snappy input as a Binary.
+	 * Uncompress the input data as a Binary.
 	 */
 	BINARY,
 
 	/**
-	 * Uncompress the Snappy input as a String.
+	 * Uncompress the input data as a String.
 	 */
 	STRING
 }
