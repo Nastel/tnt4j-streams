@@ -164,8 +164,7 @@
         </embedded-activity>
     </parser>
 
-    <parser name="SnappyCompressedMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <reference name="SnappyBinPreParser"/>
+    <parser name="MetricsParserProm" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <reference name="PrometheusReqMapPreParser"/>
 
         <field name="EventType" value="Activity"/>
@@ -189,6 +188,15 @@
         </embedded-activity>
     </parser>
 
+    <parser name="SnappyCompressedMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser">
+        <reference name="SnappyBinPreParser"/>
+
+        <field name="EventType" value="Activity"/>
+        <field name="MetricsDataProtoBin" locator="$DATA$" locator-type="Label" datatype="AsInput" transparent="true">
+            <parser-ref name="MetricsParserProm" aggregation="Merge"/>
+        </field>
+    </parser>
+
     <parser name="MetricsParserStr" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
         <field name="EventType" value="NOOP"/>
         <field name="ParserName" locator="ParserName" locator-type="ParserProp" transparent="true"/>
@@ -200,12 +208,17 @@
 
     <parser name="PrometheusParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="NOOP"/>
+        <field name="cEncoding" locator="Headers.content-encoding" locator-type="Label" datatype="String" transparent="true"/>
+        <field name="cType" locator="Headers.content-type" locator-type="Label" datatype="String" transparent="true"/>
         <field name="MetricsDataRAW" locator="ActivityData" locator-type="Label" datatype="AsInput" transparent="true">
             <parser-ref name="SnappyCompressedMetricsParser" aggregation="Merge">
-                <matchExp>groovy: $fieldValue instanceof byte[]</matchExp>
+                <matchExp>groovy:StringUtils.equalsIgnoreCase(${cEncoding}, "snappy")</matchExp>
+            </parser-ref>
+            <parser-ref name="MetricsParserProm" aggregation="Merge">
+                <matchExp>groovy:StringUtils.containsAnyIgnoreCase(${cType}, "protobuf")</matchExp>
             </parser-ref>
             <parser-ref name="MetricsParserStr" aggregation="Merge">
-                <matchExp>string:startsWithAny([,{)</matchExp>
+                <matchExp>groovy:StringUtils.containsAnyIgnoreCase(${cType}, "json")</matchExp>
             </parser-ref>
         </field>
     </parser>
