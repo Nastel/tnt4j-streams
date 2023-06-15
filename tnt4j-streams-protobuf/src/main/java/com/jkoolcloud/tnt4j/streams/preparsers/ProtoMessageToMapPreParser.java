@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 
@@ -125,6 +126,8 @@ public class ProtoMessageToMapPreParser extends AbstractPreParser<Message, Map<S
 				result = fieldValue;
 				break;
 			case BYTE_STRING:
+				result = ((ByteString) fieldValue).toByteArray();
+				break;
 			case ENUM:
 				result = fieldValue.toString();
 				break;

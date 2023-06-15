@@ -33,7 +33,7 @@ import com.google.protobuf.util.JsonFormat;
  */
 public class ProtoMessageToStringPreParser extends AbstractPreParser<Message, String> {
 
-	private static final JsonFormat.Printer jsonPrinter = JsonFormat.printer();
+	private static final JsonFormat.Printer jsonPrinter = JsonFormat.printer().includingDefaultValueFields();
 	private static final TextFormat.Printer textPrinter = TextFormat.printer();
 
 	/**
@@ -44,7 +44,7 @@ public class ProtoMessageToStringPreParser extends AbstractPreParser<Message, St
 	/**
 	 * Constructs a new ProtoMessageToStringPreParser.
 	 */
-	protected ProtoMessageToStringPreParser() {
+	public ProtoMessageToStringPreParser() {
 		this(PrintFormatType.JSON);
 	}
 
@@ -54,7 +54,7 @@ public class ProtoMessageToStringPreParser extends AbstractPreParser<Message, St
 	 * @param printFormatType
 	 *            protobuf message print format type
 	 */
-	protected ProtoMessageToStringPreParser(PrintFormatType printFormatType) {
+	public ProtoMessageToStringPreParser(PrintFormatType printFormatType) {
 		this.printFormatType = printFormatType;
 	}
 
@@ -64,7 +64,7 @@ public class ProtoMessageToStringPreParser extends AbstractPreParser<Message, St
 	 * @param printFormatTypeName
 	 *            protobuf message print format type name
 	 */
-	protected ProtoMessageToStringPreParser(String printFormatTypeName) {
+	public ProtoMessageToStringPreParser(String printFormatTypeName) {
 		printFormatType = StringUtils.isEmpty(printFormatTypeName) ? PrintFormatType.JSON
 				: PrintFormatType.valueOf(printFormatTypeName.toUpperCase());
 	}
