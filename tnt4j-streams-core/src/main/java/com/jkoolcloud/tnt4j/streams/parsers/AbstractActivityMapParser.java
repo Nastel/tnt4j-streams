@@ -136,23 +136,23 @@ public abstract class AbstractActivityMapParser extends GenericActivityParser<Ma
 	/**
 	 * Constant defining locator "size" function to get size of prefix locator expression resolved value.
 	 */
-	protected static final String SIZE_FUNCTION = ".size()"; // NON-NLS
+	protected static final String SIZE_FUNCTION = "size()"; // NON-NLS
 	/**
 	 * Constant defining locator "length" function. Stands as alias for {@link #SIZE_FUNCTION}.
 	 */
-	protected static final String LENGTH_FUNCTION = ".length()"; // NON-NLS
+	protected static final String LENGTH_FUNCTION = "length()"; // NON-NLS
 	/**
 	 * Constant defining locator "keys" function to get key set for prefix locator expression resolved map.
 	 */
-	protected static final String KEYS_FUNCTION = ".keys()"; // NON-NLS
+	protected static final String KEYS_FUNCTION = "keys()"; // NON-NLS
 	/**
 	 * Constant defining locator "values" function to get values collection for prefix locator expression resolved map.
 	 */
-	protected static final String VALUES_FUNCTION = ".values()"; // NON-NLS
+	protected static final String VALUES_FUNCTION = "values()"; // NON-NLS
 	/**
 	 * Constant defining locator "entries" function to get entry set for prefix locator expression resolved map.
 	 */
-	protected static final String ENTRIES_FUNCTION = ".entries()"; // NON-NLS
+	protected static final String ENTRIES_FUNCTION = "entries()"; // NON-NLS
 
 	/**
 	 * Constructs a new AbstractActivityMapParser.
@@ -254,7 +254,7 @@ public abstract class AbstractActivityMapParser extends GenericActivityParser<Ma
 	 *            flag to set if value formatting is not needed
 	 * @return raw value resolved by locator, or {@code null} if value is not resolved
 	 *
-	 * @see Utils#getMapValueByPath(String, String, java.util.Map, Set)
+	 * @see Utils#getMapValueByPath(String[], java.util.Map, java.util.Set)
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -262,35 +262,38 @@ public abstract class AbstractActivityMapParser extends GenericActivityParser<Ma
 			AtomicBoolean formattingNeeded) {
 		Object val = null;
 		String locStr = locator.getLocator();
+		String[] path = (String[]) getPreparedLocator(locStr, k -> Utils.getNodePath(k, nodePathDelim));
+		String lastToken = path[path.length - 1];
 		Set<String[]> accessedPaths = (Set<String[]>) cData.get(ACCESSED_PATHS_KEY);
 
-		if (StringUtils.endsWithAny(locStr, SIZE_FUNCTION, LENGTH_FUNCTION, KEYS_FUNCTION, VALUES_FUNCTION,
+		if (StringUtils.equalsAny(lastToken, SIZE_FUNCTION, LENGTH_FUNCTION, KEYS_FUNCTION, VALUES_FUNCTION,
 				ENTRIES_FUNCTION)) {
-			String pLocStr = locStr.substring(0, locStr.lastIndexOf('.'));
+			String pLocStr = locStr.substring(0, locStr.lastIndexOf(nodePathDelim));
 			pLocStr = pLocStr.replace(LOC_FOR_COMPLETE_ACTIVITY_DATA, "*"); // NON-NLS
-			val = Utils.getMapValueByPath(pLocStr, nodePathDelim, cData.getData(), accessedPaths);
+			String[] pPath = (String[]) getPreparedLocator(pLocStr, k -> Utils.getNodePath(k, nodePathDelim));
+			val = Utils.getMapValueByPath(pPath, cData.getData(), accessedPaths);
 
-			if (locStr.endsWith(SIZE_FUNCTION) || locStr.endsWith(LENGTH_FUNCTION)) {
+			if (StringUtils.equalsAny(lastToken, SIZE_FUNCTION, LENGTH_FUNCTION)) {
 				try {
 					val = CollectionUtils.size(val);
 				} catch (Throwable exc) {
 					val = 0;
 				}
-			} else if (locStr.endsWith(KEYS_FUNCTION)) {
+			} else if (lastToken.equals(KEYS_FUNCTION)) {
 				if (val instanceof Map) {
 					val = ((Map<?, ?>) val).keySet();
 				}
-			} else if (locStr.endsWith(VALUES_FUNCTION)) {
+			} else if (lastToken.equals(VALUES_FUNCTION)) {
 				if (val instanceof Map) {
 					val = ((Map<?, ?>) val).values();
 				}
-			} else if (locStr.endsWith(ENTRIES_FUNCTION)) {
+			} else if (lastToken.equals(ENTRIES_FUNCTION)) {
 				if (val instanceof Map) {
 					val = ((Map<?, ?>) val).entrySet();
 				}
 			}
 		} else {
-			val = Utils.getMapValueByPath(locStr, nodePathDelim, cData.getData(), accessedPaths);
+			val = Utils.getMapValueByPath(path, cData.getData(), accessedPaths);
 		}
 
 		return val;

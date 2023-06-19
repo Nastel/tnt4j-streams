@@ -18,10 +18,13 @@ package com.jkoolcloud.tnt4j.streams.parsers;
 
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
@@ -48,6 +51,8 @@ public abstract class ActivityParser implements NamedObject {
 
 	private ActivityFieldDataType defaultDataType;
 	private boolean defaultEmptyAsNull = true;
+
+	private final Map<String, Object> locatorsMap = new HashMap<>(10);
 
 	/**
 	 * Constructs a new ActivityParser.
@@ -454,6 +459,24 @@ public abstract class ActivityParser implements NamedObject {
 	 */
 	public void setDefaultEmptyAsNull(boolean defaultEmptyAsNull) {
 		this.defaultEmptyAsNull = defaultEmptyAsNull;
+	}
+
+	/**
+	 * Evaluates locator string expression defined locator objects: token arrays, alterations, etc.
+	 * <p>
+	 * Evaluated object gets stored on map to access it without repeating evaluation.
+	 *
+	 * @param loc
+	 *            locator string to resolve map entry
+	 * @param initFnc
+	 *            function to evaluate locator object for a new entry
+	 * @return locator string expression defined locator object
+	 */
+	protected Object getPreparedLocator(String loc, Function<String, Object> initFnc) {
+		if (StringUtils.isEmpty(loc)) {
+			return loc;
+		}
+		return locatorsMap.computeIfAbsent(loc, initFnc);
 	}
 
 	/**

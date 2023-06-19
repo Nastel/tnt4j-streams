@@ -127,7 +127,8 @@ public class KafkaConsumerRecordParser extends GenericActivityParser<ConsumerRec
 			AtomicBoolean formattingNeeded) throws ParseException {
 		Object val = null;
 		String locStr = locator.getLocator();
-		String[] valPath = Utils.getNodePath(locStr, StreamsConstants.DEFAULT_PATH_DELIM);
+		String[] valPath = (String[]) getPreparedLocator(locStr,
+				k -> Utils.getNodePath(k, StreamsConstants.DEFAULT_PATH_DELIM));
 		try {
 			val = getRecordValue(valPath, cData.getData(), 0);
 		} catch (Exception exc) {

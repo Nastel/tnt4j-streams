@@ -176,7 +176,8 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 			AtomicBoolean formattingNeeded) throws ParseException {
 		Object val = null;
 		String locStr = locator.getLocator();
-		String[] path = Utils.getNodePath(locStr, StreamsConstants.DEFAULT_PATH_DELIM);
+		String[] path = (String[]) getPreparedLocator(locStr,
+				k -> Utils.getNodePath(k, StreamsConstants.DEFAULT_PATH_DELIM));
 		val = getParamValue(locator, path, cData.getData(), 0, cData);
 
 		logger().log(OpLevel.TRACE, StreamsResources.getBundle(WmqStreamConstants.RESOURCE_BUNDLE_NAME),
@@ -618,7 +619,6 @@ public class ActivityPCFParser extends GenericActivityParser<PCFContent> {
 		}
 
 		return val;
-
 	}
 
 	private boolean isStringLocatorWithoutCharset(ActivityFieldLocator locator) {
