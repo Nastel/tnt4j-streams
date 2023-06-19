@@ -181,7 +181,8 @@ public class ActivityJavaObjectParser extends GenericActivityParser<Object> {
 			AtomicBoolean formattingNeeded) {
 		Object val = null;
 		String locStr = locator.getLocator();
-		String[] path = Utils.getNodePath(locStr, StreamsConstants.DEFAULT_PATH_DELIM);
+		String[] path = (String[]) getPreparedLocator(locStr,
+				k -> Utils.getNodePath(k, StreamsConstants.DEFAULT_PATH_DELIM));
 		try {
 			val = Utils.getFieldValue(path, cData.getData(), 0);
 		} catch (Exception exc) {
