@@ -71,6 +71,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * This activity stream supports the following configuration properties (in addition to those supported by
  * {@link AbstractBufferedStream}):
  * <ul>
+ * <li>Host - host name/IP to run Http server. (Optional)</li>
  * <li>Port - port number to run Http server. (Optional - default 8080 used if not defined)</li>
  * <li>UseSSL - flag indicating to use SSL. (Optional)</li>
  * <li>Keystore - keystore path. (Optional)</li>
@@ -94,6 +95,7 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 	private static final long SOCKET_TIMEOUT = TimeUnit.SECONDS.toMillis(15);
 	private static final boolean TCP_NO_DELAY = true;
 
+	private String serverHost = null;
 	private Integer serverPort = null;
 	private boolean useSSL = false;
 	private String keystore = null;
@@ -118,7 +120,9 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 	public void setProperty(String name, String value) {
 		super.setProperty(name, value);
 
-		if (StreamProperties.PROP_PORT.equalsIgnoreCase(name)) {
+		if (StreamProperties.PROP_HOST.equalsIgnoreCase(name)) {
+			serverHost = value;
+		} else if (StreamProperties.PROP_PORT.equalsIgnoreCase(name)) {
 			serverPort = Integer.valueOf(value);
 		} else if (StreamProperties.PROP_USE_SSL.equalsIgnoreCase(name)) {
 			useSSL = Utils.toBoolean(value);
@@ -133,6 +137,9 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 
 	@Override
 	public Object getProperty(String name) {
+		if (StreamProperties.PROP_HOST.equalsIgnoreCase(name)) {
+			return serverHost;
+		}
 		if (StreamProperties.PROP_PORT.equalsIgnoreCase(name)) {
 			return serverPort;
 		}
@@ -253,6 +260,7 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 		@Override
 		protected void initialize(Object... params) throws Exception {
 			SSLContext sslcontext = null;
+			String host;
 			int port;
 
 			if (useSSL) {
@@ -267,6 +275,7 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 				port = DEFAULT_HTTP_PORT;
 			}
 
+			host = serverHost;
 			if (serverPort != null) {
 				port = serverPort;
 			}
@@ -275,7 +284,7 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 					.setTcpNoDelay(TCP_NO_DELAY).build();
 			server = ServerBootstrap.bootstrap().setListenerPort(port).setSocketConfig(socketConfig)
 					.setSslContext(sslcontext).setExceptionListener(new HttpStreamExceptionLogger()).register("*", this)
-					.create();
+					.registerVirtual(host, "*", this).create();
 		}
 
 		/**

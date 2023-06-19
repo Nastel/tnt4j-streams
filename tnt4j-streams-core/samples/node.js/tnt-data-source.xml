@@ -36,6 +36,7 @@
 
     <stream name="njstraceHttpStream" class="com.jkoolcloud.tnt4j.streams.inputs.HttpStream">
         <property name="HaltIfNoParser" value="false"/>
+        <!--property name="Host" value="localhost"/-->
         <property name="Port" value="9596"/>
 
         <parser-ref name="njstraceParser"/>

@@ -14,6 +14,7 @@
 
     <stream name="SampleHttpStream" class="com.jkoolcloud.tnt4j.streams.inputs.HttpStream">
         <property name="HaltIfNoParser" value="false"/>
+        <!--property name="Host" value="localhost"/-->
         <property name="Port" value="8080"/>
         <!--<property name="UseSSL" value="true"/>-->
         <!--<property name="Keystore" value="path_to_keystore_file"/>-->
