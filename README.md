@@ -5122,6 +5122,7 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 
 Stream class: `com.jkoolcloud.tnt4j.streams.inputs.HttpStream`
 
+* `Host` - host name/IP to run Http server. Default values - `localhost`, `127.0.0.1` and **canonical hostname** of runner machine. (Optional)
 * `Port` - port number to run Http server. Default value - `8080`. (Optional)
 * `UseSSL` - flag indicating to use SSL. Default value - `false`. (Optional)
     * `Keystore` - keystore path. (Optional) Actual only if `UseSSL` is set to `true`.

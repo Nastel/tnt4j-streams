@@ -30,6 +30,7 @@
         <property name="RetryStateCheck" value="true"/>
         <property name="RetryInterval" value="300"/>
 
+        <!--property name="Host" value="localhost"/-->
         <property name="Port" value="443"/>
         <property name="UseSSL" value="false"/>
         <property name="Keystore" value="file:///home/ubuntu/tnt4j-streams-1.15.2/samples/cloudwatch/clientkeystore"/>

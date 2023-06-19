@@ -39,6 +39,7 @@
 
     <stream name="AjaxEventStream" class="com.jkoolcloud.tnt4j.streams.inputs.HttpStream">
         <property name="HaltIfNoParser" value="false"/>
+        <!--property name="Host" value="localhost"/-->
         <property name="Port" value="9595"/>
 
         <parser-ref name="AjaxEventParser"/>
