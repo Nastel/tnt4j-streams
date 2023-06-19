@@ -54,6 +54,16 @@ public final class StreamsConstants {
 	public static final String DEFAULT_PATH_DELIM = "."; // NON-NLS
 
 	/**
+	 * Default object identification path grouping symbol used by streams parsers.
+	 */
+	public static final String DEFAULT_GROUPING_SYMBOL = "'"; // NON-NLS
+
+	/**
+	 * Default object identification path delimiter escape symbol used by streams parsers.
+	 */
+	public static final String DEFAULT_ESCAPE_SYMBOL = "\\"; // NON-NLS
+
+	/**
 	 * The constant for locator path node token meaning complete map.
 	 */
 	public static final String MAP_NODE_TOKEN = "*"; // NON-NLS

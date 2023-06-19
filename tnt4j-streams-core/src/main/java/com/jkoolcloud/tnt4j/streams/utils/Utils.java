@@ -24,10 +24,13 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.FileSystem;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1437,12 +1440,28 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			} else {
 				HexDump.dump(b, 0, bos, offset);
 			}
-			hexStr = NEW_LINE + bos.toString(UTF8);
+			hexStr = NEW_LINE + bos.toString(StandardCharsets.UTF_8);
 		} catch (Exception exc) {
 			hexStr = "HEX FAIL: " + getExceptionMessages(exc); // NON-NLS
 		}
 
 		return hexStr;
+	}
+
+	/**
+	 * Splits object identification path expression into path nodes array. Uses grouping symbol
+	 * {@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#DEFAULT_GROUPING_SYMBOL}.
+	 * <p>
+	 * If empty path node is found, it is removed from path.
+	 *
+	 * @param path
+	 *            object identification path
+	 * @param nps
+	 *            path nodes separator
+	 * @return array of path nodes, or {@code null} if path is empty
+	 */
+	public static String[] getNodePath(String path, String nps) {
+		return getNodePath(path, nps, StreamsConstants.DEFAULT_GROUPING_SYMBOL);
 	}
 
 	/**
@@ -1454,11 +1473,15 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *            object identification path
 	 * @param nps
 	 *            path nodes separator
+	 * @param ngs
+	 *            path node grouping separator
 	 * @return array of path nodes, or {@code null} if path is empty
+	 * 
+	 * @see #splitWithGrouping(String, String, String)
 	 */
-	public static String[] getNodePath(String path, String nps) {
+	public static String[] getNodePath(String path, String nps, String ngs) {
 		if (StringUtils.isNotEmpty(path)) {
-			String[] pArray = StringUtils.isEmpty(nps) ? new String[] { path } : path.split(Pattern.quote(nps));
+			String[] pArray = StringUtils.isEmpty(nps) ? new String[] { path } : splitWithGrouping(path, nps, ngs);
 			List<String> pList = new ArrayList<>(pArray.length);
 			for (String pe : pArray) {
 				if (StringUtils.isNotEmpty(pe)) {
@@ -1470,6 +1493,58 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Splits provided string by separator and grouping symbols. Grouping symbol is used to recognize when separator
+	 * symbol shall be treated as part of string within grouping symbols wrapped string section and not as string tokens
+	 * delimiter.
+	 * 
+	 * @param str
+	 *            string to split
+	 * @param sep
+	 *            separator symbol
+	 * @param grp
+	 *            grouping symbol
+	 * @return array of strings computed by splitting provided string by separator and grouping symbols
+	 */
+	public static String[] splitWithGrouping(String str, String sep, String grp) {
+		String regex = MessageFormat.format("({0}[^{0}]*{0}|[^{1}]+)", escapeSymbol(grp), escapeSymbol(sep)); // NON-NLS
+		String[] matches = Pattern.compile(regex).matcher(str).results().map(MatchResult::group).toArray(String[]::new);
+
+		for (int i = 0; i < matches.length; i++) {
+			matches[i] = StringUtils.unwrap(matches[i], grp);
+		}
+
+		return matches;
+	}
+
+	/**
+	 * Splits provided string by separator and escape symbols. Escape symbol is used to recognize when separator symbol
+	 * shall be treated as part of split string and not as string tokens delimiter.
+	 * 
+	 * @param str
+	 *            string to split
+	 * @param sep
+	 *            separator symbol
+	 * @param esc
+	 *            escape symbol
+	 * @return array of strings computed by splitting provided string by separator and escape symbols
+	 */
+	public static String[] splitWithEscape(String str, String sep, String esc) {
+		String regex = MessageFormat.format("(?<!{0})[{1}]", escapeSymbol(esc), escapeSymbol(sep)); // NON-NLS
+		return str.split(regex);
+	}
+
+	/**
+	 * Adds escape prefix {@value StreamsConstants#DEFAULT_ESCAPE_SYMBOL} to provided symbol string.
+	 * 
+	 * @param symbol
+	 *            symbol to escape
+	 * @return escape symbol prefixed symbol string
+	 */
+	public static String escapeSymbol(String symbol) {
+		return StreamsConstants.DEFAULT_ESCAPE_SYMBOL + symbol;
 	}
 
 	/**
@@ -1986,7 +2061,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			}
 		}
 
-		files.sort(new Comparator<Path>() {
+		files.sort(new Comparator<>() {
 			@Override
 			public int compare(Path o1, Path o2) {
 				try {
