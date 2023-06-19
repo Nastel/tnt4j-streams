@@ -126,6 +126,18 @@ public class ActivityStringParser extends GenericActivityParser<String> {
 		return cData;
 	}
 
+	private static final String[] ACTIVITY_DATA_TYPES = { "TEXT", "JSON", "XML" }; // NON-NLS
+
+	/**
+	 * Returns "logical" type of RAW activity data entries.
+	 *
+	 * @return "logical" type of RAW activity data entries - {@code "TEXT"}, {@code "JSON"} and {@code "XML"}
+	 */
+	@Override
+	protected String[] getActivityDataType() {
+		return ACTIVITY_DATA_TYPES;
+	}
+
 	/**
 	 * Gets field raw data value resolved by locator.
 	 *
