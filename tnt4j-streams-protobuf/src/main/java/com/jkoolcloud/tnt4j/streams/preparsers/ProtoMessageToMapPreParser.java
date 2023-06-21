@@ -29,7 +29,7 @@ import com.google.protobuf.Message;
  * RAW activity data pre-parser capable to deserialize incoming activity data from protobuf message
  * {@link com.google.protobuf.Message} to string keyed map.
  * 
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  */
 public class ProtoMessageToMapPreParser extends AbstractPreParser<Message, Map<String, ?>> {
 
@@ -79,6 +79,7 @@ public class ProtoMessageToMapPreParser extends AbstractPreParser<Message, Map<S
 	 *             if field value is some protobuf message and failure occurs while parsing it
 	 * 
 	 * @see #convertAtomicVal(com.google.protobuf.Descriptors.FieldDescriptor, Object)
+	 * @see #convertList(com.google.protobuf.Descriptors.FieldDescriptor, java.util.List)
 	 */
 	protected Object simplifyValue(Message message, Descriptors.FieldDescriptor fieldDescriptor, Object fieldValue)
 			throws Exception {
@@ -86,16 +87,49 @@ public class ProtoMessageToMapPreParser extends AbstractPreParser<Message, Map<S
 		if (fieldValue != null) {
 			if (fieldDescriptor.isRepeated()) {
 				if (message.getRepeatedFieldCount(fieldDescriptor) > 0) {
-					List<?> originals = (List<?>) fieldValue;
-					List<Object> copies = new ArrayList<>(originals.size());
-					for (Object original : originals) {
-						copies.add(convertAtomicVal(fieldDescriptor, original));
-					}
-					result = copies;
+					result = convertList(fieldDescriptor, (List<?>) fieldValue);
 				}
 			} else {
 				result = convertAtomicVal(fieldDescriptor, fieldValue);
 			}
+		}
+		return result;
+	}
+
+	/**
+	 * Converts list of protobuf type values to collection/map of more simple (atomic) type.
+	 * 
+	 * @param originals
+	 *            protobuf values list to convert to more simple (atomic) type values
+	 * @return converted values collection or map
+	 */
+	protected Object convertList(Descriptors.FieldDescriptor fieldDescriptor, List<?> originals) throws Exception {
+		List<Object> copies = new ArrayList<>(originals.size());
+		for (Object original : originals) {
+			copies.add(convertAtomicVal(fieldDescriptor, original));
+		}
+		return copies;
+	}
+
+	/**
+	 * Converts complex field value type to more simple (atomic) type. In case field value is some protobuf message, map
+	 * containing fields for that message is returned.
+	 * 
+	 * @param fieldDescriptor
+	 *            field descriptor
+	 * @param fieldValue
+	 *            field value
+	 * @return field value converted to simple type value or map if field value is some protobuf message
+	 * 
+	 * @throws Exception
+	 *             if field value is some protobuf message and failure occurs while parsing it
+	 * 
+	 * @see #getAtomicValue(com.google.protobuf.Descriptors.FieldDescriptor, Object)
+	 */
+	protected Object convertAtomicVal(Descriptors.FieldDescriptor fieldDescriptor, Object fieldValue) throws Exception {
+		Object result = null;
+		if (fieldValue != null) {
+			result = getAtomicValue(fieldDescriptor, fieldValue);
 		}
 		return result;
 	}
@@ -113,29 +147,29 @@ public class ProtoMessageToMapPreParser extends AbstractPreParser<Message, Map<S
 	 * @throws Exception
 	 *             if field value is some protobuf message and failure occurs while parsing it
 	 */
-	protected Object convertAtomicVal(Descriptors.FieldDescriptor fieldDescriptor, Object fieldValue) throws Exception {
-		Object result = null;
-		if (fieldValue != null) {
-			switch (fieldDescriptor.getJavaType()) {
-			case INT:
-			case LONG:
-			case FLOAT:
-			case DOUBLE:
-			case BOOLEAN:
-			case STRING:
-				result = fieldValue;
-				break;
-			case BYTE_STRING:
-				result = ((ByteString) fieldValue).toByteArray();
-				break;
-			case ENUM:
-				result = fieldValue.toString();
-				break;
-			case MESSAGE:
-				result = preParse((Message) fieldValue);
-				break;
-			}
+	protected Object getAtomicValue(Descriptors.FieldDescriptor fieldDescriptor, Object fieldValue) throws Exception {
+		Object result = fieldValue;
+
+		switch (fieldDescriptor.getJavaType()) {
+		case INT:
+		case LONG:
+		case FLOAT:
+		case DOUBLE:
+		case BOOLEAN:
+		case STRING:
+			result = fieldValue;
+			break;
+		case BYTE_STRING:
+			result = ((ByteString) fieldValue).toByteArray();
+			break;
+		case ENUM:
+			result = fieldValue.toString();
+			break;
+		case MESSAGE:
+			result = preParse((Message) fieldValue);
+			break;
 		}
+
 		return result;
 	}
 
