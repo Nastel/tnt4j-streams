@@ -2,32 +2,54 @@ receivers:
   otlp:
     protocols:
       grpc:
-      http:
+
+  solace:
+    broker: [solace-pubsub:5671]
+    auth:
+      sasl_plain:
+        username: admin
+        password: admin
+    queue: queue://#telemetry-profile123
+
+exporters:
+  # Data sources: traces, metrics, logs
+  logging:
+    loglevel: debug	
+
+  # Data sources: traces, metrics, logs
+  otlp:
+#    endpoint: otelcol2:4317
+    endpoint: jaeger-all-in-one:4317
+    tls:
+      insecure: true
+
+  # Data sources: traces, metrics
+#  otlphttp:
+#    endpoint: https://example.com:4318	  
 
 processors:
   batch:
 
-exporters:
-  otlp:
-    endpoint: otelcol:4317
-
 extensions:
   health_check:
   pprof:
+    endpoint: :1888
   zpages:
+    endpoint: :55679
 
 service:
-  extensions: [health_check, pprof, zpages]
+  extensions: [pprof, zpages, health_check]
   pipelines:
     traces:
-      receivers: [otlp]
+      receivers: [otlp, solace]
       processors: [batch]
-      exporters: [otlp]
+      exporters: [logging, otlp]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp]
+      exporters: [logging, otlp]
+#	  address: ":8888"
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp]
+      exporters: [logging, otlp]	  
