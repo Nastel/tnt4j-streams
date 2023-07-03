@@ -1,6 +1,6 @@
 version: "2"
-services:
 
+services:
   # Jaeger
   jaeger-all-in-one:
     image: jaegertracing/all-in-one:latest
@@ -9,6 +9,8 @@ services:
       - "16686:16686"
       - "14268"
       - "14250"
+      - "4317"
+      - "4318"
 
   # Collector
   otel-collector:
@@ -17,15 +19,17 @@ services:
     command: ["--config=/etc/otel-collector-config.yaml", "${OTELCOL_ARGS}"]
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+#      - ./ot-all.json:/etc/otelcol/ot-all.json
     ports:
       - "1888:1888"   # pprof extension
       - "8888:8888"   # Prometheus metrics exposed by the collector
-      - "8889:8889"   # Prometheus exporter metrics
+      - "8887:8887"   # Prometheus exporter metrics
       - "13133:13133" # health_check extension
       - "4317:4317"   # OTLP gRPC receiver
       - "55679:55679" # zpages extension
     depends_on:
       - jaeger-all-in-one
+      - solace-pubsub
 
   # Solace PubSub+ Standard
   solace-pubsub:
@@ -39,10 +43,10 @@ services:
       nofile:
         soft: 2448
         hard: 6592
-    #    deploy:
-    #      restart_policy:
-    #        condition: on-failure
-    #        max_attempts: 1
+#    deploy:
+#      restart_policy:
+#        condition: on-failure
+#        max_attempts: 1
     ports:
       # Port Mappings: With the exception of SMF, ports are mapped straight
       # through from host to container. This may result in port collisions on
@@ -86,4 +90,3 @@ services:
 
 volumes:
   storage-group:
-
