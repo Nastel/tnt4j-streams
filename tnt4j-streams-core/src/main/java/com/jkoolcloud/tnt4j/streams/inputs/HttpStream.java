@@ -51,7 +51,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
 /**
  * Implements a Http requests transmitted activity stream, where each request body is assumed to represent:
  * <ul>
- * <li>a single activity event sent as form data (parameters keys/values set)</li>
+ * <li>a single activity event sent as form data (parameter keys/values set)</li>
  * <li>a byte array as request payload data (e.g., log file contents)</li>
  * </ul>
  * <p>
@@ -61,11 +61,13 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * into {@link Map} filling these entries:
  * <ul>
  * <li>ActivityData - raw activity data as {@code byte[]} retrieved from http request.</li>
- * <li>ActivityTransport - activity transport definition: 'Http'.</li>
- * <li>Headers - HTTP request headers values map.</li>
- * <li>Line - HTTP request line values map: 'Method', 'Protocol', 'Uri'</li>
- * <li>Entity - HTTP request entity values map: 'Content-Length', 'Content-Encoding', 'Content-Type', 'Chunked',
- * 'Repeatable', 'Streaming'</li>
+ * <li>Form - HTTP request form parameters map.</li>
+ * <li>ActivityTransport - activity transport definition: {@value StreamsConstants#TRANSPORT_HTTP}.</li>
+ * <li>Headers - HTTP request headers map.</li>
+ * <li>Line - HTTP request metadata values map: 'Method', 'Protocol', 'Uri', 'ReqUri', 'Authority', 'Path',
+ * 'Scheme'</li>
+ * <li>Entity - HTTP request entity metadata values map: 'Content-Length', 'Content-Encoding', 'Content-Type',
+ * 'Chunked', 'Repeatable', 'Streaming'</li>
  * </ul>
  * <p>
  * This activity stream supports the following configuration properties (in addition to those supported by
@@ -326,12 +328,17 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 		 * This method buffers a map structured content of next raw activity data item received over Http request
 		 * handler. Buffered {@link Map} contains:
 		 * <ul>
-		 * <li>{@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#ACTIVITY_DATA_KEY} or all parameters from
-		 * request if request id URL encoded</li>
-		 * <li>{@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#TRANSPORT_KEY}</li>
-		 * <li>{@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#HEADERS_KEY}</li>
-		 * <li>{@code "Line"}</li>
-		 * <li>{@code "Entity"}</li>
+		 * <li>{@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#ACTIVITY_DATA_KEY} - request payload data
+		 * (binary or string)</li>
+		 * <li>{@code "Form"} - form parameters map, if request is of type
+		 * {@code "application/x-www-form-urlencoded"}</li>
+		 * <li>{@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#TRANSPORT_KEY} - value
+		 * {@value StreamsConstants#TRANSPORT_HTTP}</li>
+		 * <li>{@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#HEADERS_KEY} - request headers map</li>
+		 * <li>{@code "Line"} - request metadata values map: 'Method', 'Protocol', 'Uri', 'ReqUri', 'Authority', 'Path',
+		 * 'Scheme'</li>
+		 * <li>{@code "Entity"} - request entity metadata values map: 'Content-Length', 'Content-Encoding',
+		 * 'Content-Type', 'Chunked', 'Repeatable', 'Streaming'</li>
 		 * </ul>
 		 */
 		@Override
@@ -347,9 +354,11 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 					if (ContentType.parse(reqEntity.getContentType()).equals(ContentType.APPLICATION_FORM_URLENCODED)) {
 						List<NameValuePair> reqParams = EntityUtils.parse(reqEntity);
 						if (reqParams != null) {
+							Map<String, Object> paramsMap = new HashMap<>();
 							for (NameValuePair param : reqParams) {
-								reqMap.put(param.getName(), param.getValue());
+								paramsMap.put(param.getName(), param.getValue());
 							}
+							reqMap.put("Form", paramsMap); // NON-NLS
 						}
 					} else {
 						ContentType reqContType = ContentType.parse(reqEntity.getContentType());
