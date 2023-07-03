@@ -1,0 +1,89 @@
+version: "2"
+services:
+
+  # Jaeger
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:latest
+    restart: always
+    ports:
+      - "16686:16686"
+      - "14268"
+      - "14250"
+
+  # Collector
+  otel-collector:
+    image: ${OTELCOL_IMG}
+    restart: always
+    command: ["--config=/etc/otel-collector-config.yaml", "${OTELCOL_ARGS}"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "1888:1888"   # pprof extension
+      - "8888:8888"   # Prometheus metrics exposed by the collector
+      - "8889:8889"   # Prometheus exporter metrics
+      - "13133:13133" # health_check extension
+      - "4317:4317"   # OTLP gRPC receiver
+      - "55679:55679" # zpages extension
+    depends_on:
+      - jaeger-all-in-one
+
+  # Solace PubSub+ Standard
+  solace-pubsub:
+    container_name: pubSubStandardSingleNode
+    image: solace/solace-pubsub-standard:latest
+    volumes:
+      - "storage-group:/var/lib/solace"
+    shm_size: 1g
+    ulimits:
+      core: -1
+      nofile:
+        soft: 2448
+        hard: 6592
+    #    deploy:
+    #      restart_policy:
+    #        condition: on-failure
+    #        max_attempts: 1
+    ports:
+      # Port Mappings: With the exception of SMF, ports are mapped straight
+      # through from host to container. This may result in port collisions on
+      # commonly used ports that will cause failure of the container to start.
+      # Web transport
+      - '8008:8008'
+      # Web transport over TLS
+      - '1443:1443'
+      # SEMP over TLS
+      - '1943:1943'
+      # MQTT Default VPN
+      - '1883:1883'
+      # AMQP Default VPN over TLS
+      - '5671:5671'
+      # AMQP Default VPN
+      - '5672:5672'
+      # MQTT Default VPN over WebSockets
+      - '8000:8000'
+      # MQTT Default VPN over WebSockets / TLS
+      - '8443:8443'
+      # MQTT Default VPN over TLS
+      - '8883:8883'
+      # SEMP / PubSub+ Manager
+      - '8080:8080'
+      # REST Default VPN
+      - '9000:9000'
+      # REST Default VPN over TLS
+      - '9443:9443'
+      # SMF
+      - '55554:55555'
+      # SMF Compressed
+      - '55003:55003'
+      # SMF over TLS
+      - '55443:55443'
+      # SSH connection to CLI
+      - '2222:2222'
+    environment:
+      - username_admin_globalaccesslevel=admin
+      - username_admin_password=admin
+      - system_scaling_maxconnectioncount=100
+
+volumes:
+  storage-group:
+
