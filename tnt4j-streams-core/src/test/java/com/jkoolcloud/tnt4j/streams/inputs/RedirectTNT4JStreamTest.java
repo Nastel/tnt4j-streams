@@ -47,7 +47,7 @@ public class RedirectTNT4JStreamTest {
 		Map<String, String> props = new HashMap<>(3);
 		props.put(StreamProperties.PROP_FILENAME, tempFile.getAbsolutePath());
 		props.put(StreamProperties.PROP_BUFFER_SIZE, String.valueOf(55));
-		props.put(StreamProperties.PROP_BUFFER_DROP_WHEN_FULL, String.valueOf(false));
+		props.put(StreamProperties.PROP_FULL_BUFFER_ADD_POLICY, "WAIT"); // NON-NLS
 		rs.setProperties(props.entrySet());
 		testPropertyList(rs, props.entrySet());
 		rs.startStream();

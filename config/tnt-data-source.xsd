@@ -784,14 +784,6 @@
                 </xs:annotation>
             </xs:enumeration>
 
-            <xs:enumeration value="BufferDropWhenFull">
-                <xs:annotation>
-                    <xs:documentation>
-                        Flag indicating to drop buffer queue offered RAW activity data entries when queue gets full.
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:enumeration>
-
             <xs:enumeration value="FullBufferAddPolicy">
                 <xs:annotation>
                     <xs:documentation>

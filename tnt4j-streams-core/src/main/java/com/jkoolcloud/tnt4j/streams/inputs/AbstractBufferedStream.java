@@ -40,10 +40,8 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * {@link TNTParseableInputStream}):
  * <ul>
  * <li>BufferSize - maximal buffer queue capacity. Default value - {@code 1024}. (Optional)</li>
- * <li>BufferDropWhenFull - flag indicating to drop buffer queue offered RAW activity data entries when queue gets full.
- * Default value - {@code false}. (Optional, deprecated - use {@code FullBufferAddPolicy} instead)</li>
  * <li>FullBufferAddPolicy - defines policy how to perform adding new RAW activity data entry, when buffer queue is
- * full: {@code WAIT} or {@code DROP}. Default value - {@code WAIT}. (Optional)</li>
+ * full: {@code 'WAIT'} or {@code 'DROP'}. Default value - {@code 'WAIT'}. (Optional)</li>
  * </ul>
  *
  * @param <T>
@@ -100,9 +98,6 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 
 		if (StreamProperties.PROP_BUFFER_SIZE.equalsIgnoreCase(name)) {
 			bufferSize = Integer.parseInt(value);
-		} else if (StreamProperties.PROP_BUFFER_DROP_WHEN_FULL.equalsIgnoreCase(name)) {
-			boolean dropDataWhenBufferFull = Utils.toBoolean(value);
-			fullBufferAddPolicy = dropDataWhenBufferFull ? FullBufferAddPolicy.DROP : FullBufferAddPolicy.WAIT;
 		} else if (StreamProperties.PROP_FULL_BUFFER_ADD_POLICY.equalsIgnoreCase(name)) {
 			fullBufferAddPolicy = FullBufferAddPolicy.valueOf(value.toUpperCase());
 		}
@@ -112,9 +107,6 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 	public Object getProperty(String name) {
 		if (StreamProperties.PROP_BUFFER_SIZE.equalsIgnoreCase(name)) {
 			return bufferSize;
-		}
-		if (StreamProperties.PROP_BUFFER_DROP_WHEN_FULL.equalsIgnoreCase(name)) {
-			return fullBufferAddPolicy == FullBufferAddPolicy.DROP;
 		}
 		if (StreamProperties.PROP_FULL_BUFFER_ADD_POLICY.equalsIgnoreCase(name)) {
 			return fullBufferAddPolicy;
@@ -350,7 +342,7 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 
 	/**
 	 * Adds input data to buffer for asynchronous processing. Input data may not be added, if buffer size limit is
-	 * exceeded and stream configuration parameter {@code 'BufferDropWhenFull'} value is {@code true}.
+	 * exceeded and stream configuration parameter {@code 'FullBufferAddPolicy'} value is {@code 'DROP'}.
 	 *
 	 * @param inputData
 	 *            input data to add to buffer
@@ -526,7 +518,17 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 		}
 	}
 
-	private enum FullBufferAddPolicy {
-		WAIT, DROP
+	/**
+	 * This enumeration defines full buffer handling policies.
+	 */
+	enum FullBufferAddPolicy {
+		/**
+		 * Wait until buffer gets available or timeout.
+		 */
+		WAIT,
+		/**
+		 * Drop data package.
+		 */
+		DROP
 	}
 }

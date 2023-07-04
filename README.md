@@ -4656,15 +4656,12 @@ Sample:
 ##### Buffered streams parameters
 
 * `BufferSize` - maximal buffer queue capacity. Default value - `1024`. (Optional)
-* `BufferDropWhenFull` - flag indicating to drop buffer queue offered Raw activity data entries when queue gets full. Default value -
-  `false`. (Optional, **deprecated** - use `FullBufferAddPolicy` instead)
 * `FullBufferAddPolicy` - defines policy how to perform adding new RAW activity data entry, when buffer queue is full: `WAIT` or `DROP`.
-  Default value - `WAIT. (Optional)
+  Default value - `WAIT`. (Optional)
 
 Sample:
  ```xml
 <property name="BufferSize" value="2048"/>
-<property name="BufferDropWhenFull" value="true"/>
 <property name="FullBufferAddPolicy" value="DROP"/>
  ```
 
@@ -5622,8 +5619,8 @@ Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffe
 * `RestartOnInputClose` - flag indicating to restart Server Socket (open new instance) if listened one gets closed or fails to accept
   connection. (Optional)
 * `BufferSize` - maximal buffer queue capacity. Default value - `1024`. (Optional)
-* `BufferDropWhenFull` - flag indicating to drop buffer queue offered Raw activity data entries when queue gets full. Default value -
-  `false`. (Optional)
+* `FullBufferAddPolicy` - defines policy how to perform adding new RAW activity data entry, when buffer queue is full: `WAIT` or `DROP`.
+  Default value - `WAIT`. (Optional)
 
 Sample:
 ```xml
@@ -5634,7 +5631,7 @@ or
 <property name="Port" value="9009"/>
 <property name="RestartOnInputClose" value="true"/>
 <property name="BufferSize" value="2048"/>
-<property name="BufferDropWhenFull" value="true"/>
+<property name="FullBufferAddPolicy" value="DROP"/>
 ```
 
 Also see ['Generic streams parameters'](#generic-streams-parameters).

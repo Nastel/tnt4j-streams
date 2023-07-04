@@ -62,7 +62,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="RestartOnInputClose"/&gt;
  *     &lt;enumeration value="ArchType"/&gt;
  *     &lt;enumeration value="BufferSize"/&gt;
- *     &lt;enumeration value="BufferDropWhenFull"/&gt;
+ *     &lt;enumeration value="FullBufferAddPolicy"/&gt;
  *     &lt;enumeration value="FilePolling"/&gt;
  *     &lt;enumeration value="RestoreState"/&gt;
  *     &lt;enumeration value="StartServer"/&gt;
@@ -361,16 +361,6 @@ public enum StreamProperties {
 	 */
 	@XmlEnumValue("BufferSize")
 	BUFFER_SIZE("BufferSize"),
-
-	/**
-	 * 
-	 * Flag indicating to drop buffer queue offered RAW activity data entries when queue gets full.
-	 *
-	 *
-	 */
-	@XmlEnumValue("BufferDropWhenFull")
-	@Deprecated
-	BUFFER_DROP_WHEN_FULL("BufferDropWhenFull"),
 
 	/**
 	 * 
