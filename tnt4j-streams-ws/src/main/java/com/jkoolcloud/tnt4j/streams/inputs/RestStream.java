@@ -17,11 +17,8 @@
 package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
@@ -42,7 +39,7 @@ import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.protocol.HttpContext;
-import org.apache.hc.core5.net.URLEncodedUtils;
+import org.apache.hc.core5.net.URIBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -359,8 +356,15 @@ public class RestStream extends AbstractHttpStream {
 		}
 
 		WsRequest<String> fReq = fillInRequest(req);
-		String uriStr = uriForGET(fReq);
-		fReq.setData(uriStr);
+		try {
+			String uriStr = uriForGET(fReq);
+			fReq.setData(uriStr);
+		} catch (URISyntaxException exc) {
+			throw new VoidRequestException(StreamsResources.getStringFormatted(WsStreamConstants.RESOURCE_BUNDLE_NAME,
+					"RestStream.invalid.request.uri"), exc);
+		} catch (VoidRequestException exc) {
+			throw exc;
+		}
 
 		return fReq;
 	}
@@ -512,55 +516,19 @@ public class RestStream extends AbstractHttpStream {
 	 *            request data package
 	 * @return URL string appended with query parameter values
 	 * 
+	 * @throws URISyntaxException
+	 *             if request defines invalid URI
 	 * @throws VoidRequestException
 	 *             if request can't be build from request context data or built URL is meaningless
 	 */
-	protected String uriForGET(WsRequest<String> request) throws VoidRequestException {
+	protected String uriForGET(WsRequest<String> request) throws URISyntaxException, VoidRequestException {
 		String uri = request.getData();
 
-		Map<String, String> qMap;
-		try {
-			URI url = new URI(uri);
-			qMap = getQueryMap(url.getQuery());
-			// uri = url.getPath();
-		} catch (URISyntaxException e) {
-			qMap = new HashMap<>();
-		}
-
-		StringBuilder uriBuilder = new StringBuilder();
-		uriBuilder.append(uri);
-
+		URIBuilder uriBuilder = new URIBuilder(uri);
 		List<NameValuePair> params = makeParamsList(request);
-		String paramsStr = URLEncodedUtils.format(params, StandardCharsets.UTF_8);
-
-		if (StringUtils.isNotEmpty(paramsStr)) {
-			int i = uri.indexOf('?');
-
-			if (i == -1) {
-				uriBuilder.append('?');
-			} else if (i != uri.length() - 1) {
-				uriBuilder.append('&');
-			}
-
-			uriBuilder.append(paramsStr);
-		}
+		uriBuilder.addParameters(params);
 
 		return uriBuilder.toString();
-	}
-
-	public static Map<String, String> getQueryMap(String query) {
-		Map<String, String> map = new HashMap<>();
-
-		if (StringUtils.isNotEmpty(query)) {
-			String[] params = query.split("&");
-			for (String param : params) {
-				String name = param.split("=")[0];
-				String value = param.split("=")[1];
-				map.put(name, value);
-			}
-		}
-
-		return map;
 	}
 
 	/**

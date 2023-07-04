@@ -17,7 +17,7 @@
 package com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.reporters.metrics;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.lang.management.ManagementFactory;
@@ -26,7 +26,7 @@ import java.util.Map;
 
 import javax.management.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
