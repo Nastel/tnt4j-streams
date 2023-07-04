@@ -59,8 +59,8 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * <li>RestartOnInputClose - flag indicating to restart {@link ServerSocket} (open new {@link ServerSocket} instance) if
  * listened server socked gets closed or fails to accept connection. (Optional)</li>
  * <li>BufferSize - maximal buffer queue capacity. Default value - {@code 1024}. (Optional)</li>
- * <li>BufferDropWhenFull - flag indicating to drop buffer queue offered RAW activity data entries when queue gets full.
- * Default value - {@code false}. (Optional)</li>
+ * <li>FullBufferAddPolicy - defines policy how to perform adding new RAW activity data entry, when buffer queue is
+ * full: {@code 'WAIT'} or {@code 'DROP'}. Default value - {@code 'WAIT'}. (Optional)
  * </ul>
  *
  * @version $Revision: 1 $
@@ -78,7 +78,7 @@ public class RedirectTNT4JStream extends TNTInputStream<String, String> {
 	private static final Object DIE_MARKER = new Object();
 
 	private int bufferSize = DEFAULT_INPUT_BUFFER_SIZE;
-	private boolean dropDataWhenBufferFull = false;
+	private AbstractBufferedStream.FullBufferAddPolicy fullBufferAddPolicy = AbstractBufferedStream.FullBufferAddPolicy.WAIT;
 	private boolean restartOnInputClose = false;
 
 	private Reader rawReader;
@@ -170,8 +170,8 @@ public class RedirectTNT4JStream extends TNTInputStream<String, String> {
 			restartOnInputClose = Utils.toBoolean(value);
 		} else if (StreamProperties.PROP_BUFFER_SIZE.equalsIgnoreCase(name)) {
 			bufferSize = Integer.parseInt(value);
-		} else if (StreamProperties.PROP_BUFFER_DROP_WHEN_FULL.equalsIgnoreCase(name)) {
-			dropDataWhenBufferFull = Utils.toBoolean(value);
+		} else if (StreamProperties.PROP_FULL_BUFFER_ADD_POLICY.equalsIgnoreCase(name)) {
+			fullBufferAddPolicy = AbstractBufferedStream.FullBufferAddPolicy.valueOf(value.toUpperCase());
 		}
 	}
 
@@ -189,8 +189,8 @@ public class RedirectTNT4JStream extends TNTInputStream<String, String> {
 		if (StreamProperties.PROP_BUFFER_SIZE.equalsIgnoreCase(name)) {
 			return bufferSize;
 		}
-		if (StreamProperties.PROP_BUFFER_DROP_WHEN_FULL.equalsIgnoreCase(name)) {
-			return dropDataWhenBufferFull;
+		if (StreamProperties.PROP_FULL_BUFFER_ADD_POLICY.equalsIgnoreCase(name)) {
+			return fullBufferAddPolicy;
 		}
 
 		return super.getProperty(name);
@@ -259,7 +259,8 @@ public class RedirectTNT4JStream extends TNTInputStream<String, String> {
 					"AbstractBufferedStream.changes.buffer.uninitialized"));
 		}
 		if (inputData != null && !isHalted()) {
-			if (dropDataWhenBufferFull) {
+			switch (fullBufferAddPolicy) {
+			case DROP:
 				boolean added = inputBuffer.offer(inputData);
 				if (!added) {
 					logger().log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
@@ -267,7 +268,8 @@ public class RedirectTNT4JStream extends TNTInputStream<String, String> {
 					incrementLostActivitiesCount();
 				}
 				return added;
-			} else {
+			case WAIT:
+			default:
 				try {
 					inputBuffer.put(inputData);
 					return true;
