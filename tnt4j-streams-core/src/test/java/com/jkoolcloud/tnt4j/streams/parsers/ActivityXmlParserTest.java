@@ -210,8 +210,9 @@ public class ActivityXmlParserTest extends GenericActivityParserTestBase<Activit
 		Document tDoc = document.getOwnerDocument();
 		Element docElem = tDoc == null ? null : tDoc.getDocumentElement();
 		if (tDoc == null || StringUtils.isEmpty(tDoc.getNamespaceURI())) {
-			document = builder.parse(
-					new ReaderInputStream(new StringReader(Utils.documentToString(document)), StandardCharsets.UTF_8));
+			document = builder
+					.parse(ReaderInputStream.builder().setReader(new StringReader(Utils.documentToString(document)))
+							.setCharset(StandardCharsets.UTF_8).get());
 		}
 
 		NamespaceMap documentNamespaces = new NamespaceMap();
@@ -274,16 +275,17 @@ public class ActivityXmlParserTest extends GenericActivityParserTestBase<Activit
 		}
 
 		public NamespaceTestSuite invoke() throws ParserConfigurationException {
-			namespaces = new HashMap<String, String>() {
+			namespaces = new HashMap<> ()
+			{
 				private static final long serialVersionUID = 7566251836422017139L;
 
 				{
-					put("soapenv", "http://schemas.xmlsoap.org/soap/envelope/");
-					put("ts", "http://github.com/Nastel/tnt4j-streams");
-					put("xml", "http://www.w3.org/XML/1998/namespace");
-					put("ch", "urn://tsys.com/xmlmessaging/CH");
-					put("xmlns", "http://schemas.microsoft.com/sharepoint/soap/");
-					put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+					put ("soapenv", "http://schemas.xmlsoap.org/soap/envelope/");
+					put ("ts", "http://github.com/Nastel/tnt4j-streams");
+					put ("xml", "http://www.w3.org/XML/1998/namespace");
+					put ("ch", "urn://tsys.com/xmlmessaging/CH");
+					put ("xmlns", "http://schemas.microsoft.com/sharepoint/soap/");
+					put ("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 				}
 			};
 			xPath = StreamsXMLUtils.getStreamsXPath();

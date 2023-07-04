@@ -30,13 +30,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
-import org.apache.hc.core5.http.*;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.protocol.HttpContext;
@@ -61,7 +63,7 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  * activity or event which should be recorded.
  * <p>
  * Service call is performed by invoking
- * {@link org.apache.hc.client5.http.classic.HttpClient#execute(org.apache.hc.core5.http.ClassicHttpRequest, org.apache.hc.core5.http.protocol.HttpContext)}
+ * {@link org.apache.hc.client5.http.classic.HttpClient#execute(org.apache.hc.core5.http.ClassicHttpRequest, org.apache.hc.core5.http.protocol.HttpContext, org.apache.hc.core5.http.io.HttpClientResponseHandler)}
  * with GET or POST method request depending on scenario step configuration parameter 'method'. Default method is GET.
  * Stream uses {@link org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager} to handle connections pool
  * used by HTTP client.
@@ -82,6 +84,7 @@ import com.jkoolcloud.tnt4j.streams.utils.WsStreamConstants;
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
  * @see org.apache.hc.client5.http.classic.HttpClient#execute(org.apache.hc.core5.http.ClassicHttpRequest,
+ *      org.apache.hc.core5.http.protocol.HttpContext, org.apache.hc.core5.http.io.HttpClientResponseHandler)
  *      org.apache.hc.core5.http.protocol.HttpContext)
  */
 public class RestStream extends AbstractHttpStream {
@@ -89,6 +92,7 @@ public class RestStream extends AbstractHttpStream {
 
 	private static final String REQ_HEAD_PARAM_PREFIX = "H:"; // NON-NLS
 	private static final String REQ_HEAD_PARAM_AUTH = REQ_HEAD_PARAM_PREFIX + HttpHeaders.AUTHORIZATION;
+	private static final BasicHttpClientResponseHandler respHandler = new BasicHttpClientResponseHandler();
 
 	private int maxTotalPoolConnections = 5;
 	private int defaultMaxPerRouteConnections = 2;
@@ -294,27 +298,9 @@ public class RestStream extends AbstractHttpStream {
 				}
 			}
 
-			response = client.execute(req, ctx);
-
-			return processResponse(response);
+			return client.execute(req, ctx, respHandler);
 		} finally {
 			Utils.close(response);
-		}
-	}
-
-	private static String processResponse(CloseableHttpResponse response) throws IOException, ParseException {
-		HttpEntity entity = null;
-		try {
-			int responseCode = response.getCode();
-
-			if (responseCode >= HttpStatus.SC_MULTIPLE_CHOICES) {
-				throw new HttpResponseException(responseCode, response.getReasonPhrase());
-			}
-
-			entity = response.getEntity();
-			return entity == null ? null : EntityUtils.toString(entity, StandardCharsets.UTF_8);
-		} finally {
-			EntityUtils.consumeQuietly(entity);
 		}
 	}
 
