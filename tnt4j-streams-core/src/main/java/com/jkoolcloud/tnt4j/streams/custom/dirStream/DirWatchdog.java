@@ -171,7 +171,7 @@ public class DirWatchdog {
 		IOFileFilter directories = FileFilterUtils.and(FileFilterUtils.directoryFileFilter(), HiddenFileFilter.VISIBLE);
 
 		IOFileFilter files = FileFilterUtils.and(FileFilterUtils.fileFileFilter(),
-				new WildcardFileFilter(fileWildcardName, IOCase.INSENSITIVE));
+				WildcardFileFilter.builder().setWildcards(fileWildcardName).setIoCase(IOCase.INSENSITIVE).get());
 
 		IOFileFilter filter = FileFilterUtils.or(directories, files);
 

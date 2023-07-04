@@ -32,6 +32,7 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
  *
  * @version $Revision: 2 $
  */
+@Deprecated
 public class SnappyBinaryPreParser extends CompressedBinaryPreParser {
 	/**
 	 * Constructs a new SnappyBinaryPreParser.

@@ -181,7 +181,8 @@ public class StreamsConfigLoader {
 	 *             if there is an error reading the configuration data
 	 */
 	public StreamsConfigLoader(Reader configReader) throws SAXException, ParserConfigurationException, IOException {
-		load(new ReaderInputStream(configReader, StandardCharsets.UTF_8));
+		InputStream is = ReaderInputStream.builder().setReader(configReader).setCharset(StandardCharsets.UTF_8).get();
+		load(is);
 	}
 
 	/**
