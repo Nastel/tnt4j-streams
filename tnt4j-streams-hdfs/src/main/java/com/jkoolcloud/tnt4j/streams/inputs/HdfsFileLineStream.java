@@ -26,7 +26,6 @@ import java.util.Comparator;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
@@ -51,7 +50,6 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * @version $Revision: 2 $
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
- * @see WildcardFileFilter#WildcardFileFilter(String)
  */
 public class HdfsFileLineStream extends AbstractFileLineStream<Path> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(HdfsFileLineStream.class);
@@ -102,7 +100,7 @@ public class HdfsFileLineStream extends AbstractFileLineStream<Path> {
 
 		Path[] activityFiles = new Path[dir == null ? 0 : dir.length];
 		if (dir != null) {
-			Arrays.sort(dir, new Comparator<FileStatus>() {
+			Arrays.sort(dir, new Comparator<>() {
 				@Override
 				public int compare(FileStatus o1, FileStatus o2) {
 					return Long.valueOf(o1.getModificationTime()).compareTo(o2.getModificationTime()) * (-1);

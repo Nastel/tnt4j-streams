@@ -178,7 +178,7 @@ public class MsgTraceReporterTest {
 		InterceptorStream<ActivityInfo> stream = buildStream();
 		MsgTraceReporter reporter = getMsgTraceReporter(stream);
 
-		RecordMetadata recordMetadata = new RecordMetadata(getTopicPartition(), OFFSET, OFFSET, TIMESTAMP, 123L,
+		RecordMetadata recordMetadata = new RecordMetadata(getTopicPartition(), OFFSET, BATCH_INDEX, TIMESTAMP,
 				KEY.length(), MESSAGE.length());
 		Exception e = new Exception("AAA");
 		ClusterResource clusterResource = new ClusterResource("CLUSTERID");
@@ -221,7 +221,7 @@ public class MsgTraceReporterTest {
 	}
 
 	private InterceptorStream<ActivityInfo> buildStream() throws Exception {
-		InterceptorStream<ActivityInfo> stream = new InterceptorStream<ActivityInfo>() {
+		InterceptorStream<ActivityInfo> stream = new InterceptorStream<>() {
 			{
 				setOutput(new JKCloudActivityOutput() {
 					@Override

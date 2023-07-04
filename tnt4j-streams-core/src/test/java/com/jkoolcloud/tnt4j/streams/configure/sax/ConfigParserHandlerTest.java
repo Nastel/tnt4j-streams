@@ -83,8 +83,8 @@ public class ConfigParserHandlerTest {
 	protected void validateConfigs(File samplesDir, String configFileWildcard, boolean checkStreams,
 			List<String> skipFiles) throws Exception {
 		Collection<File> sampleConfigurations = FileUtils.listFiles(samplesDir,
-				FileFilterUtils
-						.asFileFilter((FilenameFilter) new WildcardFileFilter(configFileWildcard, IOCase.INSENSITIVE)),
+				FileFilterUtils.asFileFilter((FilenameFilter) WildcardFileFilter.builder()
+						.setWildcards(configFileWildcard).setIoCase(IOCase.INSENSITIVE).get()),
 				TrueFileFilter.INSTANCE);
 
 		Collection<File> sampleConfigurationsFiltered = new ArrayList<>(sampleConfigurations);
@@ -787,7 +787,7 @@ public class ConfigParserHandlerTest {
 		String VALUE = "${user.home}/abc/bcd";
 		String VALUE1 = "file://${JAVA_HOME}/abc/bcd";
 
-		HashMap<String, String> propertiesMap = new HashMap<String, String>() {
+		HashMap<String, String> propertiesMap = new HashMap<>() {
 			private static final long serialVersionUID = 1L;
 			{
 				put("filename", "*");

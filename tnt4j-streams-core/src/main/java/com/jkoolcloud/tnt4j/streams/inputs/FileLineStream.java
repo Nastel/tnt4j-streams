@@ -26,7 +26,6 @@ import java.net.URL;
 import java.nio.file.*;
 import java.util.Collections;
 
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
@@ -49,7 +48,6 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * @version $Revision: 2 $
  *
  * @see com.jkoolcloud.tnt4j.streams.parsers.ActivityParser#isDataClassSupported(Object)
- * @see WildcardFileFilter#WildcardFileFilter(String)
  */
 public class FileLineStream extends AbstractFileLineStream<Path> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(FileLineStream.class);
@@ -199,12 +197,9 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 		 */
 		@Override
 		void closeInternals() throws Exception {
-			super.closeInternals();
+			Utils.close(fs);
 
-			try {
-				Utils.close(fs);
-			} catch (UnsupportedOperationException exc) {
-			}
+			super.closeInternals();
 		}
 
 		/**
