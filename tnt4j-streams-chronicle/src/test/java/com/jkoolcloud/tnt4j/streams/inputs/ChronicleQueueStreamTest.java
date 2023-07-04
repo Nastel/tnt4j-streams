@@ -17,7 +17,7 @@ import com.jkoolcloud.tnt4j.streams.parsers.ActivityJavaObjectParser;
 
 import net.openhft.chronicle.queue.ChronicleQueue;
 import net.openhft.chronicle.queue.ExcerptAppender;
-import net.openhft.chronicle.wire.AbstractCommonMarshallable;
+import net.openhft.chronicle.wire.BytesInBinaryMarshallable;
 
 public class ChronicleQueueStreamTest {
 
@@ -105,7 +105,7 @@ public class ChronicleQueueStreamTest {
 		}
 	}
 
-	public static class EntryDefinition extends AbstractCommonMarshallable {
+	public static class EntryDefinition extends BytesInBinaryMarshallable {
 		String name;
 
 		public String getName() {

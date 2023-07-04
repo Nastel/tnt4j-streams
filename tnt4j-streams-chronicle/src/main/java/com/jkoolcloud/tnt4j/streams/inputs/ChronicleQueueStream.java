@@ -159,7 +159,7 @@ public class ChronicleQueueStream extends TNTParseableInputStream<Object> {
 		}
 	}
 
-	private boolean readOne0(ExcerptTailer in) throws InstantiationException, IllegalAccessException {
+	private boolean readOne0(ExcerptTailer in) throws Exception {
 		try (DocumentContext context = in.readingDocument()) {
 			if (!context.isPresent()) {
 				return false;
@@ -179,7 +179,7 @@ public class ChronicleQueueStream extends TNTParseableInputStream<Object> {
 		return lastRead != null;
 	}
 
-	private void accept(Wire wire) throws IllegalAccessException, InstantiationException {
+	private void accept(Wire wire) throws Exception {
 		StringBuilder sb = new StringBuilder();
 		ValueIn valueIn = wire.readEventName(sb);
 		Class<?> aClass = classNameMap.get(sb.toString().toUpperCase());
@@ -189,7 +189,7 @@ public class ChronicleQueueStream extends TNTParseableInputStream<Object> {
 					"ChronicleQueueStream.unsupported.class"), sb.toString());
 			lastRead = null;
 		} else {
-			Object entry = aClass.newInstance();
+			Object entry = aClass.getDeclaredConstructor().newInstance();
 			lastRead = Wires.object0(valueIn, entry, aClass);
 		}
 	}
