@@ -33,6 +33,7 @@ import org.apache.hc.client5.http.entity.EntityBuilder;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.fluent.Form;
 import org.apache.hc.client5.http.fluent.Request;
+import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
@@ -107,7 +108,7 @@ public class HttpStreamTest {
 
 		post.setEntity(multipart);
 
-		HttpResponse returned = client.execute(post);
+		String returned = client.execute(post, new BasicHttpClientResponseHandler());
 		assertNotNull(returned);
 
 	}
