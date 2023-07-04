@@ -26,11 +26,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.EntityBuilder;
+import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.net.URIBuilder;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.jkoolcloud.tnt4j.streams.StreamsAgent;
 import com.jkoolcloud.tnt4j.streams.configure.build.CfgStreamsBuilder;
@@ -54,7 +54,7 @@ public class ActivityCacheTest {
 	private static final String cfgFile = "./samples/cached-values/tnt-data-source.xml"; // NON-NLS
 
 	@Test
-	@Ignore("Integration test")
+	@Disabled("Integration test")
 	public void runStreams() throws Exception {
 		InputStreamListener streamListener = mock(InputStreamListener.class);
 		StreamTasksListener streamTasksListener = mock(StreamTasksListener.class);
@@ -68,20 +68,23 @@ public class ActivityCacheTest {
 
 		Thread.sleep(500);
 
-		sendRequest(client, PROGRESS_FILE);
-		sendRequest(client, START_FILE);
+		BasicHttpClientResponseHandler respHandler = new BasicHttpClientResponseHandler();
+
+		sendRequest(client, PROGRESS_FILE, respHandler);
+		sendRequest(client, START_FILE, respHandler);
 
 		TimeUnit.SECONDS.sleep(50);
 
 		verify(streamListener, times(2)).onStatusChange(any(TNTInputStream.class), (StreamStatus) any());
 	}
 
-	private static HttpResponse sendRequest(HttpClient client, String file) throws Exception {
+	private static String sendRequest(HttpClient client, String file, BasicHttpClientResponseHandler responseHandler)
+			throws Exception {
 		URI url = makeURI();
 		HttpPost post = new HttpPost(url);
 
 		post.setEntity(EntityBuilder.create().setText(getFileContents(file)).build());
-		return client.execute(post);
+		return client.execute(post, responseHandler);
 	}
 
 	private static URI makeURI() {
