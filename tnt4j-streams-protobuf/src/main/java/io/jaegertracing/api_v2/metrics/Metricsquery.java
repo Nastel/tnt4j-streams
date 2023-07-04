@@ -278,7 +278,7 @@ public final class Metricsquery {
       super(builder);
     }
     private MetricsQueryBaseRequest() {
-      serviceNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      serviceNames_ = com.google.protobuf.LazyStringArrayList.emptyList();
       spanKinds_ = java.util.Collections.emptyList();
     }
 
@@ -1077,7 +1077,7 @@ public final class Metricsquery {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        serviceNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        serviceNames_ = com.google.protobuf.LazyStringArrayList.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
         groupByOperation_ = false;
 
@@ -1278,7 +1278,7 @@ public final class Metricsquery {
       }
       private int bitField0_;
 
-      private com.google.protobuf.LazyStringList serviceNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private com.google.protobuf.LazyStringList serviceNames_ = com.google.protobuf.LazyStringArrayList.emptyList();
       private void ensureServiceNamesIsMutable() {
         if (!((bitField0_ & 0x00000001) != 0)) {
           serviceNames_ = new com.google.protobuf.LazyStringArrayList(serviceNames_);
@@ -1414,7 +1414,7 @@ public final class Metricsquery {
        * @return This builder for chaining.
        */
       public Builder clearServiceNames() {
-        serviceNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        serviceNames_ = com.google.protobuf.LazyStringArrayList.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;

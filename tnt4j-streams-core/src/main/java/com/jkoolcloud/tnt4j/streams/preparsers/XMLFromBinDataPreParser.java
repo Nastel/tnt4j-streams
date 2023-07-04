@@ -178,8 +178,16 @@ public class XMLFromBinDataPreParser extends AbstractPreParser<Object, Document>
 			is = new ByteArrayInputStream(((ByteBuffer) data).array());
 			closeWhenDone = true;
 		} else if (data instanceof Reader) {
-			Reader reader = (Reader) data;
-			is = new ReaderInputStream(reader, charset);
+			try {
+				Reader reader = (Reader) data;
+				is = ReaderInputStream.builder().setReader(reader).setCharset(charset).get();
+			} catch (Exception exc) {
+				ParseException pe = new ParseException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+						"XMLFromBinDataPreParser.reader.init.failure"), 0);
+				pe.initCause(exc);
+
+				throw pe;
+			}
 		} else if (data instanceof InputStream) {
 			is = (InputStream) data;
 		} else {
@@ -202,8 +210,11 @@ public class XMLFromBinDataPreParser extends AbstractPreParser<Object, Document>
 		try {
 			documentHandler.parseBinInput(is, charset);
 		} catch (IOException e) {
-			throw new ParseException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+			ParseException pe = new ParseException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
 					"XMLFromBinDataPreParser.bin.data.parse.failure"), 0);
+			pe.initCause(e);
+
+			throw pe;
 		} finally {
 			if (closeWhenDone) {
 				Utils.close(is);

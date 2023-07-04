@@ -181,7 +181,7 @@ public class StringMatcher implements Matcher {
 
 	private static boolean returnBoolean(Object result) {
 		if (result instanceof Integer) {
-			return new Integer(0).equals(result);
+			return Integer.valueOf(0).equals(result);
 		}
 		if (result instanceof Boolean) {
 			return (boolean) result;
