@@ -47,7 +47,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.HexDump;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -2026,9 +2025,6 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * 
 	 * @throws java.io.IOException
 	 *             if an I/O error occurs
-	 *
-	 * @see WildcardFileFilter#WildcardFileFilter(String)
-	 * @see File#listFiles(FilenameFilter)
 	 */
 	public static Path[] searchFiles(String namePattern, FileSystem fs) throws IOException {
 		if (fs == null) {
