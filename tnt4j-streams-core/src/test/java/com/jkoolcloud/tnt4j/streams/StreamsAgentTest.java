@@ -16,18 +16,15 @@
 
 package com.jkoolcloud.tnt4j.streams;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import org.apache.commons.io.output.WriterOutputStream;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.jkoolcloud.tnt4j.streams.configure.build.CfgStreamsBuilder;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
@@ -49,7 +46,7 @@ public class StreamsAgentTest {
 		String string = console.getBuffer().toString();
 		String expected = StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsAgent.help")
 				+ Utils.NEW_LINE;
-		assertTrue("Console output does not contain expected string", string.contains(expected));
+		assertTrue(string.contains(expected), "Console output does not contain expected string");
 		Utils.close(console);
 	}
 
@@ -65,7 +62,7 @@ public class StreamsAgentTest {
 		expected += Utils.NEW_LINE;
 		expected += StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsAgent.help");
 		expected += Utils.NEW_LINE;
-		assertTrue("Console output does not contain expected string", string.contains(expected));
+		assertTrue(string.contains(expected), "Console output does not contain expected string");
 		Utils.close(console);
 	}
 
@@ -81,7 +78,7 @@ public class StreamsAgentTest {
 		expected += Utils.NEW_LINE;
 		expected += StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "StreamsAgent.help");
 		expected += Utils.NEW_LINE;
-		assertTrue("Console output does not contain expected string", string.contains(expected));
+		assertTrue(string.contains(expected), "Console output does not contain expected string");
 		Utils.close(console);
 	}
 
@@ -115,11 +112,13 @@ public class StreamsAgentTest {
 		fail("No streams thread created");
 	}
 
-	private void interceptConsole() throws InterruptedException {
+	private void interceptConsole() throws IOException, InterruptedException {
 		console = new StringWriter();
-		WriterOutputStream writerOutputStream = new WriterOutputStream(console, StandardCharsets.UTF_8);
+		OutputStream writerOutputStream = WriterOutputStream.builder().setWriter(console)
+				.setCharset(StandardCharsets.UTF_8).get();
 		PrintStream out = new PrintStream(writerOutputStream);
 		System.setOut(out);
+		System.setErr(out);
 		Thread.sleep(50);
 	}
 }
