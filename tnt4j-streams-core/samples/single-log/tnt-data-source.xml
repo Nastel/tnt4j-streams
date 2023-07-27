@@ -6,7 +6,8 @@
     <parser name="TokenParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityTokenParser">
         <property name="FieldDelim" value="|"/>
 
-        <field name="StartTime" locator="1" format="dd MMM yyyy HH:mm:ss" locale="en-US"/>
+        <!-- date is ignored from file to avoid need to update for sample usage -->    
+        <!--field name="StartTime" locator="1" format="dd MMM yyyy HH:mm:ss" locale="en-US"/-->
         <field name="ServerIp" locator="2"/>
         <field name="ApplName" value="orders"/>
         <field name="Correlator" locator="3"/>
@@ -23,7 +24,7 @@
     </parser>
 
     <stream name="FileStream" class="com.jkoolcloud.tnt4j.streams.inputs.FileLineStream">
-        <property name="FileName" value="./tnt4j-streams-core/samples/single-log/orders.log"/>
+        <property name="FileName" value="orders.log"/>
         <property name="RestoreState" value="false"/>
         <!--<property name="StartFromLatest" value="false"/>-->
         <!--<property name="RangeToStream" value="1:"/>-->
