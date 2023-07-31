@@ -82,7 +82,7 @@
         <!-- ######################## TNT4J ######################## -->
         <!-- ### streams API logger -->
         <!-- ### if streams are not subject to be added to main kafka log, streams will be logged to dedicated log only ### -->
-        <AsyncLogger name="com.jkoolcloud.tnt4j.streams" level="DEBUG" additivity="false">
+        <AsyncLogger name="com.jkoolcloud.tnt4j.streams" level="INFO" additivity="false">
             <AppenderRef ref="tnt4jAppender"/>
         </AsyncLogger>
         <!-- ### tnt4j API logger -->
