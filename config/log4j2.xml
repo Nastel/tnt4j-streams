@@ -104,11 +104,11 @@
             <AppenderRef ref="file"/>
         </AsyncRoot>
         <!-- ### streams API logger -->
-        <AsyncLogger name="com.jkoolcloud.tnt4j.streams" level="DEBUG"/>
+        <AsyncLogger name="com.jkoolcloud.tnt4j.streams" level="INFO"/>
         <!-- ### tnt4j API logger -->
-        <!-- <AsyncLogger name="com.jkoolcloud.tnt4j" level="DEBUG"/> -->
+        <!-- <AsyncLogger name="com.jkoolcloud.tnt4j" level="INFO"/> -->
         <!-- ### jesl API logger -->
-        <!-- <AsyncLogger name="com.jkoolcloud.jesl" level="DEBUG"/> -->
+        <!-- <AsyncLogger name="com.jkoolcloud.jesl" level="INFO"/> -->
         <!-- #### streamed activity entities logger #### -->
         <AsyncLogger name="com.jkoolcloud.tnt4j.streams.activities_prod_log" level="INFO" additivity="false">
             <AppenderRef ref="activities_prod_log"/>
