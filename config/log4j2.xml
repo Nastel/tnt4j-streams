@@ -35,7 +35,6 @@
             <PatternLayout>
                 <Pattern>%d{ISO8601} %-5p [%t!%c{1}] - %m%n</Pattern>
             </PatternLayout>
-            <ThresholdFilter level="info"/>
         </Console>
         <!-- ### direct log messages to file rolling on startup and size based ### -->
         <RollingFile name="file"
