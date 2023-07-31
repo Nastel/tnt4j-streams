@@ -38,7 +38,7 @@
    or optionally with custom LOG4J configuration:
     * *NIX:
     ```bash
-    export KAFKA_OPTS="-Dtnt4j.config=../config/tnt4j.properties -Dinterceptors.config=../config/interceptorsC.properties -Dlog4j2.configurationFile=file:../config/my_log4j2.xml"
+    export KAFKA_OPTS="-Dtnt4j.config=../config/tnt4j.properties -Dinterceptors.config=../config/interceptorsC.properties -Dlog4j2.configurationFile=../config/my_log4j2.xml"
     ```
     * Windows:
     ```cmd
@@ -58,7 +58,7 @@
    or optionally with custom LOG4J configuration:
     * *NIX:
     ```bash
-    export KAFKA_OPTS="-Dtnt4j.config=../config/tnt4j.properties -Dinterceptors.config=../config/interceptorsP.properties -Dlog4j2.configurationFile=file:../config/my_log4j2.xml"
+    export KAFKA_OPTS="-Dtnt4j.config=../config/tnt4j.properties -Dinterceptors.config=../config/interceptorsP.properties -Dlog4j2.configurationFile=../config/my_log4j2.xml"
     ```
     * Windows:
     ```cmd

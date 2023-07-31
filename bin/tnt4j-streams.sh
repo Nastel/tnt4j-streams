@@ -17,10 +17,10 @@ TNT4JOPTS="-Dtnt4j.config=$TNT4J_PROPERTIES"
 if [[ -z "$LOG4J_PROPERTIES" ]]; then
   LOG4J_PROPERTIES="$SCRIPTPATH/../config/log4j2.xml"
 fi
-LOG4JOPTS="-Dlog4j2.configurationFile=file:$LOG4J_PROPERTIES"
-#LOG4JOPTS=${LOG4JOPTS:-"-Dlog4j2.configurationFile=file:$SCRIPTPATH/../config/log4j2.xml"}
+LOG4JOPTS="-Dlog4j2.configurationFile=$LOG4J_PROPERTIES"
+#LOG4JOPTS=${LOG4JOPTS:-"-Dlog4j2.configurationFile=$SCRIPTPATH/../config/log4j2.xml"}
 
-#LOGBACKOPTS="-Dlogback.configurationFile=file:$SCRIPTPATH/../config/logback.xml"
+#LOGBACKOPTS="-Dlogback.configurationFile=$SCRIPTPATH/../config/logback.xml"
 STREAMSOPTS="$STREAMSOPTS $LOG4JOPTS $TNT4JOPTS -Dfile.encoding=UTF-8"
 
 if [[ "$MAINCLASS" == "" ]]; then
