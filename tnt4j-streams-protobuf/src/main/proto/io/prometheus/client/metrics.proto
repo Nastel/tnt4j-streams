@@ -25,7 +25,7 @@ import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 
 message LabelPair {
-  string name = 1;
+  string name  = 1;
   string value = 2;
 }
 
@@ -49,19 +49,19 @@ message Gauge {
 }
 
 message Counter {
-  double   value = 1;
+  double   value    = 1;
   Exemplar exemplar = 2;
 }
 
 message Quantile {
   double quantile = 1;
-  double value = 2;
+  double value    = 2;
 }
 
 message Summary {
   uint64            sample_count = 1;
-  double            sample_sum = 2;
-  repeated Quantile quantile = 3 [(gogoproto.nullable) = false];
+  double            sample_sum   = 2;
+  repeated Quantile quantile     = 3 [(gogoproto.nullable) = false];
 }
 
 message Untyped {
@@ -69,9 +69,9 @@ message Untyped {
 }
 
 message Histogram {
-  uint64 sample_count = 1;
+  uint64 sample_count       = 1;
   double sample_count_float = 4; // Overrides sample_count if > 0.
-  double sample_sum = 2;
+  double sample_sum         = 2;
   // Buckets for the conventional histogram.
   repeated Bucket bucket = 3 [(gogoproto.nullable) = false]; // Ordered in increasing order of upper_bound, +Inf bucket is optional.
 
@@ -83,9 +83,9 @@ message Histogram {
   // then each power of two is divided into 2^n logarithmic buckets.
   // Or in other words, each bucket boundary is the previous boundary times 2^(2^-n).
   // In the future, more bucket schemas may be added using numbers < -4 or > 8.
-  sint32 schema = 5;
-  double zero_threshold = 6; // Breadth of the zero bucket.
-  uint64 zero_count = 7; // Count in zero bucket.
+  sint32 schema           = 5;
+  double zero_threshold   = 6; // Breadth of the zero bucket.
+  uint64 zero_count       = 7; // Count in zero bucket.
   double zero_count_float = 8; // Overrides sb_zero_count if > 0.
 
   // Negative buckets for the native histogram.
@@ -97,6 +97,9 @@ message Histogram {
   repeated double negative_count = 11; // Absolute count of each bucket.
 
   // Positive buckets for the native histogram.
+  // Use a no-op span (offset 0, length 0) for a native histogram without any
+  // observations yet and with a zero_threshold of 0. Otherwise, it would be
+  // indistinguishable from a classic histogram.
   repeated BucketSpan positive_span = 12 [(gogoproto.nullable) = false];
   // Use either "positive_delta" or "positive_count", the former for
   // regular histograms with integer counts, the latter for float
@@ -106,10 +109,10 @@ message Histogram {
 }
 
 message Bucket {
-  uint64   cumulative_count = 1; // Cumulative in increasing order.
+  uint64   cumulative_count       = 1; // Cumulative in increasing order.
   double   cumulative_count_float = 4; // Overrides cumulative_count if > 0.
-  double   upper_bound = 2; // Inclusive.
-  Exemplar exemplar = 3;
+  double   upper_bound            = 2; // Inclusive.
+  Exemplar exemplar               = 3;
 }
 
 // A BucketSpan defines a number of consecutive buckets in a native
@@ -124,24 +127,24 @@ message BucketSpan {
 }
 
 message Exemplar {
-  repeated LabelPair        label = 1 [(gogoproto.nullable) = false];
-  double                    value = 2;
+  repeated LabelPair        label     = 1 [(gogoproto.nullable) = false];
+  double                    value     = 2;
   google.protobuf.Timestamp timestamp = 3; // OpenMetrics-style.
 }
 
 message Metric {
-  repeated LabelPair label = 1 [(gogoproto.nullable) = false];
-  Gauge              gauge = 2;
-  Counter            counter = 3;
-  Summary            summary = 4;
-  Untyped            untyped = 5;
-  Histogram          histogram = 7;
+  repeated LabelPair label        = 1 [(gogoproto.nullable) = false];
+  Gauge              gauge        = 2;
+  Counter            counter      = 3;
+  Summary            summary      = 4;
+  Untyped            untyped      = 5;
+  Histogram          histogram    = 7;
   int64              timestamp_ms = 6;
 }
 
 message MetricFamily {
-  string          name = 1;
-  string          help = 2;
-  MetricType      type = 3;
+  string          name   = 1;
+  string          help   = 2;
+  MetricType      type   = 3;
   repeated Metric metric = 4 [(gogoproto.nullable) = false];
 }
