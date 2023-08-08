@@ -4,7 +4,7 @@ receivers:
       grpc:
 
   solace:
-    broker: [192.168.29.187:5672]
+    broker: ["Enter you local system IP":5672]
     max_unacknowledged: 500
     auth:
       sasl_plain:
