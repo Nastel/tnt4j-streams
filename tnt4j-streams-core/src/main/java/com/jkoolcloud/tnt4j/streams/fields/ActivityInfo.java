@@ -1601,8 +1601,16 @@ public class ActivityInfo {
 				children = new LinkedHashMap<>();
 			}
 
-			children.putAll(otherAi.children);
-			parent = otherAi.parent;
+			for (Map.Entry<String, List<ActivityInfo>> chE : otherAi.children.entrySet()) {
+				children.put(chE.getKey(), chE.getValue());
+
+				for (ActivityInfo chAi : chE.getValue()) {
+					chAi.setParent(this);
+				}
+			}
+			if (parent == null) {
+				parent = otherAi.parent;
+			}
 		}
 	}
 
@@ -1992,14 +2000,7 @@ public class ActivityInfo {
 	 * @see #addChild(ActivityInfo, String, ActivityInfo)
 	 */
 	public void addChild(String groupName, ActivityInfo ai, boolean flatten) {
-		ActivityInfo parent;
-		if (flatten) {
-			parent = getRootActivity();
-		} else {
-			parent = this;
-		}
-
-		addChild(parent, groupName, ai);
+		addChild(flatten ? getRootActivity() : this, groupName, ai);
 	}
 
 	/**
