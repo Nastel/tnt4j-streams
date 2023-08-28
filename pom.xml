@@ -378,6 +378,7 @@
         <module>tnt4j-streams-compress</module>
         <module>tnt4j-streams-protobuf</module>
         <module>tnt4j-streams-prometheus</module>
+        <module>tnt4j-streams-otel</module>
         <module>tnt4j-streams--distribution</module>
     </modules>
 </project>
