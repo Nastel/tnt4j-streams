@@ -30,10 +30,10 @@
         <property name="RetryStateCheck" value="true"/>
         <property name="RetryInterval" value="300"/>
 
-        <property name="Host" value="172.16.10.21"/>
+        <property name="Host" value="127.0.0.1"/>
         <property name="Port" value="8787"/>
         <property name="UseSSL" value="false"/>
-        <property name="Keystore" value="file:///home/ubuntu/tnt4j-streams-1.16.0-SNAPSHOT/samples/cloudwatch/clientkeystore"/>
+        <property name="Keystore" value="file://clientkeystore"/>
         <property name="KeyPass" value="pass123"/>
         <property name="KeystorePass" value="pass123"/>
 
@@ -51,10 +51,10 @@
             <property name="event.sink.factory.BroadcastSequence" value="jkool"/>
 
             <!-- File sink -->
-            <property name="event.sink.factory.EventSinkFactory.ap" value="com.jkoolcloud.tnt4j.sink.impl.FileEventSinkFactory"/>
-            <property name="event.sink.factory.EventSinkFactory.ap.FileName" value="./logs/tnt4j-streams-otlp_samples.log"/>
+            <property name="event.sink.factory.EventSinkFactory.file" value="com.jkoolcloud.tnt4j.sink.impl.FileEventSinkFactory"/>
+            <property name="event.sink.factory.EventSinkFactory.file.FileName" value="./logs/tnt4j-streams-otlp_samples.log"/>
 
-            <property name="event.sink.factory.EventSinkFactory.ap.Formatter" value="com.jkoolcloud.tnt4j.format.JSONFormatter"/>
+            <property name="event.sink.factory.EventSinkFactory.file.Formatter" value="com.jkoolcloud.tnt4j.format.JSONFormatter"/>
 
             <!-- JKool/XRay sink -->
             <property name="event.sink.factory.EventSinkFactory.jkool" value="com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory"/>
