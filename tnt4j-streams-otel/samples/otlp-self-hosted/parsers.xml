@@ -208,6 +208,7 @@
     <parser name="ResourceMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="Activity"/>
         <field name="EventName" value="ResourceMetrics"/>
+        <field name="@SplitRelatives@" value="true" transparent="true"/>
 
         <embedded-activity name="ResourceAttributes" locator="resource.attributes" locator-type="Label">
             <parser-ref name="AttributeParser" aggregation="Merge"/>
@@ -288,6 +289,7 @@
     <parser name="ResourceSpansParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="Activity"/>
         <field name="EventName" value="ResourceSpans"/>
+        <field name="@SplitRelatives@" value="false" transparent="true"/>
 
         <embedded-activity name="ResourceAttributes" locator="resource.attributes" locator-type="Label">
             <parser-ref name="AttributeParser" aggregation="Merge"/>
@@ -334,6 +336,7 @@
     <parser name="ResourceLogsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="Activity"/>
         <field name="EventName" value="ResourceLogs"/>
+        <field name="@SplitRelatives@" value="false" transparent="true"/>
 
         <embedded-activity name="ResourceAttributes" locator="resource.attributes" locator-type="Label">
             <parser-ref name="AttributeParser" aggregation="Merge"/>
@@ -352,9 +355,6 @@
         <!--        <reference name="ProtoMsgToJsonPreParser"/>-->
 
         <field name="EventType" value="NOOP"/>
-
-        <!--<field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>-->
-        <!--<field name="EndTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>-->
 
         <embedded-activity name="ResourceMetrics" locator="resource_metrics" locator-type="Label">
             <parser-ref name="ResourceMetricsParser" aggregation="Merge"/>
@@ -379,7 +379,6 @@
     <parser name="OTLPParserStr" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
         <field name="EventType" value="NOOP"/>
         <field name="ParserName" locator="ParserName" locator-type="ParserProp" transparent="true"/>
-
     </parser>
 
     <parser name="OTLPParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
