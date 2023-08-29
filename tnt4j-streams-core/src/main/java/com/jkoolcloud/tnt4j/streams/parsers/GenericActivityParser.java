@@ -1387,7 +1387,16 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 					if (validData && logicalValid) {
 						logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 								"ActivityParser.pre.parsing.data", Utils.getName(preParser));
-						data = preParser.preParse(data);
+						try {
+							data = preParser.preParse(data);
+						} catch (Exception exc) {
+							if (pId < preParsers.size() - 1) {
+								logger().log(OpLevel.WARNING, "Pre-parser failed to handle. Skipping to next one...");
+								continue;
+							} else {
+								throw exc;
+							}
+						}
 						logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 								"ActivityParser.data.after.pre.parsing", getLogString(data));
 					} else {
