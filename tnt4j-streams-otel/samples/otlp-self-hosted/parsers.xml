@@ -168,7 +168,7 @@
         <field name="AggregationTemporality" locator="aggregation_temporality" locator-type="Label"/>
     </parser>
 
-    <parser name="ScopeMetricsParser2" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+    <parser name="MetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="Event"/>
         <field name="EventName" locator="name" locator-type="Label"/>
         <field name="MetricsDescription" locator="description" locator-type="Label"/>
@@ -200,7 +200,7 @@
             <parser-ref name="AttributeParser" aggregation="Merge"/>
         </embedded-activity>
         <embedded-activity name="ScopeMetrics" locator="metrics" locator-type="Label">
-            <parser-ref name="ScopeMetricsParser2" aggregation="Relate"/>
+            <parser-ref name="MetricsParser" aggregation="Relate"/>
         </embedded-activity>
         <field name="ScopeSchemaUrl" locator="schema_url" locator-type="Label"/>
     </parser>
@@ -212,7 +212,7 @@
         <embedded-activity name="ResourceAttributes" locator="resource.attributes" locator-type="Label">
             <parser-ref name="AttributeParser" aggregation="Merge"/>
         </embedded-activity>
-        <embedded-activity name="ScopeMetrics" locator="scope_metrics" locator-type="Label">
+        <embedded-activity name="ResourceScopeMetrics" locator="scope_metrics" locator-type="Label">
             <parser-ref name="ScopeMetricsParser" aggregation="Relate"/>
         </embedded-activity>
         <field name="ResourceSchemaUrl" locator="schemaUrl" locator-type="Label"/>
