@@ -55,6 +55,9 @@ message ResourceSpans {
   // A list of ScopeSpans that originate from a resource.
   repeated ScopeSpans scope_spans = 2;
 
+  // The Schema URL, if known. This is the identifier of the Schema that the resource data
+  // is recorded in. To learn more about Schema URL see
+  // https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
   // This schema_url applies to the data in the "resource" field. It does not apply
   // to the data in the "scope_spans" field which have their own schema_url field.
   string schema_url = 3;
@@ -70,6 +73,9 @@ message ScopeSpans {
   // A list of Spans that originate from an instrumentation scope.
   repeated Span spans = 2;
 
+  // The Schema URL, if known. This is the identifier of the Schema that the span data
+  // is recorded in. To learn more about Schema URL see
+  // https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
   // This schema_url applies to all spans and span events in the "spans" field.
   string schema_url = 3;
 }
@@ -263,12 +269,12 @@ message Status {
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#set-status
   enum StatusCode {
     // The default status.
-    STATUS_CODE_UNSET = 0;
+    STATUS_CODE_UNSET               = 0;
     // The Span has been validated by an Application developer or Operator to
     // have completed successfully.
-    STATUS_CODE_OK = 1;
+    STATUS_CODE_OK                  = 1;
     // The Span contains an error.
-    STATUS_CODE_ERROR = 2;
+    STATUS_CODE_ERROR               = 2;
   };
 
   // The status code.
