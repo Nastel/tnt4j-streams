@@ -80,9 +80,8 @@ public class TimestampFormatterTest {
 
 	@Test
 	public void testTimeZone() {
-		TimestampFormatter formatter = new TimestampFormatter(TimeUnit.MILLISECONDS);
 		String timezone = TimeZone.getDefault().toString();
-		formatter.setTimeZone(timezone);
+		TimestampFormatter formatter = new TimestampFormatter(TimeUnit.MILLISECONDS, timezone);
 		assertEquals(timezone, formatter.getTimeZone());
 	}
 
