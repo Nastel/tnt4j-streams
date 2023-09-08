@@ -18,7 +18,6 @@ package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +27,7 @@ import javax.script.ScriptException;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -922,7 +922,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 			if (cValue instanceof UsecTimestamp) {
 				return ((UsecTimestamp) cValue).toString(format);
 			} else if (cValue instanceof Date) {
-				SimpleDateFormat df = new SimpleDateFormat(format);
+				FastDateFormat df = FastDateFormat.getInstance(format);
 				return df.format(cValue);
 			} else if (cValue instanceof Number) {
 				DecimalFormat df = new DecimalFormat(format);
