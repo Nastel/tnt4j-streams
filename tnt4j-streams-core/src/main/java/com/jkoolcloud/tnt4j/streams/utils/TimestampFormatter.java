@@ -17,7 +17,6 @@
 package com.jkoolcloud.tnt4j.streams.utils;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -28,6 +27,7 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -57,7 +57,7 @@ public class TimestampFormatter {
 	private String pattern = null;
 	private String timeZone = null;
 	private TimeUnit units = null;
-	private DateFormat formatter = null;
+	private FastDateFormat formatter = null;
 	private String locale = null;
 
 	/**
@@ -67,7 +67,21 @@ public class TimestampFormatter {
 	 *            resolution of timestamp values
 	 */
 	public TimestampFormatter(TimeUnit units) {
+		this(units, null);
+	}
+
+	/**
+	 * Creates a timestamp formatter/parser for numeric timestamps with the specified resolution and timezone.
+	 *
+	 * @param units
+	 *            resolution of timestamp values
+	 * @param timeZone
+	 *            time zone ID, or {@code null} to use the default time zone or to assume pattern contains time zone
+	 *            specification
+	 */
+	public TimestampFormatter(TimeUnit units, String timeZone) {
 		setUnits(units);
+		setTimeZone(timeZone);
 	}
 
 	/**
@@ -83,8 +97,8 @@ public class TimestampFormatter {
 	 *            locale for date format to use.
 	 */
 	public TimestampFormatter(String pattern, String timeZone, String locale) {
-		setPattern(pattern, locale);
 		setTimeZone(timeZone);
+		setPattern(pattern, locale);
 	}
 
 	/**
@@ -109,8 +123,11 @@ public class TimestampFormatter {
 		this.pattern = pattern;
 		this.units = null;
 		this.locale = locale;
-		formatter = StringUtils.isEmpty(pattern) ? new SimpleDateFormat() : StringUtils.isEmpty(locale)
-				? new SimpleDateFormat(pattern) : new SimpleDateFormat(pattern, Utils.getLocale(locale));
+		formatter = StringUtils.isEmpty(pattern) //
+				? FastDateFormat.getInstance() //
+				: FastDateFormat.getInstance(pattern,
+						StringUtils.isEmpty(timeZone) ? null : TimeZone.getTimeZone(timeZone),
+						StringUtils.isEmpty(locale) ? null : Utils.getLocale(locale));
 	}
 
 	/**
@@ -151,12 +168,8 @@ public class TimestampFormatter {
 	 * @param timeZone
 	 *            time zone ID for time zone of date/time strings
 	 */
-	public void setTimeZone(String timeZone) {
+	protected void setTimeZone(String timeZone) {
 		this.timeZone = timeZone;
-
-		if (formatter != null && StringUtils.isNotEmpty(timeZone)) {
-			formatter.setTimeZone(TimeZone.getTimeZone(timeZone));
-		}
 	}
 
 	/**
@@ -267,8 +280,16 @@ public class TimestampFormatter {
 	 * @param value
 	 *            date/time to format
 	 * @return date/time formatted as a string
+	 * 
+	 * @throws java.lang.IllegalArgumentException
+	 *             if this formatter is made for parsing
 	 */
 	public String format(Object value) {
+		if (formatter == null) {
+			throw new IllegalStateException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+					"TimestampFormatter.invalid.format.state"));
+		}
+
 		return formatter.format(value);
 	}
 
