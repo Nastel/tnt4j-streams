@@ -117,15 +117,14 @@ public class TraceCommandDeserializer implements Deserializer<TraceCommandDeseri
 				command.count = Integer.parseInt(arg);
 			}
 
+			TimestampFormatter formatter = new TimestampFormatter(DATE_PATTERN, null, null);
 			if (arg.equalsIgnoreCase(UNTIL)) {
-				TimestampFormatter formatter = new TimestampFormatter(DATE_PATTERN, null, null);
 				String dateTime = args[++i] + ' ' + args[++i];
 				UsecTimestamp timestamp = formatter.parse(dateTime);
 				command.endAt = timestamp.getTimeMillis();
 			}
 
 			if (arg.equalsIgnoreCase(BETWEEN)) {
-				TimestampFormatter formatter = new TimestampFormatter(DATE_PATTERN, null, null);
 				String dateTime = args[++i] + ' ' + args[++i];
 				UsecTimestamp begin = formatter.parse(dateTime);
 				dateTime = args[++i] + ' ' + args[++i];

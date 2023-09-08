@@ -20,15 +20,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.poi.hssf.eventusermodel.FormatTrackingHSSFListener;
 import org.apache.poi.hssf.eventusermodel.HSSFEventFactory;
 import org.apache.poi.hssf.eventusermodel.HSSFListener;
@@ -682,7 +681,7 @@ public class ExcelSXSSFRowStream extends AbstractBufferedStream<Row> {
 				formatString = formatString.replaceAll("\\\\-", "-"); // NON-NLS
 
 				Date d = DateUtil.getJavaDate(value, false);
-				DateFormat df = new SimpleDateFormat(formatString);
+				FastDateFormat df = FastDateFormat.getInstance(formatString);
 				return df.format(d);
 			}
 
