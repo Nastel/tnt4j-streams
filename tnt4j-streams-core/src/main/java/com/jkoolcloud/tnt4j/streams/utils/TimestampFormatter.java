@@ -18,7 +18,6 @@ package com.jkoolcloud.tnt4j.streams.utils;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.Temporal;
 import java.util.Calendar;
@@ -36,9 +35,9 @@ import com.jkoolcloud.tnt4j.core.UsecTimestamp;
 /**
  * Provides methods for parsing objects into timestamps and for formatting timestamps as strings.
  * <p>
- * This is based on {@link SimpleDateFormat}, but extends its support to recognize microsecond fractional seconds. If
- * number of fractional second characters is greater than 3, then it's assumed to be microseconds. Otherwise, it's
- * assumed to be milliseconds (as this is the behavior of {@link SimpleDateFormat}.
+ * This is based on {@link java.text.SimpleDateFormat}, but extends its support to recognize microsecond fractional
+ * seconds. If number of fractional second characters is greater than 3, then it's assumed to be microseconds.
+ * Otherwise, it's assumed to be milliseconds (as this is the behavior of {@link java.text.SimpleDateFormat}.
  * <p>
  * Supports such pattern definitions:
  * <ul>
@@ -49,8 +48,8 @@ import com.jkoolcloud.tnt4j.core.UsecTimestamp;
  *
  * @version $Revision: 1 $
  *
- * @see SimpleDateFormat
- * @see UsecTimestamp
+ * @see java.text.SimpleDateFormat
+ * @see com.jkoolcloud.tnt4j.core.UsecTimestamp
  */
 public class TimestampFormatter {
 
