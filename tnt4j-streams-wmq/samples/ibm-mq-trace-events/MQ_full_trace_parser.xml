@@ -16,8 +16,8 @@
                transparent="true"/>
         <field name="Message" locator="MQGACF_ACTIVITY_TRACE.MQBACF_MESSAGE_DATA" locator-type="Label" datatype="Binary">
             <field-transform name="MsgPayloadToString" lang="groovy"><![CDATA[
-            WmqUtils.getString($fieldValue, ${CodedCharSetValue}, WmqUtils.MQ_BIN_STR_STRIP_DLH_XQH)
-        ]]></field-transform>
+                WmqUtils.getString($fieldValue, ${CodedCharSetValue}, WmqUtils.MQ_BIN_STR_STRIP_DLH_XQH)
+            ]]></field-transform>
         </field>
 
         <!--  Uncomment the following to pass a binary copy of the message data with the event   -->
@@ -40,16 +40,16 @@
 
         <field name="MsgId" value="" datatype="Binary">
             <field-transform lang="groovy" name="MsgidTransform"><![CDATA[
-            ${MsgIdXQH} != null
-                ? ${MsgIdXQH} : ${MsgIdNorm}
-        ]]></field-transform>
+                ${MsgIdXQH} != null
+                    ? ${MsgIdXQH} : ${MsgIdNorm}
+            ]]></field-transform>
         </field>
 
         <field name="CorrelId" value="" datatype="Binary">
             <field-transform lang="groovy" name="CorridTransform"><![CDATA[
-            ${CorrelIdXQH} != null
-                ? ${CorrelIdXQH} : ${CorrelIdNorm}
-        ]]></field-transform>
+                ${CorrelIdXQH} != null
+                    ? ${CorrelIdXQH} : ${CorrelIdNorm}
+            ]]></field-transform>
         </field>
 
         <!-- One or more correlators are used to stitch sets of messages together based on common criteria.
@@ -144,10 +144,10 @@
         </field>
         <field name="TrackingId" value="">
             <field-transform lang="groovy" name="TrackTransform"><![CDATA[
-            ${TrackingIdXQH} != null
-                ? ${TrackingIdXQH}
-                : (${TrackingIdNorm} != null ? ${TrackingIdNorm} : null)
-        ]]></field-transform>
+                ${TrackingIdXQH} != null
+                    ? ${TrackingIdXQH}
+                    : (${TrackingIdNorm} != null ? ${TrackingIdNorm} : null)
+            ]]></field-transform>
         </field>
 
         <field name="ObjType" locator="MQGACF_ACTIVITY_TRACE.MQIACF_OBJECT_TYPE" locator-type="Label">
@@ -191,12 +191,12 @@
 
         <field name="DerivedName" value="" transparent="true">
             <field-transform lang="groovy" name="ResTransform"><![CDATA[
-            StringUtils.isNotEmpty(${ResolvedObjectString})
-                ? ${ResolvedObjectString}
-                : StringUtils.isNotEmpty(${TargetName})
-                    ? ${TargetName}
-                    : ${QMgrName}
-        ]]></field-transform>
+                StringUtils.isNotEmpty(${ResolvedObjectString})
+                    ? ${ResolvedObjectString}
+                    : StringUtils.isNotEmpty(${TargetName})
+                        ? ${TargetName}
+                        : ${QMgrName}
+            ]]></field-transform>
         </field>
 
         <!-- ResourceName identifies the target for events and views such as topology.  -->
@@ -227,8 +227,8 @@
         <!-- provide application name without path for tracking -->
         <field name="ProgramName" locator="MQCACF_APPL_NAME" locator-type="Label">
             <field-transform name="pgmName" lang="groovy"><![CDATA[
-            Utils.getFileName($fieldValue)
-        ]]></field-transform>
+                Utils.getFileName($fieldValue)
+            ]]></field-transform>
         </field>
 
         <field name="ChannelType" locator="MQIACH_CHANNEL_TYPE" locator-type="Label">
@@ -247,18 +247,18 @@
         <field name="ApplName" value="">
             <!-- show APPLNAME as channel name in case of Queue Manager channels as type along with channel name -->
             <field-transform lang="groovy" name="ApplTransform"><![CDATA[
-            (${ChannelType} == null || ${ChannelType} == "SVRCONN")
-                ? ${ProgramName}
-                : "CHL:" + ${ChannelType} + ":" + ${ChannelName}
-        ]]></field-transform>
+                (${ChannelType} == null || ${ChannelType} == "SVRCONN")
+                    ? ${ProgramName}
+                    : "CHL:" + ${ChannelType} + ":" + ${ChannelName}
+            ]]></field-transform>
         </field>
 
         <!-- record actual elapsed time as a number only, not time stamp -->
         <field name="QMgrOpDuration" locator="MQGACF_ACTIVITY_TRACE.MQIAMO64_QMGR_OP_DURATION" locator-type="Label" datatype="Number"
                units="Microseconds">
             <field-transform name="ElapTransform" lang="groovy"><![CDATA[
-           $fieldValue == null ? 0 : $fieldValue
-        ]]></field-transform>
+                $fieldValue == null ? 0 : $fieldValue
+            ]]></field-transform>
         </field>
 
         <!-- time calculations, use highrestime if available (not all calls have it) -->
@@ -270,8 +270,8 @@
             <field-locator locator="MQGACF_ACTIVITY_TRACE.MQCACF_OPERATION_TIME" locator-type="Label" required="false"/>
             <filter name="IncompleteDateFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
-                ArrayUtils.isEmpty($fieldValue) || StringUtils.isEmpty($fieldValue[0])
-            ]]></expression>
+                    ArrayUtils.isEmpty($fieldValue) || StringUtils.isEmpty($fieldValue[0])
+                ]]></expression>
             </filter>
         </field>
 
@@ -280,37 +280,37 @@
             <field-locator locator="MQGACF_ACTIVITY_TRACE.MQCACF_PUT_TIME" locator-type="Label" required="false"/>
             <filter name="IncompleteDateFilter">
                 <expression handle="exclude" lang="groovy"><![CDATA[
-                ArrayUtils.isEmpty($fieldValue) || StringUtils.isEmpty($fieldValue[0])
-            ]]></expression>
+                    ArrayUtils.isEmpty($fieldValue) || StringUtils.isEmpty($fieldValue[0])
+                ]]></expression>
             </filter>
         </field>
 
         <!-- compute age of message based on time from put to time when delivered adjusting for difference in precision -->
         <field name="MessageAge" value="" datatype="Number">
             <field-transform name="MATransform" lang="groovy"><![CDATA[
-            (${PutTime} != null && ${EventType}.name().equals("RECEIVE"))
-                ? ${HighresTime} - ${PutTime} - 10000
-                : 0
-        ]]></field-transform>
+                (${PutTime} != null && ${EventType}.name().equals("RECEIVE"))
+                    ? ${HighresTime} - ${PutTime} - 10000
+                    : 0
+            ]]></field-transform>
         </field>
 
         <!-- If we have message age, use for Elapsed Time, otherwise use reported MQ time -->
         <field name="ElapsedTime" value="0" datatype="Number" units="Microseconds">
             <field-transform name="EtTransform" lang="groovy"><![CDATA[
-            ${MessageAge} > 0 ? ${MessageAge} : ${QMgrOpDuration}
-        ]]></field-transform>
+                ${MessageAge} > 0 ? ${MessageAge} : ${QMgrOpDuration}
+            ]]></field-transform>
         </field>
         <!-- start time is only precise to seconds so use highrestime if available -->
         <field name="StartTime" value="" datatype="Timestamp">
             <field-transform lang="groovy" name="StartTimeTransform"><![CDATA[
-            ${HighresTime} != null ? ${HighresTime} : ${OperationTime}
-        ]]></field-transform>
+                ${HighresTime} != null ? ${HighresTime} : ${OperationTime}
+            ]]></field-transform>
         </field>
         <!-- if MessageAge is present, just use highrestime as end time otherwise if present, highrestime plus duration -->
         <field name="EndTime" value="" datatype="Timestamp" units="Microseconds">
             <field-transform lang="groovy" name="EndTimeTransform"><![CDATA[
-            ${MessageAge} = 0 ? ${StartTime}.longValue() + ${ElapsedTime} : ${StartTime}
-        ]]></field-transform>
+                ${MessageAge} = 0 ? ${StartTime}.longValue() + ${ElapsedTime} : ${StartTime}
+            ]]></field-transform>
         </field>
 
         <!-- activity trace fields -->
@@ -350,8 +350,8 @@
         <field name="RcText" locator="MQGACF_ACTIVITY_TRACE.MQIACF_REASON_CODE" locator-type="Label"/>
         <field name="Exception" value="">
             <field-transform lang="groovy" name="RCTransform"><![CDATA[
-            ${ReasonCode} != 0 ? ${RcText} : ""
-        ]]></field-transform>
+                ${ReasonCode} != 0 ? ${RcText} : ""
+            ]]></field-transform>
         </field>
         <field name="ConnectOptions" locator="MQGACF_ACTIVITY_TRACE.MQIACF_CONNECT_OPTIONS" locator-type="Label"/>
         <field name="OpenOptions" locator="MQGACF_ACTIVITY_TRACE.MQIACF_OPEN_OPTIONS" locator-type="Label"/>
