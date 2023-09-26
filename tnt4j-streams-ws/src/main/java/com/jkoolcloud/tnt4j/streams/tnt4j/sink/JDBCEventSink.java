@@ -181,8 +181,6 @@ public class JDBCEventSink extends LoggedEventSink {
 
 			super._open();
 		} catch (Throwable e) {
-			LOGGER.log(OpLevel.ERROR, "Failed to open sink name={0}, url={1}, user={2}, pass={3}", getName(), url, user,
-					passwd == null ? null : "xxxxxx", e);
 			_close();
 
 			if (e instanceof IOException) {
