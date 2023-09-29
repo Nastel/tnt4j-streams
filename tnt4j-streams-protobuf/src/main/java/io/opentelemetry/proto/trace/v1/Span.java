@@ -161,6 +161,11 @@ private static final long serialVersionUID = 0L;
 
             break;
           }
+          case 133: {
+
+            flags_ = input.readFixed32();
+            break;
+          }
           default: {
             if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
@@ -1880,6 +1885,22 @@ private static final long serialVersionUID = 0L;
      * @return The droppedAttributesCount.
      */
     int getDroppedAttributesCount();
+
+    /**
+     * <pre>
+     * Flags, a bit field. 8 least significant bits are the trace
+     * flags as defined in W3C Trace Context specification. Readers
+     * MUST not assume that 24 most significant bits will be zero.
+     * When creating new spans, the most-significant 24-bits MUST be
+     * zero.  To read the 8-bit W3C trace flag (use flags &amp;
+     * SPAN_FLAGS_TRACE_FLAGS_MASK).  [Optional].
+     * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+     * </pre>
+     *
+     * <code>fixed32 flags = 6;</code>
+     * @return The flags.
+     */
+    int getFlags();
   }
   /**
    * <pre>
@@ -1966,6 +1987,11 @@ private static final long serialVersionUID = 0L;
             case 40: {
 
               droppedAttributesCount_ = input.readUInt32();
+              break;
+            }
+            case 53: {
+
+              flags_ = input.readFixed32();
               break;
             }
             default: {
@@ -2168,6 +2194,27 @@ private static final long serialVersionUID = 0L;
       return droppedAttributesCount_;
     }
 
+    public static final int FLAGS_FIELD_NUMBER = 6;
+    private int flags_;
+    /**
+     * <pre>
+     * Flags, a bit field. 8 least significant bits are the trace
+     * flags as defined in W3C Trace Context specification. Readers
+     * MUST not assume that 24 most significant bits will be zero.
+     * When creating new spans, the most-significant 24-bits MUST be
+     * zero.  To read the 8-bit W3C trace flag (use flags &amp;
+     * SPAN_FLAGS_TRACE_FLAGS_MASK).  [Optional].
+     * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+     * </pre>
+     *
+     * <code>fixed32 flags = 6;</code>
+     * @return The flags.
+     */
+    @java.lang.Override
+    public int getFlags() {
+      return flags_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2197,6 +2244,9 @@ private static final long serialVersionUID = 0L;
       if (droppedAttributesCount_ != 0) {
         output.writeUInt32(5, droppedAttributesCount_);
       }
+      if (flags_ != 0) {
+        output.writeFixed32(6, flags_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -2225,6 +2275,10 @@ private static final long serialVersionUID = 0L;
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(5, droppedAttributesCount_);
       }
+      if (flags_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFixed32Size(6, flags_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -2250,6 +2304,8 @@ private static final long serialVersionUID = 0L;
           .equals(other.getAttributesList())) return false;
       if (getDroppedAttributesCount()
           != other.getDroppedAttributesCount()) return false;
+      if (getFlags()
+          != other.getFlags()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2273,6 +2329,8 @@ private static final long serialVersionUID = 0L;
       }
       hash = (37 * hash) + DROPPED_ATTRIBUTES_COUNT_FIELD_NUMBER;
       hash = (53 * hash) + getDroppedAttributesCount();
+      hash = (37 * hash) + FLAGS_FIELD_NUMBER;
+      hash = (53 * hash) + getFlags();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2428,6 +2486,8 @@ private static final long serialVersionUID = 0L;
         }
         droppedAttributesCount_ = 0;
 
+        flags_ = 0;
+
         return this;
       }
 
@@ -2468,6 +2528,7 @@ private static final long serialVersionUID = 0L;
           result.attributes_ = attributesBuilder_.build();
         }
         result.droppedAttributesCount_ = droppedAttributesCount_;
+        result.flags_ = flags_;
         onBuilt();
         return result;
       }
@@ -2554,6 +2615,9 @@ private static final long serialVersionUID = 0L;
         }
         if (other.getDroppedAttributesCount() != 0) {
           setDroppedAttributesCount(other.getDroppedAttributesCount());
+        }
+        if (other.getFlags() != 0) {
+          setFlags(other.getFlags());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3169,6 +3233,67 @@ private static final long serialVersionUID = 0L;
         onChanged();
         return this;
       }
+
+      private int flags_ ;
+      /**
+       * <pre>
+       * Flags, a bit field. 8 least significant bits are the trace
+       * flags as defined in W3C Trace Context specification. Readers
+       * MUST not assume that 24 most significant bits will be zero.
+       * When creating new spans, the most-significant 24-bits MUST be
+       * zero.  To read the 8-bit W3C trace flag (use flags &amp;
+       * SPAN_FLAGS_TRACE_FLAGS_MASK).  [Optional].
+       * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+       * </pre>
+       *
+       * <code>fixed32 flags = 6;</code>
+       * @return The flags.
+       */
+      @java.lang.Override
+      public int getFlags() {
+        return flags_;
+      }
+      /**
+       * <pre>
+       * Flags, a bit field. 8 least significant bits are the trace
+       * flags as defined in W3C Trace Context specification. Readers
+       * MUST not assume that 24 most significant bits will be zero.
+       * When creating new spans, the most-significant 24-bits MUST be
+       * zero.  To read the 8-bit W3C trace flag (use flags &amp;
+       * SPAN_FLAGS_TRACE_FLAGS_MASK).  [Optional].
+       * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+       * </pre>
+       *
+       * <code>fixed32 flags = 6;</code>
+       * @param value The flags to set.
+       * @return This builder for chaining.
+       */
+      public Builder setFlags(int value) {
+        
+        flags_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Flags, a bit field. 8 least significant bits are the trace
+       * flags as defined in W3C Trace Context specification. Readers
+       * MUST not assume that 24 most significant bits will be zero.
+       * When creating new spans, the most-significant 24-bits MUST be
+       * zero.  To read the 8-bit W3C trace flag (use flags &amp;
+       * SPAN_FLAGS_TRACE_FLAGS_MASK).  [Optional].
+       * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+       * </pre>
+       *
+       * <code>fixed32 flags = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearFlags() {
+        
+        flags_ = 0;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -3324,6 +3449,31 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public com.google.protobuf.ByteString getParentSpanId() {
     return parentSpanId_;
+  }
+
+  public static final int FLAGS_FIELD_NUMBER = 16;
+  private int flags_;
+  /**
+   * <pre>
+   * Flags, a bit field. 8 least significant bits are the trace
+   * flags as defined in W3C Trace Context specification. Readers
+   * MUST not assume that 24 most significant bits will be zero.
+   * To read the 8-bit W3C trace flag, use `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
+   * When creating span messages, if the message is logically forwarded from another source
+   * with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
+   * be copied as-is. If creating from a source that does not have an equivalent flags field
+   * (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+   * be set to zero.
+   * [Optional].
+   * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+   * </pre>
+   *
+   * <code>fixed32 flags = 16;</code>
+   * @return The flags.
+   */
+  @java.lang.Override
+  public int getFlags() {
+    return flags_;
   }
 
   public static final int NAME_FIELD_NUMBER = 5;
@@ -3834,6 +3984,9 @@ private static final long serialVersionUID = 0L;
     if (status_ != null) {
       output.writeMessage(15, getStatus());
     }
+    if (flags_ != 0) {
+      output.writeFixed32(16, flags_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -3901,6 +4054,10 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(15, getStatus());
     }
+    if (flags_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeFixed32Size(16, flags_);
+    }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
@@ -3924,6 +4081,8 @@ private static final long serialVersionUID = 0L;
         .equals(other.getTraceState())) return false;
     if (!getParentSpanId()
         .equals(other.getParentSpanId())) return false;
+    if (getFlags()
+        != other.getFlags()) return false;
     if (!getName()
         .equals(other.getName())) return false;
     if (kind_ != other.kind_) return false;
@@ -3967,6 +4126,8 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getTraceState().hashCode();
     hash = (37 * hash) + PARENT_SPAN_ID_FIELD_NUMBER;
     hash = (53 * hash) + getParentSpanId().hashCode();
+    hash = (37 * hash) + FLAGS_FIELD_NUMBER;
+    hash = (53 * hash) + getFlags();
     hash = (37 * hash) + NAME_FIELD_NUMBER;
     hash = (53 * hash) + getName().hashCode();
     hash = (37 * hash) + KIND_FIELD_NUMBER;
@@ -4148,6 +4309,8 @@ private static final long serialVersionUID = 0L;
 
       parentSpanId_ = com.google.protobuf.ByteString.EMPTY;
 
+      flags_ = 0;
+
       name_ = "";
 
       kind_ = 0;
@@ -4217,6 +4380,7 @@ private static final long serialVersionUID = 0L;
       result.spanId_ = spanId_;
       result.traceState_ = traceState_;
       result.parentSpanId_ = parentSpanId_;
+      result.flags_ = flags_;
       result.name_ = name_;
       result.kind_ = kind_;
       result.startTimeUnixNano_ = startTimeUnixNano_;
@@ -4316,6 +4480,9 @@ private static final long serialVersionUID = 0L;
       }
       if (other.getParentSpanId() != com.google.protobuf.ByteString.EMPTY) {
         setParentSpanId(other.getParentSpanId());
+      }
+      if (other.getFlags() != 0) {
+        setFlags(other.getFlags());
       }
       if (!other.getName().isEmpty()) {
         name_ = other.name_;
@@ -4717,6 +4884,79 @@ private static final long serialVersionUID = 0L;
     public Builder clearParentSpanId() {
       
       parentSpanId_ = getDefaultInstance().getParentSpanId();
+      onChanged();
+      return this;
+    }
+
+    private int flags_ ;
+    /**
+     * <pre>
+     * Flags, a bit field. 8 least significant bits are the trace
+     * flags as defined in W3C Trace Context specification. Readers
+     * MUST not assume that 24 most significant bits will be zero.
+     * To read the 8-bit W3C trace flag, use `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
+     * When creating span messages, if the message is logically forwarded from another source
+     * with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
+     * be copied as-is. If creating from a source that does not have an equivalent flags field
+     * (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+     * be set to zero.
+     * [Optional].
+     * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+     * </pre>
+     *
+     * <code>fixed32 flags = 16;</code>
+     * @return The flags.
+     */
+    @java.lang.Override
+    public int getFlags() {
+      return flags_;
+    }
+    /**
+     * <pre>
+     * Flags, a bit field. 8 least significant bits are the trace
+     * flags as defined in W3C Trace Context specification. Readers
+     * MUST not assume that 24 most significant bits will be zero.
+     * To read the 8-bit W3C trace flag, use `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
+     * When creating span messages, if the message is logically forwarded from another source
+     * with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
+     * be copied as-is. If creating from a source that does not have an equivalent flags field
+     * (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+     * be set to zero.
+     * [Optional].
+     * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+     * </pre>
+     *
+     * <code>fixed32 flags = 16;</code>
+     * @param value The flags to set.
+     * @return This builder for chaining.
+     */
+    public Builder setFlags(int value) {
+      
+      flags_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Flags, a bit field. 8 least significant bits are the trace
+     * flags as defined in W3C Trace Context specification. Readers
+     * MUST not assume that 24 most significant bits will be zero.
+     * To read the 8-bit W3C trace flag, use `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
+     * When creating span messages, if the message is logically forwarded from another source
+     * with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
+     * be copied as-is. If creating from a source that does not have an equivalent flags field
+     * (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+     * be set to zero.
+     * [Optional].
+     * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+     * </pre>
+     *
+     * <code>fixed32 flags = 16;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearFlags() {
+      
+      flags_ = 0;
       onChanged();
       return this;
     }

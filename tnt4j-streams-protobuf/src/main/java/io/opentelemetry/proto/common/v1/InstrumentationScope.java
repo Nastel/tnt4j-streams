@@ -207,6 +207,12 @@ private static final long serialVersionUID = 0L;
   public static final int ATTRIBUTES_FIELD_NUMBER = 3;
   private java.util.List<io.opentelemetry.proto.common.v1.KeyValue> attributes_;
   /**
+   * <pre>
+   * Additional attributes that describe the scope. [Optional].
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
    * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
    */
   @java.lang.Override
@@ -214,6 +220,12 @@ private static final long serialVersionUID = 0L;
     return attributes_;
   }
   /**
+   * <pre>
+   * Additional attributes that describe the scope. [Optional].
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
    * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
    */
   @java.lang.Override
@@ -222,6 +234,12 @@ private static final long serialVersionUID = 0L;
     return attributes_;
   }
   /**
+   * <pre>
+   * Additional attributes that describe the scope. [Optional].
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
    * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
    */
   @java.lang.Override
@@ -229,6 +247,12 @@ private static final long serialVersionUID = 0L;
     return attributes_.size();
   }
   /**
+   * <pre>
+   * Additional attributes that describe the scope. [Optional].
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
    * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
    */
   @java.lang.Override
@@ -236,6 +260,12 @@ private static final long serialVersionUID = 0L;
     return attributes_.get(index);
   }
   /**
+   * <pre>
+   * Additional attributes that describe the scope. [Optional].
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
    * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
    */
   @java.lang.Override
@@ -838,6 +868,12 @@ private static final long serialVersionUID = 0L;
         io.opentelemetry.proto.common.v1.KeyValue, io.opentelemetry.proto.common.v1.KeyValue.Builder, io.opentelemetry.proto.common.v1.KeyValueOrBuilder> attributesBuilder_;
 
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public java.util.List<io.opentelemetry.proto.common.v1.KeyValue> getAttributesList() {
@@ -848,6 +884,12 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public int getAttributesCount() {
@@ -858,6 +900,12 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public io.opentelemetry.proto.common.v1.KeyValue getAttributes(int index) {
@@ -868,6 +916,12 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public Builder setAttributes(
@@ -885,6 +939,12 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public Builder setAttributes(
@@ -899,6 +959,12 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public Builder addAttributes(io.opentelemetry.proto.common.v1.KeyValue value) {
@@ -915,6 +981,12 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public Builder addAttributes(
@@ -932,6 +1004,12 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public Builder addAttributes(
@@ -946,6 +1024,12 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public Builder addAttributes(
@@ -960,6 +1044,12 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public Builder addAllAttributes(
@@ -975,6 +1065,12 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public Builder clearAttributes() {
@@ -988,6 +1084,12 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public Builder removeAttributes(int index) {
@@ -1001,6 +1103,12 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public io.opentelemetry.proto.common.v1.KeyValue.Builder getAttributesBuilder(
@@ -1008,6 +1116,12 @@ private static final long serialVersionUID = 0L;
       return getAttributesFieldBuilder().getBuilder(index);
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public io.opentelemetry.proto.common.v1.KeyValueOrBuilder getAttributesOrBuilder(
@@ -1018,6 +1132,12 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public java.util.List<? extends io.opentelemetry.proto.common.v1.KeyValueOrBuilder> 
@@ -1029,6 +1149,12 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public io.opentelemetry.proto.common.v1.KeyValue.Builder addAttributesBuilder() {
@@ -1036,6 +1162,12 @@ private static final long serialVersionUID = 0L;
           io.opentelemetry.proto.common.v1.KeyValue.getDefaultInstance());
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public io.opentelemetry.proto.common.v1.KeyValue.Builder addAttributesBuilder(
@@ -1044,6 +1176,12 @@ private static final long serialVersionUID = 0L;
           index, io.opentelemetry.proto.common.v1.KeyValue.getDefaultInstance());
     }
     /**
+     * <pre>
+     * Additional attributes that describe the scope. [Optional].
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
      * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
      */
     public java.util.List<io.opentelemetry.proto.common.v1.KeyValue.Builder> 

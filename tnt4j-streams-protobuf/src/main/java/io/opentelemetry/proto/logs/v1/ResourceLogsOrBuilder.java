@@ -83,6 +83,9 @@ public interface ResourceLogsOrBuilder extends
 
   /**
    * <pre>
+   * The Schema URL, if known. This is the identifier of the Schema that the resource data
+   * is recorded in. To learn more about Schema URL see
+   * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
    * This schema_url applies to the data in the "resource" field. It does not apply
    * to the data in the "scope_logs" field which have their own schema_url field.
    * </pre>
@@ -93,6 +96,9 @@ public interface ResourceLogsOrBuilder extends
   java.lang.String getSchemaUrl();
   /**
    * <pre>
+   * The Schema URL, if known. This is the identifier of the Schema that the resource data
+   * is recorded in. To learn more about Schema URL see
+   * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
    * This schema_url applies to the data in the "resource" field. It does not apply
    * to the data in the "scope_logs" field which have their own schema_url field.
    * </pre>

@@ -72,39 +72,42 @@ public final class TraceProto {
       "e\030\001 \001(\01323.opentelemetry.proto.common.v1." +
       "InstrumentationScope\0221\n\005spans\030\002 \003(\0132\".op" +
       "entelemetry.proto.trace.v1.Span\022\022\n\nschem" +
-      "a_url\030\003 \001(\t\"\346\007\n\004Span\022\020\n\010trace_id\030\001 \001(\014\022\017" +
+      "a_url\030\003 \001(\t\"\204\010\n\004Span\022\020\n\010trace_id\030\001 \001(\014\022\017" +
       "\n\007span_id\030\002 \001(\014\022\023\n\013trace_state\030\003 \001(\t\022\026\n\016" +
-      "parent_span_id\030\004 \001(\014\022\014\n\004name\030\005 \001(\t\0229\n\004ki" +
-      "nd\030\006 \001(\0162+.opentelemetry.proto.trace.v1." +
-      "Span.SpanKind\022\034\n\024start_time_unix_nano\030\007 " +
-      "\001(\006\022\032\n\022end_time_unix_nano\030\010 \001(\006\022;\n\nattri" +
-      "butes\030\t \003(\0132\'.opentelemetry.proto.common" +
-      ".v1.KeyValue\022 \n\030dropped_attributes_count" +
-      "\030\n \001(\r\0228\n\006events\030\013 \003(\0132(.opentelemetry.p" +
-      "roto.trace.v1.Span.Event\022\034\n\024dropped_even" +
-      "ts_count\030\014 \001(\r\0226\n\005links\030\r \003(\0132\'.opentele" +
-      "metry.proto.trace.v1.Span.Link\022\033\n\023droppe" +
-      "d_links_count\030\016 \001(\r\0224\n\006status\030\017 \001(\0132$.op" +
-      "entelemetry.proto.trace.v1.Status\032\214\001\n\005Ev" +
-      "ent\022\026\n\016time_unix_nano\030\001 \001(\006\022\014\n\004name\030\002 \001(" +
-      "\t\022;\n\nattributes\030\003 \003(\0132\'.opentelemetry.pr" +
-      "oto.common.v1.KeyValue\022 \n\030dropped_attrib" +
-      "utes_count\030\004 \001(\r\032\235\001\n\004Link\022\020\n\010trace_id\030\001 " +
-      "\001(\014\022\017\n\007span_id\030\002 \001(\014\022\023\n\013trace_state\030\003 \001(" +
-      "\t\022;\n\nattributes\030\004 \003(\0132\'.opentelemetry.pr" +
-      "oto.common.v1.KeyValue\022 \n\030dropped_attrib" +
-      "utes_count\030\005 \001(\r\"\231\001\n\010SpanKind\022\031\n\025SPAN_KI" +
-      "ND_UNSPECIFIED\020\000\022\026\n\022SPAN_KIND_INTERNAL\020\001" +
-      "\022\024\n\020SPAN_KIND_SERVER\020\002\022\024\n\020SPAN_KIND_CLIE" +
-      "NT\020\003\022\026\n\022SPAN_KIND_PRODUCER\020\004\022\026\n\022SPAN_KIN" +
-      "D_CONSUMER\020\005\"\256\001\n\006Status\022\017\n\007message\030\002 \001(\t" +
-      "\022=\n\004code\030\003 \001(\0162/.opentelemetry.proto.tra" +
-      "ce.v1.Status.StatusCode\"N\n\nStatusCode\022\025\n" +
-      "\021STATUS_CODE_UNSET\020\000\022\022\n\016STATUS_CODE_OK\020\001" +
-      "\022\025\n\021STATUS_CODE_ERROR\020\002J\004\010\001\020\002Bw\n\037io.open" +
-      "telemetry.proto.trace.v1B\nTraceProtoP\001Z\'" +
-      "go.opentelemetry.io/proto/otlp/trace/v1\252" +
-      "\002\034OpenTelemetry.Proto.Trace.V1b\006proto3"
+      "parent_span_id\030\004 \001(\014\022\r\n\005flags\030\020 \001(\007\022\014\n\004n" +
+      "ame\030\005 \001(\t\0229\n\004kind\030\006 \001(\0162+.opentelemetry." +
+      "proto.trace.v1.Span.SpanKind\022\034\n\024start_ti" +
+      "me_unix_nano\030\007 \001(\006\022\032\n\022end_time_unix_nano" +
+      "\030\010 \001(\006\022;\n\nattributes\030\t \003(\0132\'.opentelemet" +
+      "ry.proto.common.v1.KeyValue\022 \n\030dropped_a" +
+      "ttributes_count\030\n \001(\r\0228\n\006events\030\013 \003(\0132(." +
+      "opentelemetry.proto.trace.v1.Span.Event\022" +
+      "\034\n\024dropped_events_count\030\014 \001(\r\0226\n\005links\030\r" +
+      " \003(\0132\'.opentelemetry.proto.trace.v1.Span" +
+      ".Link\022\033\n\023dropped_links_count\030\016 \001(\r\0224\n\006st" +
+      "atus\030\017 \001(\0132$.opentelemetry.proto.trace.v" +
+      "1.Status\032\214\001\n\005Event\022\026\n\016time_unix_nano\030\001 \001" +
+      "(\006\022\014\n\004name\030\002 \001(\t\022;\n\nattributes\030\003 \003(\0132\'.o" +
+      "pentelemetry.proto.common.v1.KeyValue\022 \n" +
+      "\030dropped_attributes_count\030\004 \001(\r\032\254\001\n\004Link" +
+      "\022\020\n\010trace_id\030\001 \001(\014\022\017\n\007span_id\030\002 \001(\014\022\023\n\013t" +
+      "race_state\030\003 \001(\t\022;\n\nattributes\030\004 \003(\0132\'.o" +
+      "pentelemetry.proto.common.v1.KeyValue\022 \n" +
+      "\030dropped_attributes_count\030\005 \001(\r\022\r\n\005flags" +
+      "\030\006 \001(\007\"\231\001\n\010SpanKind\022\031\n\025SPAN_KIND_UNSPECI" +
+      "FIED\020\000\022\026\n\022SPAN_KIND_INTERNAL\020\001\022\024\n\020SPAN_K" +
+      "IND_SERVER\020\002\022\024\n\020SPAN_KIND_CLIENT\020\003\022\026\n\022SP" +
+      "AN_KIND_PRODUCER\020\004\022\026\n\022SPAN_KIND_CONSUMER" +
+      "\020\005\"\256\001\n\006Status\022\017\n\007message\030\002 \001(\t\022=\n\004code\030\003" +
+      " \001(\0162/.opentelemetry.proto.trace.v1.Stat" +
+      "us.StatusCode\"N\n\nStatusCode\022\025\n\021STATUS_CO" +
+      "DE_UNSET\020\000\022\022\n\016STATUS_CODE_OK\020\001\022\025\n\021STATUS" +
+      "_CODE_ERROR\020\002J\004\010\001\020\002*H\n\tSpanFlags\022\031\n\025SPAN" +
+      "_FLAGS_DO_NOT_USE\020\000\022 \n\033SPAN_FLAGS_TRACE_" +
+      "FLAGS_MASK\020\377\001Bw\n\037io.opentelemetry.proto." +
+      "trace.v1B\nTraceProtoP\001Z\'go.opentelemetry" +
+      ".io/proto/otlp/trace/v1\252\002\034OpenTelemetry." +
+      "Proto.Trace.V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -135,7 +138,7 @@ public final class TraceProto {
     internal_static_opentelemetry_proto_trace_v1_Span_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_opentelemetry_proto_trace_v1_Span_descriptor,
-        new java.lang.String[] { "TraceId", "SpanId", "TraceState", "ParentSpanId", "Name", "Kind", "StartTimeUnixNano", "EndTimeUnixNano", "Attributes", "DroppedAttributesCount", "Events", "DroppedEventsCount", "Links", "DroppedLinksCount", "Status", });
+        new java.lang.String[] { "TraceId", "SpanId", "TraceState", "ParentSpanId", "Flags", "Name", "Kind", "StartTimeUnixNano", "EndTimeUnixNano", "Attributes", "DroppedAttributesCount", "Events", "DroppedEventsCount", "Links", "DroppedLinksCount", "Status", });
     internal_static_opentelemetry_proto_trace_v1_Span_Event_descriptor =
       internal_static_opentelemetry_proto_trace_v1_Span_descriptor.getNestedTypes().get(0);
     internal_static_opentelemetry_proto_trace_v1_Span_Event_fieldAccessorTable = new
@@ -147,7 +150,7 @@ public final class TraceProto {
     internal_static_opentelemetry_proto_trace_v1_Span_Link_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_opentelemetry_proto_trace_v1_Span_Link_descriptor,
-        new java.lang.String[] { "TraceId", "SpanId", "TraceState", "Attributes", "DroppedAttributesCount", });
+        new java.lang.String[] { "TraceId", "SpanId", "TraceState", "Attributes", "DroppedAttributesCount", "Flags", });
     internal_static_opentelemetry_proto_trace_v1_Status_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_opentelemetry_proto_trace_v1_Status_fieldAccessorTable = new

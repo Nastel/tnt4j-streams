@@ -83,6 +83,9 @@ public interface ResourceSpansOrBuilder extends
 
   /**
    * <pre>
+   * The Schema URL, if known. This is the identifier of the Schema that the resource data
+   * is recorded in. To learn more about Schema URL see
+   * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
    * This schema_url applies to the data in the "resource" field. It does not apply
    * to the data in the "scope_spans" field which have their own schema_url field.
    * </pre>
@@ -93,6 +96,9 @@ public interface ResourceSpansOrBuilder extends
   java.lang.String getSchemaUrl();
   /**
    * <pre>
+   * The Schema URL, if known. This is the identifier of the Schema that the resource data
+   * is recorded in. To learn more about Schema URL see
+   * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
    * This schema_url applies to the data in the "resource" field. It does not apply
    * to the data in the "scope_spans" field which have their own schema_url field.
    * </pre>

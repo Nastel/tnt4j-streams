@@ -86,6 +86,9 @@ public interface ScopeSpansOrBuilder extends
 
   /**
    * <pre>
+   * The Schema URL, if known. This is the identifier of the Schema that the span data
+   * is recorded in. To learn more about Schema URL see
+   * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
    * This schema_url applies to all spans and span events in the "spans" field.
    * </pre>
    *
@@ -95,6 +98,9 @@ public interface ScopeSpansOrBuilder extends
   java.lang.String getSchemaUrl();
   /**
    * <pre>
+   * The Schema URL, if known. This is the identifier of the Schema that the span data
+   * is recorded in. To learn more about Schema URL see
+   * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
    * This schema_url applies to all spans and span events in the "spans" field.
    * </pre>
    *

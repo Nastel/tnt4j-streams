@@ -86,6 +86,9 @@ public interface ScopeLogsOrBuilder extends
 
   /**
    * <pre>
+   * The Schema URL, if known. This is the identifier of the Schema that the log data
+   * is recorded in. To learn more about Schema URL see
+   * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
    * This schema_url applies to all logs in the "logs" field.
    * </pre>
    *
@@ -95,6 +98,9 @@ public interface ScopeLogsOrBuilder extends
   java.lang.String getSchemaUrl();
   /**
    * <pre>
+   * The Schema URL, if known. This is the identifier of the Schema that the log data
+   * is recorded in. To learn more about Schema URL see
+   * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
    * This schema_url applies to all logs in the "logs" field.
    * </pre>
    *

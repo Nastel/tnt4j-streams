@@ -225,6 +225,9 @@ private static final long serialVersionUID = 0L;
   private volatile java.lang.Object schemaUrl_;
   /**
    * <pre>
+   * The Schema URL, if known. This is the identifier of the Schema that the resource data
+   * is recorded in. To learn more about Schema URL see
+   * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
    * This schema_url applies to the data in the "resource" field. It does not apply
    * to the data in the "scope_metrics" field which have their own schema_url field.
    * </pre>
@@ -247,6 +250,9 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
+   * The Schema URL, if known. This is the identifier of the Schema that the resource data
+   * is recorded in. To learn more about Schema URL see
+   * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
    * This schema_url applies to the data in the "resource" field. It does not apply
    * to the data in the "scope_metrics" field which have their own schema_url field.
    * </pre>
@@ -1141,6 +1147,9 @@ private static final long serialVersionUID = 0L;
     private java.lang.Object schemaUrl_ = "";
     /**
      * <pre>
+     * The Schema URL, if known. This is the identifier of the Schema that the resource data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to the data in the "resource" field. It does not apply
      * to the data in the "scope_metrics" field which have their own schema_url field.
      * </pre>
@@ -1162,6 +1171,9 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
+     * The Schema URL, if known. This is the identifier of the Schema that the resource data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to the data in the "resource" field. It does not apply
      * to the data in the "scope_metrics" field which have their own schema_url field.
      * </pre>
@@ -1184,6 +1196,9 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
+     * The Schema URL, if known. This is the identifier of the Schema that the resource data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to the data in the "resource" field. It does not apply
      * to the data in the "scope_metrics" field which have their own schema_url field.
      * </pre>
@@ -1204,6 +1219,9 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
+     * The Schema URL, if known. This is the identifier of the Schema that the resource data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to the data in the "resource" field. It does not apply
      * to the data in the "scope_metrics" field which have their own schema_url field.
      * </pre>
@@ -1219,6 +1237,9 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
+     * The Schema URL, if known. This is the identifier of the Schema that the resource data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to the data in the "resource" field. It does not apply
      * to the data in the "scope_metrics" field which have their own schema_url field.
      * </pre>

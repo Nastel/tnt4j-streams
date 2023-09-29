@@ -40,24 +40,54 @@ public interface InstrumentationScopeOrBuilder extends
       getVersionBytes();
 
   /**
+   * <pre>
+   * Additional attributes that describe the scope. [Optional].
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
    * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
    */
   java.util.List<io.opentelemetry.proto.common.v1.KeyValue> 
       getAttributesList();
   /**
+   * <pre>
+   * Additional attributes that describe the scope. [Optional].
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
    * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
    */
   io.opentelemetry.proto.common.v1.KeyValue getAttributes(int index);
   /**
+   * <pre>
+   * Additional attributes that describe the scope. [Optional].
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
    * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
    */
   int getAttributesCount();
   /**
+   * <pre>
+   * Additional attributes that describe the scope. [Optional].
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
    * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
    */
   java.util.List<? extends io.opentelemetry.proto.common.v1.KeyValueOrBuilder> 
       getAttributesOrBuilderList();
   /**
+   * <pre>
+   * Additional attributes that describe the scope. [Optional].
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
    * <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 3;</code>
    */
   io.opentelemetry.proto.common.v1.KeyValueOrBuilder getAttributesOrBuilder(

@@ -4332,6 +4332,9 @@ public final class Metrics {
     /**
      * <pre>
      * Positive buckets for the native histogram.
+     * Use a no-op span (offset 0, length 0) for a native histogram without any
+     * observations yet and with a zero_threshold of 0. Otherwise, it would be
+     * indistinguishable from a classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -4341,6 +4344,9 @@ public final class Metrics {
     /**
      * <pre>
      * Positive buckets for the native histogram.
+     * Use a no-op span (offset 0, length 0) for a native histogram without any
+     * observations yet and with a zero_threshold of 0. Otherwise, it would be
+     * indistinguishable from a classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -4349,6 +4355,9 @@ public final class Metrics {
     /**
      * <pre>
      * Positive buckets for the native histogram.
+     * Use a no-op span (offset 0, length 0) for a native histogram without any
+     * observations yet and with a zero_threshold of 0. Otherwise, it would be
+     * indistinguishable from a classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -4357,6 +4366,9 @@ public final class Metrics {
     /**
      * <pre>
      * Positive buckets for the native histogram.
+     * Use a no-op span (offset 0, length 0) for a native histogram without any
+     * observations yet and with a zero_threshold of 0. Otherwise, it would be
+     * indistinguishable from a classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -4366,6 +4378,9 @@ public final class Metrics {
     /**
      * <pre>
      * Positive buckets for the native histogram.
+     * Use a no-op span (offset 0, length 0) for a native histogram without any
+     * observations yet and with a zero_threshold of 0. Otherwise, it would be
+     * indistinguishable from a classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -5003,6 +5018,9 @@ public final class Metrics {
     /**
      * <pre>
      * Positive buckets for the native histogram.
+     * Use a no-op span (offset 0, length 0) for a native histogram without any
+     * observations yet and with a zero_threshold of 0. Otherwise, it would be
+     * indistinguishable from a classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -5014,6 +5032,9 @@ public final class Metrics {
     /**
      * <pre>
      * Positive buckets for the native histogram.
+     * Use a no-op span (offset 0, length 0) for a native histogram without any
+     * observations yet and with a zero_threshold of 0. Otherwise, it would be
+     * indistinguishable from a classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -5026,6 +5047,9 @@ public final class Metrics {
     /**
      * <pre>
      * Positive buckets for the native histogram.
+     * Use a no-op span (offset 0, length 0) for a native histogram without any
+     * observations yet and with a zero_threshold of 0. Otherwise, it would be
+     * indistinguishable from a classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -5037,6 +5061,9 @@ public final class Metrics {
     /**
      * <pre>
      * Positive buckets for the native histogram.
+     * Use a no-op span (offset 0, length 0) for a native histogram without any
+     * observations yet and with a zero_threshold of 0. Otherwise, it would be
+     * indistinguishable from a classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -5048,6 +5075,9 @@ public final class Metrics {
     /**
      * <pre>
      * Positive buckets for the native histogram.
+     * Use a no-op span (offset 0, length 0) for a native histogram without any
+     * observations yet and with a zero_threshold of 0. Otherwise, it would be
+     * indistinguishable from a classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7052,6 +7082,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7066,6 +7099,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7080,6 +7116,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7094,6 +7133,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7115,6 +7157,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7133,6 +7178,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7153,6 +7201,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7174,6 +7225,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7192,6 +7246,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7210,6 +7267,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7229,6 +7289,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7246,6 +7309,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7263,6 +7329,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7274,6 +7343,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7288,6 +7360,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7303,6 +7378,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7314,6 +7392,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
@@ -7326,6 +7407,9 @@ public final class Metrics {
       /**
        * <pre>
        * Positive buckets for the native histogram.
+       * Use a no-op span (offset 0, length 0) for a native histogram without any
+       * observations yet and with a zero_threshold of 0. Otherwise, it would be
+       * indistinguishable from a classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.BucketSpan positive_span = 12 [(.gogoproto.nullable) = false];</code>
