@@ -86,6 +86,9 @@ public interface ScopeMetricsOrBuilder extends
 
   /**
    * <pre>
+   * The Schema URL, if known. This is the identifier of the Schema that the metric data
+   * is recorded in. To learn more about Schema URL see
+   * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
    * This schema_url applies to all metrics in the "metrics" field.
    * </pre>
    *
@@ -95,6 +98,9 @@ public interface ScopeMetricsOrBuilder extends
   java.lang.String getSchemaUrl();
   /**
    * <pre>
+   * The Schema URL, if known. This is the identifier of the Schema that the metric data
+   * is recorded in. To learn more about Schema URL see
+   * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
    * This schema_url applies to all metrics in the "metrics" field.
    * </pre>
    *

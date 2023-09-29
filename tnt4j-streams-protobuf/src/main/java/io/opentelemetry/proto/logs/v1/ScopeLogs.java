@@ -228,6 +228,9 @@ private static final long serialVersionUID = 0L;
   private volatile java.lang.Object schemaUrl_;
   /**
    * <pre>
+   * The Schema URL, if known. This is the identifier of the Schema that the log data
+   * is recorded in. To learn more about Schema URL see
+   * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
    * This schema_url applies to all logs in the "logs" field.
    * </pre>
    *
@@ -249,6 +252,9 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
+   * The Schema URL, if known. This is the identifier of the Schema that the log data
+   * is recorded in. To learn more about Schema URL see
+   * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
    * This schema_url applies to all logs in the "logs" field.
    * </pre>
    *
@@ -1151,6 +1157,9 @@ private static final long serialVersionUID = 0L;
     private java.lang.Object schemaUrl_ = "";
     /**
      * <pre>
+     * The Schema URL, if known. This is the identifier of the Schema that the log data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to all logs in the "logs" field.
      * </pre>
      *
@@ -1171,6 +1180,9 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
+     * The Schema URL, if known. This is the identifier of the Schema that the log data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to all logs in the "logs" field.
      * </pre>
      *
@@ -1192,6 +1204,9 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
+     * The Schema URL, if known. This is the identifier of the Schema that the log data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to all logs in the "logs" field.
      * </pre>
      *
@@ -1211,6 +1226,9 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
+     * The Schema URL, if known. This is the identifier of the Schema that the log data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to all logs in the "logs" field.
      * </pre>
      *
@@ -1225,6 +1243,9 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
+     * The Schema URL, if known. This is the identifier of the Schema that the log data
+     * is recorded in. To learn more about Schema URL see
+     * https://opentelemetry.io/docs/specs/otel/schemas/#schema-url
      * This schema_url applies to all logs in the "logs" field.
      * </pre>
      *

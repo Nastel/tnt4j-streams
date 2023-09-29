@@ -11806,7 +11806,7 @@ public final class Types {
     }
     private ReadHints() {
       func_ = "";
-      grouping_ = com.google.protobuf.LazyStringArrayList.emptyList();
+      grouping_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
 
     @java.lang.Override
@@ -12366,7 +12366,7 @@ public final class Types {
 
         endMs_ = 0L;
 
-        grouping_ = com.google.protobuf.LazyStringArrayList.emptyList();
+        grouping_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000001);
         by_ = false;
 
@@ -12742,7 +12742,7 @@ public final class Types {
         return this;
       }
 
-      private com.google.protobuf.LazyStringList grouping_ = com.google.protobuf.LazyStringArrayList.emptyList();
+      private com.google.protobuf.LazyStringList grouping_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       private void ensureGroupingIsMutable() {
         if (!((bitField0_ & 0x00000001) != 0)) {
           grouping_ = new com.google.protobuf.LazyStringArrayList(grouping_);
@@ -12862,7 +12862,7 @@ public final class Types {
        * @return This builder for chaining.
        */
       public Builder clearGrouping() {
-        grouping_ = com.google.protobuf.LazyStringArrayList.emptyList();
+        grouping_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;
@@ -13078,7 +13078,7 @@ public final class Types {
     }
     private Chunk() {
       type_ = 0;
-      data_ = com.google.protobuf.ByteString.empty();
+      data_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @java.lang.Override
@@ -13586,7 +13586,7 @@ public final class Types {
 
         type_ = 0;
 
-        data_ = com.google.protobuf.ByteString.empty();
+        data_ = com.google.protobuf.ByteString.EMPTY;
 
         return this;
       }
@@ -13823,7 +13823,7 @@ public final class Types {
         return this;
       }
 
-      private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.empty();
+      private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>bytes data = 4;</code>
        * @return The data.

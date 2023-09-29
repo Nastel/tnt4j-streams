@@ -72,6 +72,26 @@ public interface SpanOrBuilder extends
 
   /**
    * <pre>
+   * Flags, a bit field. 8 least significant bits are the trace
+   * flags as defined in W3C Trace Context specification. Readers
+   * MUST not assume that 24 most significant bits will be zero.
+   * To read the 8-bit W3C trace flag, use `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
+   * When creating span messages, if the message is logically forwarded from another source
+   * with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
+   * be copied as-is. If creating from a source that does not have an equivalent flags field
+   * (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+   * be set to zero.
+   * [Optional].
+   * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+   * </pre>
+   *
+   * <code>fixed32 flags = 16;</code>
+   * @return The flags.
+   */
+  int getFlags();
+
+  /**
+   * <pre>
    * A description of the span's operation.
    * For example, the name can be a qualified method name or a file name
    * and a line number where the operation is called. A best practice is to use
