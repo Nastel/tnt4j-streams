@@ -30,7 +30,7 @@
         <jesl.version>0.11-SNAPSHOT</jesl.version>
 
         <httpcomponents.version>5.2.1</httpcomponents.version>
-        <zookeeper.version>3.9.0</zookeeper.version>
+        <zookeeper.version>3.9.1</zookeeper.version>
 
         <groovy.version>4.0.15</groovy.version>
         <dropwizard.metrics.version>4.2.18</dropwizard.metrics.version>
