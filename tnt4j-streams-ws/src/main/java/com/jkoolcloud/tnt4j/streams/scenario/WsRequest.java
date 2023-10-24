@@ -319,11 +319,31 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 	 *            parameter type
 	 * @param format
 	 *            parameter format
+	 * @param tz
+	 *            date-time value format timezone
+	 */
+	public void addParameter(String id, String value, String type, String format, String tz) {
+		addParameter(new Parameter(id, value, type, format, tz));
+	}
+
+	/**
+	 * Adds request (command/query/etc.) parameter.
+	 *
+	 * @param id
+	 *            parameter identifier
+	 * @param value
+	 *            parameter value
+	 * @param type
+	 *            parameter type
+	 * @param format
+	 *            parameter format
+	 * @param tz
+	 *            date-time value format timezone
 	 * @param transient_
 	 *            transiency flag
 	 */
-	public void addParameter(String id, String value, String type, String format, boolean transient_) {
-		addParameter(new Parameter(id, value, type, format, transient_));
+	public void addParameter(String id, String value, String type, String format, String tz, boolean transient_) {
+		addParameter(new Parameter(id, value, type, format, tz, transient_));
 	}
 
 	/**
@@ -426,6 +446,7 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 		private Object value;
 		private String type;
 		private String format;
+		private String timeZone;
 		private boolean transient_ = false;
 
 		/**
@@ -437,7 +458,7 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 		 *            parameter value
 		 */
 		public Parameter(String id, Object value) {
-			this(id, value, null, null);
+			this(id, value, null, null, null);
 		}
 
 		/**
@@ -451,7 +472,7 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 		 *            parameter type
 		 */
 		public Parameter(String id, Object value, String type) {
-			this(id, value, type, null);
+			this(id, value, type, null, null);
 		}
 
 		/**
@@ -465,7 +486,25 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 		 *            transiency flag
 		 */
 		public Parameter(String id, Object value, boolean transient_) {
-			this(id, value, null, null, transient_);
+			this(id, value, null, null, null, transient_);
+		}
+
+		/**
+		 * Constructs a new Parameter. Defines parameter identifier, value and type.
+		 *
+		 * @param id
+		 *            parameter identifier
+		 * @param value
+		 *            parameter value
+		 * @param type
+		 *            parameter type
+		 * @param format
+		 *            parameter format
+		 * @param tz
+		 *            date-time value format timezone
+		 */
+		public Parameter(String id, Object value, String type, String format, String tz) {
+			this(id, value, type, format, tz, false);
 		}
 
 		/**
@@ -481,7 +520,7 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 		 *            parameter format
 		 */
 		public Parameter(String id, Object value, String type, String format) {
-			this(id, value, type, format, false);
+			this(id, value, type, format, null, false);
 		}
 
 		/**
@@ -495,14 +534,17 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 		 *            parameter type
 		 * @param format
 		 *            parameter format
+		 * @param tz
+		 *            date-time value format timezone
 		 * @param transient_
 		 *            transiency flag
 		 */
-		public Parameter(String id, Object value, String type, String format, boolean transient_) {
+		public Parameter(String id, Object value, String type, String format, String tz, boolean transient_) {
 			this.id = id;
 			this.value = value;
 			this.type = type;
 			this.format = format;
+			this.timeZone = tz;
 			this.transient_ = transient_;
 		}
 
@@ -562,6 +604,15 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 		}
 
 		/**
+		 * Returns date-time value format timezone.
+		 *
+		 * @return parameter date-time value format timezone
+		 */
+		public String getTimeZone() {
+			return timeZone;
+		}
+
+		/**
 		 * Returns parameter transiency flag.
 		 * <p>
 		 * When parameter is marked transient, value of it shall be not used directly within request formation. It may
@@ -580,6 +631,7 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 			sb.append(", value=").append(Utils.sQuote(getStringValue())); // NON-NLS
 			sb.append(", type=").append(Utils.sQuote(type)); // NON-NLS
 			sb.append(", format=").append(Utils.sQuote(format)); // NON-NLS
+			sb.append(", timeZone=").append(Utils.sQuote(timeZone)); // NON-NLS
 			sb.append(", transient=").append(Utils.sQuote(transient_)); // NON-NLS
 			sb.append('}'); // NON-NLS
 			return sb.toString();
@@ -592,7 +644,7 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 		 */
 		@Override
 		public Parameter clone() {
-			Parameter cParam = new Parameter(id, value, type, format, transient_);
+			Parameter cParam = new Parameter(id, value, type, format, timeZone, transient_);
 
 			return cParam;
 		}

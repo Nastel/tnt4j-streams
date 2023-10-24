@@ -5405,6 +5405,7 @@ request/invocation/execution parameters and scheduler. Steps are invoked/execute
                 * `value` - parameter value. (Required)
                 * `type` - parameter value type. (Optional)
                 * `format` - parameter value format. (Optional)
+                * `timezone` - parameter date-time value format timezone. (Optional)
                 * `transient` - flag indicating whether to add (when value `false`) parameter to service request or just keep it to be used
                   for internal aggregations (when value `true`), e.g. request/response mapping. Default value - `false`. (Optional)
             * `condition` tag is used to define request state condition. This tag has attributes:

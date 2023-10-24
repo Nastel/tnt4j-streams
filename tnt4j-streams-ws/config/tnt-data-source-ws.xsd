@@ -307,6 +307,14 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute name="timezone" use="optional" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>
+                    Specifies the time zone that a date/time string is represented in (when not specified, date/time string is assumed to be
+                    in local time zone).
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
         <xs:attribute name="transient" use="optional" type="xs:boolean" default="false">
             <xs:annotation>
                 <xs:documentation>
