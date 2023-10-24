@@ -396,6 +396,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 					String type = param.getValue().getType();
 					String value = param.getValue().getStringValue();
 					String format = param.getValue().getFormat();
+					String timeZone = param.getValue().getTimeZone();
 
 					if (type == null) {
 						type = "";
@@ -464,7 +465,8 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 						}
 						break;
 					case "DATE": // NON-NLS
-						value = fillInRequestData(value, StringUtils.isEmpty(format) ? DEFAULT_DATE_PATTERN : format);
+						value = fillInRequestData(value, StringUtils.isEmpty(format) ? DEFAULT_DATE_PATTERN : format,
+								timeZone);
 						if (!param.getValue().isTransient()) {
 							if (isNullValue(value)) {
 								setNullParameter(statement, dbRequest.getId(), pIdx, Types.DATE, type.toUpperCase());
@@ -479,7 +481,8 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 						}
 						break;
 					case "TIME": // NON-NLS
-						value = fillInRequestData(value, StringUtils.isEmpty(format) ? DEFAULT_TIME_PATTERN : format);
+						value = fillInRequestData(value, StringUtils.isEmpty(format) ? DEFAULT_TIME_PATTERN : format,
+								timeZone);
 						if (!param.getValue().isTransient()) {
 							if (isNullValue(value)) {
 								setNullParameter(statement, dbRequest.getId(), pIdx, Types.TIME, type.toUpperCase());
@@ -496,7 +499,7 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 					case "TIMESTAMP": // NON-NLS
 					case "DATETIME": // NON-NLS
 						value = fillInRequestData(value,
-								StringUtils.isEmpty(format) ? DEFAULT_TIMESTAMP_PATTERN : format);
+								StringUtils.isEmpty(format) ? DEFAULT_TIMESTAMP_PATTERN : format, timeZone);
 						if (!param.getValue().isTransient()) {
 							if (isNullValue(value)) {
 								setNullParameter(statement, dbRequest.getId(), pIdx, Types.TIMESTAMP,

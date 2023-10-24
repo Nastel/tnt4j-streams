@@ -232,11 +232,11 @@ public class ConfigParserHandler extends DefaultHandler {
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag attribute {@value}.
 	 */
-	private static final String LOCALE_ATTR = "locale"; // NON-NLS
+	protected static final String LOCALE_ATTR = "locale"; // NON-NLS
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag attribute {@value}.
 	 */
-	private static final String TIMEZONE_ATTR = "timezone"; // NON-NLS
+	protected static final String TIMEZONE_ATTR = "timezone"; // NON-NLS
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag attribute {@value}.
 	 */

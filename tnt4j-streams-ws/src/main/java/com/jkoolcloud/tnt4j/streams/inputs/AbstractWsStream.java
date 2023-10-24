@@ -571,10 +571,10 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 *            request/query/command string
 	 * @return variable values filled-in request/query/command string
 	 *
-	 * @see #fillInRequestData(String, String)
+	 * @see #fillInRequestData(String, String, String)
 	 */
 	public String fillInRequestData(String reqDataStr) {
-		return fillInRequestData(reqDataStr, (String) null);
+		return fillInRequestData(reqDataStr, null, null);
 	}
 
 	/**
@@ -590,11 +590,27 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 * @see #fillInRequestData(DataFillContext)
 	 */
 	public String fillInRequestData(String reqDataStr, String format) {
+		return fillInRequestData(reqDataStr, format, null);
+	}
+
+	/**
+	 * Fills-in request/query/command string having variable expressions with values stored in stream configuration
+	 * properties maps and streams cache {@link com.jkoolcloud.tnt4j.streams.utils.StreamsCache}.
+	 *
+	 * @param reqDataStr
+	 *            request/query/command string
+	 * @param format
+	 *            format of value to fill
+	 * @return variable values filled-in request/query/command string
+	 *
+	 * @see #fillInRequestData(DataFillContext)
+	 */
+	public String fillInRequestData(String reqDataStr, String format, String tz) {
 		if (StringUtils.isEmpty(reqDataStr)) {
 			return reqDataStr;
 		}
 
-		DataFillContext ctx = makeDataContext(reqDataStr, format, null);
+		DataFillContext ctx = makeDataContext(reqDataStr, format, tz, null);
 
 		return (String) fillInRequestData(ctx);
 	}
@@ -608,7 +624,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 * @return variable values filled-in request/query/command data entity
 	 * 
 	 * @see #getVariableValue(String, DataFillContext)
-	 * @see #formattedValue(Object, String)
+	 * @see #formattedValue(Object, String, String)
 	 */
 	protected Object fillInRequestData(DataFillContext context) {
 		if (context == null || StringUtils.isEmpty(context.getData())) {
@@ -628,7 +644,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 							"AbstractWsStream.filling.req.data.variable", rdVar, Utils.toString(cValue));
 					return cValue;
 				} else {
-					String varVal = formattedValue(cValue, context.getFormat());
+					String varVal = formattedValue(cValue, context.getFormat(), context.getTimeZone());
 					reqData = reqData.replace(rdVar, varVal);
 					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
 							"AbstractWsStream.filling.req.data.variable", rdVar, varVal);
@@ -735,7 +751,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 */
 	protected Object evaluateExpr(String varExpr) throws ScriptException {
 		String[] vet = varExpr.split(":"); // NON-NLS
-		if (vet.length == 1 || !vet[0].equalsIgnoreCase("groovy")) { // NON-NLS
+		if (vet.length == 1 || !vet[0].equalsIgnoreCase("groovy") || StringUtils.isEmpty(vet[1])) { // NON-NLS
 			return null;
 		}
 
@@ -784,27 +800,37 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 		// return scriptStr;
 		// }
 
-		String gScript = null;
-		switch (scriptStr.substring(0, 8)) {
-		case "HOUR_BEG": // NOTE: full value is HOUR_BEGIN
-			String dateVariable = scriptStr.substring(11);
-			gScript = " def vDate = " + dateVariable + ";";
-			gScript += "    vDate.putAt('minutes',0);";
-			gScript += "    vDate.putAt('seconds',0);";
-			gScript += "return vDate;";
-			break;
-		case "HOUR_END":
-			dateVariable = scriptStr.substring(9);
-			gScript = " def vDate = " + dateVariable + ";";
-			gScript += "    vDate.putAt('minutes',59);";
-			gScript += "    vDate.putAt('seconds',59);";
-			gScript += "return vDate;";
-			break;
-		default:
-			gScript = scriptStr;
+		String gScript = translateKeyword(scriptStr);
+		if (scriptStr.length() >= 8) {
+			switch (scriptStr.substring(0, 8)) {
+			case "HOUR_BEG": // NOTE: full value is HOUR_BEGIN
+				String dateVariable = translateKeyword(scriptStr.substring(11));
+				gScript = " def vDate = " + dateVariable + ";";
+				gScript += "    vDate.putAt('minutes',0);";
+				gScript += "    vDate.putAt('seconds',0);";
+				gScript += "return vDate;";
+				break;
+			case "HOUR_END":
+				dateVariable = translateKeyword(scriptStr.substring(9));
+				gScript = " def vDate = " + dateVariable + ";";
+				gScript += "    vDate.putAt('minutes',59);";
+				gScript += "    vDate.putAt('seconds',59);";
+				gScript += "return vDate;";
+				break;
+			default:
+			}
 		}
 
 		return "use( groovy.time.TimeCategory ) { " + gScript + " }"; // NON-NLS
+	}
+
+	private String translateKeyword(String script) {
+		switch (script) {
+		case "now":
+			return "new Date()";
+		default:
+			return script;
+		}
 	}
 
 	/**
@@ -859,7 +885,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 */
 	protected WsRequest<String> fillInRequest(WsRequest<String> req, RequestFillContext context)
 			throws VoidRequestException {
-		DataFillContext ctx = makeDataContext(null, null, context);
+		DataFillContext ctx = makeDataContext(null, null, null, context);
 		ctx.setRequest(req);
 		checkConditions(req, ctx);
 
@@ -869,8 +895,10 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 
 			if (context.isFillingParams()) {
 				for (Map.Entry<String, WsRequest.Parameter> reqParam : fReq.getParameters().entrySet()) {
-					reqParam.getValue().setValue(fillInRequestData(ctx.setData(reqParam.getValue().getStringValue())
-							.setFormat(reqParam.getValue().getFormat()).setType(reqParam.getValue().getType())));
+					reqParam.getValue()
+							.setValue(fillInRequestData(ctx.setData(reqParam.getValue().getStringValue())
+									.setFormat(reqParam.getValue().getFormat()).setType(reqParam.getValue().getType())
+									.setTimeZone(reqParam.getValue().getTimeZone())));
 				}
 			}
 
@@ -889,13 +917,16 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 *            request entity data string
 	 * @param format
 	 *            format of value to fill
+	 * @param tz
+	 *            date-time value format timezone
 	 * @param reqCtx
 	 *            request fill-in context to use
 	 * @return data fill-in context instance
 	 */
-	protected DataFillContext makeDataContext(String reqDataStr, String format, RequestFillContext reqCtx) {
+	protected DataFillContext makeDataContext(String reqDataStr, String format, String tz, RequestFillContext reqCtx) {
 		DataFillContext dataCtx = new DataFillContext(reqDataStr);
 		dataCtx.setFormat(format);
+		dataCtx.setTimeZone(tz);
 
 		if (reqCtx != null) {
 			for (Map.Entry<String, Object> rcme : reqCtx.entrySet()) {
@@ -915,14 +946,17 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 *            value to format
 	 * @param format
 	 *            format pattern of the value
+	 * @param tz
+	 *            timezone to format date-time values
 	 * @return formatted value string
 	 */
-	protected static String formattedValue(Object cValue, String format) {
+	protected static String formattedValue(Object cValue, String format, String tz) {
 		if (StringUtils.isNotEmpty(format)) {
 			if (cValue instanceof UsecTimestamp) {
-				return ((UsecTimestamp) cValue).toString(format);
+				return ((UsecTimestamp) cValue).toString(format, tz);
 			} else if (cValue instanceof Date) {
-				FastDateFormat df = FastDateFormat.getInstance(format);
+				FastDateFormat df = FastDateFormat.getInstance(format,
+						StringUtils.isEmpty(tz) ? null : TimeZone.getTimeZone(tz));
 				return df.format(cValue);
 			} else if (cValue instanceof Number) {
 				DecimalFormat df = new DecimalFormat(format);
@@ -1235,6 +1269,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 		private static final String FORMAT = KEY_PREFIX + "FORMAT"; // NON-NLS
 		private static final String TYPE = KEY_PREFIX + "TYPE"; // NON-NLS
 		private static final String REQUEST = KEY_PREFIX + "REQUEST"; // NON-NLS
+		private static final String TIMEZONE = KEY_PREFIX + "TIMEZONE"; // NON-NLS
 
 		/**
 		 * Constructs a new instance of DataFillContext.
@@ -1293,6 +1328,28 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 		}
 
 		/**
+		 * Sets date-time value format timezone.
+		 * 
+		 * @param tz
+		 *            timezone identifier string
+		 * @return instance of this context
+		 */
+		public DataFillContext setTimeZone(String tz) {
+			put(TIMEZONE, tz);
+
+			return this;
+		}
+
+		/**
+		 * Returns date-time value format timezone.
+		 * 
+		 * @return date-time value format timezone
+		 */
+		public String getTimeZone() {
+			return (String) get(TIMEZONE);
+		}
+
+		/**
 		 * Sets value type.
 		 * 
 		 * @param type
@@ -1315,12 +1372,13 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 		}
 
 		/**
-		 * Removes context additional properties: format and type.
+		 * Removes context additional properties: format, timezone and type.
 		 * 
 		 * @return instance of this context
 		 */
 		public DataFillContext reset() {
 			remove(FORMAT);
+			remove(TIMEZONE);
 			remove(TYPE);
 
 			return this;
