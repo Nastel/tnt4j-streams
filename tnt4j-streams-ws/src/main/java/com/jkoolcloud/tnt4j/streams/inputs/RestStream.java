@@ -88,7 +88,7 @@ public class RestStream extends AbstractHttpStream {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(RestStream.class);
 
 	private static final String REQ_HEAD_PARAM_PREFIX = "H:"; // NON-NLS
-	private static final String REQ_HEAD_PARAM_AUTH = REQ_HEAD_PARAM_PREFIX + HttpHeaders.AUTHORIZATION; //
+	private static final String REQ_HEAD_PARAM_AUTH = REQ_HEAD_PARAM_PREFIX + HttpHeaders.AUTHORIZATION;
 	private static final BasicHttpClientResponseHandler respHandler = new BasicHttpClientResponseHandler();
 
 	private int maxTotalPoolConnections = 5;
@@ -221,7 +221,7 @@ public class RestStream extends AbstractHttpStream {
 	 *             if exception occurs while performing JAX-RS service call
 	 */
 	public static String executePOST(CloseableHttpClient client, WsRequest<String> req) throws Exception {
-		return executePOST(client, req.getScenarioStep().getUrlStr(), req.getData(), req.getParameters());
+		return executePOST(client, req.getParameterStringValue(REQ_URL_PARAM), req.getData(), req.getParameters());
 	}
 
 	/**
@@ -407,6 +407,7 @@ public class RestStream extends AbstractHttpStream {
 					processedRequest = null;
 					try {
 						acquiredSemaphore = stream.acquireSemaphore(request);
+						request.addParameter(REQ_URL_PARAM, scenarioStep.getUrlStr(), true);
 						processedRequest = stream.fillInRequest(request);
 						respStr = stream.executePOST(stream.client, processedRequest);
 					} catch (VoidRequestException exc) {

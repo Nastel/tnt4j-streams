@@ -89,6 +89,11 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	 */
 	protected static final String JOB_PROP_SEMAPHORE = "semaphoreObj"; // NON-NLS
 
+	/**
+	 * Constant for name of built-in request parameter {@value}.
+	 */
+	protected static final String REQ_URL_PARAM = "WS_REQ_URL"; // NON-NLS
+
 	private static final String OBJECT_TYPE = "OBJECT";// NON-NLS
 
 	// private static final Pattern GROOVY_EXP_PATTERN = Pattern.compile("\\s*use\\s*\\(.+\\)\\s*\\{(?s).+\\}");
