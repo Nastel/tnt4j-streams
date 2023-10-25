@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2014-2023 JKOOL, LLC.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
+
+    <parser name="AzureESBManagementLogsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
+        <property name="ActivityDelim" value="EOF"/>
+    </parser>
+
+    <parser name="MetadataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <field name="${MetadataName}" locator="value" locator-type="Label" datatype="String" split="true">
+            <field-locator id="MetadataName" locator="name.value" locator-type="Label"/>
+            <!--<field-locator id="MetadataNameLocalized" locator="name.localizedValue" locator-type="Label"/>-->
+        </field>
+    </parser>
+
+    <parser name="MetricDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Snapshot"/>
+
+        <field name="Guid" separator="_">
+            <field-locator id="MetricName" locator="^.MetricName" locator-type="Activity" datatype="String"/>
+            <field-locator id="MetricEntityName" locator="^.EntityName" locator-type="Activity" datatype="String">
+                <field-transform lang="groovy"><![CDATA[
+                   $fieldValue == null //|| $fieldValue.equals("-NamespaceOnlyMetric-")
+                        ? ${NamespaceName}
+                        : $fieldValue
+                ]]></field-transform>
+            </field-locator>
+            <field-locator id="MetricRegion" locator="^.Region" locator-type="Activity" datatype="String"/>
+            <field-locator id="MetricTimeStamp" locator="timeStamp" locator-type="Label" datatype="String"/>
+            <field-locator id="MessagingErrorSubCode" locator="^.MessagingErrorSubCode" locator-type="Activity" datatype="String"/>
+        </field>
+        <field name="NamespaceName" locator="^.NamespaceName" locator-type="Activity" transparent="true"/>
+        <field name="StartTime" locator="timeStamp" locator-type="Label" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ssX"/>
+        <field name="EndTime" locator="StartTime" locator-type="Activity"/>
+
+        <field name="Total" locator="total" locator-type="Label" datatype="Number" format="long" value-type="${ValueType}">
+            <field-locator id="ValueType" locator="ValueType" locator-type="Activity"/>
+        </field>
+        <field name="Count" locator="count" locator-type="Label" datatype="Number" format="long" value-type="${ValueType}">
+            <field-locator id="ValueType" locator="ValueType" locator-type="Activity"/>
+        </field>
+        <field name="Maximum" locator="maximum" locator-type="Label" datatype="Number" format="double" value-type="${ValueType}">
+            <field-locator id="ValueType" locator="ValueType" locator-type="Activity"/>
+        </field>
+        <field name="Minimum" locator="minimum" locator-type="Label" datatype="Number" format="double" value-type="${ValueType}">
+            <field-locator id="ValueType" locator="ValueType" locator-type="Activity"/>
+        </field>
+        <field name="Average" locator="average" locator-type="Label" datatype="Number" format="double" value-type="${ValueType}">
+            <field-locator id="ValueType" locator="ValueType" locator-type="Activity"/>
+        </field>
+
+        <field name="ValueType" locator="^.MetricUnit" locator-type="Activity" datatype="String">
+            <field-map source="Bytes" target="size.byte"/>
+            <field-map source="MilliSeconds" target="age.msec"/>
+            <field-map source="Percent" target="percent"/>
+            <field-map source="CPU" target="percent"/>
+            <field-map source="Memory Usage" target="percent"/>
+            <field-map source="MemoryUsage" target="percent"/>
+            <field-map source="" target="counter"/>
+        </field>
+    </parser>
+
+    <parser name="MetricTimeseriesParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <embedded-activity name="MetadataValues" locator="metadatavalues" locator-type="Label">
+            <parser-ref name="MetadataParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="Data" locator="data" locator-type="Label">
+            <parser-ref name="MetricDataParser" aggregation="Relate"/>
+        </embedded-activity>
+    </parser>
+
+    <parser name="ESBMetricParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <field name="EventName" locator="MetricName" locator-type="Activity" separator="String"/>
+        <field name="Category" locator="MetricType" locator-type="Activity" separator="String"/>
+
+        <field name="MetricId" locator="id" locator-type="Label" datatype="String"/>
+        <field name="ResourceName" value="">
+            <field-transform lang="groovy"><![CDATA[
+                return StringUtils.substringBefore(${MetricId}, "/providers/Microsoft.Insights/metrics");
+            ]]></field-transform>
+        </field>
+        <field name="NamespaceName" value="">
+            <field-transform lang="groovy"><![CDATA[
+                return StringUtils.substringAfterLast(${ResourceName}, "/");
+            ]]></field-transform>
+        </field>
+        <field name="MetricType" locator="type" locator-type="Label" datatype="String"/>
+        <field name="MetricName" locator="name.value" locator-type="Label" datatype="String"/>
+        <field name="MetricNameLocalized" locator="name.localizedValue" locator-type="Label" datatype="String"/>
+        <field name="MetricDisplayDescription" locator="displayDescription" locator-type="Label" datatype="String"/>
+        <field name="MetricUnit" locator="unit" locator-type="Label" datatype="String"/>
+        <field name="MetricErrCode" locator="errorCode" locator-type="Label" datatype="String"/>
+        <embedded-activity name="TimeSeries" locator="timeseries" locator-type="Label">
+            <parser-ref name="MetricTimeseriesParser" aggregation="Relate"/>
+        </embedded-activity>
+    </parser>
+
+    <parser name="AzureESBMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
+        <property name="ActivityDelim" value="EOF"/>
+
+        <field name="@SplitRelatives@" value="true" transparent="true"/>
+
+        <field name="EventType" value="NOOP"/>
+
+        <field name="Namespace" locator="$.namespace" locator-type="Label" datatype="String"/>
+        <field name="Region" locator="$.resourceregion" locator-type="Label" datatype="String"/>
+        <field name="Cost" locator="$.cost" locator-type="Label" datatype="Number" format="int"/>
+        <field name="Interval" locator="$.interval" locator-type="Label" datatype="String"/>
+        <field name="Timespan" locator="$.timespan" locator-type="Label" datatype="String"/>
+        <field name="TimespanStart" locator="$.timespan" locator-type="Label" datatype="String">
+            <field-transform lang="groovy"><![CDATA[
+                StringUtils.substringBefore ($fieldValue, "/");
+            ]]></field-transform>
+        </field>
+        <field name="TimespanEnd" locator="$.timespan" locator-type="Label" datatype="String">
+            <field-transform lang="groovy"><![CDATA[
+                StringUtils.substringAfter ($fieldValue, "/");
+            ]]></field-transform>
+        </field>
+        <field name="MetricsStartTime" locator="TimespanEnd" locator-type="Activity" transparent="true"/>
+
+        <embedded-activity name="MetricValues" locator="$.value" locator-type="Label">
+            <parser-ref name="ESBMetricParser" aggregation="Relate"/>
+        </embedded-activity>
+    </parser>
+
+    <parser name="AzureTokenParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
+        <property name="ActivityDelim" value="EOF"/>
+
+        <field name="EventName" value="TokenEvent"/>
+        <field name="EventType" value="NOOP"/>
+
+        <field name="Token" locator="$.access_token" locator-type="Label" datatype="String"/>
+        <field name="TokenExpiresSec" locator="$.expires_in" locator-type="Label" datatype="Number" format="int"/>
+        <field name="ExtTokenExpiresSec" locator="$.ext_expires_in" locator-type="Label" datatype="Number" format="int"/>
+        <field name="TokenExpiresOn" locator="$.expires_on" locator-type="Label" datatype="Number" format="int"/>
+        <field name="TokenExpiresNotBefore" locator="$.not_before" locator-type="Label" datatype="Number" format="int"/>
+        <field name="TokenResource" locator="$.resource" locator-type="Label" datatype="String"/>
+        <field name="TokenExpires" value="">
+            <field-transform lang="groovy"><![CDATA[
+                System.currentTimeMillis () + TimeUnit.SECONDS.toMillis (${TokenExpiresSec})
+            ]]></field-transform>
+        </field>
+        <field name="TokenType" locator="$.token_type" locator-type="Label" datatype="String"/>
+        <!--field name="MetricsStartTime" value="">
+            <field-transform lang="groovy"><![CDATA[
+                long st = System.currentTimeMillis () - TimeUnit.HOURS.toMillis (72);
+                return new SimpleDateFormat ("yyyy-MM-dd'T'00:00:00'Z'").format (new Date (st));
+            ]]></field-transform>
+        </field-->
+    </parser>
+
+    <cache>
+        <property name="FileName" value="./cache/AzureCache.xml"/>
+        <property name="MaxSize" value="20"/>
+        <property name="ExpireDuration" value="180"/> <!-- 3 hours -->
+        <property name="Persisted" value="true"/>
+        <property name="PersistingPeriod" value="600"/> <!-- 10 minutes -->
+
+        <entry id="Token">
+            <key>Token</key>
+            <value>${Token}</value>
+        </entry>
+        <entry id="TokenType">
+            <key>TokenType</key>
+            <value>${TokenType}</value>
+        </entry>
+        <entry id="TokenExpires">
+            <key>TokenExpires</key>
+            <value>${TokenExpires}</value>
+        </entry>
+        <entry id="MetricsStartTime">
+            <key>MetricsStartTime</key>
+            <value>${MetricsStartTime}</value>
+            <default>2023-10-20T00:00:00Z</default>  <!-- set any date you want to start picking metrics -->
+        </entry>
+        <entry id="Timespan">
+            <key>Timespan</key>
+            <value>${Timespan}</value>
+        </entry>
+    </cache>
+</tnt-data-source>
