@@ -14,8 +14,8 @@
     <artifactId>tnt4j-streams-kafka</artifactId>
 
     <properties>
-        <kafka.clients.version>3.4.1</kafka.clients.version>
-        <kafka.sink.version>2.16-SNAPSHOT</kafka.sink.version>
+        <kafka.clients.version>3.6.0</kafka.clients.version>
+        <kafka.sink.version>2.17-SNAPSHOT</kafka.sink.version>
     </properties>
 
     <build>
@@ -42,7 +42,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.5.1</version>
                 <configuration>
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                     <shadedClassifierName>interceptor</shadedClassifierName>
