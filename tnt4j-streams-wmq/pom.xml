@@ -14,7 +14,7 @@
     <artifactId>tnt4j-streams-wmq</artifactId>
 
     <properties>
-        <ibm.mq.version>9.3.3.1</ibm.mq.version>
+        <ibm.mq.version>9.3.4.0</ibm.mq.version>
         <jakarta.jms.version>2.0.3</jakarta.jms.version>
     </properties>
 

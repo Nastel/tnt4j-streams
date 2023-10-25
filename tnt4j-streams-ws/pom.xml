@@ -17,7 +17,7 @@
         <quartz.version>2.3.2</quartz.version>
         <hikaricp.version>5.0.1</hikaricp.version>
 
-        <jaxws.rt.version>2.3.6</jaxws.rt.version>
+        <jaxws.rt.version>2.3.7</jaxws.rt.version>
     </properties>
 
     <profiles>
