@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2014-2023 JKOOL, LLC.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-ws/config/tnt-data-source-ws.xsd">
+
+    <resource-ref id="AzureMetricsParsers" type="Parser" uri="parsers.xml"/>
+
+    <stream name="AzureESBMonitoringStream" class="com.jkoolcloud.tnt4j.streams.inputs.RestStream">
+        <property name="HaltIfNoParser" value="false"/>
+        <property name="SplitRelatives" value="true"/>
+        <property name="SendStreamStates" value="false"/>
+        <property name="RetryStateCheck" value="true"/>
+        <property name="RetryInterval" value="300"/>
+
+        <tnt4j-properties>
+            <property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://data.jkoolcloud.com"/>
+            <property name="event.sink.factory.EventSinkFactory.prod.Token" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
+
+            <property name="event.sink.factory.RateLimit" value="false"/>
+            <property name="event.sink.factory.RateMaxMPS" value="45"/>
+            <property name="event.sink.factory.RateMaxBPS" value="50000"/>
+            <!--  < 0 BLOCK_UNTIL_GRANTED, 0 NO_BLOCK, > 0 BLOCK_UNTIL_TIMEOUT in milliseconds -->
+            <property name="event.sink.factory.RateTimeout" value="-1"/>
+        </tnt4j-properties>
+
+        <scenario name="Azure ESB monitoring">
+            <property name="AzureTenant" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
+            <property name="AzureAppId" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
+            <property name="AzureSecret" value="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"/>
+
+            <step name="GetAPIToken"
+                  url="https://login.windows.net/${AzureTenant}/oauth2/token"
+                  method="POST">
+
+                <property name="SynchronizeRequests" value="true"/>
+
+                <!--<schedule-cron expression="0 0 0/1 * * ?"/>-->
+                <schedule-simple interval="1" units="Hours" startDelay="0" startDelayUnits="Seconds" repeatCount="-1"/>
+
+                <request id="GetToken"><![CDATA[
+                   grant_type=client_credentials&resource=https://management.azure.com&client_id=${AzureAppId}&client_secret=${AzureSecret}
+                ]]>
+
+                    <req-param id="H:Content-Type" value="application/x-www-form-urlencoded"/>
+
+                    <condition id="TokenStillValidCondition" resolution="SKIP">
+                        <matchExp><![CDATA[
+                               StringUtils.isNotEmpty(${Token})
+                            && ${TokenExpires} > 0
+                            && (System.currentTimeMillis () - ${TokenExpires}) < TimeUnit.SECONDS.toMillis(10)
+                       ]]></matchExp>
+                    </condition>
+
+                    <parser-ref name="AzureTokenParser"/>
+                </request>
+            </step>
+            <step name="GetAzureESBMetrics"
+                  method="GET">
+
+                <property name="SynchronizeRequests" value="true"/>
+
+                <property name="AzureSubscriptionId" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
+                <property name="AzureResourceGroup" value="xxxxxxxxxxxxx"/>
+                <property name="AzureESBNamespace" value="xxxxxx"/>
+
+                <!--<schedule-cron expression="0 0/30 * * * ?"/>-->
+                <schedule-simple interval="5" units="Minutes" startDelay="10" startDelayUnits="Seconds" repeatCount="-1"/>
+
+                <request id="GetNamespaceMetrics"><![CDATA[
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                ]]>
+
+                    <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
+
+                    <!-- The API version to use for this operation. -->
+                    <req-param id="api-version" value="2021-05-01"/>
+                    <!-- The names of the metrics (comma separated) to retrieve. Special case: If a metricname itself has a comma in it then
+                         use %2 to indicate it. Eg: 'Metric,Name1' should be 'Metric%2Name1' -->
+                    <req-param id="metricnames"
+                               value="SuccessfulRequests,ServerErrors,UserErrors,ThrottledRequests,IncomingRequests,IncomingMessages,OutgoingMessages,ActiveConnections,ConnectionsOpened,ConnectionsClosed,Size,Messages,ActiveMessages,DeadletteredMessages,ScheduledMessages,CompleteMessage,AbandonMessage,PendingCheckpointOperationCount,ServerSendLatency"/>
+                    <!-- with CPU and Memory metrics from Premium tier -->
+                    <!--req-param id="metricnames"
+                               value="SuccessfulRequests,ServerErrors,UserErrors,ThrottledRequests,IncomingRequests,IncomingMessages,OutgoingMessages,ActiveConnections,ConnectionsOpened,ConnectionsClosed,Size,Messages,ActiveMessages,DeadletteredMessages,ScheduledMessages,CompleteMessage,AbandonMessage,PendingCheckpointOperationCount,ServerSendLatency,NamespaceCpuUsage,NamespaceMemoryUsage"/-->
+                    <!-- The list of aggregation types (comma separated) to retrieve. -->
+                    <req-param id="aggregation" value="count,total,minimum,maximum,average"/>
+                    <!--  The timespan of the query. It is a string with the following format 'startDateTime_ISO/endDateTime_ISO'.
+                          Supported Iso 8601 time interval format: (Datetime/Datetime, Datetime/Duration, Duration/Datetime, Duration) -->
+                    <!--<req-param id="timespan" value="2023-10-01T02:00:00Z/2023-10-11T02:05:00Z"/>-->
+                    <req-param id="timespanEnd" value="${groovy:now}" format="yyyy-MM-dd'T'HH:mm:ss'Z'" timezone="UTC" transient="true"/>
+                    <req-param id="timespan" value="${MetricsStartTime}/${timespanEnd}"/>
+                    <!-- The interval (i.e. timegrain) of the query. Values may be: PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H, P1D -->
+                    <req-param id="interval" value="PT5M"/>
+
+                    <!-- The $filter is used to reduce the set of metric data returned. Example: Metric contains metadata A, B and C.
+                         - Return all time series of C where A = a1 and B = b1 or b2 $filter=A eq 'a1' and B eq 'b1' or B eq 'b2' and C eq '*'
+                         - Invalid variant: $filter=A eq 'a1' and B eq 'b1' and C eq '*' or B = 'b2' This is invalid because the logical or
+                           operator cannot separate two different metadata names.
+                         - Return all time series where A = a1, B = b1 and C = c1: $filter=A eq 'a1' and B eq 'b1' and C eq 'c1'
+                         - Return all time series where A = a1 $filter=A eq 'a1' and B eq '' and C eq ''. 
+
+                         Special case: When dimension name or dimension value uses round brackets. Eg: When dimension name is dim (test) 1
+                         Instead of using $filter= "dim (test) 1 eq '' " use **$filter= "dim %2528test%2529 1 eq '' "** When dimension name
+                         is dim (test) 3 and dimension value is dim3 (test) val Instead of using
+                         $filter= "dim (test) 3 eq 'dim3 (test) val' " use $filter= "dim %2528test%2529 3 eq 'dim3 %2528test%2529 val' " -->
+                    <!--<req-param id="$filter" value=""/>-->
+
+                    <!-- Metric namespace to query metric definitions for. -->
+                    <!--<req-param id="metricnamespace" value=""/>-->
+
+                    <!-- The aggregation to use for sorting results and the direction of the sort. Only one order can be specified.
+                         Examples: sum asc. -->
+                    <!--<req-param id="orderby" value=""/>-->
+
+                    <!-- Reduces the set of data collected. The syntax allowed depends on the operation. See the operation's description for
+                         details. Values may be: Data, Metadata -->
+                    <!--<req-param id="resultType" value="query"/>-->
+
+                    <!-- The maximum number of records to retrieve. Valid only if $filter is specified. Defaults to 10. -->
+                    <!--<req-param id="top" value="50"/>-->
+
+                    <parser-ref name="AzureESBMetricsParser"/>
+                </request>
+
+                <request id="GetEntitiesMetrics"><![CDATA[
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                ]]>
+
+                    <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
+
+                    <req-param id="api-version" value="2021-05-01"/>
+                    <req-param id="metricnames"
+                               value="SuccessfulRequests,ServerErrors,UserErrors,ThrottledRequests,IncomingRequests,IncomingMessages,OutgoingMessages,ConnectionsOpened,ConnectionsClosed,Size,Messages,ActiveMessages,DeadletteredMessages,ScheduledMessages,CompleteMessage,AbandonMessage,ServerSendLatency"/>
+                    <req-param id="aggregation" value="count,total,minimum,maximum,average"/>
+                    <req-param id="timespan" value="${Timespan}"/>
+                    <req-param id="interval" value="PT1H"/>
+                    <req-param id="$filter" value="EntityName eq '*'"/>
+                    <req-param id="top" value="500"/>
+
+                    <parser-ref name="AzureESBMetricsParser"/>
+                </request>
+
+                <request id="GetThrottleMetrics"><![CDATA[
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                ]]>
+
+                    <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
+
+                    <req-param id="api-version" value="2021-05-01"/>
+                    <req-param id="metricnames" value="ThrottledRequests"/>
+                    <req-param id="aggregation" value="count,total,minimum,maximum,average"/>
+                    <req-param id="timespan" value="${Timespan}"/>
+                    <req-param id="interval" value="PT1H"/>
+                    <req-param id="$filter" value="MessagingErrorSubCode eq '*'"/>
+                    <req-param id="top" value="500"/>
+
+                    <parser-ref name="AzureESBMetricsParser"/>
+                </request>
+            </step>
+        </scenario>
+    </stream>
+</tnt-data-source>
