@@ -393,10 +393,10 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 			for (Map.Entry<String, WsRequest.Parameter> param : params.entrySet()) {
 				try {
 					int pIdx = Integer.parseInt(param.getValue().getId());
-					String type = param.getValue().getType();
+					String type = param.getValue().getAttribute(WsRequest.Parameter.ATTR_TYPE);
 					String value = param.getValue().getStringValue();
-					String format = param.getValue().getFormat();
-					String timeZone = param.getValue().getTimeZone();
+					String format = param.getValue().getAttribute(WsRequest.Parameter.ATTR_FORMAT);
+					String timeZone = param.getValue().getAttribute(WsRequest.Parameter.ATTR_TIMEZONE);
 
 					if (type == null) {
 						type = "";
