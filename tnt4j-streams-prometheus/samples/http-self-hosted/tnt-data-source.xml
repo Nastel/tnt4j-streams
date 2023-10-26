@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2014-2023 JKOOL, LLC.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
+
+    <resource-ref id="MetricsParsers" type="Parser" uri="parsers.xml"/>
+
+    <stream name="PrometheusMetricsStream" class="com.jkoolcloud.tnt4j.streams.inputs.HttpStream">
+        <property name="HaltIfNoParser" value="false"/>
+        <property name="SendStreamStates" value="false"/>
+        <property name="BuildSourceFQNFromStreamedData" value="false"/>
+        <!--<property name="SourceFQN" value="DATACENTER=${DataCenter}"/>-->
+        <property name="RetryStateCheck" value="true"/>
+        <property name="RetryInterval" value="300"/>
+        <property name="SplitRelatives" value="false"/>
+
+        <!-- Stream run HTTP server configuration -->
+        <property name="Host" value="127.0.0.1"/>
+        <property name="Port" value="8787"/>
+        <property name="UseSSL" value="false"/>
+        <property name="Keystore" value="file://clientkeystore"/>
+        <property name="KeyPass" value="pass123"/>
+        <property name="KeystorePass" value="pass123"/>
+
+        <property name="UseExecutors" value="true"/>
+        <property name="ExecutorThreadsQuantity" value="5"/>
+        <property name="ExecutorsTerminationTimeout" value="20"/>
+        <property name="ExecutorsBoundedModel" value="true"/>
+        <property name="ExecutorRejectedTaskOfferTimeout" value="20"/>
+
+        <tnt4j-properties>
+            <!-- Set your CloudWatch data center name -->
+            <property name="source.factory.DATACENTER" value="Prometheus"/>
+            <!--            <property name="source.factory.SERVICE" value="MSK"/>-->
+            <!--            <property name="source.factory.GEOADDR" value="us-east-1"/>-->
+            <!--            <property name="source.factory.NETWORK" value="demo-cluster-1"/>-->
+            <!--            <property name="source.factory.APPSERVER" value="b-1"/>-->
+            <!--            <property name="source.factory.RootFQN" value="APPSERVER=?#NETWORK=?#GEOADDR=?#SERVICE=?#DATACENTER=?"/>-->
+            <property name="source.factory.RootFQN" value="DATACENTER=?"/>
+
+            <!-- Sequence of sinks to broadcast stream produced activities. You may leave just one of them to sent data to single endpoint -->
+            <property name="event.sink.factory.BroadcastSequence" value="xray"/>
+
+            <!-- File sink -->
+            <property name="event.sink.factory.EventSinkFactory.ap" value="com.jkoolcloud.tnt4j.sink.impl.FileEventSinkFactory"/>
+            <property name="event.sink.factory.EventSinkFactory.ap.FileName"
+                      value="${sys:catalina.base}/logs/tnt4j-streams-prom_samples.log"/>
+
+            <property name="event.sink.factory.EventSinkFactory.ap.Formatter" value="com.jkoolcloud.tnt4j.format.JSONFormatter"/>
+
+            <!-- JKool/XRay sink -->
+            <property name="event.sink.factory.EventSinkFactory.xray" value="com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory"/>
+            <property name="event.sink.factory.EventSinkFactory.xray.LogSink"
+                      value="slf4j:com.jkoolcloud.tnt4j.streams.activities_jkool_log"/>
+            <property name="event.sink.factory.EventSinkFactory.xray.Url" value="https://data.jkoolcloud.com"/>
+            <property name="event.sink.factory.EventSinkFactory.xray.Token" value="jkool-access-token"/>
+
+            <property name="event.sink.factory.EventSinkFactory.xray.Formatter" value="com.jkoolcloud.tnt4j.format.JSONFormatter"/>
+        </tnt4j-properties>
+
+        <parser-ref name="PrometheusParser"/>
+    </stream>
+</tnt-data-source>
