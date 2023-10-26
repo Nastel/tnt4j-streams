@@ -296,7 +296,7 @@
                 <matchExp>string:contains("metric_stream_name":)</matchExp>
             </parser-ref>
         </field>
-        <!--field name="@SplitRelatives@" value="">
+        <!--field name="@SplitRelatives@" value="" transparent="true">
             <field-transform lang="groovy" phase="formatted"><![CDATA[
                 StringUtils.contains (${ParserName}, "KinesisFirehoseParser")
             ]]></field-transform>
