@@ -902,8 +902,9 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 				for (Map.Entry<String, WsRequest.Parameter> reqParam : fReq.getParameters().entrySet()) {
 					reqParam.getValue()
 							.setValue(fillInRequestData(ctx.setData(reqParam.getValue().getStringValue())
-									.setFormat(reqParam.getValue().getFormat()).setType(reqParam.getValue().getType())
-									.setTimeZone(reqParam.getValue().getTimeZone())));
+									.setFormat(reqParam.getValue().getAttribute(WsRequest.Parameter.ATTR_FORMAT))
+									.setType(reqParam.getValue().getAttribute(WsRequest.Parameter.ATTR_TYPE))
+									.setTimeZone(reqParam.getValue().getAttribute(WsRequest.Parameter.ATTR_TIMEZONE))));
 				}
 			}
 

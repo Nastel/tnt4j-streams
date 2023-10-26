@@ -285,65 +285,13 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 	 *            parameter identifier
 	 * @param value
 	 *            parameter value
-	 * @param type
-	 *            parameter type
-	 */
-	public void addParameter(String id, String value, String type) {
-		addParameter(new Parameter(id, value, type));
-	}
-
-	/**
-	 * Adds request (command/query/etc.) parameter.
-	 *
-	 * @param id
-	 *            parameter identifier
-	 * @param value
-	 *            parameter value
-	 * @param type
-	 *            parameter type
-	 * @param format
-	 *            parameter format
-	 */
-	public void addParameter(String id, String value, String type, String format) {
-		addParameter(new Parameter(id, value, type, format));
-	}
-
-	/**
-	 * Adds request (command/query/etc.) parameter.
-	 *
-	 * @param id
-	 *            parameter identifier
-	 * @param value
-	 *            parameter value
-	 * @param type
-	 *            parameter type
-	 * @param format
-	 *            parameter format
-	 * @param tz
-	 *            date-time value format timezone
-	 */
-	public void addParameter(String id, String value, String type, String format, String tz) {
-		addParameter(new Parameter(id, value, type, format, tz));
-	}
-
-	/**
-	 * Adds request (command/query/etc.) parameter.
-	 *
-	 * @param id
-	 *            parameter identifier
-	 * @param value
-	 *            parameter value
-	 * @param type
-	 *            parameter type
-	 * @param format
-	 *            parameter format
-	 * @param tz
-	 *            date-time value format timezone
+	 * @param attrs
+	 *            parameter attributes map
 	 * @param transient_
 	 *            transiency flag
 	 */
-	public void addParameter(String id, String value, String type, String format, String tz, boolean transient_) {
-		addParameter(new Parameter(id, value, type, format, tz, transient_));
+	public void addParameter(String id, String value, Map<String, String> attrs, boolean transient_) {
+		addParameter(new Parameter(id, value, attrs, transient_));
 	}
 
 	/**
@@ -442,11 +390,22 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 	 * Class defining request parameter properties.
 	 */
 	public static class Parameter implements Cloneable {
+		/**
+		 * Constant for name of parameter attribute {@value}.
+		 */
+		public static final String ATTR_TYPE = "type"; // NON-NLS
+		/**
+		 * Constant for name of parameter attribute {@value}.
+		 */
+		public static final String ATTR_FORMAT = "format"; // NON-NLS
+		/**
+		 * Constant for name of parameter attribute {@value}.
+		 */
+		public static final String ATTR_TIMEZONE = "timeZone"; // NON-NLS
+
 		private String id;
 		private Object value;
-		private String type;
-		private String format;
-		private String timeZone;
+		private Map<String, String> attributes = new HashMap<>(3);
 		private boolean transient_ = false;
 
 		/**
@@ -458,21 +417,7 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 		 *            parameter value
 		 */
 		public Parameter(String id, Object value) {
-			this(id, value, null, null, null);
-		}
-
-		/**
-		 * Constructs a new Parameter. Defines parameter identifier, value and type.
-		 *
-		 * @param id
-		 *            parameter identifier
-		 * @param value
-		 *            parameter value
-		 * @param type
-		 *            parameter type
-		 */
-		public Parameter(String id, Object value, String type) {
-			this(id, value, type, null, null);
+			this(id, value, false);
 		}
 
 		/**
@@ -486,41 +431,7 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 		 *            transiency flag
 		 */
 		public Parameter(String id, Object value, boolean transient_) {
-			this(id, value, null, null, null, transient_);
-		}
-
-		/**
-		 * Constructs a new Parameter. Defines parameter identifier, value and type.
-		 *
-		 * @param id
-		 *            parameter identifier
-		 * @param value
-		 *            parameter value
-		 * @param type
-		 *            parameter type
-		 * @param format
-		 *            parameter format
-		 * @param tz
-		 *            date-time value format timezone
-		 */
-		public Parameter(String id, Object value, String type, String format, String tz) {
-			this(id, value, type, format, tz, false);
-		}
-
-		/**
-		 * Constructs a new Parameter. Defines parameter identifier, value and type.
-		 *
-		 * @param id
-		 *            parameter identifier
-		 * @param value
-		 *            parameter value
-		 * @param type
-		 *            parameter type
-		 * @param format
-		 *            parameter format
-		 */
-		public Parameter(String id, Object value, String type, String format) {
-			this(id, value, type, format, null, false);
+			this(id, value, null, transient_);
 		}
 
 		/**
@@ -542,9 +453,30 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 		public Parameter(String id, Object value, String type, String format, String tz, boolean transient_) {
 			this.id = id;
 			this.value = value;
-			this.type = type;
-			this.format = format;
-			this.timeZone = tz;
+			this.attributes.put(ATTR_TYPE, type);
+			this.attributes.put(ATTR_FORMAT, format);
+			this.attributes.put(ATTR_TIMEZONE, tz);
+			this.transient_ = transient_;
+		}
+
+		/**
+		 * Constructs a new Parameter. Defines parameter identifier, value and type.
+		 *
+		 * @param id
+		 *            parameter identifier
+		 * @param value
+		 *            parameter value
+		 * @param attributes
+		 *            parameter attributes map
+		 * @param transient_
+		 *            transiency flag
+		 */
+		public Parameter(String id, Object value, Map<String, String> attributes, boolean transient_) {
+			this.id = id;
+			this.value = value;
+			if (attributes != null) {
+				this.attributes.putAll(attributes);
+			}
 			this.transient_ = transient_;
 		}
 
@@ -586,30 +518,36 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 		}
 
 		/**
-		 * Returns parameter type.
+		 * Returns parameter attribute value, or {@code null} if attribute is not defined.
 		 *
-		 * @return parameter type
+		 * @param attrId
+		 *            attribute identifier
+		 * @return parameter attribute value, or {@code null} if attribute is not defined
 		 */
-		public String getType() {
-			return type;
+		public String getAttribute(String attrId) {
+			return attributes.get(attrId);
 		}
 
 		/**
-		 * Returns parameter format.
+		 * Returns parameter attribute value, or default value if attribute is not defined.
 		 *
-		 * @return parameter format
+		 * @param attrId
+		 *            attribute identifier
+		 * @param def
+		 *            default value
+		 * @return parameter attribute value, or default value if attribute is not defined
 		 */
-		public String getFormat() {
-			return format;
+		public String getAttribute(String attrId, String def) {
+			return attributes.getOrDefault(attrId, def);
 		}
 
 		/**
-		 * Returns date-time value format timezone.
+		 * Returns parameter attributes map.
 		 *
-		 * @return parameter date-time value format timezone
+		 * @return parameter attributes map
 		 */
-		public String getTimeZone() {
-			return timeZone;
+		public Map<String, String> getAttributes() {
+			return attributes;
 		}
 
 		/**
@@ -629,9 +567,7 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 			StringBuilder sb = new StringBuilder("Parameter{"); // NON-NLS
 			sb.append("id=").append(Utils.sQuote(id)); // NON-NLS
 			sb.append(", value=").append(Utils.sQuote(getStringValue())); // NON-NLS
-			sb.append(", type=").append(Utils.sQuote(type)); // NON-NLS
-			sb.append(", format=").append(Utils.sQuote(format)); // NON-NLS
-			sb.append(", timeZone=").append(Utils.sQuote(timeZone)); // NON-NLS
+			sb.append(", attributes=").append(Utils.sQuote(attributes)); // NON-NLS
 			sb.append(", transient=").append(Utils.sQuote(transient_)); // NON-NLS
 			sb.append('}'); // NON-NLS
 			return sb.toString();
@@ -644,7 +580,7 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 		 */
 		@Override
 		public Parameter clone() {
-			Parameter cParam = new Parameter(id, value, type, format, timeZone, transient_);
+			Parameter cParam = new Parameter(id, value, attributes, transient_);
 
 			return cParam;
 		}
