@@ -23,12 +23,13 @@
 
 All required configuration shall be done in [tnt-data-source.xml](tnt-data-source.xml) file.
 
-* Configure your Azure ESB namespace access:
+* Configure XRay access:
   * Set your XRay access token:
     ```xml
     <property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://data.jkoolcloud.com"/>
     <property name="event.sink.factory.EventSinkFactory.prod.Token" value="388xxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxb3"/>
     ```
+* Configure your Azure ESB namespace access: 
   * Set your REST API access service principle credentials (ones provided by `az ad sp create-for-rbac`):
     ```xml
     <property name="AzureTenant" value="5029a0f1-xxxx-xxxx-xxxx-xxxxxxxxxx78"/>
