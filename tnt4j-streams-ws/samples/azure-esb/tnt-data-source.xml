@@ -159,7 +159,7 @@
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
 
-                <request id="GetEntitiesMetrics"><![CDATA[
+                <request id="GetEntitiesMetricsCount"><![CDATA[
                     https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
@@ -168,11 +168,83 @@
                     <req-param id="api-version" value="2021-05-01"/>
                     <req-param id="metricnames"
                                value="SuccessfulRequests,ServerErrors,UserErrors,ThrottledRequests,IncomingRequests,IncomingMessages,OutgoingMessages,ConnectionsOpened,ConnectionsClosed,Size,Messages,ActiveMessages,DeadletteredMessages,ScheduledMessages,CompleteMessage,AbandonMessage,ServerSendLatency"/>
-                    <req-param id="aggregation" value="count,total,minimum,maximum,average"/>
+                    <req-param id="aggregation" value="count"/>
                     <req-param id="timespan" value="${Timespan}"/>
                     <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="EntityName eq '*'"/>
-                    <req-param id="top" value="500"/>
+                    <req-param id="top" value="50"/>
+
+                    <parser-ref name="AzureESBMetricsParser"/>
+                </request>
+
+                <request id="GetEntitiesMetricsTotal"><![CDATA[
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                ]]>
+
+                    <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
+
+                    <req-param id="api-version" value="2021-05-01"/>
+                    <req-param id="metricnames"
+                               value="SuccessfulRequests,ServerErrors,UserErrors,ThrottledRequests,IncomingRequests,IncomingMessages,OutgoingMessages,ConnectionsOpened,ConnectionsClosed,Size,Messages,ActiveMessages,DeadletteredMessages,ScheduledMessages,CompleteMessage,AbandonMessage,ServerSendLatency"/>
+                    <req-param id="aggregation" value="total"/>
+                    <req-param id="timespan" value="${Timespan}"/>
+                    <req-param id="interval" value="${AzureMetricsInterval}"/>
+                    <req-param id="$filter" value="EntityName eq '*'"/>
+                    <req-param id="top" value="50"/>
+
+                    <parser-ref name="AzureESBMetricsParser"/>
+                </request>
+
+                <request id="GetEntitiesMetricsMin"><![CDATA[
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                ]]>
+
+                    <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
+
+                    <req-param id="api-version" value="2021-05-01"/>
+                    <req-param id="metricnames"
+                               value="SuccessfulRequests,ServerErrors,UserErrors,ThrottledRequests,IncomingRequests,IncomingMessages,OutgoingMessages,ConnectionsOpened,ConnectionsClosed,Size,Messages,ActiveMessages,DeadletteredMessages,ScheduledMessages,CompleteMessage,AbandonMessage,ServerSendLatency"/>
+                    <req-param id="aggregation" value="minimum"/>
+                    <req-param id="timespan" value="${Timespan}"/>
+                    <req-param id="interval" value="${AzureMetricsInterval}"/>
+                    <req-param id="$filter" value="EntityName eq '*'"/>
+                    <req-param id="top" value="50"/>
+
+                    <parser-ref name="AzureESBMetricsParser"/>
+                </request>
+
+                <request id="GetEntitiesMetricsMax"><![CDATA[
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                ]]>
+
+                    <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
+
+                    <req-param id="api-version" value="2021-05-01"/>
+                    <req-param id="metricnames"
+                               value="SuccessfulRequests,ServerErrors,UserErrors,ThrottledRequests,IncomingRequests,IncomingMessages,OutgoingMessages,ConnectionsOpened,ConnectionsClosed,Size,Messages,ActiveMessages,DeadletteredMessages,ScheduledMessages,CompleteMessage,AbandonMessage,ServerSendLatency"/>
+                    <req-param id="aggregation" value="maximum"/>
+                    <req-param id="timespan" value="${Timespan}"/>
+                    <req-param id="interval" value="${AzureMetricsInterval}"/>
+                    <req-param id="$filter" value="EntityName eq '*'"/>
+                    <req-param id="top" value="50"/>
+
+                    <parser-ref name="AzureESBMetricsParser"/>
+                </request>
+
+                <request id="GetEntitiesMetricsAvg"><![CDATA[
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                ]]>
+
+                    <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
+
+                    <req-param id="api-version" value="2021-05-01"/>
+                    <req-param id="metricnames"
+                               value="SuccessfulRequests,ServerErrors,UserErrors,ThrottledRequests,IncomingRequests,IncomingMessages,OutgoingMessages,ConnectionsOpened,ConnectionsClosed,Size,Messages,ActiveMessages,DeadletteredMessages,ScheduledMessages,CompleteMessage,AbandonMessage,ServerSendLatency"/>
+                    <req-param id="aggregation" value="average"/>
+                    <req-param id="timespan" value="${Timespan}"/>
+                    <req-param id="interval" value="${AzureMetricsInterval}"/>
+                    <req-param id="$filter" value="EntityName eq '*'"/>
+                    <req-param id="top" value="50"/>
 
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
@@ -189,7 +261,7 @@
                     <req-param id="timespan" value="${Timespan}"/>
                     <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="MessagingErrorSubCode eq '*'"/>
-                    <req-param id="top" value="500"/>
+                    <req-param id="top" value="50"/>
 
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>

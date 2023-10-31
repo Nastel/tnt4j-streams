@@ -126,7 +126,7 @@
         <field name="Category" locator="MetricType" locator-type="Activity" separator="String"/>
 
         <field name="MetricId" locator="id" locator-type="Label" datatype="String"/>
-        <field name="ResourceName" value="">
+        <field name="ResourceName" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
                 return StringUtils.substringBefore(${MetricId}, "/providers/Microsoft.Insights/metrics");
             ]]></field-transform>
@@ -163,15 +163,15 @@
 
         <field name="Namespace" locator="$.namespace" locator-type="Label" datatype="String"/>
         <field name="Region" locator="$.resourceregion" locator-type="Label" datatype="String"/>
-        <field name="Cost" locator="$.cost" locator-type="Label" datatype="Number" format="int"/>
+        <field name="Cost" locator="$.cost" locator-type="Label" datatype="Number" format="int" transparent="true"/>
         <field name="Interval" locator="$.interval" locator-type="Label" datatype="String"/>
         <field name="Timespan" locator="$.timespan" locator-type="Label" datatype="String"/>
-        <field name="TimespanStart" locator="$.timespan" locator-type="Label" datatype="String">
+        <field name="TimespanStart" locator="$.timespan" locator-type="Label" datatype="String" transparent="true">
             <field-transform lang="groovy"><![CDATA[
                 StringUtils.substringBefore ($fieldValue, "/");
             ]]></field-transform>
         </field>
-        <field name="TimespanEnd" locator="$.timespan" locator-type="Label" datatype="String">
+        <field name="TimespanEnd" locator="$.timespan" locator-type="Label" datatype="String" transparent="true">
             <field-transform lang="groovy"><![CDATA[
                 StringUtils.substringAfter ($fieldValue, "/");
             ]]></field-transform>
