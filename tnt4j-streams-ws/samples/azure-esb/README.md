@@ -7,7 +7,9 @@
   ```bash
   az login
   az account set --subscription "<your subscription id>"
-  az ad sp create-for-rbac -n "readESBMetric" --role Reader --scope "<list of resource groups to read metrics>" 
+  # ESB resource group format is: /subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP_NAME>
+  #                         like: /subscriptions/c3xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxf8/resourceGroups/AndriusESB-RG
+  az ad sp create-for-rbac -n "readESBMetric" --role Reader --scope "<list of ESB bound resource groups to read metrics>" 
   ```
   Last command shall produce output like this:
   ```json
@@ -24,10 +26,10 @@
 All required configuration shall be done in [tnt-data-source.xml](tnt-data-source.xml) file.
 
 * Configure XRay access:
-  * Set your XRay access token:
+  * Set your AutoPilot CEP facts streaming endpoint:
     ```xml
-    <property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://data.jkoolcloud.com"/>
-    <property name="event.sink.factory.EventSinkFactory.prod.Token" value="388xxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxb3"/>
+    <property name="event.sink.factory.EventSinkFactory.ap.Host" value="<AP_CEP_IP/HOST>"/>
+    <property name="event.sink.factory.EventSinkFactory.ap.Port" value="6060"/>
     ```
 * Configure your Azure ESB namespace access: 
   * Set your REST API access service principle credentials (ones provided by `az ad sp create-for-rbac`):
@@ -39,14 +41,25 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
   * Set your ESB cluster info to collect metrics:
     ```xml
     <property name="AzureSubscriptionId" value="c3cbb071-xxxx-xxxx-xxxx-xxxxxxxxxxf8"/>
-    <property name="AzureResourceGroup" value="AndriusAKS-RG"/>
+    <property name="AzureResourceGroup" value="AndriusESB-RG"/>
     <property name="AzureESBNamespace" value="meshiq"/>
+    ```
+  * Set metrics collection request interval (default is `5 minutes`) by changing configuration entries below accordingly:
+    ```xml 
+    <!-- The interval (i.e. timegrain) of the query. Values may be: PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H, P1D -->
+    <property name="AzureMetricsInterval" value="PT5M"/>
+    ...
+    <!-- The interval of REST API calls to collect ESB metrics -->
+    <schedule-simple interval="5" units="Minutes" startDelay="10" startDelayUnits="Seconds" repeatCount="-1"/>
+    ...
+    <!-- Sets metrics timespan start date and time: groovy expression to calculate timestamp for 5 minutes back from now -->
+    <req-param id="timespanStart" value="${groovy:5.minutes.ago}" format="yyyy-MM-dd'T'HH:mm:ss'Z'" timezone="UTC" transient="true"/>
     ```
 * Configure metrics collection properties. There are tree Azure REST API requests named:
   * `GetNamespaceMetrics` - to collect your namespace scoped metrics 
   * `GetEntitiesMetrics` - to collect namespace bound entity scoped metrics 
   * `GetThrottleMetrics` - to collect `ThrottledRequests` scoped by `MessagingErrorSubCode`.
-  
+
   REST API calls interval is configured over simple scheduler configuration:
   ```xml 
   <schedule-simple interval="5" units="Minutes" startDelay="10" startDelayUnits="Seconds" repeatCount="-1"/>
@@ -55,7 +68,7 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
   * `units` - defines call interval time units
   * `startDelay` - defines how long to delay of the request after the application starts. We want to obtain access token before.
   * `startDelayUnits` - defines delay time units
-  * `repeatCount` - defines how many requests to schedule. `-1` means infinite. 
+  * `repeatCount` - defines how many requests to schedule. `-1` means infinite.
 
   Azure API call requests have similar parameters to configure:
   * `metricnames` - the names of the metrics (comma separated) to retrieve. Special case: if a metricname itself has a comma in it then use 
@@ -80,9 +93,6 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
   * `resultType` - reduces the set of data collected. The syntax allowed depends on the operation. See the operation's description for 
      details. Values may be: `Data`, `Metadata`
   * `top` - the maximum number of records to retrieve. Valid only if `$filter` is specified. Defaults to 10.
-
-Additionally to configure metrics collection period start change [parsers.xml](parsers.xml) file `<cache>` section entry 
-`<entry id="MetricsStartTime">` `default` value to date you want start collecting metrics for your ESB.
 
 ### Run TNT4J stream
 

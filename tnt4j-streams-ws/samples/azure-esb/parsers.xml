@@ -35,7 +35,7 @@
     <parser name="MetricDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="Snapshot"/>
 
-        <field name="Guid" separator="_">
+        <!--field name="Guid" separator="_">
             <field-locator id="MetricName" locator="^.MetricName" locator-type="Activity" datatype="String"/>
             <field-locator id="MetricEntityName" locator="^.EntityName" locator-type="Activity" datatype="String">
                 <field-transform lang="groovy"><![CDATA[
@@ -47,7 +47,24 @@
             <field-locator id="MetricRegion" locator="^.Region" locator-type="Activity" datatype="String"/>
             <field-locator id="MetricTimeStamp" locator="timeStamp" locator-type="Label" datatype="String"/>
             <field-locator id="MessagingErrorSubCode" locator="^.MessagingErrorSubCode" locator-type="Activity" datatype="String"/>
+        </field-->
+        <field name="EventName" locator="^.EventName" locator-type="Activity">
+            <field-transform lang="groovy"><![CDATA[
+                String props = $fieldValue;
+                props += (StringUtils.isEmpty(${MetricEntityName}) ? "" : ",entityName=" + ${MetricEntityName});
+                props += (StringUtils.isEmpty(${MessagingErrorSubCode}) ? "" : ",messagingErrorSubCode=" + ${MessagingErrorSubCode});
+
+                return props;
+            ]]></field-transform>
         </field>
+        <field name="MetricEntityName" locator="^.EntityName" locator-type="Activity" transparent="true">
+            <!--field-transform lang="groovy"><![CDATA[
+                $fieldValue == null //|| $fieldValue.equals("-NamespaceOnlyMetric-")
+                    ? ${NamespaceName}
+                    : $fieldValue
+            ]]></field-transform-->
+        </field>
+        <field name="MessagingErrorSubCode" locator="^.MessagingErrorSubCode" locator-type="Activity" datatype="String"/>
         <field name="NamespaceName" locator="^.NamespaceName" locator-type="Activity" transparent="true"/>
         <field name="StartTime" locator="timeStamp" locator-type="Label" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ssX"/>
         <field name="EndTime" locator="StartTime" locator-type="Activity"/>
@@ -93,7 +110,19 @@
     <parser name="ESBMetricParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="NOOP"/>
 
-        <field name="EventName" locator="MetricName" locator-type="Activity" separator="String"/>
+        <field name="EventName" value="snapName">
+            <field-transform lang="groovy"><![CDATA[
+                String props = "";
+                props += (${idTokens}.length > 2 ? (props.length() > 0 ? "," : "") + "subscription=" + ${idTokens}[2] : "");
+                props += (${idTokens}.length > 4 ? (props.length() > 0 ? "," : "") + "resourceGroup=" + ${idTokens}[4] : "");
+                props += (${idTokens}.length > 6 ? (props.length() > 0 ? "," : "") + "provider=" + ${idTokens}[6] : "");
+                props += (${idTokens}.length > 8 ? (props.length() > 0 ? "," : "") + "namespace=" + ${idTokens}[8] : "");
+                //props += (${idTokens}.length > 10 ? (props.length() > 0 ? "," : "") + "metricProvider=" + ${idTokens}[10] : "");
+                props += (${idTokens}.length > 12 ? (props.length() > 0 ? "," : "") + "metric=" + ${idTokens}[12] : "");
+
+                "Azure_ESB" + ":" + props
+            ]]></field-transform>
+        </field>
         <field name="Category" locator="MetricType" locator-type="Activity" separator="String"/>
 
         <field name="MetricId" locator="id" locator-type="Label" datatype="String"/>
@@ -105,6 +134,13 @@
         <field name="NamespaceName" value="">
             <field-transform lang="groovy"><![CDATA[
                 return StringUtils.substringAfterLast(${ResourceName}, "/");
+            ]]></field-transform>
+        </field>
+        <field name="idTokens" value="" datatype="AsInput" transparent="true">
+            <field-transform lang="groovy" phase="aggregated"><![CDATA[
+                StringUtils.isEmpty(${MetricId})
+                    ? new String[0]
+                    : ${MetricId}.split("/")
             ]]></field-transform>
         </field>
         <field name="MetricType" locator="type" locator-type="Label" datatype="String"/>
@@ -195,7 +231,7 @@
         <entry id="MetricsStartTime">
             <key>MetricsStartTime</key>
             <value>${MetricsStartTime}</value>
-            <default>2023-10-20T00:00:00Z</default>  <!-- set any date you want to start picking metrics -->
+            <default>2023-10-31T08:00:00Z</default>  <!-- set any date you want to start picking metrics -->
         </entry>
         <entry id="Timespan">
             <key>Timespan</key>

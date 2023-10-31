@@ -29,8 +29,26 @@
         <property name="RetryInterval" value="300"/>
 
         <tnt4j-properties>
-            <property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://data.jkoolcloud.com"/>
-            <property name="event.sink.factory.EventSinkFactory.prod.Token" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
+            <!-- Sequence of sinks to broadcast stream produced activities. You may leave just one of them to sent data to single endpoint -->
+            <property name="event.sink.factory.BroadcastSequence" value="ap"/>
+
+            <property name="event.sink.factory.EventSinkFactory.ap" value="com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory"/>
+            <!--<property name="event.sink.factory.EventSinkFactory.ap.LogSink" value="file:./logs/tnt4j-streams_samples_socket.log"/>-->
+            <property name="event.sink.factory.EventSinkFactory.ap.LogSink" value="null"/>
+            <property name="event.sink.factory.EventSinkFactory.ap.Host" value="localhost"/>
+            <property name="event.sink.factory.EventSinkFactory.ap.Port" value="6060"/>
+
+            <property name="event.formatter" value="com.jkoolcloud.tnt4j.streams.custom.format.openmetrics.FactPathValueFormatter"/>
+            <property name="event.formatter.AddSelfSnapshot" value="false"/>
+            <property name="event.formatter.KeyReplacements">
+                " "->"_" "\\\""->"" "\""->"'" "/"->"%" "="->"\\" ","->"!'" "\\\\"->"\\"
+            </property>
+            <property name="event.formatter.ValueReplacements">
+                "\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"
+            </property>
+            <property name="event.formatter.PathLevelAttributes">
+                domain;subscription;resourceGroup;provider;namespace;metric;entityName,messagingErrorSubCode;
+            </property>
 
             <property name="event.sink.factory.RateLimit" value="false"/>
             <property name="event.sink.factory.RateMaxMPS" value="45"/>
@@ -78,8 +96,10 @@
                 <property name="AzureSubscriptionId" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
                 <property name="AzureResourceGroup" value="xxxxxxxxxxxxx"/>
                 <property name="AzureESBNamespace" value="xxxxxx"/>
+                <!-- The interval (i.e. timegrain) of the query. Values may be: PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H, P1D -->
+                <property name="AzureMetricsInterval" value="PT5M"/>
 
-                <!--<schedule-cron expression="0 0/30 * * * ?"/>-->
+                <!--<schedule-cron expression="0 0/5 * * * ?"/>-->
                 <schedule-simple interval="5" units="Minutes" startDelay="10" startDelayUnits="Seconds" repeatCount="-1"/>
 
                 <request id="GetNamespaceMetrics"><![CDATA[
@@ -102,10 +122,12 @@
                     <!--  The timespan of the query. It is a string with the following format 'startDateTime_ISO/endDateTime_ISO'.
                           Supported Iso 8601 time interval format: (Datetime/Datetime, Datetime/Duration, Duration/Datetime, Duration) -->
                     <!--<req-param id="timespan" value="2023-10-01T02:00:00Z/2023-10-11T02:05:00Z"/>-->
+                    <req-param id="timespanStart" value="${groovy:5.minutes.ago}" format="yyyy-MM-dd'T'HH:mm:ss'Z'" timezone="UTC"
+                               transient="true"/>
                     <req-param id="timespanEnd" value="${groovy:now}" format="yyyy-MM-dd'T'HH:mm:ss'Z'" timezone="UTC" transient="true"/>
-                    <req-param id="timespan" value="${MetricsStartTime}/${timespanEnd}"/>
+                    <req-param id="timespan" value="${timespanStart}/${timespanEnd}"/>
                     <!-- The interval (i.e. timegrain) of the query. Values may be: PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H, P1D -->
-                    <req-param id="interval" value="PT5M"/>
+                    <req-param id="interval" value="${AzureMetricsInterval}"/>
 
                     <!-- The $filter is used to reduce the set of metric data returned. Example: Metric contains metadata A, B and C.
                          - Return all time series of C where A = a1 and B = b1 or b2 $filter=A eq 'a1' and B eq 'b1' or B eq 'b2' and C eq '*'
@@ -148,7 +170,7 @@
                                value="SuccessfulRequests,ServerErrors,UserErrors,ThrottledRequests,IncomingRequests,IncomingMessages,OutgoingMessages,ConnectionsOpened,ConnectionsClosed,Size,Messages,ActiveMessages,DeadletteredMessages,ScheduledMessages,CompleteMessage,AbandonMessage,ServerSendLatency"/>
                     <req-param id="aggregation" value="count,total,minimum,maximum,average"/>
                     <req-param id="timespan" value="${Timespan}"/>
-                    <req-param id="interval" value="PT1H"/>
+                    <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="EntityName eq '*'"/>
                     <req-param id="top" value="500"/>
 
@@ -165,7 +187,7 @@
                     <req-param id="metricnames" value="ThrottledRequests"/>
                     <req-param id="aggregation" value="count,total,minimum,maximum,average"/>
                     <req-param id="timespan" value="${Timespan}"/>
-                    <req-param id="interval" value="PT1H"/>
+                    <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="MessagingErrorSubCode eq '*'"/>
                     <req-param id="top" value="500"/>
 
