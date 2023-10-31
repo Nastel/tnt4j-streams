@@ -167,12 +167,12 @@
 
                     <req-param id="api-version" value="2021-05-01"/>
                     <req-param id="metricnames"
-                               value="SuccessfulRequests,ServerErrors,UserErrors,ThrottledRequests,IncomingRequests,IncomingMessages,OutgoingMessages,ConnectionsOpened,ConnectionsClosed,Size,Messages,ActiveMessages,DeadletteredMessages,ScheduledMessages,CompleteMessage,AbandonMessage,ServerSendLatency"/>
+                               value="SuccessfulRequests,ServerErrors,UserErrors,ThrottledRequests,IncomingRequests,IncomingMessages,OutgoingMessages,ConnectionsOpened,ConnectionsClosed,CompleteMessage,AbandonMessage,ServerSendLatency"/>
                     <req-param id="aggregation" value="count"/>
                     <req-param id="timespan" value="${Timespan}"/>
                     <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="EntityName eq '*'"/>
-                    <req-param id="top" value="50"/>
+                    <req-param id="top" value="500"/>
 
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
@@ -185,12 +185,12 @@
 
                     <req-param id="api-version" value="2021-05-01"/>
                     <req-param id="metricnames"
-                               value="SuccessfulRequests,ServerErrors,UserErrors,ThrottledRequests,IncomingRequests,IncomingMessages,OutgoingMessages,ConnectionsOpened,ConnectionsClosed,Size,Messages,ActiveMessages,DeadletteredMessages,ScheduledMessages,CompleteMessage,AbandonMessage,ServerSendLatency"/>
+                               value="SuccessfulRequests,ServerErrors,UserErrors,ThrottledRequests,IncomingRequests,IncomingMessages,OutgoingMessages,ConnectionsOpened,ConnectionsClosed,CompleteMessage,AbandonMessage,ServerSendLatency"/>
                     <req-param id="aggregation" value="total"/>
                     <req-param id="timespan" value="${Timespan}"/>
                     <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="EntityName eq '*'"/>
-                    <req-param id="top" value="50"/>
+                    <req-param id="top" value="500"/>
 
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
@@ -208,7 +208,7 @@
                     <req-param id="timespan" value="${Timespan}"/>
                     <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="EntityName eq '*'"/>
-                    <req-param id="top" value="50"/>
+                    <req-param id="top" value="500"/>
 
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
@@ -226,7 +226,7 @@
                     <req-param id="timespan" value="${Timespan}"/>
                     <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="EntityName eq '*'"/>
-                    <req-param id="top" value="50"/>
+                    <req-param id="top" value="500"/>
 
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
@@ -244,7 +244,7 @@
                     <req-param id="timespan" value="${Timespan}"/>
                     <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="EntityName eq '*'"/>
-                    <req-param id="top" value="50"/>
+                    <req-param id="top" value="500"/>
 
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
@@ -261,7 +261,7 @@
                     <req-param id="timespan" value="${Timespan}"/>
                     <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="MessagingErrorSubCode eq '*'"/>
-                    <req-param id="top" value="50"/>
+                    <req-param id="top" value="500"/>
 
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
