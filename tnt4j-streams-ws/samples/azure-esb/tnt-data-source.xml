@@ -38,15 +38,24 @@
             <property name="event.sink.factory.EventSinkFactory.ap.Host" value="localhost"/>
             <property name="event.sink.factory.EventSinkFactory.ap.Port" value="6060"/>
 
-            <property name="event.formatter" value="com.jkoolcloud.tnt4j.streams.custom.format.openmetrics.FactPathValueFormatter"/>
-            <property name="event.formatter.AddSelfSnapshot" value="false"/>
-            <property name="event.formatter.KeyReplacements">
+            <!-- Activities routing by activity field "RoutePath" value "ap" or null -->
+            <property name="event.sink.factory.EventSinkFactory.ap.Filter"
+                      value="com.jkoolcloud.tnt4j.streams.sink.filters.EventMatchExpressionFilter"/>
+            <property name="event.sink.factory.EventSinkFactory.ap.Filter.MatchExp"><![CDATA[
+                groovy: StringUtils.equalsAny(${RoutePath}, "ap", null)
+            ]]></property>
+
+            <property name="event.sink.factory.EventSinkFactory.ap.Formatter"
+                      value="com.jkoolcloud.tnt4j.streams.custom.format.openmetrics.FactPathValueFormatter"/>
+            <property name="event.sink.factory.EventSinkFactory.ap.Formatter.AddSelfSnapshot" value="false"/>
+            <property name="event.sink.factory.EventSinkFactory.ap.Formatter.KeyReplacements">
                 " "->"_" "\\\""->"" "\""->"'" "/"->"%" "="->"\\" ","->"!'" "\\\\"->"\\"
             </property>
-            <property name="event.formatter.ValueReplacements">
+            <property name="event.sink.factory.EventSinkFactory.ap.Formatter.ValueReplacements">
                 "\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"
             </property>
-            <property name="event.formatter.PathLevelAttributes">
+            <!-- Path of activity name properties to build AutoPilot facts tree layout -->
+            <property name="event.sink.factory.EventSinkFactory.ap.Formatter.PathLevelAttributes">
                 domain;subscription;resourceGroup;provider;namespace;metric;entityName,messagingErrorSubCode;
             </property>
 
