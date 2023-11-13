@@ -63,7 +63,7 @@
             <property name="event.formatter" value="com.jkoolcloud.tnt4j.streams.custom.format.openmetrics.FactPathValueFormatter"/>
             <property name="event.formatter.AddSelfSnapshot" value="false"/>
             <property name="event.formatter.KeyReplacements">
-                " "->"_" "\\\""->"" "\""->"'" "/"->"%" "="->"\\" ","->"!'" "\\\\"->"\\"
+                " "->"_" "\\\""->"" "\""->"'" "/"->"%" "="->"\\" ","->"!" "\\\\"->"\\"
             </property>
             <property name="event.formatter.ValueReplacements">
                 "\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"
