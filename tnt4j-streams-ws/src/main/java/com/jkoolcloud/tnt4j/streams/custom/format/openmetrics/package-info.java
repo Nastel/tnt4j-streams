@@ -24,5 +24,4 @@
  *             {@link com.jkoolcloud.tnt4j.streams.custom.format.autopilot} instead.
  */
 
-@Deprecated
 package com.jkoolcloud.tnt4j.streams.custom.format.openmetrics;
