@@ -1442,6 +1442,21 @@ public final class Metrics {
      * <code>.io.prometheus.client.Exemplar exemplar = 2;</code>
      */
     io.prometheus.client.Metrics.ExemplarOrBuilder getExemplarOrBuilder();
+
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+     * @return Whether the createdTimestamp field is set.
+     */
+    boolean hasCreatedTimestamp();
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+     * @return The createdTimestamp.
+     */
+    com.google.protobuf.Timestamp getCreatedTimestamp();
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getCreatedTimestampOrBuilder();
   }
   /**
    * Protobuf type {@code io.prometheus.client.Counter}
@@ -1502,6 +1517,19 @@ public final class Metrics {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(exemplar_);
                 exemplar_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 26: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (createdTimestamp_ != null) {
+                subBuilder = createdTimestamp_.toBuilder();
+              }
+              createdTimestamp_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(createdTimestamp_);
+                createdTimestamp_ = subBuilder.buildPartial();
               }
 
               break;
@@ -1577,6 +1605,32 @@ public final class Metrics {
       return getExemplar();
     }
 
+    public static final int CREATED_TIMESTAMP_FIELD_NUMBER = 3;
+    private com.google.protobuf.Timestamp createdTimestamp_;
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+     * @return Whether the createdTimestamp field is set.
+     */
+    @java.lang.Override
+    public boolean hasCreatedTimestamp() {
+      return createdTimestamp_ != null;
+    }
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+     * @return The createdTimestamp.
+     */
+    @java.lang.Override
+    public com.google.protobuf.Timestamp getCreatedTimestamp() {
+      return createdTimestamp_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : createdTimestamp_;
+    }
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+     */
+    @java.lang.Override
+    public com.google.protobuf.TimestampOrBuilder getCreatedTimestampOrBuilder() {
+      return getCreatedTimestamp();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1597,6 +1651,9 @@ public final class Metrics {
       if (exemplar_ != null) {
         output.writeMessage(2, getExemplar());
       }
+      if (createdTimestamp_ != null) {
+        output.writeMessage(3, getCreatedTimestamp());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1613,6 +1670,10 @@ public final class Metrics {
       if (exemplar_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getExemplar());
+      }
+      if (createdTimestamp_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, getCreatedTimestamp());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1637,6 +1698,11 @@ public final class Metrics {
         if (!getExemplar()
             .equals(other.getExemplar())) return false;
       }
+      if (hasCreatedTimestamp() != other.hasCreatedTimestamp()) return false;
+      if (hasCreatedTimestamp()) {
+        if (!getCreatedTimestamp()
+            .equals(other.getCreatedTimestamp())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1654,6 +1720,10 @@ public final class Metrics {
       if (hasExemplar()) {
         hash = (37 * hash) + EXEMPLAR_FIELD_NUMBER;
         hash = (53 * hash) + getExemplar().hashCode();
+      }
+      if (hasCreatedTimestamp()) {
+        hash = (37 * hash) + CREATED_TIMESTAMP_FIELD_NUMBER;
+        hash = (53 * hash) + getCreatedTimestamp().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -1796,6 +1866,12 @@ public final class Metrics {
           exemplar_ = null;
           exemplarBuilder_ = null;
         }
+        if (createdTimestampBuilder_ == null) {
+          createdTimestamp_ = null;
+        } else {
+          createdTimestamp_ = null;
+          createdTimestampBuilder_ = null;
+        }
         return this;
       }
 
@@ -1827,6 +1903,11 @@ public final class Metrics {
           result.exemplar_ = exemplar_;
         } else {
           result.exemplar_ = exemplarBuilder_.build();
+        }
+        if (createdTimestampBuilder_ == null) {
+          result.createdTimestamp_ = createdTimestamp_;
+        } else {
+          result.createdTimestamp_ = createdTimestampBuilder_.build();
         }
         onBuilt();
         return result;
@@ -1881,6 +1962,9 @@ public final class Metrics {
         }
         if (other.hasExemplar()) {
           mergeExemplar(other.getExemplar());
+        }
+        if (other.hasCreatedTimestamp()) {
+          mergeCreatedTimestamp(other.getCreatedTimestamp());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2059,6 +2143,125 @@ public final class Metrics {
           exemplar_ = null;
         }
         return exemplarBuilder_;
+      }
+
+      private com.google.protobuf.Timestamp createdTimestamp_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> createdTimestampBuilder_;
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+       * @return Whether the createdTimestamp field is set.
+       */
+      public boolean hasCreatedTimestamp() {
+        return createdTimestampBuilder_ != null || createdTimestamp_ != null;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+       * @return The createdTimestamp.
+       */
+      public com.google.protobuf.Timestamp getCreatedTimestamp() {
+        if (createdTimestampBuilder_ == null) {
+          return createdTimestamp_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : createdTimestamp_;
+        } else {
+          return createdTimestampBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+       */
+      public Builder setCreatedTimestamp(com.google.protobuf.Timestamp value) {
+        if (createdTimestampBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          createdTimestamp_ = value;
+          onChanged();
+        } else {
+          createdTimestampBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+       */
+      public Builder setCreatedTimestamp(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (createdTimestampBuilder_ == null) {
+          createdTimestamp_ = builderForValue.build();
+          onChanged();
+        } else {
+          createdTimestampBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+       */
+      public Builder mergeCreatedTimestamp(com.google.protobuf.Timestamp value) {
+        if (createdTimestampBuilder_ == null) {
+          if (createdTimestamp_ != null) {
+            createdTimestamp_ =
+              com.google.protobuf.Timestamp.newBuilder(createdTimestamp_).mergeFrom(value).buildPartial();
+          } else {
+            createdTimestamp_ = value;
+          }
+          onChanged();
+        } else {
+          createdTimestampBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+       */
+      public Builder clearCreatedTimestamp() {
+        if (createdTimestampBuilder_ == null) {
+          createdTimestamp_ = null;
+          onChanged();
+        } else {
+          createdTimestamp_ = null;
+          createdTimestampBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getCreatedTimestampBuilder() {
+        
+        onChanged();
+        return getCreatedTimestampFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getCreatedTimestampOrBuilder() {
+        if (createdTimestampBuilder_ != null) {
+          return createdTimestampBuilder_.getMessageOrBuilder();
+        } else {
+          return createdTimestamp_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : createdTimestamp_;
+        }
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getCreatedTimestampFieldBuilder() {
+        if (createdTimestampBuilder_ == null) {
+          createdTimestampBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getCreatedTimestamp(),
+                  getParentForChildren(),
+                  isClean());
+          createdTimestamp_ = null;
+        }
+        return createdTimestampBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -2716,6 +2919,21 @@ public final class Metrics {
      */
     io.prometheus.client.Metrics.QuantileOrBuilder getQuantileOrBuilder(
         int index);
+
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+     * @return Whether the createdTimestamp field is set.
+     */
+    boolean hasCreatedTimestamp();
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+     * @return The createdTimestamp.
+     */
+    com.google.protobuf.Timestamp getCreatedTimestamp();
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getCreatedTimestampOrBuilder();
   }
   /**
    * Protobuf type {@code io.prometheus.client.Summary}
@@ -2781,6 +2999,19 @@ public final class Metrics {
               }
               quantile_.add(
                   input.readMessage(io.prometheus.client.Metrics.Quantile.parser(), extensionRegistry));
+              break;
+            }
+            case 34: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (createdTimestamp_ != null) {
+                subBuilder = createdTimestamp_.toBuilder();
+              }
+              createdTimestamp_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(createdTimestamp_);
+                createdTimestamp_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -2882,6 +3113,32 @@ public final class Metrics {
       return quantile_.get(index);
     }
 
+    public static final int CREATED_TIMESTAMP_FIELD_NUMBER = 4;
+    private com.google.protobuf.Timestamp createdTimestamp_;
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+     * @return Whether the createdTimestamp field is set.
+     */
+    @java.lang.Override
+    public boolean hasCreatedTimestamp() {
+      return createdTimestamp_ != null;
+    }
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+     * @return The createdTimestamp.
+     */
+    @java.lang.Override
+    public com.google.protobuf.Timestamp getCreatedTimestamp() {
+      return createdTimestamp_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : createdTimestamp_;
+    }
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+     */
+    @java.lang.Override
+    public com.google.protobuf.TimestampOrBuilder getCreatedTimestampOrBuilder() {
+      return getCreatedTimestamp();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2905,6 +3162,9 @@ public final class Metrics {
       for (int i = 0; i < quantile_.size(); i++) {
         output.writeMessage(3, quantile_.get(i));
       }
+      if (createdTimestamp_ != null) {
+        output.writeMessage(4, getCreatedTimestamp());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -2925,6 +3185,10 @@ public final class Metrics {
       for (int i = 0; i < quantile_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, quantile_.get(i));
+      }
+      if (createdTimestamp_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, getCreatedTimestamp());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2948,6 +3212,11 @@ public final class Metrics {
               other.getSampleSum())) return false;
       if (!getQuantileList()
           .equals(other.getQuantileList())) return false;
+      if (hasCreatedTimestamp() != other.hasCreatedTimestamp()) return false;
+      if (hasCreatedTimestamp()) {
+        if (!getCreatedTimestamp()
+            .equals(other.getCreatedTimestamp())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2968,6 +3237,10 @@ public final class Metrics {
       if (getQuantileCount() > 0) {
         hash = (37 * hash) + QUANTILE_FIELD_NUMBER;
         hash = (53 * hash) + getQuantileList().hashCode();
+      }
+      if (hasCreatedTimestamp()) {
+        hash = (37 * hash) + CREATED_TIMESTAMP_FIELD_NUMBER;
+        hash = (53 * hash) + getCreatedTimestamp().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -3113,6 +3386,12 @@ public final class Metrics {
         } else {
           quantileBuilder_.clear();
         }
+        if (createdTimestampBuilder_ == null) {
+          createdTimestamp_ = null;
+        } else {
+          createdTimestamp_ = null;
+          createdTimestampBuilder_ = null;
+        }
         return this;
       }
 
@@ -3150,6 +3429,11 @@ public final class Metrics {
           result.quantile_ = quantile_;
         } else {
           result.quantile_ = quantileBuilder_.build();
+        }
+        if (createdTimestampBuilder_ == null) {
+          result.createdTimestamp_ = createdTimestamp_;
+        } else {
+          result.createdTimestamp_ = createdTimestampBuilder_.build();
         }
         onBuilt();
         return result;
@@ -3230,6 +3514,9 @@ public final class Metrics {
               quantileBuilder_.addAllMessages(other.quantile_);
             }
           }
+        }
+        if (other.hasCreatedTimestamp()) {
+          mergeCreatedTimestamp(other.getCreatedTimestamp());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3561,6 +3848,125 @@ public final class Metrics {
           quantile_ = null;
         }
         return quantileBuilder_;
+      }
+
+      private com.google.protobuf.Timestamp createdTimestamp_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> createdTimestampBuilder_;
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+       * @return Whether the createdTimestamp field is set.
+       */
+      public boolean hasCreatedTimestamp() {
+        return createdTimestampBuilder_ != null || createdTimestamp_ != null;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+       * @return The createdTimestamp.
+       */
+      public com.google.protobuf.Timestamp getCreatedTimestamp() {
+        if (createdTimestampBuilder_ == null) {
+          return createdTimestamp_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : createdTimestamp_;
+        } else {
+          return createdTimestampBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+       */
+      public Builder setCreatedTimestamp(com.google.protobuf.Timestamp value) {
+        if (createdTimestampBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          createdTimestamp_ = value;
+          onChanged();
+        } else {
+          createdTimestampBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+       */
+      public Builder setCreatedTimestamp(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (createdTimestampBuilder_ == null) {
+          createdTimestamp_ = builderForValue.build();
+          onChanged();
+        } else {
+          createdTimestampBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+       */
+      public Builder mergeCreatedTimestamp(com.google.protobuf.Timestamp value) {
+        if (createdTimestampBuilder_ == null) {
+          if (createdTimestamp_ != null) {
+            createdTimestamp_ =
+              com.google.protobuf.Timestamp.newBuilder(createdTimestamp_).mergeFrom(value).buildPartial();
+          } else {
+            createdTimestamp_ = value;
+          }
+          onChanged();
+        } else {
+          createdTimestampBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+       */
+      public Builder clearCreatedTimestamp() {
+        if (createdTimestampBuilder_ == null) {
+          createdTimestamp_ = null;
+          onChanged();
+        } else {
+          createdTimestamp_ = null;
+          createdTimestampBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getCreatedTimestampBuilder() {
+        
+        onChanged();
+        return getCreatedTimestampFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getCreatedTimestampOrBuilder() {
+        if (createdTimestampBuilder_ != null) {
+          return createdTimestampBuilder_.getMessageOrBuilder();
+        } else {
+          return createdTimestamp_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : createdTimestamp_;
+        }
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getCreatedTimestampFieldBuilder() {
+        if (createdTimestampBuilder_ == null) {
+          createdTimestampBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getCreatedTimestamp(),
+                  getParentForChildren(),
+                  isClean());
+          createdTimestamp_ = null;
+        }
+        return createdTimestampBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -4178,6 +4584,21 @@ public final class Metrics {
         int index);
 
     /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+     * @return Whether the createdTimestamp field is set.
+     */
+    boolean hasCreatedTimestamp();
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+     * @return The createdTimestamp.
+     */
+    com.google.protobuf.Timestamp getCreatedTimestamp();
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getCreatedTimestampOrBuilder();
+
+    /**
      * <pre>
      * schema defines the bucket schema. Currently, valid numbers are -4 &lt;= n &lt;= 8.
      * They are all for base-2 bucket schemas, where 1 is a bucket boundary in each case, and
@@ -4651,6 +5072,19 @@ public final class Metrics {
               input.popLimit(limit);
               break;
             }
+            case 122: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (createdTimestamp_ != null) {
+                subBuilder = createdTimestamp_.toBuilder();
+              }
+              createdTimestamp_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(createdTimestamp_);
+                createdTimestamp_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -4801,6 +5235,32 @@ public final class Metrics {
     public io.prometheus.client.Metrics.BucketOrBuilder getBucketOrBuilder(
         int index) {
       return bucket_.get(index);
+    }
+
+    public static final int CREATED_TIMESTAMP_FIELD_NUMBER = 15;
+    private com.google.protobuf.Timestamp createdTimestamp_;
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+     * @return Whether the createdTimestamp field is set.
+     */
+    @java.lang.Override
+    public boolean hasCreatedTimestamp() {
+      return createdTimestamp_ != null;
+    }
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+     * @return The createdTimestamp.
+     */
+    @java.lang.Override
+    public com.google.protobuf.Timestamp getCreatedTimestamp() {
+      return createdTimestamp_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : createdTimestamp_;
+    }
+    /**
+     * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+     */
+    @java.lang.Override
+    public com.google.protobuf.TimestampOrBuilder getCreatedTimestampOrBuilder() {
+      return getCreatedTimestamp();
     }
 
     public static final int SCHEMA_FIELD_NUMBER = 5;
@@ -5247,6 +5707,9 @@ public final class Metrics {
       for (int i = 0; i < positiveCount_.size(); i++) {
         output.writeDoubleNoTag(positiveCount_.getDouble(i));
       }
+      if (createdTimestamp_ != null) {
+        output.writeMessage(15, getCreatedTimestamp());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -5346,6 +5809,10 @@ public final class Metrics {
         }
         positiveCountMemoizedSerializedSize = dataSize;
       }
+      if (createdTimestamp_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(15, getCreatedTimestamp());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -5371,6 +5838,11 @@ public final class Metrics {
               other.getSampleSum())) return false;
       if (!getBucketList()
           .equals(other.getBucketList())) return false;
+      if (hasCreatedTimestamp() != other.hasCreatedTimestamp()) return false;
+      if (hasCreatedTimestamp()) {
+        if (!getCreatedTimestamp()
+            .equals(other.getCreatedTimestamp())) return false;
+      }
       if (getSchema()
           != other.getSchema()) return false;
       if (java.lang.Double.doubleToLongBits(getZeroThreshold())
@@ -5416,6 +5888,10 @@ public final class Metrics {
       if (getBucketCount() > 0) {
         hash = (37 * hash) + BUCKET_FIELD_NUMBER;
         hash = (53 * hash) + getBucketList().hashCode();
+      }
+      if (hasCreatedTimestamp()) {
+        hash = (37 * hash) + CREATED_TIMESTAMP_FIELD_NUMBER;
+        hash = (53 * hash) + getCreatedTimestamp().hashCode();
       }
       hash = (37 * hash) + SCHEMA_FIELD_NUMBER;
       hash = (53 * hash) + getSchema();
@@ -5600,6 +6076,12 @@ public final class Metrics {
         } else {
           bucketBuilder_.clear();
         }
+        if (createdTimestampBuilder_ == null) {
+          createdTimestamp_ = null;
+        } else {
+          createdTimestamp_ = null;
+          createdTimestampBuilder_ = null;
+        }
         schema_ = 0;
 
         zeroThreshold_ = 0D;
@@ -5666,6 +6148,11 @@ public final class Metrics {
           result.bucket_ = bucket_;
         } else {
           result.bucket_ = bucketBuilder_.build();
+        }
+        if (createdTimestampBuilder_ == null) {
+          result.createdTimestamp_ = createdTimestamp_;
+        } else {
+          result.createdTimestamp_ = createdTimestampBuilder_.build();
         }
         result.schema_ = schema_;
         result.zeroThreshold_ = zeroThreshold_;
@@ -5791,6 +6278,9 @@ public final class Metrics {
               bucketBuilder_.addAllMessages(other.bucket_);
             }
           }
+        }
+        if (other.hasCreatedTimestamp()) {
+          mergeCreatedTimestamp(other.getCreatedTimestamp());
         }
         if (other.getSchema() != 0) {
           setSchema(other.getSchema());
@@ -6341,6 +6831,125 @@ public final class Metrics {
           bucket_ = null;
         }
         return bucketBuilder_;
+      }
+
+      private com.google.protobuf.Timestamp createdTimestamp_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> createdTimestampBuilder_;
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+       * @return Whether the createdTimestamp field is set.
+       */
+      public boolean hasCreatedTimestamp() {
+        return createdTimestampBuilder_ != null || createdTimestamp_ != null;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+       * @return The createdTimestamp.
+       */
+      public com.google.protobuf.Timestamp getCreatedTimestamp() {
+        if (createdTimestampBuilder_ == null) {
+          return createdTimestamp_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : createdTimestamp_;
+        } else {
+          return createdTimestampBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+       */
+      public Builder setCreatedTimestamp(com.google.protobuf.Timestamp value) {
+        if (createdTimestampBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          createdTimestamp_ = value;
+          onChanged();
+        } else {
+          createdTimestampBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+       */
+      public Builder setCreatedTimestamp(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (createdTimestampBuilder_ == null) {
+          createdTimestamp_ = builderForValue.build();
+          onChanged();
+        } else {
+          createdTimestampBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+       */
+      public Builder mergeCreatedTimestamp(com.google.protobuf.Timestamp value) {
+        if (createdTimestampBuilder_ == null) {
+          if (createdTimestamp_ != null) {
+            createdTimestamp_ =
+              com.google.protobuf.Timestamp.newBuilder(createdTimestamp_).mergeFrom(value).buildPartial();
+          } else {
+            createdTimestamp_ = value;
+          }
+          onChanged();
+        } else {
+          createdTimestampBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+       */
+      public Builder clearCreatedTimestamp() {
+        if (createdTimestampBuilder_ == null) {
+          createdTimestamp_ = null;
+          onChanged();
+        } else {
+          createdTimestamp_ = null;
+          createdTimestampBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getCreatedTimestampBuilder() {
+        
+        onChanged();
+        return getCreatedTimestampFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getCreatedTimestampOrBuilder() {
+        if (createdTimestampBuilder_ != null) {
+          return createdTimestampBuilder_.getMessageOrBuilder();
+        } else {
+          return createdTimestamp_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : createdTimestamp_;
+        }
+      }
+      /**
+       * <code>.google.protobuf.Timestamp created_timestamp = 15;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getCreatedTimestampFieldBuilder() {
+        if (createdTimestampBuilder_ == null) {
+          createdTimestampBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getCreatedTimestamp(),
+                  getParentForChildren(),
+                  isClean());
+          createdTimestamp_ = null;
+        }
+        return createdTimestampBuilder_;
       }
 
       private int schema_ ;
@@ -13515,47 +14124,52 @@ public final class Metrics {
       ".prometheus.client\032\024gogoproto/gogo.proto" +
       "\032\037google/protobuf/timestamp.proto\"(\n\tLab" +
       "elPair\022\014\n\004name\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"\026\n\005G" +
-      "auge\022\r\n\005value\030\001 \001(\001\"J\n\007Counter\022\r\n\005value\030" +
-      "\001 \001(\001\0220\n\010exemplar\030\002 \001(\0132\036.io.prometheus." +
-      "client.Exemplar\"+\n\010Quantile\022\020\n\010quantile\030" +
-      "\001 \001(\001\022\r\n\005value\030\002 \001(\001\"k\n\007Summary\022\024\n\014sampl" +
-      "e_count\030\001 \001(\004\022\022\n\nsample_sum\030\002 \001(\001\0226\n\010qua" +
-      "ntile\030\003 \003(\0132\036.io.prometheus.client.Quant" +
-      "ileB\004\310\336\037\000\"\030\n\007Untyped\022\r\n\005value\030\001 \001(\001\"\271\003\n\t" +
-      "Histogram\022\024\n\014sample_count\030\001 \001(\004\022\032\n\022sampl" +
-      "e_count_float\030\004 \001(\001\022\022\n\nsample_sum\030\002 \001(\001\022" +
-      "2\n\006bucket\030\003 \003(\0132\034.io.prometheus.client.B" +
-      "ucketB\004\310\336\037\000\022\016\n\006schema\030\005 \001(\021\022\026\n\016zero_thre" +
-      "shold\030\006 \001(\001\022\022\n\nzero_count\030\007 \001(\004\022\030\n\020zero_" +
-      "count_float\030\010 \001(\001\022=\n\rnegative_span\030\t \003(\013" +
-      "2 .io.prometheus.client.BucketSpanB\004\310\336\037\000" +
-      "\022\026\n\016negative_delta\030\n \003(\022\022\026\n\016negative_cou" +
-      "nt\030\013 \003(\001\022=\n\rpositive_span\030\014 \003(\0132 .io.pro" +
-      "metheus.client.BucketSpanB\004\310\336\037\000\022\026\n\016posit" +
-      "ive_delta\030\r \003(\022\022\026\n\016positive_count\030\016 \003(\001\"" +
-      "\211\001\n\006Bucket\022\030\n\020cumulative_count\030\001 \001(\004\022\036\n\026" +
-      "cumulative_count_float\030\004 \001(\001\022\023\n\013upper_bo" +
-      "und\030\002 \001(\001\0220\n\010exemplar\030\003 \001(\0132\036.io.prometh" +
-      "eus.client.Exemplar\",\n\nBucketSpan\022\016\n\006off" +
-      "set\030\001 \001(\021\022\016\n\006length\030\002 \001(\r\"~\n\010Exemplar\0224\n" +
-      "\005label\030\001 \003(\0132\037.io.prometheus.client.Labe" +
-      "lPairB\004\310\336\037\000\022\r\n\005value\030\002 \001(\001\022-\n\ttimestamp\030" +
-      "\003 \001(\0132\032.google.protobuf.Timestamp\"\304\002\n\006Me" +
-      "tric\0224\n\005label\030\001 \003(\0132\037.io.prometheus.clie" +
-      "nt.LabelPairB\004\310\336\037\000\022*\n\005gauge\030\002 \001(\0132\033.io.p" +
-      "rometheus.client.Gauge\022.\n\007counter\030\003 \001(\0132" +
-      "\035.io.prometheus.client.Counter\022.\n\007summar" +
-      "y\030\004 \001(\0132\035.io.prometheus.client.Summary\022." +
-      "\n\007untyped\030\005 \001(\0132\035.io.prometheus.client.U" +
-      "ntyped\0222\n\thistogram\030\007 \001(\0132\037.io.prometheu" +
-      "s.client.Histogram\022\024\n\014timestamp_ms\030\006 \001(\003" +
-      "\"\216\001\n\014MetricFamily\022\014\n\004name\030\001 \001(\t\022\014\n\004help\030" +
-      "\002 \001(\t\022.\n\004type\030\003 \001(\0162 .io.prometheus.clie" +
-      "nt.MetricType\0222\n\006metric\030\004 \003(\0132\034.io.prome" +
-      "theus.client.MetricB\004\310\336\037\000*b\n\nMetricType\022" +
-      "\013\n\007COUNTER\020\000\022\t\n\005GAUGE\020\001\022\013\n\007SUMMARY\020\002\022\013\n\007" +
-      "UNTYPED\020\003\022\r\n\tHISTOGRAM\020\004\022\023\n\017GAUGE_HISTOG" +
-      "RAM\020\005B\026Z\024io_prometheus_clientb\006proto3"
+      "auge\022\r\n\005value\030\001 \001(\001\"\201\001\n\007Counter\022\r\n\005value" +
+      "\030\001 \001(\001\0220\n\010exemplar\030\002 \001(\0132\036.io.prometheus" +
+      ".client.Exemplar\0225\n\021created_timestamp\030\003 " +
+      "\001(\0132\032.google.protobuf.Timestamp\"+\n\010Quant" +
+      "ile\022\020\n\010quantile\030\001 \001(\001\022\r\n\005value\030\002 \001(\001\"\242\001\n" +
+      "\007Summary\022\024\n\014sample_count\030\001 \001(\004\022\022\n\nsample" +
+      "_sum\030\002 \001(\001\0226\n\010quantile\030\003 \003(\0132\036.io.promet" +
+      "heus.client.QuantileB\004\310\336\037\000\0225\n\021created_ti" +
+      "mestamp\030\004 \001(\0132\032.google.protobuf.Timestam" +
+      "p\"\030\n\007Untyped\022\r\n\005value\030\001 \001(\001\"\360\003\n\tHistogra" +
+      "m\022\024\n\014sample_count\030\001 \001(\004\022\032\n\022sample_count_" +
+      "float\030\004 \001(\001\022\022\n\nsample_sum\030\002 \001(\001\0222\n\006bucke" +
+      "t\030\003 \003(\0132\034.io.prometheus.client.BucketB\004\310" +
+      "\336\037\000\0225\n\021created_timestamp\030\017 \001(\0132\032.google." +
+      "protobuf.Timestamp\022\016\n\006schema\030\005 \001(\021\022\026\n\016ze" +
+      "ro_threshold\030\006 \001(\001\022\022\n\nzero_count\030\007 \001(\004\022\030" +
+      "\n\020zero_count_float\030\010 \001(\001\022=\n\rnegative_spa" +
+      "n\030\t \003(\0132 .io.prometheus.client.BucketSpa" +
+      "nB\004\310\336\037\000\022\026\n\016negative_delta\030\n \003(\022\022\026\n\016negat" +
+      "ive_count\030\013 \003(\001\022=\n\rpositive_span\030\014 \003(\0132 " +
+      ".io.prometheus.client.BucketSpanB\004\310\336\037\000\022\026" +
+      "\n\016positive_delta\030\r \003(\022\022\026\n\016positive_count" +
+      "\030\016 \003(\001\"\211\001\n\006Bucket\022\030\n\020cumulative_count\030\001 " +
+      "\001(\004\022\036\n\026cumulative_count_float\030\004 \001(\001\022\023\n\013u" +
+      "pper_bound\030\002 \001(\001\0220\n\010exemplar\030\003 \001(\0132\036.io." +
+      "prometheus.client.Exemplar\",\n\nBucketSpan" +
+      "\022\016\n\006offset\030\001 \001(\021\022\016\n\006length\030\002 \001(\r\"~\n\010Exem" +
+      "plar\0224\n\005label\030\001 \003(\0132\037.io.prometheus.clie" +
+      "nt.LabelPairB\004\310\336\037\000\022\r\n\005value\030\002 \001(\001\022-\n\ttim" +
+      "estamp\030\003 \001(\0132\032.google.protobuf.Timestamp" +
+      "\"\304\002\n\006Metric\0224\n\005label\030\001 \003(\0132\037.io.promethe" +
+      "us.client.LabelPairB\004\310\336\037\000\022*\n\005gauge\030\002 \001(\013" +
+      "2\033.io.prometheus.client.Gauge\022.\n\007counter" +
+      "\030\003 \001(\0132\035.io.prometheus.client.Counter\022.\n" +
+      "\007summary\030\004 \001(\0132\035.io.prometheus.client.Su" +
+      "mmary\022.\n\007untyped\030\005 \001(\0132\035.io.prometheus.c" +
+      "lient.Untyped\0222\n\thistogram\030\007 \001(\0132\037.io.pr" +
+      "ometheus.client.Histogram\022\024\n\014timestamp_m" +
+      "s\030\006 \001(\003\"\216\001\n\014MetricFamily\022\014\n\004name\030\001 \001(\t\022\014" +
+      "\n\004help\030\002 \001(\t\022.\n\004type\030\003 \001(\0162 .io.promethe" +
+      "us.client.MetricType\0222\n\006metric\030\004 \003(\0132\034.i" +
+      "o.prometheus.client.MetricB\004\310\336\037\000*b\n\nMetr" +
+      "icType\022\013\n\007COUNTER\020\000\022\t\n\005GAUGE\020\001\022\013\n\007SUMMAR" +
+      "Y\020\002\022\013\n\007UNTYPED\020\003\022\r\n\tHISTOGRAM\020\004\022\023\n\017GAUGE" +
+      "_HISTOGRAM\020\005B\026Z\024io_prometheus_clientb\006pr" +
+      "oto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -13580,7 +14194,7 @@ public final class Metrics {
     internal_static_io_prometheus_client_Counter_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_io_prometheus_client_Counter_descriptor,
-        new java.lang.String[] { "Value", "Exemplar", });
+        new java.lang.String[] { "Value", "Exemplar", "CreatedTimestamp", });
     internal_static_io_prometheus_client_Quantile_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_io_prometheus_client_Quantile_fieldAccessorTable = new
@@ -13592,7 +14206,7 @@ public final class Metrics {
     internal_static_io_prometheus_client_Summary_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_io_prometheus_client_Summary_descriptor,
-        new java.lang.String[] { "SampleCount", "SampleSum", "Quantile", });
+        new java.lang.String[] { "SampleCount", "SampleSum", "Quantile", "CreatedTimestamp", });
     internal_static_io_prometheus_client_Untyped_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_io_prometheus_client_Untyped_fieldAccessorTable = new
@@ -13604,7 +14218,7 @@ public final class Metrics {
     internal_static_io_prometheus_client_Histogram_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_io_prometheus_client_Histogram_descriptor,
-        new java.lang.String[] { "SampleCount", "SampleCountFloat", "SampleSum", "Bucket", "Schema", "ZeroThreshold", "ZeroCount", "ZeroCountFloat", "NegativeSpan", "NegativeDelta", "NegativeCount", "PositiveSpan", "PositiveDelta", "PositiveCount", });
+        new java.lang.String[] { "SampleCount", "SampleCountFloat", "SampleSum", "Bucket", "CreatedTimestamp", "Schema", "ZeroThreshold", "ZeroCount", "ZeroCountFloat", "NegativeSpan", "NegativeDelta", "NegativeCount", "PositiveSpan", "PositiveDelta", "PositiveCount", });
     internal_static_io_prometheus_client_Bucket_descriptor =
       getDescriptor().getMessageTypes().get(7);
     internal_static_io_prometheus_client_Bucket_fieldAccessorTable = new
