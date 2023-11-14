@@ -81,7 +81,7 @@
             ]]></property>
 
             <property name="event.sink.factory.EventSinkFactory.ap.Formatter"
-                      value="com.jkoolcloud.tnt4j.streams.custom.format.openmetrics.FactPathValueFormatter"/>
+                      value="com.jkoolcloud.tnt4j.streams.custom.format.autopilot.FactPathValueFormatter"/>
             <property name="event.sink.factory.EventSinkFactory.ap.Formatter.AddSelfSnapshot" value="false"/>
             <property name="event.sink.factory.EventSinkFactory.ap.Formatter.KeyReplacements">
                 " "->"_" "\\\""->"" "\""->"'" "/"->"%" "="->"\\" ","->"!" "\\\\"->"\\"

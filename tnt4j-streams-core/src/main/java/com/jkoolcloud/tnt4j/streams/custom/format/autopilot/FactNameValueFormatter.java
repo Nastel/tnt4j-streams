@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.jkoolcloud.tnt4j.streams.custom.format.castiron;
+package com.jkoolcloud.tnt4j.streams.custom.format.autopilot;
 
 import java.util.*;
 
@@ -23,7 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.jkoolcloud.tnt4j.core.*;
 import com.jkoolcloud.tnt4j.format.DefaultFormatter;
 import com.jkoolcloud.tnt4j.source.Source;
-import com.jkoolcloud.tnt4j.streams.fields.StreamFieldType;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 import com.jkoolcloud.tnt4j.tracker.TrackingActivity;
 import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
@@ -35,29 +34,6 @@ import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
  * {@code "OBJ:name-value-prefix,name1=value1,....,nameN=valueN"}.
  * </p>
  * Newline is added at the end of each line.
- * <p>
- * This formatter supports the following configuration properties (in addition to those supported by
- * {@link com.jkoolcloud.tnt4j.format.DefaultFormatter}):
- * <ul>
- * <li>KeyReplacements - configures produced property key replacement symbols. Format is:
- * {@code event.formatter.KeyReplacements: "s1"->"rs1" "s2"->"rs" ... "sn"->"rsN"}, where:
- * <ul>
- * <li>{@code sX} - symbol to be replaced</li>
- * <li>{@code rsX} - replacement symbol</li>
- * </ul>
- * E.g. {@code event.formatter.KeyReplacements: " "->"_" "\""->"'" "/"->"%"}. Default value -
- * {@code " "->"_" "\""->"'" "/"->"%" "="->"\" ","->"!"}. (Optional)</li>
- * <li>ValueReplacements - configures produced property value replacement symbols. Format is:
- * {@code event.formatter.ValueReplacements: "s1"->"rs1" "s2"->"rs" ... "sn"->"rsN"}, where:
- * <ul>
- * <li>{@code sX} - symbol to be replaced</li>
- * <li>{@code rsX} - replacement symbol</li>
- * </ul>
- * E.g. {@code event.formatter.ValueReplacements: "\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}"
- * "\""->"'"}. Default value - {@code "\r"->"\\r" "\n"->"\\n" ";"->"|" ","->"|" "["->"{(" "]"->")}" "\""->"'"}.
- * (Optional)</li>
- * </ul>
- *
  *
  * @version $Revision: 1 $
  */
@@ -65,34 +41,36 @@ public class FactNameValueFormatter extends DefaultFormatter {
 	/**
 	 * Line-feed symbol {@value}.
 	 */
-	protected static final String LF = "\n"; // NON-NLS
+	public static final String LF = "\n"; // NON-NLS
 	/**
 	 * Carriage-return symbol {@value}.
 	 */
-	protected static final String CR = "\r"; // NON-NLS
+	public static final String CR = "\r"; // NON-NLS
 	/**
 	 * Field separator symbol {@value}.
 	 */
-	protected static final String FIELD_SEP = ","; // NON-NLS
+	public static final String FIELD_SEP = ","; // NON-NLS
 	/**
 	 * Formatted data package end symbol {@value}.
 	 */
-	protected static final String END_SEP = LF;
+	public static final String END_SEP = LF;
 	/**
 	 * Property path delimiter symbol {@value}.
 	 */
-	protected static final String PATH_DELIM = "\\"; // NON-NLS
+	public static final String PATH_DELIM = "\\"; // NON-NLS
 	/**
 	 * Equality symbol {@value}.
 	 */
-	protected static final String EQ = "="; // NON-NLS
+	public static final String EQ = "="; // NON-NLS
 	/**
 	 * Fields separator symbol {@value}.
 	 */
-	protected static final String FS_REP = "!"; // NON-NLS
+	public static final String FS_REP = "!"; // NON-NLS
 
 	private static final String SELF_SNAP_NAME = "Self"; // NON-NLS
 	private static final String SELF_SNAP_ID = SELF_SNAP_NAME + "@" + PropertySnapshot.CATEGORY_DEFAULT; // NON-NLS
+
+	private static final String SNAP_NAME_PROP = "JMX_SNAP_NAME"; // NON-NLS
 
 	/**
 	 * Mapping of attribute key string symbol replacements.
@@ -126,22 +104,10 @@ public class FactNameValueFormatter extends DefaultFormatter {
 
 		nvString.append("OBJ:"); // NON-NLS
 		// ------------------------------------------------------------- name
-		toString(nvString, event.getSource()).append(PATH_DELIM).append("Events").append(FIELD_SEP); // NON-NLS
+		toString(nvString, event.getSource()).append(PATH_DELIM).append(event.getName()).append(PATH_DELIM)
+				.append("Events").append(FIELD_SEP); // NON-NLS
 
-		toString(nvString, getTrackableKey(event, StreamFieldType.EventName.name()), event.getOperation().getName());
-		toString(nvString, getTrackableKey(event, StreamFieldType.Severity.name()), event.getSeverity());
-		toString(nvString, getTrackableKey(event, StreamFieldType.StartTime.name()),
-				event.getOperation().getStartTime());
-		toString(nvString, getTrackableKey(event, StreamFieldType.EndTime.name()), event.getOperation().getEndTime());
-		toString(nvString, getTrackableKey(event, StreamFieldType.Message.name()), event.getMessage());
-		toString(nvString, getTrackableKey(event, StreamFieldType.Correlator.name()), event.getCorrelator());
-
-		Collection<Property> pList = getProperties(event.getOperation());
-		for (Property prop : pList) {
-			toString(nvString, event, prop);
-		}
-
-		if (event.getOperation().getSnapshot(SELF_SNAP_ID) == null) {
+		if (addSelfSnapshot && event.getOperation().getSnapshot(SELF_SNAP_ID) == null) {
 			Snapshot selfSnapshot = getSelfSnapshot(event.getOperation());
 			if (event.getTag() != null) {
 				Set<String> tags = event.getTag();
@@ -155,7 +121,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 
 		Collection<Snapshot> sList = getSnapshots(event.getOperation());
 		for (Snapshot snap : sList) {
-			toString(nvString, event, snap);
+			toString(nvString, snap);
 		}
 
 		return nvString.append(END_SEP).toString();
@@ -179,19 +145,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 		nvString.append("OBJ:"); // NON-NLS
 		toString(nvString, activity.getSource()).append(PATH_DELIM).append("Activities").append(FIELD_SEP); // NON-NLS
 
-		toString(nvString, getTrackableKey(activity, StreamFieldType.EventName.name()), activity.getName());
-		toString(nvString, getTrackableKey(activity, StreamFieldType.Severity.name()), activity.getSeverity());
-		toString(nvString, getTrackableKey(activity, StreamFieldType.StartTime.name()), activity.getStartTime());
-		toString(nvString, getTrackableKey(activity, StreamFieldType.EndTime.name()), activity.getEndTime());
-		toString(nvString, getTrackableKey(activity, StreamFieldType.ResourceName.name()), activity.getResource());
-		toString(nvString, getTrackableKey(activity, StreamFieldType.Correlator.name()), activity.getCorrelator());
-
-		Collection<Property> pList = getProperties(activity);
-		for (Property prop : pList) {
-			toString(nvString, activity, prop);
-		}
-
-		if (activity.getSnapshot(SELF_SNAP_ID) == null) {
+		if (addSelfSnapshot && activity.getSnapshot(SELF_SNAP_ID) == null) {
 			Snapshot selfSnapshot = getSelfSnapshot(activity);
 			selfSnapshot.add("id.count", activity.getIdCount()); // NON-NLS
 
@@ -200,7 +154,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 
 		Collection<Snapshot> sList = getSnapshots(activity);
 		for (Snapshot snap : sList) {
-			toString(nvString, activity, snap);
+			toString(nvString, snap);
 		}
 
 		return nvString.append(END_SEP).toString();
@@ -236,7 +190,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 
 		// ------------------------------------------------------ category, id or name
 		nvString.append("OBJ:Metrics").append(PATH_DELIM).append(snapshot.getCategory()).append(FIELD_SEP); // NON-NLS
-		toString(nvString, (Trackable) null, snapshot).append(END_SEP);
+		toString(nvString, snapshot).append(END_SEP);
 
 		return nvString.toString();
 	}
@@ -314,61 +268,17 @@ public class FactNameValueFormatter extends DefaultFormatter {
 	}
 
 	/**
-	 * Returns operation contained properties collection.
-	 *
-	 * @param operation
-	 *            operation instance
-	 * @return collection of operation properties
-	 */
-	protected Collection<Property> getProperties(Operation operation) {
-		return operation.getProperties();
-	}
-
-	/**
-	 * Makes decorated string representation of argument trackable and property key.
-	 *
-	 * @param t
-	 *            trackable instance
-	 * @param pKey
-	 *            field/property key string
-	 * @return decorated string representation of trackable contained field/property
-	 *
-	 * @see #getTrackableName(com.jkoolcloud.tnt4j.core.Trackable)
-	 * @see #getKeyStr(String, String)
-	 */
-	protected String getTrackableKey(Trackable t, String pKey) {
-		if (t == null) {
-			return pKey;
-		}
-
-		return getKeyStr(getTrackableName(t), pKey);
-	}
-
-	/**
-	 * Returns name for provided {@code trackable} instance.
-	 *
-	 * @param trackable
-	 *            trackable instance to get name for
-	 * @return name of provided trackable
-	 */
-	protected String getTrackableName(Trackable trackable) {
-		return trackable.getName();
-	}
-
-	/**
 	 * Makes string representation of snapshot and appends it to provided string builder.
 	 *
 	 * @param nvString
 	 *            string builder instance to append
-	 * @param t
-	 *            snapshot parent entity
 	 * @param snap
 	 *            snapshot instance to represent as string
 	 * @return appended string builder reference
 	 */
-	protected StringBuilder toString(StringBuilder nvString, Trackable t, Snapshot snap) {
+	protected StringBuilder toString(StringBuilder nvString, Snapshot snap) {
 		Collection<Property> list = getProperties(snap);
-		String sName = getTrackableKey(t, getSnapName(snap));
+		String sName = getSnapName(snap);
 		for (Property p : list) {
 			if (p.isTransient()) {
 				continue;
@@ -383,47 +293,6 @@ public class FactNameValueFormatter extends DefaultFormatter {
 			nvString.append(getKeyStr(sName, pKey));
 			formatValue(nvString, value, FIELD_SEP);
 		}
-		return nvString;
-	}
-
-	/**
-	 * Makes string representation of property and appends it to provided string builder.
-	 * 
-	 * @param nvString
-	 *            string builder instance to append
-	 * @param t
-	 *            trackable instance
-	 * @param prop
-	 *            property instance
-	 * @return appended string builder reference
-	 *
-	 * @see #toString(StringBuilder, String, Object)
-	 */
-	protected StringBuilder toString(StringBuilder nvString, Trackable t, Property prop) {
-		if (!prop.isTransient()) {
-			String pKey = getTrackableKey(t, prop.getKey());
-			Object value = prop.getValue();
-
-			return toString(nvString, pKey, value);
-
-		}
-		return nvString;
-	}
-
-	/**
-	 * Makes string representation of property by provided {@code key} and {@code value}.
-	 * 
-	 * @param nvString
-	 *            string builder instance to append
-	 * @param key
-	 *            property key
-	 * @param value
-	 *            property value
-	 * @return appended string builder reference
-	 */
-	protected StringBuilder toString(StringBuilder nvString, String key, Object value) {
-		nvString.append(key);
-		nvString.append(EQ).append(getValueStr(value)).append(FIELD_SEP);
 		return nvString;
 	}
 
@@ -471,25 +340,38 @@ public class FactNameValueFormatter extends DefaultFormatter {
 	 * <p>
 	 * Snapshot name string gets symbols replaced using ones defined in {@link #keyReplacements} map.
 	 *
-	 * @param snapName
-	 *            snapshot name
+	 * @param snap
+	 *            snapshot instance to get name
 	 * @return decorated string representation of snapshot name
 	 */
-	protected String getSnapNameStr(String snapName) {
-		return Utils.replace(snapName, keyReplacements);
+	protected String getSnapNameStr(Snapshot snap) {
+		return Utils.replace(snap.getName(), keyReplacements);
 	}
 
 	/**
-	 * Makes decorated string representation of {@link Snapshot} name.
+	 * Makes decorated string representation of {@link Snapshot} name and puts it as snapshot property
+	 * {@code 'JMX_SNAP_NAME'} for a later use.
 	 *
 	 * @param snap
 	 *            snapshot instance
 	 * @return decorated string representation of snapshot name
 	 *
-	 * @see #getSnapNameStr(String)
+	 * @see #getSnapNameStr(com.jkoolcloud.tnt4j.core.Snapshot)
 	 */
 	protected String getSnapName(Snapshot snap) {
-		return getSnapNameStr(snap.getName());
+		Property pSnapName = snap.get(SNAP_NAME_PROP);
+		if (pSnapName == null) {
+			String snapNameStr = getSnapNameStr(snap);
+			pSnapName = new Property(SNAP_NAME_PROP, snapNameStr, true);
+
+			snap.add(pSnapName);
+		}
+
+		return (String) pSnapName.getValue();
+	}
+
+	private boolean isEmpty(Property p) {
+		return p == null || p.getValue() == null;
 	}
 
 	/**
