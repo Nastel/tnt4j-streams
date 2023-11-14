@@ -15,14 +15,10 @@
  */
 
 /**
- * Custom TNT4J-Streams formatter used to format OpenMetrics reported data.
+ * Custom TNT4J-Streams formatter used to format AutoPilot reported data.
  *
  * @author akausinis
  * @version 1.0
- *
- * @deprecated this package is left just for backward compatibility. Use
- *             {@link com.jkoolcloud.tnt4j.streams.custom.format.autopilot} instead.
  */
 
-@Deprecated
-package com.jkoolcloud.tnt4j.streams.custom.format.openmetrics;
+package com.jkoolcloud.tnt4j.streams.custom.format.autopilot;

@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.jkoolcloud.tnt4j.streams.custom.format.castiron;
+package com.jkoolcloud.tnt4j.streams.custom.format.autopilot;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.*;
 
-import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.jkoolcloud.tnt4j.core.Operation;
 import com.jkoolcloud.tnt4j.core.Property;
 import com.jkoolcloud.tnt4j.core.Snapshot;
-import com.jkoolcloud.tnt4j.core.Trackable;
-import com.jkoolcloud.tnt4j.utils.Utils;
+import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
  * This class provides key/value formatting for tnt4j activities, events and snapshots. The output format follows the
@@ -33,28 +35,8 @@ import com.jkoolcloud.tnt4j.utils.Utils;
  * {@code "OBJ:object-path\name1=value1,...,object-path\nameN=valueN"}.
  * </p>
  * Newline is added at the end of each line.
- * <p>
- * This formatter supports the following configuration properties (in addition to those supported by
- * {@link FactNameValueFormatter}):
- * <ul>
- * <li>DuplicateKeySuffix - suffix value for duplicate path level keys. Default value - {@code "_"}. (Optional)</li>
- * <li>PathLevelAttributes - configures produced path tokens sequence. Format is:
- * {@code event.formatter.PathLevelAttributes[.CONDITION]: fieldName1; fieldName2, fieldName4; fieldName6;...;fieldNameN},
- * where:
- * <ul>
- * <li>{@code CONDITION} - path build condition having format {@code fieldName.fieldValue} (Optional)</li>
- * <li>{@code fieldNameX} - name of activity entity field or property</li>
- * <li>{@code ;} - path level delimiter</li>
- * <li>{@code ,} - path token field/property names delimiter (path adds first found non-null value)</li>
- * </ul>
- * E.g. {@code event.formatter.PathLevelAttributes.CastIronType.Jobs: CastIronType; CastIronStatus; Resource; Name}
- * {@code event.formatter.PathLevelAttributes.CastIronType.Logs: CastIronType; Name; Severity}. Default value -
- * {@code Name}. (Optional)</li>
- * </ul>
  *
  * @version $Revision: 1 $
- *
- * @see com.jkoolcloud.tnt4j.core.Trackable#getFieldValue(String)
  */
 public class FactPathValueFormatter extends FactNameValueFormatter {
 
@@ -64,7 +46,7 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 	public static final String UNIQUE_SUFFIX = "_"; // NON-NLS
 
 	private String uniqueSuffix = UNIQUE_SUFFIX;
-	private Map<Condition, String[][]> pathLevelAttrKeys = new TreeMap<>();
+	private String[][] pathLevelAttrKeys = null;
 
 	private Comparator<Snapshot> snapshotComparator;
 	private Comparator<Property> propertyComparator;
@@ -106,13 +88,6 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 		return getSortedCollection(pList, getPropertyComparator());
 	}
 
-	@Override
-	protected Collection<Property> getProperties(Operation operation) {
-		Collection<Property> pList = super.getProperties(operation);
-
-		return getSortedCollection(pList, getPropertyComparator());
-	}
-
 	private static <T> Collection<T> getSortedCollection(Collection<T> col, Comparator<T> comp) {
 		List<T> cList;
 		if (col instanceof List<?>) {
@@ -141,6 +116,8 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 	/**
 	 * Makes string representation of snapshot and appends it to provided string builder.
 	 * <p>
+	 * Note: Custom internal use snapshot property named {@code 'JMX_SNAP_NAME'} is ignored.
+	 * <p>
 	 * In case snapshot properties have same key for "branch" and "leaf" nodes at same path level, than "leaf" node
 	 * property key value is appended by configuration defined (cfg. key {@code "DuplicateKeySuffix"}, default value
 	 * {@value #UNIQUE_SUFFIX}) suffix.
@@ -154,10 +131,11 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 	 * @see #getUniquePropertyKey(String, com.jkoolcloud.tnt4j.core.Property[], int)
 	 */
 	@Override
-	protected StringBuilder toString(StringBuilder nvString, Trackable t, Snapshot snap) {
+	protected StringBuilder toString(StringBuilder nvString, Snapshot snap) {
 		Collection<Property> list = getProperties(snap);
 		Property[] pArray = list.toArray(new Property[list.size()]);
-		String sName = getTrackableKey(t, getSnapName(snap));
+		boolean hasMultipleProperties = hasMultipleProperties(pArray);
+		String sName = getSnapName(snap);
 		for (int i = 0; i < pArray.length; i++) {
 			Property p = pArray[i];
 			if (p.isTransient()) {
@@ -167,10 +145,26 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 			String pKey = getUniquePropertyKey(p.getKey(), pArray, i);
 			Object value = p.getValue();
 
-			nvString.append(getKeyStr(sName, pKey));
+			if (StringUtils.equals(pKey, "Value") && !hasMultipleProperties) {
+				nvString.append(sName);
+			} else {
+				nvString.append(getKeyStr(sName, pKey));
+			}
 			nvString.append(EQ).append(getValueStr(value)).append(FIELD_SEP);
 		}
 		return nvString;
+	}
+
+	private static boolean hasMultipleProperties(Property[] pArray) {
+		int count = 0;
+
+		for (Property p : pArray) {
+			if (!p.isTransient()) {
+				count++;
+			}
+		}
+
+		return count > 1;
 	}
 
 	/**
@@ -200,41 +194,96 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 		return pKey;
 	}
 
-	/**
-	 * Returns name for provided {@code trackable} instance.
-	 * <p>
-	 * Builds path using user configured ({@code "PathLevelAttributes"} property) path of trackable values.
-	 *
-	 * @param trackable
-	 *            trackable instance to get name for
-	 * @return name of provided trackable
-	 */
 	@Override
-	protected String getTrackableName(Trackable trackable) {
-		StringBuilder pathBuilder = new StringBuilder(128);
-		Object pv;
+	protected String getSnapNameStr(Snapshot snap) {
+		String objCanonName = snap.getName();
+		if (StringUtils.isEmpty(objCanonName)) {
+			return objCanonName;
+		}
 
-		if (MapUtils.isNotEmpty(pathLevelAttrKeys)) {
-			for (Map.Entry<Condition, String[][]> entry : pathLevelAttrKeys.entrySet()) {
-				pv = trackable.getFieldValue(entry.getKey().variable);
-				if (entry.getKey().evaluate(Utils.toString(pv))) {
-					for (String[] levelAttrKeys : entry.getValue()) {
-						inner: for (String pKey : levelAttrKeys) {
-							pv = trackable.getFieldValue(pKey);
-							if (pv != null) {
-								appendPath(pathBuilder, pv);
-								break inner;
-							}
+		int ddIdx = objCanonName.indexOf(':');
+
+		if (ddIdx == -1) {
+			return objCanonName;
+		}
+
+		Properties objNameProps = new Properties();
+		loadProps(objNameProps, objCanonName, ddIdx);
+
+		String objName = getObjNameStr(objNameProps, snap);
+
+		return Utils.replace(objName, keyReplacements);
+	}
+
+	/**
+	 * Makes decorated string representation of snapshot name from provided set of canonical object name properties
+	 * (attributes).
+	 *
+	 * @param objNameProps
+	 *            canonical object name properties
+	 * @param snap
+	 *            snapshot instance to construct name
+	 *
+	 * @return decorated string representation of snapshot name
+	 */
+	protected String getObjNameStr(Map<?, ?> objNameProps, Snapshot snap) {
+		StringBuilder pathBuilder = new StringBuilder(128);
+		String pv;
+
+		if (pathLevelAttrKeys != null) {
+			for (String[] levelAttrKeys : pathLevelAttrKeys) {
+				for (String pKey : levelAttrKeys) {
+					pv = (String) objNameProps.remove(pKey);
+					if (pv == null) {
+						Property p = snap.remove(pKey);
+						if (p != null) {
+							pv = Utils.toString(p.getValue());
 						}
 					}
-					break; // handle first
+
+					if (pv != null) {
+						appendPath(pathBuilder, pv);
+					}
 				}
 			}
-		} else {
-			pathBuilder.append(trackable.getName());
+		}
+
+		if (!objNameProps.isEmpty()) {
+			for (Map.Entry<?, ?> pe : objNameProps.entrySet()) {
+				pv = String.valueOf(pe.getValue());
+				appendPath(pathBuilder, pv);
+			}
 		}
 
 		return pathBuilder.toString();
+	}
+
+	/**
+	 * Resolves properties map from provided canonical object name string and puts into provided {@link Properties}
+	 * instance.
+	 *
+	 * @param props
+	 *            properties to load into
+	 * @param objCanonName
+	 *            object canonical name string
+	 * @param ddIdx
+	 *            domain separator index
+	 */
+	protected static void loadProps(Properties props, String objCanonName, int ddIdx) {
+		String domainStr = objCanonName.substring(0, ddIdx);
+
+		props.clear();
+		props.setProperty("domain", domainStr);
+
+		String propsStr = objCanonName.substring(ddIdx + 1);
+
+		if (!propsStr.isEmpty()) {
+			propsStr = Utils.replace(propsStr, FIELD_SEP, LF);
+			try (Reader rdr = new StringReader(propsStr)) {
+				props.load(rdr);
+			} catch (IOException exc) {
+			}
+		}
 	}
 
 	/**
@@ -243,12 +292,12 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 	 * @param pathBuilder
 	 *            path string builder to append
 	 * @param pathToken
-	 *            path token data to add to path
+	 *            path token string
 	 * @return appended path string builder instance
 	 */
-	protected StringBuilder appendPath(StringBuilder pathBuilder, Object pathToken) {
-		if (pathToken != null) {
-			pathBuilder.append(pathBuilder.length() > 0 ? PATH_DELIM : "").append(Utils.toString(pathToken));
+	protected StringBuilder appendPath(StringBuilder pathBuilder, String pathToken) {
+		if (StringUtils.isNotEmpty(pathToken)) {
+			pathBuilder.append(pathBuilder.length() > 0 ? PATH_DELIM : "").append(pathToken);
 		}
 
 		return pathBuilder;
@@ -260,25 +309,13 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 
 		uniqueSuffix = Utils.getString("DuplicateKeySuffix", settings, uniqueSuffix); // NON-NLS
 
-		Map<String, ?> pathLevelAttributes = Utils.getAttributes("PathLevelAttributes", settings); // NON-NLS
-
-		for (Map.Entry<String, ?> entry : pathLevelAttributes.entrySet()) {
-			String[] split = entry.getKey().split("\\."); // NON-NLS
-			Condition condition;
-			switch (split.length) {
-			case 3:
-				condition = new Condition(split[1], split[2]);
-				break;
-			default:
-				condition = new Condition();
-				break;
-			}
-			pathLevelAttrKeys.put(condition, initPathLevelAttrKeys(String.valueOf(entry.getValue())));
+		String pValue = Utils.getString("PathLevelAttributes", settings, ""); // NON-NLS
+		if (StringUtils.isNotEmpty(pValue)) {
+			initPathLevelAttrKeys(pValue);
 		}
 	}
 
-	private static String[][] initPathLevelAttrKeys(String levelsStr) {
-		String[][] pathLevelAttrKeys = null;
+	private void initPathLevelAttrKeys(String levelsStr) {
 		List<List<String>> levelList = new ArrayList<>();
 		List<String> attrsList;
 
@@ -312,47 +349,6 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 			levelAttrs = level.toArray(new String[level.size()]);
 
 			pathLevelAttrKeys[i++] = levelAttrs;
-		}
-		return pathLevelAttrKeys;
-	}
-
-	private static class Condition implements Comparable<Condition> {
-		boolean all = true;
-		String variable;
-		String value;
-
-		Condition() {
-			all = true;
-		}
-
-		Condition(String variable, String value) {
-			this();
-			if (value != null && variable != null) {
-				this.variable = variable;
-				this.value = value;
-				all = false;
-			}
-		}
-
-		boolean evaluate(String variable) {
-			if (all) {
-				return true;
-			}
-			return value != null && value.equals(variable);
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (all) {
-				return true;
-			}
-			return obj != null && obj instanceof Condition && ((Condition) obj).value.equals(value)
-					&& ((Condition) obj).variable.equals(variable);
-		}
-
-		@Override
-		public int compareTo(Condition o) {
-			return o.all ? -1 : 1; // ensures "all" is last
 		}
 	}
 }
