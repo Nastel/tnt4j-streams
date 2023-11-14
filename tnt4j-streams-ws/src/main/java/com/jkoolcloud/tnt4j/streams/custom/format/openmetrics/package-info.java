@@ -20,8 +20,8 @@
  * @author akausinis
  * @version 1.0
  *
- * @deprecated this package is left just for backward compatibility. Use
- *             {@link com.jkoolcloud.tnt4j.streams.custom.format.autopilot} instead.
+ * @deprecated this package is left just for backward compatibility. Use classes from
+ *             {@link com.jkoolcloud.tnt4j.streams.custom.format.autopilot} package instead.
  */
 
 package com.jkoolcloud.tnt4j.streams.custom.format.openmetrics;
