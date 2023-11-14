@@ -298,7 +298,7 @@ private static final long serialVersionUID = 0L;
   private volatile java.lang.Object name_;
   /**
    * <pre>
-   * name of the metric, including its DNS name prefix. It must be unique.
+   * name of the metric.
    * </pre>
    *
    * <code>string name = 1;</code>
@@ -319,7 +319,7 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * name of the metric, including its DNS name prefix. It must be unique.
+   * name of the metric.
    * </pre>
    *
    * <code>string name = 1;</code>
@@ -1164,7 +1164,7 @@ private static final long serialVersionUID = 0L;
     private java.lang.Object name_ = "";
     /**
      * <pre>
-     * name of the metric, including its DNS name prefix. It must be unique.
+     * name of the metric.
      * </pre>
      *
      * <code>string name = 1;</code>
@@ -1184,7 +1184,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * name of the metric, including its DNS name prefix. It must be unique.
+     * name of the metric.
      * </pre>
      *
      * <code>string name = 1;</code>
@@ -1205,7 +1205,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * name of the metric, including its DNS name prefix. It must be unique.
+     * name of the metric.
      * </pre>
      *
      * <code>string name = 1;</code>
@@ -1224,7 +1224,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * name of the metric, including its DNS name prefix. It must be unique.
+     * name of the metric.
      * </pre>
      *
      * <code>string name = 1;</code>
@@ -1238,7 +1238,7 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * name of the metric, including its DNS name prefix. It must be unique.
+     * name of the metric.
      * </pre>
      *
      * <code>string name = 1;</code>

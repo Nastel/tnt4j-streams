@@ -9,7 +9,7 @@ public interface MetricOrBuilder extends
 
   /**
    * <pre>
-   * name of the metric, including its DNS name prefix. It must be unique.
+   * name of the metric.
    * </pre>
    *
    * <code>string name = 1;</code>
@@ -18,7 +18,7 @@ public interface MetricOrBuilder extends
   java.lang.String getName();
   /**
    * <pre>
-   * name of the metric, including its DNS name prefix. It must be unique.
+   * name of the metric.
    * </pre>
    *
    * <code>string name = 1;</code>
