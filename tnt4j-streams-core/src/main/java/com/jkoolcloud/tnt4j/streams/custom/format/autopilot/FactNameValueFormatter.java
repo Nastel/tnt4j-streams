@@ -189,7 +189,8 @@ public class FactNameValueFormatter extends DefaultFormatter {
 		StringBuilder nvString = new StringBuilder(1024);
 
 		// ------------------------------------------------------ category, id or name
-		nvString.append("OBJ:Metrics").append(PATH_DELIM).append(snapshot.getCategory()).append(FIELD_SEP); // NON-NLS
+		nvString.append("OBJ:");
+		toString(nvString, snapshot.getSource()).append(PATH_DELIM).append(snapshot.getCategory()).append(FIELD_SEP); // NON-NLS
 		toString(nvString, snapshot).append(END_SEP);
 
 		return nvString.toString();
