@@ -35,8 +35,8 @@
         <field name="EventName" value="snapName">
             <field-transform lang="groovy"><![CDATA[
                 String props = "";
-                props += (StringUtils.isEmpty(${mName}) ? "" : "mName=" + ${mName});
-                props += (props.length() > 0 ? "," : "") + "mType=" + ${mType};
+                props += (StringUtils.isEmpty(${mName})   ? "" : "mName=" + ${mName});
+                props += (props.length() > 0              ? "," : "") + "mType=" + ${mType};
                 props += (StringUtils.isEmpty(${mToken4}) ? "" : (props.length() > 0 ? "," : "") + "mToken4=" + ${mToken4});
                 props += (StringUtils.isEmpty(${mToken5}) ? "" : (props.length() > 0 ? "," : "") + "mToken5=" + ${mToken5});
                 props += (StringUtils.isEmpty(${mToken6}) ? "" : (props.length() > 0 ? "," : "") + "mToken6=" + ${mToken6});
