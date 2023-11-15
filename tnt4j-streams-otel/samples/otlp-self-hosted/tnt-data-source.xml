@@ -44,7 +44,7 @@
             <property name="source.factory.RootFQN" value="DATACENTER=?"/>
 
             <!-- Sequence of sinks to broadcast stream produced activities. You may leave just one of them to sent data to single endpoint -->
-            <property name="event.sink.factory.BroadcastSequence" value="ap,xray"/>
+            <property name="event.sink.factory.BroadcastSequence" value="ap"/>
 
             <!-- File sink -->
             <property name="event.sink.factory.EventSinkFactory.file" value="com.jkoolcloud.tnt4j.sink.impl.FileEventSinkFactory"/>
@@ -92,7 +92,7 @@
             </property>
             <!-- Path of activity name properties to build AutoPilot facts tree layout -->
             <property name="event.sink.factory.EventSinkFactory.ap.Formatter.PathLevelAttributes">
-                domain;subscription;resourceGroup;provider;namespace;metric;entityName,messagingErrorSubCode;
+                domain;service;process;owner;scope;metric;
             </property>
 
             <property name="event.sink.factory.RateLimit" value="false"/>

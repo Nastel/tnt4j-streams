@@ -19,6 +19,420 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
+    <!-- ############################################################################################################################### -->
+    <!-- ######################################### COMMON PARSERS ###################################################################### -->
+
+    <parser name="AttributeParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <field name="AllAttributes" locator="#" locator-type="Label"/>
+    </parser>
+
+    <!-- ############################################################################################################################### -->
+    <!-- ######################################### METRICS PARSERS ##################################################################### -->
+
+    <parser name="NumberDataPointParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Snapshot"/>
+        <field name="MetricType" value="NumberDataPoint"/>
+
+        <embedded-activity name="DataPointAttributes" locator="attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <field name="Value">
+            <field-locator locator="as_int" locator-type="Label" datatype="Number" format="int" required="false"/>
+            <field-locator locator="as_double" locator-type="Label" datatype="Number" format="double" required="false"/>
+        </field>
+        <field name="StartTime" locator="start_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
+        <field name="EndTime" locator="time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
+        <field name="Flags" locator="flags" locator-type="Label" datatype="Number" format="int"/>
+        <!--Exemplars-->
+    </parser>
+
+    <parser name="HistogramDataPointParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Snapshot"/>
+        <field name="MetricType" value="HistogramDataPoint"/>
+
+        <embedded-activity name="DataPointAttributes" locator="attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <field name="Count" locator="count" locator-type="Label" datatype="Number" format="int"/>
+        <field name="Sum" locator="sum" locator-type="Label" datatype="Number" format="double"/>
+        <field name="Min" locator="min" locator-type="Label" datatype="Number" format="double"/>
+        <field name="Max" locator="max" locator-type="Label" datatype="Number" format="double"/>
+        <!--field name="BucketCounts" locator="bucket_counts" locator-type="Label" datatype="AsInput"/-->
+        <field name="ExplicitBounds" locator="explicit_bounds" locator-type="Label" datatype="AsInput" transparent="true">
+            <field-transform lang="groovy"><![CDATA[
+                if ($fieldValue != null) {
+                    Double[] bounds = $fieldValue;
+                    String[] boundsStr = new String[bounds.length + 1];
+
+                    int idx = 0;
+                    for (; idx < bounds.length; idx++) {
+                        boundsStr[idx] = String.format("%07.1f", bounds[idx]);
+                    }
+                    boundsStr[idx] = "Infinity";
+
+                    return boundsStr;
+                }
+            ]]></field-transform>
+        </field>
+        <field name="Bucket_${Bound}" locator="bucket_counts" locator-type="Label" split="true">
+            <field-locator id="Bound" locator="ExplicitBounds" locator-type="Activity"/>
+        </field>
+        <field name="StartTime" locator="start_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
+        <field name="EndTime" locator="time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
+        <field name="Flags" locator="flags" locator-type="Label" datatype="Number" format="int"/>
+        <!--Exemplars-->
+    </parser>
+
+    <parser name="SummaryDataPointParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Snapshot"/>
+        <field name="MetricType" value="SummaryDataPoint"/>
+
+        <embedded-activity name="DataPointAttributes" locator="attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <field name="Count" locator="count" locator-type="Label" datatype="Number" format="int"/>
+        <field name="Sum" locator="sum" locator-type="Label" datatype="Number" format="double"/>
+        <field name="QuantileValues" locator="quantile_values" locator-type="Label" datatype="AsInput"/>
+        <field name="StartTime" locator="start_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
+        <field name="EndTime" locator="time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
+        <field name="Flags" locator="flags" locator-type="Label" datatype="Number" format="int"/>
+    </parser>
+
+    <parser name="ExponentialHistogramDataPointParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Snapshot"/>
+        <field name="MetricType" value="ExponentialHistogramDataPoint"/>
+
+        <embedded-activity name="DataPointAttributes" locator="attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <field name="Count" locator="count" locator-type="Label" datatype="Number" format="int"/>
+        <field name="Sum" locator="sum" locator-type="Label" datatype="Number" format="double"/>
+        <field name="Scale" locator="scale" locator-type="Label" datatype="Number" format="int"/>
+        <field name="ZeroCount" locator="zero_count" locator-type="Label" datatype="Number" format="int"/>
+        <field name="Min" locator="min" locator-type="Label" datatype="Number" format="double"/>
+        <field name="Max" locator="max" locator-type="Label" datatype="Number" format="double"/>
+        <field name="ZeroThreshold" locator="zero_threshold" locator-type="Label" datatype="Number" format="double"/>
+        <field name="PositiveOffset" locator="positive.offset" locator-type="Label" datatype="Number" format="int"/>
+        <field name="PositiveBucketCounts" locator="positive.bucket_counts" locator-type="Label" datatype="AsInput"/>
+        <field name="NegativeOffset" locator="negative.offset" locator-type="Label" datatype="Number" format="int"/>
+        <field name="NegativeBucketCounts" locator="negative.bucket_counts" locator-type="Label" datatype="AsInput"/>
+        <field name="StartTime" locator="start_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
+        <field name="EndTime" locator="time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
+        <field name="Flags" locator="flags" locator-type="Label" datatype="Number" format="int"/>
+        <!--Exemplars-->
+    </parser>
+
+    <parser name="HistogramParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <embedded-activity name="HistogramDataPoints" locator="data_points" locator-type="Label">
+            <parser-ref name="HistogramDataPointParser" aggregation="Relate"/>
+        </embedded-activity>
+
+        <field name="AggregationTemporality" locator="aggregation_temporality" locator-type="Label"/>
+    </parser>
+
+    <parser name="SumParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <embedded-activity name="SumDataPoints" locator="data_points" locator-type="Label">
+            <parser-ref name="NumberDataPointParser" aggregation="Relate"/>
+        </embedded-activity>
+
+        <field name="AggregationTemporality" locator="aggregation_temporality" locator-type="Label"/>
+        <field name="Monotonic" locator="is_monotonic" locator-type="Label"/>
+    </parser>
+
+    <parser name="GaugeParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <embedded-activity name="SumDataPoints" locator="data_points" locator-type="Label">
+            <parser-ref name="NumberDataPointParser" aggregation="Relate"/>
+        </embedded-activity>
+    </parser>
+
+    <parser name="SummaryParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <embedded-activity name="SummaryDataPoins" locator="data_points" locator-type="Label">
+            <parser-ref name="SummaryDataPointParser" aggregation="Relate"/>
+        </embedded-activity>
+    </parser>
+
+    <parser name="ExponentialHistogramParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+
+        <embedded-activity name="ExponentialHistogramDataPoints" locator="data_points" locator-type="Label">
+            <parser-ref name="ExponentialHistogramDataPointParser" aggregation="Relate"/>
+        </embedded-activity>
+        <field name="AggregationTemporality" locator="aggregation_temporality" locator-type="Label"/>
+    </parser>
+
+    <parser name="MetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+        <field name="MetricName" locator="name" locator-type="Label"/>
+        <field name="MetricDescription" locator="description" locator-type="Label"/>
+        <field name="MetricUnit" locator="unit" locator-type="Label"/>
+
+        <embedded-activity name="Histogram" locator="histogram" locator-type="Label">
+            <parser-ref name="HistogramParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="Sum" locator="sum" locator-type="Label">
+            <parser-ref name="SumParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="Gauge" locator="gauge" locator-type="Label">
+            <parser-ref name="GaugeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="Summary" locator="summary" locator-type="Label">
+            <parser-ref name="SummaryParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="ExponentialHistogram" locator="exponential_histogram" locator-type="Label">
+            <parser-ref name="ExponentialHistogramParser" aggregation="Merge"/>
+        </embedded-activity>
+    </parser>
+
+    <parser name="MetricsParserAP" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+        <field name="MetricName" locator="name" locator-type="Label"/>
+        <field name="MetricDescription" locator="description" locator-type="Label"/>
+        <field name="MetricUnit" locator="unit" locator-type="Label"/>
+
+        <embedded-activity name="Histogram" locator="histogram" locator-type="Label">
+            <parser-ref name="HistogramParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="Sum" locator="sum" locator-type="Label">
+            <parser-ref name="SumParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="Gauge" locator="gauge" locator-type="Label">
+            <parser-ref name="GaugeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="Summary" locator="summary" locator-type="Label">
+            <parser-ref name="SummaryParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="ExponentialHistogram" locator="exponential_histogram" locator-type="Label">
+            <parser-ref name="ExponentialHistogramParser" aggregation="Merge"/>
+        </embedded-activity>
+
+        <field name="HostName" locator="^.host.name" locator-type="Activity" transparent="true"/>
+        <field name="ServiceName" locator="^.service.name" locator-type="Activity" transparent="true"/>
+        <field name="ProcessPath" locator="^.process.executable.path" locator-type="Activity" transparent="true"/>
+        <field name="ProcessOwner" locator="^.process.owner" locator-type="Activity" transparent="true"/>
+        <field name="ScopeName" locator="^.ScopeName" locator-type="Activity" transparent="true"/>
+
+        <field name="EventName" value="snapName">
+            <field-transform lang="groovy"><![CDATA[
+                String props = "";
+                //props += (StringUtils.isEmpty(${ServiceName})   ? "" : "service=" + ${ServiceName});
+                props += (StringUtils.isEmpty(${ProcessPath})   ? "" : (props.length() > 0 ? "," : "") + "process="  + ${ProcessPath});
+                props += (StringUtils.isEmpty(${ProcessOwner})  ? "" : (props.length() > 0 ? "," : "") + "owner="    + ${ProcessOwner});
+                props += (StringUtils.isEmpty(${ScopeName})     ? "" : (props.length() > 0 ? "," : "") + "scope="    + ${ScopeName});
+                props += (StringUtils.isEmpty(${MetricName})    ? "" : (props.length() > 0 ? "," : "") + "metric="   + ${MetricName});
+
+                ${ServiceName} + ":" + props
+            ]]></field-transform>
+        </field>
+        <field name="Category" locator="HostName" locator-type="Activity"/>
+    </parser>
+
+    <parser name="ScopeMetricsParserXRay" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+        <field name="RoutePath" value="xray"/>
+
+        <field name="ScopeName" locator="scope.name" locator-type="Label"/>
+        <field name="ScopeVersion" locator="scope.version" locator-type="Label"/>
+        <embedded-activity name="ScopeAttributes" locator="scope.attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="ScopeMetrics" locator="metrics" locator-type="Label">
+            <parser-ref name="MetricsParser" aggregation="Relate"/>
+        </embedded-activity>
+        <field name="ScopeSchemaUrl" locator="schema_url" locator-type="Label"/>
+    </parser>
+
+    <parser name="ScopeMetricsParserAP" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+        <field name="RoutePath" value="ap"/>
+
+        <field name="ScopeName" locator="scope.name" locator-type="Label"/>
+        <field name="ScopeVersion" locator="scope.version" locator-type="Label"/>
+        <embedded-activity name="ScopeAttributes" locator="scope.attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="ScopeMetrics" locator="metrics" locator-type="Label">
+            <parser-ref name="MetricsParserAP" aggregation="Relate"/>
+        </embedded-activity>
+        <field name="ScopeSchemaUrl" locator="schema_url" locator-type="Label"/>
+    </parser>
+
+    <parser name="ResourceMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+        <field name="EventName" value="ResourceMetrics"/>
+        <field name="@SplitRelatives@" value="true" transparent="true"/>
+
+        <embedded-activity name="ResourceAttributes" locator="resource.attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="ResourceScopeMetrics" locator="scope_metrics" locator-type="Label">
+            <parser-ref name="ScopeMetricsParserXRay" aggregation="Relate" tags="continuous"/>
+            <parser-ref name="ScopeMetricsParserAP" aggregation="Relate" tags="continuous"/>
+        </embedded-activity>
+        <field name="ResourceSchemaUrl" locator="schemaUrl" locator-type="Label"/>
+    </parser>
+
+    <!-- ############################################################################################################################### -->
+    <!-- ######################################### TRACES (SPANS) PARSERS ############################################################## -->
+
+    <parser name="SpanEventsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Event"/>
+        <field name="EventName" value="SpanEvent"/>
+        <embedded-activity name="EventAttributes" locator="attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <field name="Correlator">
+            <field-locator locator="^.Guid" locator-type="Activity"/>
+            <field-locator locator="^.TrackingId" locator-type="Activity"/>
+        </field>
+        <field name="Name" locator="name" locator-type="Label"/>
+        <field name="StartTime" locator="time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
+        <field name="EndTime" locator="StartTime" locator-type="Activity"/>
+    </parser>
+
+    <parser name="SpanLinksParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Event"/>
+        <field name="EventName" value="SpanLink"/>
+        <embedded-activity name="LinkAttributes" locator="attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <field name="ParentId" locator="span_id" locator-type="Label" datatype="Binary" format="string"/>
+        <field name="TrackingId" locator="trace_id" locator-type="Label" datatype="Binary" format="string"/>
+        <field name="Correlator">
+            <field-locator locator="ParentId" locator-type="Activity"/>
+            <field-locator locator="TrackingId" locator-type="Activity"/>
+            <field-locator locator="^.Guid" locator-type="Activity"/>
+            <field-locator locator="^.TrackingId" locator-type="Activity"/>
+        </field>
+        <field name="TraceState" locator="trace_state" locator-type="Label"/>
+        <field name="Flags" locator="flags" locator-type="Label" datatype="Number" format="long"/>
+    </parser>
+
+    <parser name="SpanParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Event"/>
+        <field name="EventName" locator="name" locator-type="Label"/>
+        <field name="Guid" locator="span_id" locator-type="Label" datatype="Binary" format="string"/>
+        <field name="Name" locator="name" locator-type="Label"/>
+        <field name="TrackingId" locator="trace_id" locator-type="Label" datatype="Binary" format="string"/>
+        <field name="ParentId" locator="parent_span_id" locator-type="Label" datatype="Binary" format="string"/>
+        <field name="Correlator">
+            <field-locator locator="Guid" locator-type="Activity"/>
+            <field-locator locator="TrackingId" locator-type="Activity"/>
+            <field-locator locator="ParentId" locator-type="Activity"/>
+        </field>
+        <field name="Kind" locator="kind" locator-type="Label"/>
+        <field name="TraceState" locator="trace_state" locator-type="Label"/>
+        <field name="Flags" locator="flags" locator-type="Label" datatype="Number" format="long"/>
+        <field name="StartTime" locator="start_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
+        <field name="EndTime" locator="end_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
+        <embedded-activity name="SpanAttributes" locator="attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="SpanEvents" locator="events" locator-type="Label">
+            <parser-ref name="SpanEventsParser" aggregation="Relate_Flat"/>
+        </embedded-activity>
+        <embedded-activity name="SpanLinks" locator="links" locator-type="Label">
+            <parser-ref name="SpanLinksParser" aggregation="Relate_Flat"/>
+        </embedded-activity>
+        <field name="StatusMessage" locator="status.message" locator-type="Label"/>
+        <field name="StatusCode" locator="status.code" locator-type="Label"/>
+    </parser>
+
+    <parser name="ScopeSpansParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Event"/>
+        <field name="RoutePath" value="xray"/>
+        <field name="EventName" locator="scope.name" locator-type="Label"/>
+
+        <field name="ScopeName" locator="scope.name" locator-type="Label"/>
+        <field name="ScopeVersion" locator="scope.version" locator-type="Label"/>
+        <embedded-activity name="ScopeAttributes" locator="scope.attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="ScopeSpans" locator="spans" locator-type="Label">
+            <parser-ref name="SpanParser" aggregation="Relate"/>
+        </embedded-activity>
+        <field name="ScopeSchemaUrl" locator="schema_url" locator-type="Label"/>
+    </parser>
+
+    <parser name="ResourceSpansParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+        <field name="EventName" value="ResourceSpans"/>
+        <field name="@SplitRelatives@" value="true" transparent="true"/>
+
+        <embedded-activity name="ResourceAttributes" locator="resource.attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="ScopeSpans" locator="scope_spans" locator-type="Label">
+            <parser-ref name="ScopeSpansParser" aggregation="Relate"/>
+        </embedded-activity>
+        <field name="ResourceSchemaUrl" locator="schema_url" locator-type="Label"/>
+    </parser>
+
+    <!-- ############################################################################################################################### -->
+    <!-- ######################################### LOGS PARSERS ######################################################################## -->
+
+    <parser name="LogRecordParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Event"/>
+        <field name="EventName" value="LogRecord"/>
+        <field name="ParentId" locator="span_id" locator-type="Label" datatype="Binary" format="string"/>
+        <field name="SeverityNumber" locator="severity_number" locator-type="Label" datatype="Number" format="int"/>
+        <field name="SeverityText" locator="severity_text" locator-type="Label"/>
+        <field name="TrackingId" locator="trace_id" locator-type="Label" datatype="Binary" format="string"/>
+        <field name="Correlator">
+            <field-locator locator="ParentId" locator-type="Activity"/>
+            <field-locator locator="TrackingId" locator-type="Activity"/>
+        </field>
+        <field name="Message" locator="body" locator-type="Label" datatype="String"/>
+        <field name="StartTime" locator="time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
+        <field name="EndTime" locator="observed_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
+        <embedded-activity name="LogAttributes" locator="attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <field name="Flags" locator="flags" locator-type="Label" datatype="Number" format="int"/>
+    </parser>
+
+    <parser name="ScopeLogsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Event"/>
+        <field name="RoutePath" value="xray"/>
+        <field name="EventName" locator="scope.name" locator-type="Label"/>
+
+        <field name="ScopeName" locator="scope.name" locator-type="Label"/>
+        <field name="ScopeVersion" locator="scope.version" locator-type="Label"/>
+        <embedded-activity name="ScopeAttributes" locator="scope.attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="ScopeLogs" locator="log_records" locator-type="Label">
+            <parser-ref name="LogRecordParser" aggregation="Relate"/>
+        </embedded-activity>
+        <field name="ScopeSchemaUrl" locator="schema_url" locator-type="Label"/>
+    </parser>
+
+    <parser name="ResourceLogsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+        <field name="EventName" value="ResourceLogs"/>
+        <field name="@SplitRelatives@" value="true" transparent="true"/>
+
+        <embedded-activity name="ResourceAttributes" locator="resource.attributes" locator-type="Label">
+            <parser-ref name="AttributeParser" aggregation="Merge"/>
+        </embedded-activity>
+        <embedded-activity name="ScopeLogs" locator="scope_logs" locator-type="Label">
+            <parser-ref name="ScopeLogsParser" aggregation="Relate"/>
+        </embedded-activity>
+        <field name="ResourceSchemaUrl" locator="schemaUrl" locator-type="Label"/>
+    </parser>
+
+    <!-- ############################################################################################################################### -->
+    <!-- ######################################### BOOTSTRAP PARSERS ################################################################### -->
+
     <!--  Pre-parser to decompress GZip packet of binary data -->
     <java-object name="GZipBinPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.CompressedBinaryPreParser">
         <param name="compressFormat" type="java.lang.String" value="gzip"/>
@@ -40,312 +454,6 @@
     <java-object name="ProtoMsgToJsonPreParser" class="com.jkoolcloud.tnt4j.streams.preparsers.ProtoMessageToStringPreParser">
         <param name="printFormatTypeName" type="java.lang.String" value="JSON"/>
     </java-object>
-
-    <parser name="AttributeParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="NOOP"/>
-
-        <field name="AllAttributes" locator="#" locator-type="Label"/>
-    </parser>
-
-    <parser name="NumberDataPointParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Snapshot"/>
-        <field name="EventName" value="NumberDataPoint"/>
-
-        <embedded-activity name="DataPointAttributes" locator="attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <field name="Value">
-            <field-locator locator="as_int" locator-type="Label" datatype="Number" format="int" required="false"/>
-            <field-locator locator="as_double" locator-type="Label" datatype="Number" format="double" required="false"/>
-        </field>
-        <field name="StartTime" locator="start_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
-        <field name="EndTime" locator="time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
-        <field name="Flags" locator="flags" locator-type="Label" datatype="Number"/>
-        <!--Exemplars-->
-    </parser>
-
-    <parser name="HistogramDataPointParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Snapshot"/>
-        <field name="EventName" value="HistogramDataPoint"/>
-
-        <embedded-activity name="DataPointAttributes" locator="attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <field name="Count" locator="count" locator-type="Label" datatype="Number" format="int"/>
-        <field name="Sum" locator="sum" locator-type="Label" datatype="Number" format="double"/>
-        <field name="Min" locator="min" locator-type="Label" datatype="Number" format="double"/>
-        <field name="Max" locator="max" locator-type="Label" datatype="Number" format="double"/>
-        <field name="BucketCounts" locator="bucket_counts" locator-type="Label" datatype="AsInput"/>
-        <field name="ExplicitBounds" locator="explicit_bounds" locator-type="Label" datatype="AsInput"/>
-        <field name="StartTime" locator="start_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
-        <field name="EndTime" locator="time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
-        <field name="Flags" locator="flags" locator-type="Label" datatype="Number"/>
-        <!--Exemplars-->
-    </parser>
-
-    <parser name="SummaryDataPointParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Snapshot"/>
-        <field name="EventName" value="SummaryDataPoint"/>
-
-        <embedded-activity name="DataPointAttributes" locator="attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <field name="Count" locator="count" locator-type="Label" datatype="Number" format="int"/>
-        <field name="Sum" locator="sum" locator-type="Label" datatype="Number" format="double"/>
-        <field name="QuantileValues" locator="quantile_values" locator-type="Label" datatype="AsInput"/>
-        <field name="StartTime" locator="start_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
-        <field name="EndTime" locator="time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
-        <field name="Flags" locator="flags" locator-type="Label" datatype="Number"/>
-    </parser>
-
-    <parser name="ExponentialHistogramDataPointParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Snapshot"/>
-        <field name="EventName" value="ExponentialHistogramDataPoint"/>
-
-        <embedded-activity name="DataPointAttributes" locator="attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <field name="Count" locator="count" locator-type="Label" datatype="Number" format="int"/>
-        <field name="Sum" locator="sum" locator-type="Label" datatype="Number" format="double"/>
-        <field name="Scale" locator="scale" locator-type="Label" datatype="Number" format="int"/>
-        <field name="ZeroCount" locator="zero_count" locator-type="Label" datatype="Number" format="int"/>
-        <field name="Min" locator="min" locator-type="Label" datatype="Number" format="double"/>
-        <field name="Max" locator="max" locator-type="Label" datatype="Number" format="double"/>
-        <field name="ZeroThreshold" locator="zero_threshold" locator-type="Label" datatype="Number" format="double"/>
-        <field name="PositiveOffset" locator="positive.offset" locator-type="Label" datatype="Number" format="int"/>
-        <field name="PositiveBucketCounts" locator="positive.bucket_counts" locator-type="Label" datatype="AsInput"/>
-        <field name="NegativeOffset" locator="negative.offset" locator-type="Label" datatype="Number" format="int"/>
-        <field name="NegativeBucketCounts" locator="negative.bucket_counts" locator-type="Label" datatype="AsInput"/>
-        <field name="StartTime" locator="start_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
-        <field name="EndTime" locator="time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
-        <field name="Flags" locator="flags" locator-type="Label" datatype="Number"/>
-        <!--Exemplars-->
-    </parser>
-
-    <parser name="HistogramParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Event"/>
-
-        <embedded-activity name="HistogramDataPoints" locator="data_points" locator-type="Label">
-            <parser-ref name="HistogramDataPointParser" aggregation="Relate"/>
-        </embedded-activity>
-
-        <field name="AggregationTemporality" locator="aggregation_temporality" locator-type="Label"/>
-    </parser>
-
-    <parser name="SumParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Event"/>
-
-        <embedded-activity name="SumDataPoints" locator="data_points" locator-type="Label">
-            <parser-ref name="NumberDataPointParser" aggregation="Relate"/>
-        </embedded-activity>
-
-        <field name="AggregationTemporality" locator="aggregation_temporality" locator-type="Label"/>
-        <field name="Monotonic" locator="is_monotonic" locator-type="Label"/>
-    </parser>
-
-    <parser name="GaugeParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Event"/>
-
-        <embedded-activity name="SumDataPoints" locator="data_points" locator-type="Label">
-            <parser-ref name="NumberDataPointParser" aggregation="Relate"/>
-        </embedded-activity>
-    </parser>
-
-    <parser name="SummaryParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Event"/>
-
-        <embedded-activity name="SummaryDataPoins" locator="data_points" locator-type="Label">
-            <parser-ref name="SummaryDataPointParser" aggregation="Relate"/>
-        </embedded-activity>
-    </parser>
-
-    <parser name="ExponentialHistogramParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Event"/>
-
-        <embedded-activity name="ExponentialHistogramDataPoints" locator="data_points" locator-type="Label">
-            <parser-ref name="ExponentialHistogramDataPointParser" aggregation="Relate"/>
-        </embedded-activity>
-        <field name="AggregationTemporality" locator="aggregation_temporality" locator-type="Label"/>
-    </parser>
-
-    <parser name="MetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Event"/>
-        <field name="EventName" locator="name" locator-type="Label"/>
-        <field name="MetricsDescription" locator="description" locator-type="Label"/>
-        <field name="MetricsUnit" locator="unit" locator-type="Label"/>
-
-        <embedded-activity name="Histogram" locator="histogram" locator-type="Label">
-            <parser-ref name="HistogramParser" aggregation="Merge"/>
-        </embedded-activity>
-        <embedded-activity name="Sum" locator="sum" locator-type="Label">
-            <parser-ref name="SumParser" aggregation="Merge"/>
-        </embedded-activity>
-        <embedded-activity name="Gauge" locator="gauge" locator-type="Label">
-            <parser-ref name="GaugeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <embedded-activity name="Summary" locator="summary" locator-type="Label">
-            <parser-ref name="SummaryParser" aggregation="Merge"/>
-        </embedded-activity>
-        <embedded-activity name="ExponentialHistogram" locator="exponential_histogram" locator-type="Label">
-            <parser-ref name="ExponentialHistogramParser" aggregation="Merge"/>
-        </embedded-activity>
-    </parser>
-
-    <parser name="ScopeMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Event"/>
-        <field name="EventName" locator="scope.name" locator-type="Label"/>
-
-        <field name="ScopeVersion" locator="scope.version" locator-type="Label"/>
-        <embedded-activity name="ScopeAttributes" locator="scope.attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <embedded-activity name="ScopeMetrics" locator="metrics" locator-type="Label">
-            <parser-ref name="MetricsParser" aggregation="Relate"/>
-        </embedded-activity>
-        <field name="ScopeSchemaUrl" locator="schema_url" locator-type="Label"/>
-    </parser>
-
-    <parser name="ResourceMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Activity"/>
-        <field name="EventName" value="ResourceMetrics"/>
-        <field name="@SplitRelatives@" value="true" transparent="true"/>
-
-        <embedded-activity name="ResourceAttributes" locator="resource.attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <embedded-activity name="ResourceScopeMetrics" locator="scope_metrics" locator-type="Label">
-            <parser-ref name="ScopeMetricsParser" aggregation="Relate"/>
-        </embedded-activity>
-        <field name="ResourceSchemaUrl" locator="schemaUrl" locator-type="Label"/>
-    </parser>
-
-    <parser name="SpanEventsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Dataset"/>
-        <field name="EventName" value="SPAN_EVENT"/>
-        <embedded-activity name="EventAttributes" locator="attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <field name="Name" locator="name" locator-type="Label"/>
-        <field name="StartTime" locator="time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
-        <field name="EndTime" locator="StartTime" locator-type="Activity"/>
-    </parser>
-
-    <parser name="SpanLinksParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Dataset"/>
-        <field name="EventName" value="SPAN_LINK"/>
-        <embedded-activity name="LinkAttributes" locator="attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <field name="SpanId" locator="span_id" locator-type="Label" datatype="Binary" format="string"/>
-        <field name="TrackingId" locator="trace_id" locator-type="Label" datatype="Binary" format="string"/>
-        <field name="Correlator">
-            <field-locator locator="SpanId" locator-type="Activity"/>
-            <field-locator locator="TrackingId" locator-type="Activity"/>
-        </field>
-        <field name="TraceState" locator="trace_state" locator-type="Label"/>
-    </parser>
-
-    <parser name="SpanParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Event"/>
-        <field name="EventName" locator="name" locator-type="Label"/>
-        <field name="TrackingId" locator="trace_id" locator-type="Label" datatype="Binary" format="string"/>
-        <field name="SpanId" locator="span_id" locator-type="Label" datatype="Binary" format="string"/>
-        <field name="ParentSpanId" locator="parent_span_id" locator-type="Label" datatype="Binary" format="string"/>
-        <field name="Correlator">
-            <field-locator locator="TrackingId" locator-type="Activity"/>
-            <field-locator locator="SpanId" locator-type="Activity"/>
-            <field-locator locator="ParentSpanId" locator-type="Activity"/>
-        </field>
-        <field name="Kind" locator="kind" locator-type="Label"/>
-        <field name="TraceState" locator="trace_state" locator-type="Label"/>
-        <field name="StartTime" locator="start_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
-        <field name="EndTime" locator="end_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
-        <embedded-activity name="SpanAttributes" locator="attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <embedded-activity name="SpanEvents" locator="events" locator-type="Label">
-            <parser-ref name="SpanEventsParser" aggregation="Relate"/>
-        </embedded-activity>
-        <embedded-activity name="SpanLinks" locator="links" locator-type="Label">
-            <parser-ref name="SpanLinksParser" aggregation="Relate"/>
-        </embedded-activity>
-        <field name="StatusMessage" locator="status.message" locator-type="Label"/>
-        <field name="StatusCode" locator="status.code" locator-type="Label"/>
-    </parser>
-
-    <parser name="ScopeSpansParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Event"/>
-        <field name="EventName" locator="scope.name" locator-type="Label"/>
-        <field name="ScopeVersion" locator="scope.version" locator-type="Label"/>
-        <embedded-activity name="ScopeAttributes" locator="scope.attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <embedded-activity name="ScopeSpans" locator="spans" locator-type="Label">
-            <parser-ref name="SpanParser" aggregation="Relate"/>
-        </embedded-activity>
-        <field name="ScopeSchemaUrl" locator="schema_url" locator-type="Label"/>
-    </parser>
-
-    <parser name="ResourceSpansParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Activity"/>
-        <field name="EventName" value="ResourceSpans"/>
-        <field name="@SplitRelatives@" value="false" transparent="true"/>
-
-        <embedded-activity name="ResourceAttributes" locator="resource.attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <embedded-activity name="ScopeSpans" locator="scope_spans" locator-type="Label">
-            <parser-ref name="ScopeSpansParser" aggregation="Relate"/>
-        </embedded-activity>
-        <field name="ResourceSchemaUrl" locator="schema_url" locator-type="Label"/>
-    </parser>
-
-    <parser name="LogRecordParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Event"/>
-        <field name="EventName" value="LogRecord"/>
-        <field name="TrackingId" locator="trace_id" locator-type="Label"/>
-        <field name="SeverityNumber" locator="severity_number" locator-type="Label" datatype="Number" format="int"/>
-        <field name="SeverityText" locator="severity_text" locator-type="Label"/>
-        <field name="SpanId" locator="span_id" locator-type="Label" datatype="Binary" format="string"/>
-        <field name="Correlator">
-            <field-locator locator="TrackingId" locator-type="Activity"/>
-            <field-locator locator="SpanId" locator-type="Activity"/>
-        </field>
-        <field name="Message" locator="body" locator-type="Label" datatype="String"/>
-        <field name="StartTime" locator="time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
-        <field name="EndTime" locator="observed_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
-        <embedded-activity name="LogAttributes" locator="attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <field name="Flags" locator="flags" locator-type="Label" datatype="Number"/>
-    </parser>
-
-    <parser name="ScopeLogsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Event"/>
-        <field name="EventName" locator="scope.name" locator-type="Label"/>
-        <field name="ScopeVersion" locator="scope.version" locator-type="Label"/>
-        <embedded-activity name="ScopeAttributes" locator="scope.attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <embedded-activity name="ScopeLogs" locator="log_records" locator-type="Label">
-            <parser-ref name="LogRecordParser" aggregation="Relate"/>
-        </embedded-activity>
-        <field name="ScopeSchemaUrl" locator="schema_url" locator-type="Label"/>
-    </parser>
-
-    <parser name="ResourceLogsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Activity"/>
-        <field name="EventName" value="ResourceLogs"/>
-        <field name="@SplitRelatives@" value="false" transparent="true"/>
-
-        <embedded-activity name="ResourceAttributes" locator="resource.attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <embedded-activity name="ScopeLogs" locator="scope_logs" locator-type="Label">
-            <parser-ref name="ScopeLogsParser" aggregation="Relate"/>
-        </embedded-activity>
-        <field name="ResourceSchemaUrl" locator="schemaUrl" locator-type="Label"/>
-    </parser>
 
     <parser name="OTLPParserProm" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <reference name="ProtoBinToMetricsMsgPreParser"/>
@@ -398,4 +506,6 @@
             </parser-ref>
         </field>
     </parser>
+
+    <!-- ############################################################################################################################### -->
 </tnt-data-source>

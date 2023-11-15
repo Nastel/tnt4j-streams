@@ -10,17 +10,22 @@ Make these changes in file `samples/otlp-self-hosted/tnt-data-source.xml`:
    <property name="KeyPass" value="pass123"/>
    <property name="KeystorePass" value="pass123"/>
    ```
-1. pick a sink to use by stream - you can choose one of predefined: `file` or `xray` (default)
+1. pick a sink to use by stream - you can choose one or multiple of predefined: `file`, `xray` or `ap` (default)
    ```xml
-   <property name="event.sink.factory.BroadcastSequence" value="xray"/>
+   <property name="event.sink.factory.BroadcastSequence" value="ap,xray"/>
    ```
    1. For the `file` sink you can change default file location by changing value for property:
       ```xml
       <property name="event.sink.factory.EventSinkFactory.file.FileName" value="./logs/tnt4j-streams-otlp_samples.log"/>
       ```
-   1. For the `xray` sink set you streaming token:
+   1. For the `xray` sink, set your streaming token:
       ```xml
       <property name="event.sink.factory.EventSinkFactory.xray.Token" value="<YOUR-JKOOL-TOKEN>"/>
+      ```
+   1. For the `ap` sink, set your AutoPilot CEP facts streaming endpoint:
+      ```xml
+      <property name="event.sink.factory.EventSinkFactory.ap.Host" value="<AP_CEP_IP/HOST>"/>
+      <property name="event.sink.factory.EventSinkFactory.ap.Port" value="6060"/>
       ```
 
 # Configuring OpenTelemetry Collector
