@@ -31,7 +31,7 @@
         <property name="RetryInterval" value="300"/>
 
         <!-- Stream run HTTP server configuration -->
-        <property name="Host" value="127.0.0.1"/>
+        <property name="Host" value="172.16.10.21"/>
         <property name="Port" value="8787"/>
         <property name="UseSSL" value="false"/>
         <property name="Keystore" value="file://clientkeystore"/>
