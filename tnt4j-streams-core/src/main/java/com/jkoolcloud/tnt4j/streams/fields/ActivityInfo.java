@@ -2309,6 +2309,10 @@ public class ActivityInfo {
 			return null;
 		}
 
+		if (fieldName.startsWith(Utils.VAR_EXP_START_TOKEN)) {
+			fieldName = Utils.getVarName(fieldName);
+		}
+
 		if (StreamsConstants.isParentEntityRef(fieldName)) {
 			return getParentFieldValue(fieldName, groupName, ais);
 		}
@@ -2326,10 +2330,6 @@ public class ActivityInfo {
 
 		if (Utils.isWildcardString(fieldName)) {
 			return getWildcardFieldValue(fieldName, ai);
-		}
-
-		if (fieldName.startsWith(Utils.VAR_EXP_START_TOKEN)) {
-			fieldName = Utils.getVarName(fieldName);
 		}
 
 		StreamFieldType sft = StreamFieldType._valueOfIgnoreCase(fieldName);
