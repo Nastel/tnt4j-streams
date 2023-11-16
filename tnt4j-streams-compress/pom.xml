@@ -30,7 +30,7 @@
     <artifactId>tnt4j-streams-compress</artifactId>
 
     <properties>
-        <commons.compress.version>1.24.0</commons.compress.version>
+        <commons.compress.version>1.25.0</commons.compress.version>
     </properties>
 
     <build>
