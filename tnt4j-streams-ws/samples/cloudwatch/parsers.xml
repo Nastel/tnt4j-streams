@@ -81,19 +81,20 @@
         <field name="EventName" value="snapName">
             <field-transform lang="groovy"><![CDATA[
                 String props = "";
-                props += (StringUtils.isEmpty(${Namespace}) ? "" : "namespace=" + ${Namespace});
-                props += (StringUtils.isEmpty(${Region}) ? "" : (props.length() > 0 ? "," : "") + "region=" + ${Region});
-                props += (StringUtils.isEmpty(${ClusterName}) ? "" : (props.length() > 0 ? "," : "") + "cluster=" + ${ClusterName});
-                props += (StringUtils.isEmpty(${BrokerId}) ? "" : (props.length() > 0 ? "," : "") + "broker=" + ${BrokerId});
-                props += (StringUtils.isEmpty(${Topic}) ? "" : (props.length() > 0 ? "," : "") + "topic=" + ${Topic});
-                props += (StringUtils.isEmpty(${DeliveryStreamName}) ? "" : (props.length() > 0 ? "," : "") + "streamName=" + ${DeliveryStreamName});
-                props += (StringUtils.isEmpty(${ConsumerGroup}) ? "" : (props.length() > 0 ? "," : "") + "cGroup=" + ${ConsumerGroup});
-                props += (StringUtils.isEmpty(${ClientAuth}) ? "" : (props.length() > 0 ? "," : "") + "cAuth=" + ${ClientAuth});
-                props += (StringUtils.isEmpty(${MetricName}) ? "" : (props.length() > 0 ? "," : "") + "metric=" + ${MetricName});
+                props += (StringUtils.isEmpty(${Namespace})             ? "" : "namespace=" + ${Namespace});
+                props += (StringUtils.isEmpty(${Region})                ? "" : (props.length() > 0 ? "," : "") + "region=" + ${Region});
+                props += (StringUtils.isEmpty(${ClusterName})           ? "" : (props.length() > 0 ? "," : "") + "cluster=" + ${ClusterName});
+                props += (StringUtils.isEmpty(${BrokerId})              ? "" : (props.length() > 0 ? "," : "") + "broker=" + ${BrokerId});
+                props += (StringUtils.isEmpty(${Topic})                 ? "" : (props.length() > 0 ? "," : "") + "topic=" + ${Topic});
+                props += (StringUtils.isEmpty(${DeliveryStreamName})    ? "" : (props.length() > 0 ? "," : "") + "streamName=" + ${DeliveryStreamName});
+                props += (StringUtils.isEmpty(${ConsumerGroup})         ? "" : (props.length() > 0 ? "," : "") + "cGroup=" + ${ConsumerGroup});
+                props += (StringUtils.isEmpty(${ClientAuth})            ? "" : (props.length() > 0 ? "," : "") + "cAuth=" + ${ClientAuth});
+                props += (StringUtils.isEmpty(${MetricName})            ? "" : (props.length() > 0 ? "," : "") + "metric=" + ${MetricName});
 
                 ${MetricStreamName} + ":" + props
             ]]></field-transform>
         </field>
+        <!--field name="Category" locator="MetricStreamName" locator-type="Activity"/-->
     </parser>
     <parser name="MetricEntryParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser" manualFieldsOrder="true">
         <property name="ActivityDelim" value="EOL"/>

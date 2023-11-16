@@ -171,6 +171,7 @@
                 ${MetricStreamName} + ":" + props
             ]]></field-transform>
         </field>
+        <!--field name="Category" locator="MetricStreamName" locator-type="Activity"/-->
     </parser>
     <parser name="MetricEntryParserAP" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser" manualFieldsOrder="true">
         <property name="ActivityDelim" value="EOL"/>
