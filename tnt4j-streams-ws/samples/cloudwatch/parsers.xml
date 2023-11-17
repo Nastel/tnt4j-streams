@@ -20,7 +20,7 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
 
     <parser name="DimensionsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Snapshot"/>
+        <field name="EventType" value="NOOP"/>
 
         <field name="BrokerId" locator="Broker ID" locator-type="Label" transparent="true">
             <field-transform lang="groovy"><![CDATA[
@@ -41,7 +41,7 @@
         <field name="Rest" locator="#" locator-type="Label"/>
     </parser>
     <parser name="ValueParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="Snapshot"/>
+        <field name="EventType" value="NOOP"/>
 
         <field name="Max" locator="max" locator-type="Label" datatype="Number"/>
         <field name="Min" locator="min" locator-type="Label" datatype="Number"/>
@@ -99,8 +99,8 @@
     <parser name="MetricEntryParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser" manualFieldsOrder="true">
         <property name="ActivityDelim" value="EOL"/>
 
-        <field name="EventType" value="Activity"/>
-        <field name="EventName" value="AWSCloudWatchMetric"/>
+        <field name="EventType" value="NOOP"/>
+        <field name="EventName" value="AWSCloudWatchMetrics"/>
 
         <field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
         <field name="EndTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
@@ -122,7 +122,7 @@
                 String[] lines = $fieldValue.split("\\r|\\n");
                 List<String> payloadLines = new ArrayList<>(lines.length);
 
-                String[] includeMetrics = new String[] {
+                String[] kafkaIncludeMetrics = new String[] {
                     "ActiveControllerCount",
                     "CpuIdle",
                     "CpuSystem",
@@ -155,7 +155,9 @@
                     // Add additional lines match filtering, e.g. pick only 'kafka_server_XXXXXXX' lines
                     //pass &= Matchers.evaluate("regex:kafka_server_.+", line);
                     // Add additional lines contains filtering, e.g. from set of metric names
-                    //pass &= StringUtils.containsAny (line, includeMetrics)
+                    /*if (StringUtils.contains(line, "AWS/Kafka")) {
+                        pass &= StringUtils.containsAny(line, kafkaIncludeMetrics);
+                    }*/
 
                     if (pass) {
                         payloadLines.add(line);
@@ -171,6 +173,7 @@
     <parser name="MetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
 
         <field name="EventType" value="NOOP"/>
+        <field name="@SplitRelatives@" value="true" transparent="true"/>
         <field name="ParserName" locator="ParserName" locator-type="ParserProp" transparent="true"/>
         <embedded-activity name="MetricsData" locator="ActivityData" locator-type="Label" datatype="String">
             <parser-ref name="MetricsParserStr" aggregation="Merge"/>
