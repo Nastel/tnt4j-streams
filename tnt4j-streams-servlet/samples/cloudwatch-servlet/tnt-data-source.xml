@@ -62,7 +62,7 @@
             <property name="source.factory.RootFQN" value="DATACENTER=?#GENERIC=?"/>
 
             <!-- Sequence of sinks to broadcast stream produced activities. You may leave just one of them to sent data to single endpoint -->
-            <property name="event.sink.factory.BroadcastSequence" value="ap,jkool"/>
+            <property name="event.sink.factory.BroadcastSequence" value="ap,xray"/>
 
             <!-- Socket sink to AutoPilot -->
             <property name="event.sink.factory.EventSinkFactory.ap" value="com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory"/>
@@ -95,20 +95,20 @@
             </property>
 
             <!-- JKool/XRay sink -->
-            <property name="event.sink.factory.EventSinkFactory.jkool" value="com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory"/>
-            <property name="event.sink.factory.EventSinkFactory.jkool.LogSink"
-                      value="slf4j:com.jkoolcloud.tnt4j.streams.activities_jkool_log"/>
-            <property name="event.sink.factory.EventSinkFactory.jkool.Url" value="https://data.jkoolcloud.com"/>
-            <property name="event.sink.factory.EventSinkFactory.jkool.Token" value="jkool-access-token"/>
+            <property name="event.sink.factory.EventSinkFactory.xray" value="com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory"/>
+            <property name="event.sink.factory.EventSinkFactory.xray.LogSink"
+                      value="slf4j:com.jkoolcloud.tnt4j.streams.activities_xray_log"/>
+            <property name="event.sink.factory.EventSinkFactory.xray.Url" value="https://data.jkoolcloud.com"/>
+            <property name="event.sink.factory.EventSinkFactory.xray.Token" value="xray-access-token"/>
 
             <!-- Activities routing by activity field "RoutePath" value "xray" -->
-            <property name="event.sink.factory.EventSinkFactory.jkool.Filter"
+            <property name="event.sink.factory.EventSinkFactory.xray.Filter"
                       value="com.jkoolcloud.tnt4j.streams.sink.filters.EventMatchExpressionFilter"/>
-            <property name="event.sink.factory.EventSinkFactory.jkool.Filter.MatchExp"><![CDATA[
+            <property name="event.sink.factory.EventSinkFactory.xray.Filter.MatchExp"><![CDATA[
                 groovy:StringUtils.equals(${RoutePath}, "xray")
             ]]></property>
 
-            <property name="event.sink.factory.EventSinkFactory.jkool.Formatter" value="com.jkoolcloud.tnt4j.format.JSONFormatter"/>
+            <property name="event.sink.factory.EventSinkFactory.xray.Formatter" value="com.jkoolcloud.tnt4j.format.JSONFormatter"/>
         </tnt4j-properties>
 
         <parser-ref name="KinesisFirehoseParser"/>

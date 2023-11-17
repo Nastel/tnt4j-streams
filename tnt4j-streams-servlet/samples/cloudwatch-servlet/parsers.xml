@@ -80,6 +80,7 @@
 
         <field name="EventType" value="Snapshot"/>
         <field name="Severity" value="INFO"/>
+        <field name="RoutePath" value="xray"/>
 
         <field name="MetricStreamName" locator="$.metric_stream_name" locator-type="Label"/>
         <field name="UserName" locator="$.account_id" locator-type="Label"/>
@@ -113,28 +114,13 @@
             <field-locator locator="EventName" locator-type="Activity"/>
         </field>
     </parser>
-    <parser name="MetricEntryParserXRay" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser" manualFieldsOrder="true">
-        <property name="ActivityDelim" value="EOL"/>
-
-        <field name="EventType" value="Activity"/>
-        <field name="EventName" value="AWSCloudWatchMetrics"/>
-        <field name="RoutePath" value="xray"/>
-
-        <field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
-        <field name="EndTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
-
-        <embedded-activity name="MetricDataXRay" locator="$DATA$" locator-type="Label">
-            <parser-ref name="MetricLineParserXRay" aggregation="Relate"/>
-        </embedded-activity>
-
-        <field name="DataCenter" value="Amazon_AWS"/>
-    </parser>
 
     <parser name="MetricLineParserAP" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
         <property name="ActivityDelim" value="EOL"/>
 
         <field name="EventType" value="Snapshot"/>
         <field name="Severity" value="INFO"/>
+        <field name="RoutePath" value="ap"/>
 
         <field name="MetricStreamName" locator="$.metric_stream_name" locator-type="Label" transparent="true"/>
         <field name="UserName" locator="$.account_id" locator-type="Label" transparent="true"/>
@@ -173,18 +159,22 @@
         </field>
         <!--field name="Category" locator="MetricStreamName" locator-type="Activity"/-->
     </parser>
-    <parser name="MetricEntryParserAP" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser" manualFieldsOrder="true">
+    <parser name="MetricEntryParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser" manualFieldsOrder="true">
         <property name="ActivityDelim" value="EOL"/>
 
-        <field name="EventType" value="Activity"/>
+        <field name="EventType" value="NOOP"/>
         <field name="EventName" value="AWSCloudWatchMetrics"/>
-        <field name="RoutePath" value="ap"/>
 
         <field name="StartTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
         <field name="EndTime" locator="DateTime" locator-type="StreamProp" datatype="Timestamp"/>
 
-        <embedded-activity name="MetricDataAP" locator="$DATA$" locator-type="Label">
-            <parser-ref name="MetricLineParserAP" aggregation="Relate"/>
+        <embedded-activity name="MetricData" locator="$DATA$" locator-type="Label">
+            <parser-ref name="MetricLineParserXRay" aggregation="Relate" tags="continuous">
+                <matchExp>groovy:$stream.getOutput ().hasSink ("xray");</matchExp>
+            </parser-ref>
+            <parser-ref name="MetricLineParserAP" aggregation="Relate" tags="continuous">
+                <matchExp>groovy:$stream.getOutput ().hasSink ("ap");</matchExp>
+            </parser-ref>
         </embedded-activity>
 
         <field name="DataCenter" value="Amazon_AWS"/>
@@ -244,8 +234,7 @@
 
                 return payloadLines;
             ]]></field-transform>
-            <parser-ref name="MetricEntryParserAP" aggregation="Relate" tags="continuous"/>
-            <parser-ref name="MetricEntryParserXRay" aggregation="Relate" tags="continuous"/>
+            <parser-ref name="MetricEntryParser" aggregation="Relate"/>
         </embedded-activity>
     </parser>
 
@@ -286,6 +275,7 @@
         <property name="ActivityDelim" value="EOF"/>
 
         <field name="EventType" value="NOOP"/>
+        <field name="@SplitRelatives@" value="true" transparent="true"/>
         <field name="RAWMetricsData" locator="ActivityData" locator-type="Label" datatype="AsInput" transparent="true">
             <!--parser-ref name="OpenTelemetryParser" aggregation="Merge">
                 <matchExp>groovy: $fieldValue instanceof byte[]</matchExp>

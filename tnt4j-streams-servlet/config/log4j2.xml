@@ -26,7 +26,7 @@
         <Property name="tnt4j.webapp.id">${web:contextPathName}</Property>
         <Property name="tnt4j.log.dir">${sys:catalina.base}/logs</Property>
         <Property name="tnt4j.streams.log.filename">${tnt4j.log.dir}/${tnt4j.webapp.id}.log</Property>
-        <Property name="tnt4j.activities.jkool.log.filename">${tnt4j.log.dir}/${tnt4j.webapp.id}-jkool-activities.log</Property>
+        <Property name="tnt4j.activities.xray.log.filename">${tnt4j.log.dir}/${tnt4j.webapp.id}-xray-activities.log</Property>
         <Property name="tnt4j.activities.ap.log.filename">${tnt4j.log.dir}/${tnt4j.webapp.id}-ap-activities.log</Property>
     </Properties>
     <Appenders>
@@ -56,10 +56,10 @@
                 </Delete>
             </DefaultRolloverStrategy>
         </RollingFile>
-        <!--  ### branch for sink written 'jkool' activity entities logger ### -->
-        <RollingFile name="activities_jkool_log"
-                     fileName="${tnt4j.activities.jkool.log.filename}"
-                     filePattern="${tnt4j.activities.jkool.log.filename}.%d{yyyyMMdd}.%i.gz"
+        <!--  ### branch for sink written 'xray' activity entities logger ### -->
+        <RollingFile name="activities_xray_log"
+                     fileName="${tnt4j.activities.xray.log.filename}"
+                     filePattern="${tnt4j.activities.xray.log.filename}.%d{yyyyMMdd}.%i.gz"
                      ignoreExceptions="false" createOnDemand="true">
             <PatternLayout>
                 <Pattern>%m%n</Pattern>
@@ -70,7 +70,7 @@
             </Policies>
             <DefaultRolloverStrategy max="5" fileIndex="min">
                 <Delete basePath="${baseDir}" maxDepth="1">
-                    <IfFileName glob="${tnt4j.activities.jkool.log.filename}.*.gz"/>
+                    <IfFileName glob="${tnt4j.activities.xray.log.filename}.*.gz"/>
                     <IfLastModified age="30d"/>
                     <!--IfAccumulatedFileCount exceeds="30"/-->
                 </Delete>
@@ -110,8 +110,8 @@
         <!-- ### jesl API logger -->
         <!-- <AsyncLogger name="com.jkoolcloud.jesl" level="DEBUG"/> -->
         <!-- #### streamed activity entities logger #### -->
-        <AsyncLogger name="com.jkoolcloud.tnt4j.streams.activities_jkool_log" level="INFO" additivity="false">
-            <AppenderRef ref="activities_jkool_log"/>
+        <AsyncLogger name="com.jkoolcloud.tnt4j.streams.activities_xray_log" level="INFO" additivity="false">
+            <AppenderRef ref="activities_xray_log"/>
         </AsyncLogger>
         <AsyncLogger name="com.jkoolcloud.tnt4j.streams.activities_ap_log" level="INFO" additivity="false">
             <AppenderRef ref="activities_ap_log"/>

@@ -13,17 +13,17 @@
    1. [tnt4j-streams.properties](../../config/tnt4j-streams.properties) - TNT4J-Streams dedicated TNT4J configuration
    1. [tnt-data-source.xml](tnt-data-source.xml) - TNT4J-Streams data source (stream) configuration, having stream dedicated TNT4J 
       properties configuration section:
-      1. note that default configuration broadcasts CloudWatch metrics to AutoPilot (sink id `ap`) and jKool/XRay (sink id `jkool`) 
+      1. note that default configuration broadcasts CloudWatch metrics to AutoPilot (sink id `ap`) and jKool/XRay (sink id `xray`) 
          simultaneously. If you are willing to use just one of these sinks, then change `<tnt4j-properties>` configuration line:
          ```xml
          <tnt4j-properties>
             <...>
             <!-- FROM -->
-            <property name="event.sink.factory.BroadcastSequence" value="ap,jkool"/>
+            <property name="event.sink.factory.BroadcastSequence" value="ap,xray"/>
             <!-- TO for streaming just to AutoPilot -->
             <property name="event.sink.factory.BroadcastSequence" value="ap"/>
             <!-- TO for streaming just to jKool/XRay -->
-            <property name="event.sink.factory.BroadcastSequence" value="jkool"/>
+            <property name="event.sink.factory.BroadcastSequence" value="xray"/>
             <...>
          </tnt4j-properties>
          ```
@@ -32,7 +32,7 @@
       1. change AutoPilot sink port value (property `event.sink.factory.EventSinkFactory.ap.Port`) to match your AutoPilot instance. Default
          is `6060`.
       1. change `https://data.jkoolcloud.com` to your jKool/XRay streaming endpoint URL. 
-      1. change `jkool-access-token` placeholder to your jKool/XRay streaming token if you are willing to stream into that repo
+      1. change `xray-access-token` placeholder to your jKool/XRay streaming token if you are willing to stream into that repo
    1. [parsers.xml](parsers.xml) - TNT4J-Streams parsers configuration
 
    **NOTE:** for most general case there is no need for you to change `log4j2.xml`, `tnt4j*.propeties` and `parsers.xml` files. The only
@@ -85,12 +85,12 @@ Defines servlet initialization parameters set and servlet mapping:
 In general, configuration is same as for common TNT4-Streams logging except this config uses `${sys:catalina.base}/logs` dir to locate 
 produced log files.
 
-Also note loggers are named to match stream configuration defined broadcasting sink ids: `ap` and `jkool` instead of `prod` and `qa`.
+Also note loggers are named to match stream configuration defined broadcasting sink ids: `ap` and `xray` instead of `prod` and `qa`.
 
 ### TNT4J
 
 In general, configuration is same as common TNT4-Streams TNT4J configuration except streams scope (`tnt4j-streams.properties` file) defines 
-broadcasting sink ids `ap` and `jkool` to match sink target endpoint.
+broadcasting sink ids `ap` and `xray` to match sink target endpoint.
 
 Individual TNT4J streams scope configuration is made in `tnt-data-source.xml` file section `<tnt4j-properties>`.
 
@@ -103,17 +103,17 @@ Major entities in stream configuration are
   successful communication
 * `tnt4j-properties` section defines individual stream TNT4J configuration:
   * property `event.sink.factory.BroadcastSequence` defines produced activities broadcasting sinks. Default configuration contains 
-    configuration for AutoPilot (sink id `ap`) and for jKool/XRay (sink id `jkool`) sinks. Default set of sinks to broadcast stream produced
-    activities is `ap,jkool`. If you are willing to use just one of these sinks, then change configuration line as this:
+    configuration for AutoPilot (sink id `ap`) and for jKool/XRay (sink id `xray`) sinks. Default set of sinks to broadcast stream produced
+    activities is `ap,xray`. If you are willing to use just one of these sinks, then change configuration line as this:
     ```xml
     <tnt4j-properties>
     <...>
     <!-- FROM -->
-    <property name="event.sink.factory.BroadcastSequence" value="ap,jkool"/>
+    <property name="event.sink.factory.BroadcastSequence" value="ap,xray"/>
     <!-- TO for streaming just to AutoPilot -->
     <property name="event.sink.factory.BroadcastSequence" value="ap"/>
     <!-- TO for streaming just to jKool/XRay -->
-    <property name="event.sink.factory.BroadcastSequence" value="jkool"/>
+    <property name="event.sink.factory.BroadcastSequence" value="xray"/>
     <...>
     </tnt4j-properties>
     ```
@@ -122,11 +122,11 @@ Major entities in stream configuration are
       instance. Default is `localhost`.
     * change AutoPilot sink (id `ap`) port value (property `event.sink.factory.EventSinkFactory.ap.Port`) to match your AutoPilot
       instance. Default is `6060`.
-  * properties group starting `event.sink.factory.EventSinkFactory.jkool` defines jKool/XRay dedicated sink configuration
-    * change jKool/XRay sink (id `jkool`) URL value (property `event.sink.factory.EventSinkFactory.jkool.Url`) to match your jKool/XRay
+  * properties group starting `event.sink.factory.EventSinkFactory.xray` defines jKool/XRay dedicated sink configuration
+    * change jKool/XRay sink (id `xray`) URL value (property `event.sink.factory.EventSinkFactory.xray.Url`) to match your jKool/XRay
       instance. Default is `https://data.jkoolcloud.com`.
-    * change jKool/XRay sink (id `jkool`) token placeholder value (property `event.sink.factory.EventSinkFactory.jkool.Token`) to your 
-      jKool/XRay streaming token if you are willing to stream into that repo. Placeholder value is `jkool-access-token`.
+    * change jKool/XRay sink (id `xray`) token placeholder value (property `event.sink.factory.EventSinkFactory.xray.Token`) to your 
+      jKool/XRay streaming token if you are willing to stream into that repo. Placeholder value is `xray-access-token`.
 * `KinesisFirehoseParser` reference to bootstrap parser of incoming metrics data package
 
 ### Parsers (`parsers.xml`)
