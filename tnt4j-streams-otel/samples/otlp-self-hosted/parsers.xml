@@ -94,7 +94,7 @@
         </embedded-activity>
         <field name="Count" locator="count" locator-type="Label" datatype="Number" format="int"/>
         <field name="Sum" locator="sum" locator-type="Label" datatype="Number" format="double"/>
-        <field name="QuantileValues" locator="quantile_values" locator-type="Label" datatype="AsInput"/>
+        <field name="QuantileValues" locator="quantile_values" locator-type="Label" datatype="AsInput"/> <!-- TODO: SPLIT -->
         <field name="StartTime" locator="start_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
         <field name="EndTime" locator="time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
         <field name="Flags" locator="flags" locator-type="Label" datatype="Number" format="int"/>
@@ -115,9 +115,9 @@
         <field name="Max" locator="max" locator-type="Label" datatype="Number" format="double"/>
         <field name="ZeroThreshold" locator="zero_threshold" locator-type="Label" datatype="Number" format="double"/>
         <field name="PositiveOffset" locator="positive.offset" locator-type="Label" datatype="Number" format="int"/>
-        <field name="PositiveBucketCounts" locator="positive.bucket_counts" locator-type="Label" datatype="AsInput"/>
+        <field name="PositiveBucketCounts" locator="positive.bucket_counts" locator-type="Label" datatype="AsInput"/> <!-- TODO: SPLIT -->
         <field name="NegativeOffset" locator="negative.offset" locator-type="Label" datatype="Number" format="int"/>
-        <field name="NegativeBucketCounts" locator="negative.bucket_counts" locator-type="Label" datatype="AsInput"/>
+        <field name="NegativeBucketCounts" locator="negative.bucket_counts" locator-type="Label" datatype="AsInput"/> <!-- TODO: SPLIT -->
         <field name="StartTime" locator="start_time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
         <field name="EndTime" locator="time_unix_nano" locator-type="Label" datatype="Timestamp" units="Nanoseconds"/>
         <field name="Flags" locator="flags" locator-type="Label" datatype="Number" format="int"/>
@@ -172,6 +172,7 @@
 
     <parser name="MetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="NOOP"/>
+        <field name="RoutePath" value="xray"/>
         <field name="MetricName" locator="name" locator-type="Label"/>
         <field name="MetricDescription" locator="description" locator-type="Label"/>
         <field name="MetricUnit" locator="unit" locator-type="Label"/>
@@ -191,10 +192,14 @@
         <embedded-activity name="ExponentialHistogram" locator="exponential_histogram" locator-type="Label">
             <parser-ref name="ExponentialHistogramParser" aggregation="Merge"/>
         </embedded-activity>
+
+        <field name="EventName" locator="MetricName" locator-type="Activity"/>
+        <field name="Category" value="OT_METRICS"/>
     </parser>
 
     <parser name="MetricsParserAP" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="NOOP"/>
+        <field name="RoutePath" value="ap"/>
         <field name="MetricName" locator="name" locator-type="Label"/>
         <field name="MetricDescription" locator="description" locator-type="Label"/>
         <field name="MetricUnit" locator="unit" locator-type="Label"/>
@@ -215,30 +220,23 @@
             <parser-ref name="ExponentialHistogramParser" aggregation="Merge"/>
         </embedded-activity>
 
-        <field name="HostName" locator="^.host.name" locator-type="Activity" transparent="true"/>
-        <field name="ServiceName" locator="^.service.name" locator-type="Activity" transparent="true"/>
-        <field name="ProcessPath" locator="^.process.executable.path" locator-type="Activity" transparent="true"/>
-        <field name="ProcessOwner" locator="^.process.owner" locator-type="Activity" transparent="true"/>
-        <field name="ScopeName" locator="^.ScopeName" locator-type="Activity" transparent="true"/>
-
         <field name="EventName" value="snapName">
             <field-transform lang="groovy"><![CDATA[
                 String props = "";
-                //props += (StringUtils.isEmpty(${ServiceName})   ? "" : "service=" + ${ServiceName});
-                props += (StringUtils.isEmpty(${ProcessPath})   ? "" : (props.length() > 0 ? "," : "") + "process="  + ${ProcessPath});
-                props += (StringUtils.isEmpty(${ProcessOwner})  ? "" : (props.length() > 0 ? "," : "") + "owner="    + ${ProcessOwner});
-                props += (StringUtils.isEmpty(${ScopeName})     ? "" : (props.length() > 0 ? "," : "") + "scope="    + ${ScopeName});
-                props += (StringUtils.isEmpty(${MetricName})    ? "" : (props.length() > 0 ? "," : "") + "metric="   + ${MetricName});
+                //props += (StringUtils.isEmpty(${^.service.name})            ? "" : "service=" + ${^.service.name});
+                props += (StringUtils.isEmpty(${^.process.executable.path}) ? "" : (props.length() > 0 ? "," : "") + "process="  + ${^.process.executable.path});
+                props += (StringUtils.isEmpty(${^.process.owner})           ? "" : (props.length() > 0 ? "," : "") + "owner="    + ${^.process.owner});
+                props += (StringUtils.isEmpty(${^.ScopeName})               ? "" : (props.length() > 0 ? "," : "") + "scope="    + ${^.ScopeName});
+                props += (StringUtils.isEmpty(${MetricName})                ? "" : (props.length() > 0 ? "," : "") + "metric="   + ${MetricName});
 
-                ${ServiceName} + ":" + props
+                ${^.service.name} + ":" + props
             ]]></field-transform>
         </field>
-        <field name="Category" locator="HostName" locator-type="Activity"/>
+        <field name="Category" locator="^.host.name" locator-type="Activity"/>
     </parser>
 
-    <parser name="ScopeMetricsParserXRay" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+    <parser name="ScopeMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="NOOP"/>
-        <field name="RoutePath" value="xray"/>
 
         <field name="ScopeName" locator="scope.name" locator-type="Label"/>
         <field name="ScopeVersion" locator="scope.version" locator-type="Label"/>
@@ -246,22 +244,12 @@
             <parser-ref name="AttributeParser" aggregation="Merge"/>
         </embedded-activity>
         <embedded-activity name="ScopeMetrics" locator="metrics" locator-type="Label">
-            <parser-ref name="MetricsParser" aggregation="Relate"/>
-        </embedded-activity>
-        <field name="ScopeSchemaUrl" locator="schema_url" locator-type="Label"/>
-    </parser>
-
-    <parser name="ScopeMetricsParserAP" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
-        <field name="EventType" value="NOOP"/>
-        <field name="RoutePath" value="ap"/>
-
-        <field name="ScopeName" locator="scope.name" locator-type="Label"/>
-        <field name="ScopeVersion" locator="scope.version" locator-type="Label"/>
-        <embedded-activity name="ScopeAttributes" locator="scope.attributes" locator-type="Label">
-            <parser-ref name="AttributeParser" aggregation="Merge"/>
-        </embedded-activity>
-        <embedded-activity name="ScopeMetrics" locator="metrics" locator-type="Label">
-            <parser-ref name="MetricsParserAP" aggregation="Relate"/>
+            <parser-ref name="MetricsParser" aggregation="Relate" tags="continuous">
+                <matchExp>groovy:$stream.getOutput ().hasSink ("xray");</matchExp>
+            </parser-ref>
+            <parser-ref name="MetricsParserAP" aggregation="Relate" tags="continuous">
+                <matchExp>groovy:$stream.getOutput ().hasSink ("ap");</matchExp>
+            </parser-ref>
         </embedded-activity>
         <field name="ScopeSchemaUrl" locator="schema_url" locator-type="Label"/>
     </parser>
@@ -275,8 +263,7 @@
             <parser-ref name="AttributeParser" aggregation="Merge"/>
         </embedded-activity>
         <embedded-activity name="ResourceScopeMetrics" locator="scope_metrics" locator-type="Label">
-            <parser-ref name="ScopeMetricsParserXRay" aggregation="Relate" tags="continuous"/>
-            <parser-ref name="ScopeMetricsParserAP" aggregation="Relate" tags="continuous"/>
+            <parser-ref name="ScopeMetricsParser" aggregation="Relate"/>
         </embedded-activity>
         <field name="ResourceSchemaUrl" locator="schemaUrl" locator-type="Label"/>
     </parser>

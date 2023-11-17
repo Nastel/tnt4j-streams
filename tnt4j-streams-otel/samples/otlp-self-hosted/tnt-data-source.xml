@@ -31,12 +31,19 @@
         <property name="RetryInterval" value="300"/>
 
         <!-- Stream run HTTP server configuration -->
-        <property name="Host" value="172.16.10.21"/>
+        <property name="Host" value="127.0.0.1"/>
         <property name="Port" value="8787"/>
         <property name="UseSSL" value="false"/>
         <property name="Keystore" value="file://clientkeystore"/>
         <property name="KeyPass" value="pass123"/>
         <property name="KeystorePass" value="pass123"/>
+
+        <!-- Parallel parsing configuration -->
+        <property name="UseExecutors" value="true"/>
+        <property name="ExecutorThreadsQuantity" value="5"/>
+        <property name="ExecutorsTerminationTimeout" value="20"/>
+        <property name="ExecutorsBoundedModel" value="false"/>
+        <property name="ExecutorRejectedTaskOfferTimeout" value="20"/>
 
         <tnt4j-properties>
             <!-- Set your CloudWatch data center name -->
