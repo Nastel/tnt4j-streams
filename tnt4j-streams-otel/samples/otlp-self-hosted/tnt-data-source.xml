@@ -49,6 +49,7 @@
             <!-- Set your CloudWatch data center name -->
             <property name="source.factory.DATACENTER" value="OTLP"/>
             <property name="source.factory.RootFQN" value="DATACENTER=?"/>
+            <property name="tracker.default.snapshot.category" value="Opentelemetry-Monitored-Service"/>
 
             <!-- Sequence of sinks to broadcast stream produced activities. You may leave just one of them to sent data to single endpoint -->
             <property name="event.sink.factory.BroadcastSequence" value="ap"/>
