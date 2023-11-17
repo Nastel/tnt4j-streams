@@ -281,7 +281,7 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 			}
 		}
 
-		ActivityContext cData = new ActivityContext(stream, data, xmlDoc);
+		ActivityContext cData = new ActivityContext(stream, data, xmlDoc).setParser(this);
 		cData.setMessage(xmlString);
 
 		return cData;

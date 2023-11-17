@@ -29,6 +29,8 @@ import org.codehaus.groovy.control.customizers.CompilationCustomizer;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl;
 
+import com.jkoolcloud.tnt4j.streams.fields.AbstractFieldEntity;
+
 import groovy.lang.GroovyClassLoader;
 
 /**
@@ -46,6 +48,14 @@ public final class StreamsScriptingUtils {
 	 */
 	public static final String FIELD_NAME_VARIABLE_NAME = "fieldName"; // NON-NLS
 	/**
+	 * Constant for stream variable name used in script/expression code.
+	 */
+	public static final String STREAM_VARIABLE_NAME = "stream"; // NON-NLS
+	/**
+	 * Constant for parser variable name used in script/expression code.
+	 */
+	public static final String PARSER_VARIABLE_NAME = "parser"; // NON-NLS
+	/**
 	 * Constant for field value variable expression used in script/expression code.
 	 */
 	public static final String FIELD_VALUE_VARIABLE_EXPR = '$' + FIELD_VALUE_VARIABLE_NAME;
@@ -53,6 +63,14 @@ public final class StreamsScriptingUtils {
 	 * Constant for field name variable expression used in script/expression code.
 	 */
 	public static final String FIELD_NAME_VARIABLE_EXPR = '$' + FIELD_NAME_VARIABLE_NAME;
+	/**
+	 * Constant for stream variable expression used in script/expression code.
+	 */
+	public static final String STREAM_VARIABLE_EXPR = '$' + STREAM_VARIABLE_NAME;
+	/**
+	 * Constant for parser variable expression used in script/expression code.
+	 */
+	public static final String PARSER_VARIABLE_EXPR = '$' + PARSER_VARIABLE_NAME;
 
 	/**
 	 * Constant for name of scripting/expression language {@value}.
@@ -275,6 +293,14 @@ public final class StreamsScriptingUtils {
 		if (fValue != null) {
 			appendVariable(varStr, FIELD_NAME_VARIABLE_EXPR, fName);
 		}
+		Object stream = vars.get(STREAM_VARIABLE_EXPR);
+		if (stream != null) {
+			appendVariable(varStr, STREAM_VARIABLE_EXPR, stream);
+		}
+		Object parser = vars.get(PARSER_VARIABLE_EXPR);
+		if (fValue != null) {
+			appendVariable(varStr, PARSER_VARIABLE_EXPR, parser);
+		}
 
 		if (varStr.length() > 0) {
 			expDescStr.append(" (").append(varStr).append(")"); // NON-NLS
@@ -411,7 +437,8 @@ public final class StreamsScriptingUtils {
 	 * Checks if provided script expression string {@code expString} containing value reference placeholders (starting
 	 * {@code '$'} symbol) matches valid script expression pattern:
 	 * <ul>
-	 * <li>expression referenced field value is defined using placeholder {@value #FIELD_VALUE_VARIABLE_EXPR} (case
+	 * <li>expression referenced field value is defined using placeholder {@value FIELD_VALUE_VARIABLE_EXPR},
+	 * {@value FIELD_NAME_VARIABLE_EXPR}, {@value STREAM_VARIABLE_EXPR} or {@value PARSER_VARIABLE_EXPR} (case
 	 * sensitive)</li>
 	 * <li>expression referenced activity fields are defined using placeholder {@code ${FIELD_NAME}}, where
 	 * {@code FIELD_NAME} is parser defined filed name or cache entry name</li>
@@ -439,7 +466,8 @@ public final class StreamsScriptingUtils {
 
 		m = FIELD_VALUE_PLACEHOLDER_PATTERN.matcher(expString);
 		while (m.find()) {
-			if (!StringUtils.equalsAny(m.group(), FIELD_VALUE_VARIABLE_EXPR, FIELD_NAME_VARIABLE_EXPR)) {
+			if (!StringUtils.equalsAny(m.group(), FIELD_VALUE_VARIABLE_EXPR, FIELD_NAME_VARIABLE_EXPR,
+					STREAM_VARIABLE_EXPR, PARSER_VARIABLE_EXPR)) {
 				return false;
 			}
 		}
@@ -481,5 +509,26 @@ public final class StreamsScriptingUtils {
 
 			return count;
 		}
+	}
+
+	/**
+	 * Creates script bindings instance and pre-fills it with data and context provided values.
+	 * 
+	 * @param value
+	 *            data value to evaluate
+	 * @param context
+	 *            script execution context map containing references to activity info, field, parser, stream and etc.
+	 * @return script bindings instance pre-filled with data and context provided values
+	 */
+	public static Bindings fillBindingsFromContext(Object value, Map<String, ?> context) {
+		Bindings bindings = new SimpleBindings();
+		bindings.put(FIELD_VALUE_VARIABLE_EXPR, value);
+		AbstractFieldEntity field = context == null ? null
+				: (AbstractFieldEntity) context.get(StreamsConstants.CTX_FIELD_KEY);
+		bindings.put(FIELD_NAME_VARIABLE_EXPR, field == null ? null : field.getName());
+		bindings.put(STREAM_VARIABLE_EXPR, context == null ? null : context.get(StreamsConstants.CTX_STREAM_KEY));
+		bindings.put(PARSER_VARIABLE_EXPR, context == null ? null : context.get(StreamsConstants.CTX_PARSER_KEY));
+
+		return bindings;
 	}
 }

@@ -29,6 +29,7 @@ import com.jkoolcloud.tnt4j.core.Property;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils;
 
@@ -110,10 +111,9 @@ public class ScriptExpressionFilter extends AbstractExpressionFilter<Object> {
 	}
 
 	@Override
-	public boolean doFilter(Object value, ActivityInfo ai, String fName) throws FilterException {
-		Bindings bindings = new SimpleBindings();
-		bindings.put(StreamsScriptingUtils.FIELD_VALUE_VARIABLE_EXPR, value);
-		bindings.put(StreamsScriptingUtils.FIELD_NAME_VARIABLE_EXPR, fName);
+	public boolean doFilter(Object value, Map<String, ?> context) throws FilterException {
+		Bindings bindings = StreamsScriptingUtils.fillBindingsFromContext(value, context);
+		ActivityInfo ai = context == null ? null : (ActivityInfo) context.get(StreamsConstants.CTX_ACTIVITY_DATA_KEY);
 
 		if (ai != null && CollectionUtils.isNotEmpty(exprVars)) {
 			for (String eVar : exprVars) {

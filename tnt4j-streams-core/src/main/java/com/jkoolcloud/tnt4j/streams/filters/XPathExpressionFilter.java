@@ -27,11 +27,9 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import com.jkoolcloud.tnt4j.core.Property;
 import com.jkoolcloud.tnt4j.sink.EventSink;
+import com.jkoolcloud.tnt4j.streams.fields.AbstractFieldEntity;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
-import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsXMLUtils;
+import com.jkoolcloud.tnt4j.streams.utils.*;
 
 /**
  * Data value filtering based on XPath function expressions.
@@ -89,10 +87,14 @@ public class XPathExpressionFilter extends AbstractExpressionFilter<Object> {
 	}
 
 	@Override
-	public boolean doFilter(Object value, ActivityInfo ai, String fName) throws FilterException {
+	public boolean doFilter(Object value, Map<String, ?> context) throws FilterException {
 		Map<String, Object> valuesMap = new HashMap<>();
 		valuesMap.put(OWN_FIELD_VALUE_KEY, value);
-		valuesMap.put(OWN_FIELD_NAME_KEY, fName);
+		AbstractFieldEntity field = context == null ? null
+				: (AbstractFieldEntity) context.get(StreamsConstants.CTX_FIELD_KEY);
+		valuesMap.put(OWN_FIELD_NAME_KEY, field == null ? null : field.getName());
+
+		ActivityInfo ai = context == null ? null : (ActivityInfo) context.get(StreamsConstants.CTX_ACTIVITY_DATA_KEY);
 
 		if (ai != null && CollectionUtils.isNotEmpty(exprVars)) {
 			for (String eVar : exprVars) {

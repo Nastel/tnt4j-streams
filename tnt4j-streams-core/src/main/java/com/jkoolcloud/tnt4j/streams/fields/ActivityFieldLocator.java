@@ -485,7 +485,7 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	}
 
 	@Override
-	String getName() {
+	public String getName() {
 		return id;
 	}
 

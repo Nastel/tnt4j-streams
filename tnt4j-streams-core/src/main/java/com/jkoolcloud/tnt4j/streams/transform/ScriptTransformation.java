@@ -16,10 +16,11 @@
 
 package com.jkoolcloud.tnt4j.streams.transform;
 
+import java.util.Map;
+
 import javax.script.Bindings;
 import javax.script.CompiledScript;
 import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -27,6 +28,7 @@ import com.jkoolcloud.tnt4j.core.Property;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils;
 
@@ -111,10 +113,9 @@ public class ScriptTransformation extends AbstractScriptTransformation<Object> {
 	}
 
 	@Override
-	public Object transform(Object value, ActivityInfo ai, String fName) throws TransformationException {
-		Bindings bindings = new SimpleBindings();
-		bindings.put(StreamsScriptingUtils.FIELD_VALUE_VARIABLE_EXPR, value);
-		bindings.put(StreamsScriptingUtils.FIELD_NAME_VARIABLE_EXPR, fName);
+	public Object transform(Object value, Map<String, ?> context) throws TransformationException {
+		Bindings bindings = StreamsScriptingUtils.fillBindingsFromContext(value, context);
+		ActivityInfo ai = context == null ? null : (ActivityInfo) context.get(StreamsConstants.CTX_ACTIVITY_DATA_KEY);
 
 		if (ai != null && CollectionUtils.isNotEmpty(exprVars)) {
 			for (String eVar : exprVars) {

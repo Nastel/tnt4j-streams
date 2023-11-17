@@ -289,7 +289,7 @@ public abstract class ActivityParser implements NamedObject {
 			parserMatch = BooleanUtils.toBooleanDefaultIfNull(tagsMatch, true);
 
 			if (parserMatch) {
-				expMatch = parserRef.matchExp(this, value, ai, field);
+				expMatch = parserRef.matchExp(this, value, (Map<String, ?>) cData);
 				parserMatch = BooleanUtils.toBooleanDefaultIfNull(expMatch, true);
 			}
 		}
@@ -492,6 +492,13 @@ public abstract class ActivityParser implements NamedObject {
 		TNTInputStream<?, ?> getStream();
 
 		/**
+		 * Returns instance of parser currently parsing activity data.
+		 * 
+		 * @return parser currently parsing activity data
+		 */
+		ActivityParser getParser();
+
+		/**
 		 * Returns resolved activity entity data.
 		 *
 		 * @return resolved activity entity data
@@ -503,8 +510,10 @@ public abstract class ActivityParser implements NamedObject {
 		 *
 		 * @param pRef
 		 *            currently used stacked parser reference
+		 * 
+		 * @return this context instance
 		 */
-		void setParserRef(ActivityField.FieldParserReference pRef);
+		ActivityParserContext setParserRef(ActivityField.FieldParserReference pRef);
 
 		/**
 		 * Gets currently used stacked parser reference.
@@ -518,8 +527,10 @@ public abstract class ActivityParser implements NamedObject {
 		 * 
 		 * @param metaMap
 		 *            activity entity metadata map
+		 * 
+		 * @return this context instance
 		 */
-		void setMetadata(Map<String, ?> metaMap);
+		ActivityParserContext setMetadata(Map<String, ?> metaMap);
 
 		/**
 		 * Returns activity entity metadata map.

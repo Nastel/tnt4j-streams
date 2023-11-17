@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldFormatType;
-import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
@@ -114,7 +113,7 @@ public class DefaultValueFilter extends AbstractEntityFilter<Object> {
 	}
 
 	@Override
-	public boolean doFilter(Object value, ActivityInfo ai, String fName) {
+	public boolean doFilter(Object value, Map<String, ?> context) {
 		boolean match = false;
 
 		if (matchPattern != null) {

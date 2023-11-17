@@ -120,7 +120,7 @@ public class ActivityStringParser extends GenericActivityParser<String> {
 			return null;
 		}
 
-		ActivityContext cData = new ActivityContext(stream, data, dataStr);
+		ActivityContext cData = new ActivityContext(stream, data, dataStr).setParser(this);
 		// cData.setMessage(dataStr);
 
 		return cData;

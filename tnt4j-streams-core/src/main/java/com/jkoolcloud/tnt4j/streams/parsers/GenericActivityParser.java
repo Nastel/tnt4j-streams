@@ -720,7 +720,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	protected ActivityContext prepareItem(TNTInputStream<?, ?> stream, Object data) throws ParseException {
 		T aData = (T) data;
 
-		ActivityContext cData = new ActivityContext(stream, data, aData);
+		ActivityContext cData = new ActivityContext(stream, data, aData).setParser(this);
 		// cData.setMessage(getRawDataAsMessage(aData));
 
 		return cData;
@@ -762,7 +762,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		ai.setComplete(true);
 
 		try {
-			filterActivity(ai);
+			filterActivity(cData);
 		} catch (Exception exc) {
 			Utils.logThrowable(logger(), OpLevel.WARNING,
 					StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
@@ -1186,7 +1186,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	protected Object transformValue(Object val, ActivityFieldLocator locator, ActivityContext cData, String locStr,
 			ValueTransformation.Phase phase) {
 		try {
-			return locator.transformValue(val, cData.getActivity(), phase);
+			return locator.transformValue(val, cData, phase);
 		} catch (Exception exc) {
 			Utils.logThrowable(logger(), OpLevel.WARNING,
 					StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
@@ -1319,19 +1319,20 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 * Applies stream filters group defined filters on activity information data. If activity data matches at least one
 	 * excluding filter, activity is marked as "filtered out".
 	 * 
-	 * @param ai
-	 *            activity information data
+	 * @param cData
+	 *            activity data item context to filter
 	 *
 	 * @see com.jkoolcloud.tnt4j.streams.fields.ActivityInfo#setFiltered(boolean)
 	 */
-	protected void filterActivity(ActivityInfo ai) throws Exception {
+	protected void filterActivity(ActivityContext cData) throws Exception {
+		ActivityInfo ai = cData.getActivity();
 		if (activityFilter == null || ai == null) {
 			return;
 		}
 
 		filterLock.lock();
 		try {
-			boolean filteredOut = activityFilter.doFilter(null, ai);
+			boolean filteredOut = activityFilter.doFilter(null, cData);
 			ai.setFiltered(filteredOut);
 			logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityParser.filtering.result", getName(), activityFilter.getName(), filteredOut);
@@ -1424,19 +1425,15 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	protected class ActivityContext extends HashMap<String, Object> implements ActivityParserContext {
 		private static final long serialVersionUID = 702832545435507437L;
 
-		private static final String STREAM_KEY = "STREAM_DATA"; // NON-NLS
-		private static final String RAW_DATA_KEY = "RAW_ACTIVITY_DATA"; // NON-NLS
-		private static final String PARENT_ACTIVITY_KEY = "PARENT_ACTIVITY_DATA"; // NON-NLS
-		private static final String PARENT_CONTEXT_KEY = "PARENT_CONTEXT_DATA"; // NON-NLS
+		private static final String RAW_DATA_KEY = "CTX_RAW_ACTIVITY_DATA"; // NON-NLS
+		private static final String PARENT_ACTIVITY_KEY = "CTX_PARENT_ACTIVITY_DATA"; // NON-NLS
+		private static final String PARENT_CONTEXT_KEY = "CTX_PARENT_CONTEXT_DATA"; // NON-NLS
 
-		private static final String PREPARED_DATA_KEY = "PREPARED_ACTIVITY_DATA"; // NON-NLS
-		private static final String ACTIVITY_DATA_KEY = "ACTIVITY_DATA"; // NON-NLS
-		private static final String MESSAGE_DATA_KEY = "ACT_MESSAGE_DATA"; // NON-NLS
-		private static final String METADATA_KEY = "ACT_METADATA_DATA"; // NON-NLS
+		private static final String PREPARED_DATA_KEY = "CTX_PREPARED_ACTIVITY_DATA"; // NON-NLS
+		private static final String MESSAGE_DATA_KEY = "CTX_ACT_MESSAGE_DATA"; // NON-NLS
+		private static final String METADATA_KEY = "CTX_ACT_METADATA_DATA"; // NON-NLS
 
-		private static final String FIELD_KEY = "PARSED_FIELD"; // NON-NLS
-
-		private static final String PARSER_REF_KEY = "PARSER_REF_KEY"; // NON-NLS
+		private static final String PARSER_REF_KEY = "CTX_PARSER_REF"; // NON-NLS
 
 		private boolean valid = true;
 
@@ -1449,8 +1446,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 *            stream provided RAW activity data
 		 */
 		public ActivityContext(TNTInputStream<?, ?> stream, Object rawData) {
-			put(STREAM_KEY, stream);
-			put(RAW_DATA_KEY, rawData);
+			this(stream, rawData, null);
 		}
 
 		/**
@@ -1464,7 +1460,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 *            parser prepared activity data compatible to locate values
 		 */
 		public ActivityContext(TNTInputStream<?, ?> stream, Object rawData, T preparedData) {
-			put(STREAM_KEY, stream);
+			put(StreamsConstants.CTX_STREAM_KEY, stream);
 			put(RAW_DATA_KEY, rawData);
 			put(PREPARED_DATA_KEY, preparedData);
 		}
@@ -1495,13 +1491,27 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		}
 
 		/**
+		 * Sets parser parsing activity data.
+		 * 
+		 * @param parser
+		 *            parsing activity data
+		 */
+		public ActivityContext setParser(ActivityParser parser) {
+			put(StreamsConstants.CTX_PARSER_KEY, parser);
+
+			return this;
+		}
+
+		/**
 		 * Sets parser prepared activity data.
 		 * 
 		 * @param preparedData
 		 *            parser prepared activity data
 		 */
-		public void setData(T preparedData) {
+		public ActivityContext setData(T preparedData) {
 			put(PREPARED_DATA_KEY, preparedData);
+
+			return this;
 		}
 
 		/**
@@ -1515,8 +1525,10 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		}
 
 		@Override
-		public void setMetadata(Map<String, ?> metaMap) {
+		public ActivityContext setMetadata(Map<String, ?> metaMap) {
 			put(METADATA_KEY, metaMap);
+
+			return this;
 		}
 
 		@Override
@@ -1527,7 +1539,12 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 
 		@Override
 		public TNTInputStream<?, ?> getStream() {
-			return (TNTInputStream<?, ?>) get(STREAM_KEY);
+			return (TNTInputStream<?, ?>) get(StreamsConstants.CTX_STREAM_KEY);
+		}
+
+		@Override
+		public ActivityParser getParser() {
+			return (ActivityParser) get(StreamsConstants.CTX_PARSER_KEY);
 		}
 
 		/**
@@ -1536,13 +1553,15 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 * @param ai
 		 *            resolved activity entity data
 		 */
-		public void setActivity(ActivityInfo ai) {
-			put(ACTIVITY_DATA_KEY, ai);
+		public ActivityContext setActivity(ActivityInfo ai) {
+			put(StreamsConstants.CTX_ACTIVITY_DATA_KEY, ai);
+
+			return this;
 		}
 
 		@Override
 		public ActivityInfo getActivity() {
-			return (ActivityInfo) get(ACTIVITY_DATA_KEY);
+			return (ActivityInfo) get(StreamsConstants.CTX_ACTIVITY_DATA_KEY);
 		}
 
 		/**
@@ -1551,8 +1570,10 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 * @param pai
 		 *            parent activity entity data
 		 */
-		public void setParentActivity(ActivityInfo pai) {
+		public ActivityContext setParentActivity(ActivityInfo pai) {
 			put(PARENT_ACTIVITY_KEY, pai);
+
+			return this;
 		}
 
 		/**
@@ -1570,8 +1591,10 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 * @param message
 		 *            activity data string representation to be used as 'Message' field data
 		 */
-		public void setMessage(String message) {
+		public ActivityContext setMessage(String message) {
 			put(MESSAGE_DATA_KEY, message);
+
+			return this;
 		}
 
 		/**
@@ -1589,8 +1612,10 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 * @param pContext
 		 *            parent parser context data
 		 */
-		public void setParentContext(ActivityParserContext pContext) {
+		public ActivityContext setParentContext(ActivityParserContext pContext) {
 			put(PARENT_CONTEXT_KEY, pContext);
+
+			return this;
 		}
 
 		/**
@@ -1608,8 +1633,10 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 * @param field
 		 *            currently parsed field instance
 		 */
-		public void setField(ActivityField field) {
-			put(FIELD_KEY, field);
+		public ActivityContext setField(ActivityField field) {
+			put(StreamsConstants.CTX_FIELD_KEY, field);
+
+			return this;
 		}
 
 		/**
@@ -1618,12 +1645,14 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 * @return currently parsed field instance
 		 */
 		public ActivityField getField() {
-			return (ActivityField) get(FIELD_KEY);
+			return (ActivityField) get(StreamsConstants.CTX_FIELD_KEY);
 		}
 
 		@Override
-		public void setParserRef(ActivityField.FieldParserReference pRef) {
+		public ActivityContext setParserRef(ActivityField.FieldParserReference pRef) {
 			put(PARSER_REF_KEY, pRef);
+
+			return this;
 		}
 
 		@Override

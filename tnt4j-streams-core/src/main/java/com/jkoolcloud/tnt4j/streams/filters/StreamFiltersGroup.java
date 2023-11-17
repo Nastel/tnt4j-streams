@@ -22,8 +22,6 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
-
 /**
  * Stream entities data (activity/field/locator) filters group.
  * <p>
@@ -91,12 +89,12 @@ public class StreamFiltersGroup<T> implements StreamEntityFilter<T> {
 	}
 
 	@Override
-	public boolean doFilter(T value, ActivityInfo ai, String fName) throws FilterException {
+	public boolean doFilter(T value, Map<String, ?> context) throws FilterException {
 		if (CollectionUtils.isNotEmpty(activityFilters)) {
 			for (AbstractEntityFilter<T> aFilter : activityFilters) {
 				boolean filtered;
 				try {
-					filtered = aFilter.doFilter(value, ai, fName);
+					filtered = aFilter.doFilter(value, context);
 				} catch (Throwable e) {
 					filtered = filteredByDefault;
 				}

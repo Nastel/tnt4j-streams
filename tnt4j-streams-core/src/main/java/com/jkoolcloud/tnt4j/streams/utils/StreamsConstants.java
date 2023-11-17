@@ -116,6 +116,23 @@ public final class StreamsConstants {
 	 */
 	public static final String VAR_SCOPE_ENVIRONMENT = "env:"; // NON-NLS
 
+	/**
+	 * The constant defining context map entry key {@value} for stream reference.
+	 */
+	public static final String CTX_STREAM_KEY = "CTX_STREAM"; // NON-NLS
+	/**
+	 * The constant defining context map entry key {@value} for parser reference.
+	 */
+	public static final String CTX_PARSER_KEY = "CTX_PARSER"; // NON-NLS
+	/**
+	 * The constant defining context map entry key {@value} for activity entity data.
+	 */
+	public static final String CTX_ACTIVITY_DATA_KEY = "CTX_ACTIVITY_DATA"; // NON-NLS
+	/**
+	 * The constant defining context map entry key {@value} for parsed field reference.
+	 */
+	public static final String CTX_FIELD_KEY = "CTX_PARSED_FIELD"; // NON-NLS
+
 	private StreamsConstants() {
 	}
 

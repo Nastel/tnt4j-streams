@@ -16,8 +16,9 @@
 
 package com.jkoolcloud.tnt4j.streams.transform;
 
+import java.util.Map;
+
 import com.jkoolcloud.tnt4j.streams.configure.NamedObject;
-import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 
 /**
  * This interface defines common operations for data value transformations used by TNT4J-Streams.
@@ -36,34 +37,14 @@ public interface ValueTransformation<V, T> extends NamedObject {
 	 *
 	 * @param value
 	 *            data value to transform
-	 * @param ai
-	 *            activity entity instance
-	 * @return transformed data value
-	 *
-	 * @throws com.jkoolcloud.tnt4j.streams.transform.TransformationException
-	 *             if transformation operation fails
-	 * 
-	 * @see #transform(Object, com.jkoolcloud.tnt4j.streams.fields.ActivityInfo, String)
-	 */
-	default T transform(V value, ActivityInfo ai) throws TransformationException {
-		return transform(value, ai, null);
-	}
-
-	/**
-	 * Transforms provided data value applying some business rules.
-	 *
-	 * @param value
-	 *            data value to transform
-	 * @param ai
-	 *            activity entity instance
-	 * @param fieldName
-	 *            name of field performing transformation
+	 * @param context
+	 *            transformation context map containing references to activity info, field, parser, stream and etc.
 	 * @return transformed data value
 	 *
 	 * @throws com.jkoolcloud.tnt4j.streams.transform.TransformationException
 	 *             if transformation operation fails
 	 */
-	T transform(V value, ActivityInfo ai, String fieldName) throws TransformationException;
+	T transform(V value, Map<String, ?> context) throws TransformationException;
 
 	/**
 	 * Returns activity data value resolution phase when transformation has to be applied.

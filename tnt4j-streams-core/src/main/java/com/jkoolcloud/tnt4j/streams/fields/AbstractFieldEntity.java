@@ -18,6 +18,8 @@ package com.jkoolcloud.tnt4j.streams.fields;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +28,7 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.filters.StreamFiltersGroup;
 import com.jkoolcloud.tnt4j.streams.transform.ValueTransformation;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
@@ -158,15 +161,16 @@ public abstract class AbstractFieldEntity {
 	 *
 	 * @param fieldValue
 	 *            value to transform
-	 * @param ai
-	 *            activity entity instance to get additional value for a transformation
+	 * @param context
+	 *            transformation context map containing references to activity info, field, parser, stream and etc.
 	 * @param phase
 	 *            activity data resolution phase defining transformations to apply
 	 * @return transformed value
 	 * @throws Exception
 	 *             if transformation operation fails
 	 */
-	public Object transformValue(Object fieldValue, ActivityInfo ai, ValueTransformation.Phase phase) throws Exception {
+	public Object transformValue(Object fieldValue, Map<String, ?> context, ValueTransformation.Phase phase)
+			throws Exception {
 		if (CollectionUtils.isEmpty(transformations)) {
 			return fieldValue;
 		}
@@ -176,7 +180,7 @@ public abstract class AbstractFieldEntity {
 		Object tValue = fieldValue;
 		for (ValueTransformation<Object, Object> vt : transformations) {
 			if (vt.getPhase().equals(phase)) {
-				tValue = vt.transform(tValue, ai, getName());
+				tValue = vt.transform(tValue, context);
 				logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"AbstractFieldEntity.value.after.transformation", this, vt.getName(), Utils.toString(tValue));
 			}
@@ -218,7 +222,11 @@ public abstract class AbstractFieldEntity {
 			return false;
 		}
 
-		boolean filteredOut = filter.doFilter(fieldValue, ai, getName());
+		Map<String, Object> context = new HashMap<>(2);
+		context.put(StreamsConstants.CTX_ACTIVITY_DATA_KEY, ai);
+		context.put(StreamsConstants.CTX_FIELD_KEY, this);
+
+		boolean filteredOut = filter.doFilter(fieldValue, context);
 
 		logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 				"AbstractFieldEntity.filtering.result", this, filter.getName(), filteredOut);
@@ -251,5 +259,5 @@ public abstract class AbstractFieldEntity {
 	 * 
 	 * @return entity name
 	 */
-	abstract String getName();
+	public abstract String getName();
 }
