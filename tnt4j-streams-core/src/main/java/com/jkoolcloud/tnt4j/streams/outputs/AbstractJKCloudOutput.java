@@ -34,6 +34,7 @@ import com.jkoolcloud.tnt4j.core.OpType;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.sink.SinkError;
 import com.jkoolcloud.tnt4j.sink.SinkErrorListener;
+import com.jkoolcloud.tnt4j.sink.impl.BroadcastingEventSink;
 import com.jkoolcloud.tnt4j.sink.impl.BufferedEventSink;
 import com.jkoolcloud.tnt4j.source.Source;
 import com.jkoolcloud.tnt4j.source.SourceType;
@@ -283,6 +284,23 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 			int retryPeriodSec = Integer.parseInt((String) value);
 			retryPeriod = TimeUnit.SECONDS.toMillis(retryPeriodSec);
 		}
+	}
+
+	@Override
+	public boolean hasSink(String sinkId) {
+		Tracker tracker = getTracker();
+
+		if (tracker != null) {
+			EventSink eSink = tracker.getEventSink();
+
+			if (eSink instanceof BroadcastingEventSink) {
+				return ((BroadcastingEventSink) eSink).hasSink(sinkId);
+			} else if (eSink != null) {
+				return StringUtils.equals(eSink.getName(), sinkId);
+			}
+		}
+
+		return false;
 	}
 
 	/**

@@ -39,4 +39,9 @@ public class NullActivityOutput extends AbstractTNTStreamOutput<ActivityInfo> {
 	@Override
 	public void setProperty(String name, Object value) {
 	}
+
+	@Override
+	public boolean hasSink(String sinkId) {
+		return true;
+	}
 }
