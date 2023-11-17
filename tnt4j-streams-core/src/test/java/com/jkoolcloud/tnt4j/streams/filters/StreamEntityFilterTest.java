@@ -5,10 +5,13 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
 import com.jkoolcloud.tnt4j.streams.fields.*;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 
 public class StreamEntityFilterTest {
 
@@ -105,7 +108,11 @@ public class StreamEntityFilterTest {
 		DefaultValueFilter filter = new DefaultValueFilter("INCLUDE", "IS", "string", "123");
 
 		filterGroup.addFilter(filter);
-		boolean filterResult = filterGroup.doFilter("123", mock(ActivityInfo.class));
+
+		Map<String, Object> context = new HashMap<>(1);
+		context.put(StreamsConstants.CTX_ACTIVITY_DATA_KEY, mock(ActivityInfo.class));
+
+		boolean filterResult = filterGroup.doFilter("123", context);
 		assertFalse(filterResult);
 	}
 
@@ -115,7 +122,11 @@ public class StreamEntityFilterTest {
 		DefaultValueFilter filter = new DefaultValueFilter("INCLUDE", "IS", "string", "1243");
 
 		filterGroup.addFilter(filter);
-		boolean filterResult = filterGroup.doFilter("123", mock(ActivityInfo.class));
+
+		Map<String, Object> context = new HashMap<>(1);
+		context.put(StreamsConstants.CTX_ACTIVITY_DATA_KEY, mock(ActivityInfo.class));
+
+		boolean filterResult = filterGroup.doFilter("123", context);
 		assertTrue(filterResult);
 	}
 
@@ -125,7 +136,11 @@ public class StreamEntityFilterTest {
 		DefaultValueFilter filter = new DefaultValueFilter("EXCLUDE", "IS", "string", "123");
 
 		filterGroup.addFilter(filter);
-		boolean filterResult = filterGroup.doFilter("123", mock(ActivityInfo.class));
+
+		Map<String, Object> context = new HashMap<>(1);
+		context.put(StreamsConstants.CTX_ACTIVITY_DATA_KEY, mock(ActivityInfo.class));
+
+		boolean filterResult = filterGroup.doFilter("123", context);
 		assertTrue(filterResult);
 	}
 
@@ -135,7 +150,11 @@ public class StreamEntityFilterTest {
 		DefaultValueFilter filter = new DefaultValueFilter("EXCLUDE", "IS", "string", "1243");
 
 		filterGroup.addFilter(filter);
-		boolean filterResult = filterGroup.doFilter("123", mock(ActivityInfo.class));
+
+		Map<String, Object> context = new HashMap<>(1);
+		context.put(StreamsConstants.CTX_ACTIVITY_DATA_KEY, mock(ActivityInfo.class));
+
+		boolean filterResult = filterGroup.doFilter("123", context);
 		assertFalse(filterResult);
 	}
 
@@ -145,7 +164,11 @@ public class StreamEntityFilterTest {
 		DefaultValueFilter filter = new DefaultValueFilter("EXCLUDE", "IS", "string", "1243");
 
 		filterGroup.addFilter(filter);
-		boolean filterResult = filterGroup.doFilter(null, mock(ActivityInfo.class));
+
+		Map<String, Object> context = new HashMap<>(1);
+		context.put(StreamsConstants.CTX_ACTIVITY_DATA_KEY, mock(ActivityInfo.class));
+
+		boolean filterResult = filterGroup.doFilter(null, context);
 		assertFalse(filterResult);
 	}
 
@@ -155,7 +178,11 @@ public class StreamEntityFilterTest {
 		DefaultValueFilter filter = new DefaultValueFilter("EXCLUDE", "IS", "string", "null");
 
 		filterGroup.addFilter(filter);
-		boolean filterResult = filterGroup.doFilter(null, mock(ActivityInfo.class));
+
+		Map<String, Object> context = new HashMap<>(1);
+		context.put(StreamsConstants.CTX_ACTIVITY_DATA_KEY, mock(ActivityInfo.class));
+
+		boolean filterResult = filterGroup.doFilter(null, context);
 		assertTrue(filterResult);
 	}
 

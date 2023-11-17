@@ -85,7 +85,7 @@ public class OTSpanDataParser extends AbstractOTLPDataParser<TracesData> {
 			throw pe;
 		}
 
-		ActivityContext cData = new ActivityContext(stream, data, tracesData);
+		ActivityContext cData = new ActivityContext(stream, data, tracesData).setParser(this);
 		cData.setMessage(toString(tracesData));
 
 		return cData;

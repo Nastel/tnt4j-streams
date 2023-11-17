@@ -27,6 +27,7 @@ import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.filters.AbstractExpressionFilter;
 import com.jkoolcloud.tnt4j.streams.filters.HandleType;
 import com.jkoolcloud.tnt4j.streams.filters.StreamEntityFilter;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
@@ -62,32 +63,11 @@ public class Matchers {
 	 * 
 	 * @throws Exception
 	 *             if evaluation expression is empty or evaluation of match expression fails
+	 * 
+	 * @see #evaluate(String, String, Object, java.util.Map)
 	 */
 	public static boolean evaluate(String expression, Object data) throws Exception {
-		String[] expTokens = tokenizeExpression(expression);
-		String evalType = expTokens[0];
-		String evalExpression = expTokens[1];
-
-		if (StringUtils.isEmpty(evalType)) {
-			evalType = "STRING"; // NON-NLS
-		}
-
-		switch (evalType.toUpperCase()) {
-		case "XPATH": // NON-NLS
-			return validateAndProcess(XPathMatcher.getInstance(), evalExpression, data);
-		case "REGEX": // NON-NLS
-		case "REGEXP": // NON-NLS
-			return validateAndProcess(RegExMatcher.getInstance(), evalExpression, data);
-		case "JPATH": // NON-NLS
-		case "JSONPATH": // NON-NLS
-			return validateAndProcess(JsonPathMatcher.getInstance(), evalExpression, data);
-		case "STRING": // NON-NLS
-			return validateAndProcess(StringMatcher.getInstance(), evalExpression, data);
-		case "RE2": // NON-NLS
-			return validateAndProcess(Re2jMatcher.getInstance(), evalExpression, data);
-		default:
-			return evaluate(evalType, evalExpression, data);
-		}
+		return evaluate(expression, data, null);
 	}
 
 	private static boolean validateAndProcess(Matcher matcher, String expression, Object data) throws Exception {
@@ -98,7 +78,8 @@ public class Matchers {
 		}
 	}
 
-	private static boolean evaluate(String evalLang, String evalExp, Object data) throws Exception {
+	private static boolean evaluate(String evalLang, String evalExp, Object data, Map<String, ?> context)
+			throws Exception {
 		String expression = evalLang + ':' + evalExp;
 		StreamEntityFilter<Object> ef = langEvaluatorsCache.get(expression);
 		if (ef == null) {
@@ -106,7 +87,7 @@ public class Matchers {
 			langEvaluatorsCache.put(expression, ef);
 		}
 
-		return ef.doFilter(data, null);
+		return ef.doFilter(data, context);
 	}
 
 	/**
@@ -116,18 +97,18 @@ public class Matchers {
 	 *            match expression string defining language used to evaluate expression and evaluation expression
 	 *            delimited by {@code ':'}, e.g. {@code "groovy:${ObjectName} == 'Foo'"}. If language is not defined,
 	 *            default is {@link com.jkoolcloud.tnt4j.streams.configure.jaxb.ScriptLangs#GROOVY}
-	 * @param ai
-	 *            activity entity instance to get context values for evaluation
+	 * @param context
+	 *            evaluation context map containing references to activity info, field, parser, stream and etc.
 	 * @return {@code true} if activity entity {@code ai} data values matches {@code expression}, {@code false} -
 	 *         otherwise
 	 * 
 	 * @throws java.lang.Exception
 	 *             if evaluation expression is empty or evaluation of match expression fails
 	 */
-	public static boolean evaluate(String expression, ActivityInfo ai) throws Exception {
+	public static boolean evaluateContext(String expression, Map<String, ?> context) throws Exception {
 		StreamEntityFilter<Object> ef = getFilterForExpression(expression);
 
-		return ef.doFilter(null, ai);
+		return ef.doFilter(null, context);
 	}
 
 	private static StreamEntityFilter<Object> getFilterForExpression(String expression) {
@@ -167,29 +148,61 @@ public class Matchers {
 	}
 
 	/**
-	 * Evaluates match {@code expression} against provided activity entity {@code ai} data or activity {@code data}
-	 * value.
+	 * Evaluates match {@code expression} against provided activity {@code data} value or evaluation {@code context }
+	 * map.
 	 * 
 	 * @param expression
-	 *            match expression string
+	 *            match expression string defining type of expression and evaluation expression delimited by
+	 *            {@code ':'}, e.g. {@code "regex:.*"}. If type of expression is not defined, default is
+	 *            {@code "string"}
 	 * @param data
 	 *            data to evaluate expression
-	 * @param ai
-	 *            activity entity instance to get context values for evaluation
-	 * @return {@code true} if activity entity {@code ai} data {@code data} values matches {@code expression},
+	 * @param context
+	 *            evaluation context map containing references to activity info, field, parser, stream and etc.
+	 * @return {@code true} if activity {@code data} value or evaluation {@code context} matches {@code expression},
 	 *         {@code false} - otherwise
 	 * 
 	 * @throws Exception
 	 *             if evaluation expression is empty or evaluation of match expression fails
 	 *
-	 * @see #evaluate(String, Object)
-	 * @see #evaluate(String, com.jkoolcloud.tnt4j.streams.fields.ActivityInfo)
+	 * @see #evaluateContext(String, java.util.Map)
 	 */
-	public static boolean evaluate(String expression, Object data, ActivityInfo ai) throws Exception {
-		if (Utils.isVariableExpression(expression)) {
-			return evaluate(expression, ai);
+	public static boolean evaluate(String expression, Object data, Map<String, ?> context) throws Exception {
+		if (data instanceof ActivityInfo && context == null) {
+			Map<String, Object> aiContext = new HashMap<>(1);
+			aiContext.put(StreamsConstants.CTX_ACTIVITY_DATA_KEY, data);
+
+			return evaluateContext(expression, aiContext);
 		}
-		return evaluate(expression, data);
+
+		if (Utils.isVariableExpression(expression)) {
+			return evaluateContext(expression, context);
+		}
+
+		String[] expTokens = tokenizeExpression(expression);
+		String evalType = expTokens[0];
+		String evalExpression = expTokens[1];
+
+		if (StringUtils.isEmpty(evalType)) {
+			evalType = "STRING"; // NON-NLS
+		}
+
+		switch (evalType.toUpperCase()) {
+		case "XPATH": // NON-NLS
+			return validateAndProcess(XPathMatcher.getInstance(), evalExpression, data);
+		case "REGEX": // NON-NLS
+		case "REGEXP": // NON-NLS
+			return validateAndProcess(RegExMatcher.getInstance(), evalExpression, data);
+		case "JPATH": // NON-NLS
+		case "JSONPATH": // NON-NLS
+			return validateAndProcess(JsonPathMatcher.getInstance(), evalExpression, data);
+		case "STRING": // NON-NLS
+			return validateAndProcess(StringMatcher.getInstance(), evalExpression, data);
+		case "RE2": // NON-NLS
+			return validateAndProcess(Re2jMatcher.getInstance(), evalExpression, data);
+		default:
+			return evaluate(evalType, evalExpression, data, context);
+		}
 	}
 
 	/**

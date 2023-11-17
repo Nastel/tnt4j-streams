@@ -18,8 +18,6 @@ package com.jkoolcloud.tnt4j.streams.filters;
 
 import java.util.Map;
 
-import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
-
 /**
  * This interface defines common operations for data value filters used by TNT4J-Streams.
  *
@@ -36,35 +34,15 @@ public interface StreamEntityFilter<T> {
 	 * 
 	 * @param value
 	 *            data value to apply filter
-	 * @param ai
-	 *            activity entity instance
+	 * @param context
+	 *            filtering context map containing references to activity info, field, parser, stream and etc.
 	 * @return {@code true} if filter matching value should be excluded from streaming, {@code false} - otherwise
 	 * 
 	 * @throws com.jkoolcloud.tnt4j.streams.filters.FilterException
 	 *             if evaluation of filter fails
 	 * 
-	 * @see #doFilter(Object, com.jkoolcloud.tnt4j.streams.fields.ActivityInfo, String)
 	 */
-	default boolean doFilter(T value, ActivityInfo ai) throws FilterException {
-		return doFilter(value, ai, null);
-	}
-
-	/**
-	 * Applies filtering operation for a provided data value and returns flag indicating whether it should be excluded
-	 * from streaming.
-	 * 
-	 * @param value
-	 *            data value to apply filter
-	 * @param ai
-	 *            activity entity instance
-	 * @param fieldName
-	 *            name of field performing transformation
-	 * @return {@code true} if filter matching value should be excluded from streaming, {@code false} - otherwise
-	 * 
-	 * @throws com.jkoolcloud.tnt4j.streams.filters.FilterException
-	 *             if evaluation of filter fails
-	 */
-	boolean doFilter(T value, ActivityInfo ai, String fieldName) throws FilterException;
+	boolean doFilter(T value, Map<String, ?> context) throws FilterException;
 
 	/**
 	 * Applies filtering operation for a provided data values map and returns flag indicating whether it should be

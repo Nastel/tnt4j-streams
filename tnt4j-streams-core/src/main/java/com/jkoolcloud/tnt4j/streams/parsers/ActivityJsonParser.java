@@ -235,7 +235,7 @@ public class ActivityJsonParser extends GenericActivityParser<DocumentContext> {
 			jsonString = jsonDoc.jsonString();
 		}
 
-		ActivityContext cData = new ActivityContext(stream, data, jsonDoc);
+		ActivityContext cData = new ActivityContext(stream, data, jsonDoc).setParser(this);
 		cData.setMessage(jsonString);
 
 		return cData;

@@ -194,7 +194,7 @@ public class ActivityField extends AbstractFieldEntity {
 	}
 
 	@Override
-	String getName() {
+	public String getName() {
 		return fieldTypeName;
 	}
 
@@ -898,11 +898,15 @@ public class ActivityField extends AbstractFieldEntity {
 	 *            activity entity instance to get additional value for a transformation
 	 * @return transformed field value
 	 *
-	 * @see #transformValue(Object, ActivityInfo, com.jkoolcloud.tnt4j.streams.transform.ValueTransformation.Phase)
+	 * @see #transformValue(Object, java.util.Map, com.jkoolcloud.tnt4j.streams.transform.ValueTransformation.Phase)
 	 */
 	protected Object transform(Object fieldValue, ActivityInfo ai) {
 		try {
-			fieldValue = transformValue(fieldValue, ai, ValueTransformation.Phase.AGGREGATED);
+			Map<String, Object> context = new HashMap<>(2);
+			context.put(StreamsConstants.CTX_ACTIVITY_DATA_KEY, ai);
+			context.put(StreamsConstants.CTX_FIELD_KEY, this);
+
+			fieldValue = transformValue(fieldValue, context, ValueTransformation.Phase.AGGREGATED);
 		} catch (Exception exc) {
 			LoggerUtils.logThrowable(LOGGER, OpLevel.WARNING,
 					StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
@@ -1061,8 +1065,8 @@ public class ActivityField extends AbstractFieldEntity {
 		}
 
 		@Override
-		public Boolean matchExp(NamedObject caller, Object value, ActivityInfo ai, ActivityField field) {
-			return parserRef.matchExp(caller, value, ai, field);
+		public Boolean matchExp(NamedObject caller, Object value, Map<String, ?> context) {
+			return parserRef.matchExp(caller, value, context);
 		}
 
 		@Override

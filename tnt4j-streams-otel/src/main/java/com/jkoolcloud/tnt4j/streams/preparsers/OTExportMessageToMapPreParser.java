@@ -18,7 +18,7 @@ package com.jkoolcloud.tnt4j.streams.preparsers;
 
 import java.util.*;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors;

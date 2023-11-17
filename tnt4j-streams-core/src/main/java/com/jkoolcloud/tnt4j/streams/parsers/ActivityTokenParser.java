@@ -198,7 +198,7 @@ public class ActivityTokenParser extends GenericActivityParser<String[]> {
 		logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 				"ActivityParser.split", fields.length);
 
-		ActivityContext cData = new ActivityContext(stream, data, fields);
+		ActivityContext cData = new ActivityContext(stream, data, fields).setParser(this);
 		// cData.setMessage(getRawDataAsMessage(fields));
 
 		return cData;

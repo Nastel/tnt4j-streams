@@ -17,10 +17,10 @@
 package com.jkoolcloud.tnt4j.streams.transform;
 
 import java.util.Collections;
+import java.util.Map;
 
 import javax.xml.xpath.XPathFunction;
 
-import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 
 /**
@@ -38,17 +38,15 @@ public abstract class AbstractFunction<V> extends AbstractValueTransformation<V,
 	 *
 	 * @param value
 	 *            data value to transform
-	 * @param ai
-	 *            activity entity instance
-	 * @param fieldName
-	 *            name of field performing transformation
+	 * @param context
+	 *            transformation context map containing references to activity info, field, parser, stream and etc.
 	 * @return transformed value
 	 *
 	 * @throws com.jkoolcloud.tnt4j.streams.transform.TransformationException
 	 *             if function evaluation fails
 	 */
 	@Override
-	public Object transform(V value, ActivityInfo ai, String fieldName) throws TransformationException {
+	public Object transform(V value, Map<String, ?> context) throws TransformationException {
 		try {
 			return evaluate(Collections.singletonList(value));
 		} catch (Exception exc) {
