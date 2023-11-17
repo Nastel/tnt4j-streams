@@ -123,4 +123,14 @@ public interface TNTStreamOutput<T> extends NamedObject {
 	 *            the {@code OutputStreamListener} to be added
 	 */
 	void addOutputListener(OutputStreamListener listener);
+
+	/**
+	 * Checks if this stream output instance has sink reference by provided sink identifier.
+	 * 
+	 * @param sinkId
+	 *            sink identifier
+	 * @return {@code true} if this stream output instance has sink reference by provided sink identifier, {@code false}
+	 *         - otherwise
+	 */
+	boolean hasSink(String sinkId);
 }
