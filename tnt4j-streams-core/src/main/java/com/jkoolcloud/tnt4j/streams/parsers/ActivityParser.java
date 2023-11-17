@@ -476,7 +476,9 @@ public abstract class ActivityParser implements NamedObject {
 		if (StringUtils.isEmpty(loc)) {
 			return loc;
 		}
-		return locatorsMap.computeIfAbsent(loc, initFnc);
+		synchronized (locatorsMap) {
+			return locatorsMap.computeIfAbsent(loc, initFnc);
+		}
 	}
 
 	/**
