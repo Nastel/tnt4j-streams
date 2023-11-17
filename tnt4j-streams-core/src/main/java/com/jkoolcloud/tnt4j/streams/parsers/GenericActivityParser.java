@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
@@ -125,7 +126,8 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	private boolean autoArrangeFields = true;
 	private ActivityField parentIdField;
 
-	private CustomProperties<String> customProperties = new CustomProperties<>(5);
+	private final CustomProperties<String> customProperties = new CustomProperties<>(5);
+	private final Map<String, Object> locatorsMap = new HashMap<>(10);
 
 	/**
 	 * Constructs a new GenericActivityParser.
@@ -1300,6 +1302,33 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 */
 	protected abstract Object resolveLocatorValue(ActivityFieldLocator locator, ActivityContext cData,
 			AtomicBoolean formattingNeeded) throws ParseException;
+
+	/**
+	 * Evaluates locator string expression defined locator objects: token arrays, alterations, etc.
+	 * <p>
+	 * Evaluated object gets stored on map to access it without repeating evaluation.
+	 *
+	 * @param loc
+	 *            locator string to resolve map entry
+	 * @param initFnc
+	 *            function to evaluate locator object for a new entry
+	 * @return locator string expression defined locator object
+	 */
+	protected Object getPreparedLocator(String loc, Function<String, Object> initFnc) {
+		if (StringUtils.isEmpty(loc)) {
+			return loc;
+		}
+
+		Object prepLoc = locatorsMap.get(loc);
+		if (prepLoc == null) {
+			synchronized (locatorsMap) {
+				prepLoc = initFnc.apply(loc);
+				locatorsMap.put(loc, prepLoc);
+			}
+		}
+
+		return prepLoc;
+	}
 
 	/**
 	 * Makes string representation of data package to put into log.
