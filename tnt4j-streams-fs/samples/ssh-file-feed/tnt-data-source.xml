@@ -8,12 +8,12 @@
 
     <stream name="FileStream" class="com.jkoolcloud.tnt4j.streams.inputs.FileSystemCharacterStream">
         <property name="HaltIfNoParser" value="false"/>
-        <!-- <property name="FileName" value="ssh.unix://osboxes@172.16.6.26:22/home/osboxes/single-log/orders.log"/> -->
+        <!-- <property name="FileName" value="ssh.unix://osboxes@127.0.0.1:22/home/osboxes/single-log/orders.log"/> -->
 
         <property name="FileName" value="ssh.unix:///home/osboxes/single-log/orders.log"/>
 
         <property name="UserName" value="osboxes"/>
-        <property name="Host" value="172.16.6.64"/>
+        <property name="Host" value="127.0.0.1"/>
         <property name="Port" value="22"/>
         <property name="Password" value="slabs"/>
 
