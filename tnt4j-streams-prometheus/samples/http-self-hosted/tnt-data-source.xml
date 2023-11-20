@@ -45,7 +45,7 @@
         <property name="ExecutorRejectedTaskOfferTimeout" value="20"/>
 
         <tnt4j-properties>
-            <!-- Set your CloudWatch data center name -->
+            <!-- Set your Prometheus data center name -->
             <property name="source.factory.DATACENTER" value="Prometheus"/>
             <!--            <property name="source.factory.SERVICE" value="MSK"/>-->
             <!--            <property name="source.factory.GEOADDR" value="us-east-1"/>-->

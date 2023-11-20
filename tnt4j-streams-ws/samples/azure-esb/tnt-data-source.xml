@@ -25,10 +25,16 @@
         <property name="HaltIfNoParser" value="false"/>
         <property name="SplitRelatives" value="true"/>
         <property name="SendStreamStates" value="false"/>
+        <property name="BuildSourceFQNFromStreamedData" value="false"/>
         <property name="RetryStateCheck" value="true"/>
         <property name="RetryInterval" value="300"/>
 
         <tnt4j-properties>
+            <!-- Set your Azure Cloud data center name -->
+            <property name="source.factory.DATACENTER" value="Azure_Cloud"/>
+            <property name="source.factory.RootFQN" value="DATACENTER=?"/>
+            <property name="tracker.default.snapshot.category" value="Azure-metrics"/>
+
             <!-- Sequence of sinks to broadcast stream produced activities. You may leave just one of them to sent data to single endpoint -->
             <property name="event.sink.factory.BroadcastSequence" value="ap"/>
 
