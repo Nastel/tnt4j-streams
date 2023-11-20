@@ -80,7 +80,7 @@
 
         <field name="EventType" value="Snapshot"/>
         <field name="Severity" value="INFO"/>
-        <field name="RoutePath" value="xray"/>
+        <field name="RoutePath" value="xray" transparent="true"/>
 
         <field name="MetricStreamName" locator="$.metric_stream_name" locator-type="Label"/>
         <field name="UserName" locator="$.account_id" locator-type="Label"/>
@@ -120,7 +120,7 @@
 
         <field name="EventType" value="Snapshot"/>
         <field name="Severity" value="INFO"/>
-        <field name="RoutePath" value="ap"/>
+        <field name="RoutePath" value="ap" transparent="true"/>
 
         <field name="MetricStreamName" locator="$.metric_stream_name" locator-type="Label" transparent="true"/>
         <field name="UserName" locator="$.account_id" locator-type="Label" transparent="true"/>

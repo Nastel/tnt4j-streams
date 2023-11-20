@@ -158,7 +158,7 @@
         <property name="ActivityDelim" value="EOF"/>
 
         <field name="@SplitRelatives@" value="true" transparent="true"/>
-        <field name="RoutePath" value="ap"/>
+        <field name="RoutePath" value="ap" transparent="true"/>
 
         <field name="EventType" value="NOOP"/>
 

@@ -894,11 +894,10 @@ public class ActivityInfo {
 
 		if (activityProperties != null) {
 			for (Property ap : activityProperties.values()) {
-				if (ap.isTransient()) {
-					continue;
-				}
-
 				if (ap.getValue() instanceof Snapshot) {
+					if (ap.isTransient()) {
+						continue;
+					}
 					event.getOperation().addSnapshot((Snapshot) ap.getValue());
 				} else {
 					event.getOperation().addProperty(ap);
@@ -993,11 +992,10 @@ public class ActivityInfo {
 
 		if (activityProperties != null) {
 			for (Property ap : activityProperties.values()) {
-				if (ap.isTransient()) {
-					continue;
-				}
-
 				if (ap.getValue() instanceof Trackable) {
+					if (ap.isTransient()) {
+						continue;
+					}
 					activity.add((Trackable) ap.getValue());
 				} else {
 					activity.addProperty(ap);
@@ -1334,10 +1332,6 @@ public class ActivityInfo {
 
 		if (activityProperties != null) {
 			for (Property ap : activityProperties.values()) {
-				if (ap.isTransient()) {
-					continue;
-				}
-
 				snapshot.add(ap);
 			}
 		}
