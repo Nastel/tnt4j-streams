@@ -14,7 +14,7 @@
     <artifactId>tnt4j-streams-msoffice</artifactId>
 
     <properties>
-        <org.apache.poi.version>5.2.3</org.apache.poi.version>
+        <org.apache.poi.version>5.2.4</org.apache.poi.version>
     </properties>
 
     <build>
