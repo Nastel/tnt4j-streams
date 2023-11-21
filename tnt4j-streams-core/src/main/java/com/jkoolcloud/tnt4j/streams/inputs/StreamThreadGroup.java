@@ -72,7 +72,7 @@ public class StreamThreadGroup extends ThreadGroup {
 		enumerate(atl, false);
 
 		for (Thread t : atl) {
-			if (!isStreamThread(t) && !isShutdownHookThread(t)) {
+			if (t != null && !isStreamThread(t) && !isShutdownHookThread(t)) {
 				Thread tTerminator = new Thread(new ThreadTerminator(t));
 				tTerminator.start();
 			}
