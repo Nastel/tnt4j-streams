@@ -122,8 +122,8 @@
                 ${domain} + ":" + props
             ]]></field-transform>
         </field>
-        <field name="Category" locator="MetricType" locator-type="Activity" separator="String"/>
-        <field name="domain" value="Azure_ESB" transparent="true"/>
+        <field name="Category" locator="MetricType" locator-type="Activity"/>
+        <field name="domain" value="" transparent="true" emptyAsNull="false"/>
 
         <field name="MetricId" locator="id" locator-type="Label" datatype="String"/>
         <field name="ResourceName" value="" transparent="true">
