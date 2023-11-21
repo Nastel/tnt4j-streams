@@ -4601,6 +4601,9 @@ These parameters are applicable to all types of streams.
       Actual only if `UseExecutors` is set to `true`
         * `ExecutorRejectedTaskOfferTimeout` - time to wait (in seconds) for a task to be inserted into bounded queue if max. queue size is
           reached. Default value - `20sec`. (Optional) Actual only if `ExecutorsBoundedModel` is set to `true`.
+    * `ExecutorsImmediateShutdown` - flag indicating whether executor service shutdown shall be `immediate` (dropping all pending tasks) or 
+      `graceful` (trying to complete processing of pending tasks). Default value - `false`, meaning executors shall shutdown gracefully.
+      (Optional)
 * `PingLogActivityCount` - defines repetitive number of streamed activity entities to put "ping" log entry with stream statistics. Default
   value - `-1` meaning `NEVER`. (Optional, can be OR'ed with `PingLogActivityDelay`).
 * `PingLogActivityDelay` - defines repetitive interval in seconds between "ping" log entries with stream statistics. Default value - `-1`
@@ -4616,6 +4619,7 @@ Sample:
 <property name="ExecutorsTerminationTimeout" value="20"/>
 <property name="ExecutorsBoundedModel" value="true"/>
 <property name="ExecutorRejectedTaskOfferTimeout" value="20"/>
+<property name="ExecutorsImmediateShutdown" value="true"/>
 <!-- to define "ping" log entry on every 200th streamed activity entity, or if 30sec. elapsed since last "ping" entry -->
 <property name="PingLogActivityCount" value="200"/>
 <property name="PingLogActivityDelay" value="30"/>

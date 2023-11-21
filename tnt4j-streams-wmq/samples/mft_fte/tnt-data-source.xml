@@ -296,6 +296,7 @@
         <!-- time to wait (in seconds) for a task to be inserted into bounded queue if max.
          queue size is reached. Default value - 20sec -->
         <property name="ExecutorRejectedTaskOfferTimeout" value="20"/>
+        <property name="ExecutorsImmediateShutdown" value="false"/>
 
         <!-- In case of SSL Connection: cipher suite value must match one defined for server connection channel -->
         <!--<property name="CMQC.SSL_CIPHER_SUITE_PROPERTY" value="TLS_RSA_WITH_AES_128_CBC_SHA256"/>-->

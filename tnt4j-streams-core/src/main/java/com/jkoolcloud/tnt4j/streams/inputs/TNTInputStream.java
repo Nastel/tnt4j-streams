@@ -50,6 +50,9 @@ import com.jkoolcloud.tnt4j.utils.SecurityUtils;
  * <li>ExecutorsTerminationTimeout - time to wait (in seconds) for a task to be inserted into bounded queue if max.
  * queue size is reached. Default value - {@code 20}. (Optional, actual only if {@code ExecutorsBoundedModel} is set to
  * {@code true})</li>
+ * <li>ExecutorsImmediateShutdown - flag indicating whether executor service shutdown shall be immediate (dropping all
+ * pending tasks) or graceful (trying to complete processing of pending tasks). Default value - {@code false}, meaning
+ * executors shall shutdown gracefully. (Optional)</li>
  * <li>PingLogActivityCount - defines repetitive number of streamed activity entities to put "ping" log entry with
  * stream statistics. Default value - {@code -1} meaning "NEVER". (Optional, can be OR'ed with
  * {@code PingLogActivityDelay})</li>
@@ -60,6 +63,9 @@ import com.jkoolcloud.tnt4j.utils.SecurityUtils;
  * stream itself, but can be used in stream bound parsers configuration over dynamic locators or variable expressions to
  * enrich parsing context. (Optional)</li>
  * </ul>
+ * 
+ * Property identifies whether executor service shutdown shall be immediate (dropping all pending tasks) or graceful
+ * (trying to process all pending tasks).
  *
  * @param <T>
  *            the type of handled RAW activity data
@@ -107,6 +113,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	private int executorThreadsQty = DEFAULT_EXECUTOR_THREADS_QTY;
 	private int executorsTerminationTimeout = DEFAULT_EXECUTORS_TERMINATION_TIMEOUT;
 	private int executorRejectedTaskOfferTimeout = DEFAULT_EXECUTOR_REJECTED_TASK_TIMEOUT;
+	private boolean executorImmediateShutdown = false;
 
 	private int pingLogActivitiesCount = -1;
 	private int pingLogActivitiesDelay = -1;
@@ -236,6 +243,8 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 			executorsTerminationTimeout = Integer.parseInt(value);
 		} else if (StreamProperties.PROP_EXECUTORS_BOUNDED.equalsIgnoreCase(name)) {
 			boundedExecutorModel = Utils.toBoolean(value);
+		} else if (StreamProperties.PROP_EXECUTORS_IMMEDIATE_SHUTDOWN.equalsIgnoreCase(name)) {
+			executorImmediateShutdown = Utils.toBoolean(value);
 		} else if (StreamProperties.PROP_PING_LOG_ACTIVITY_COUNT.equalsIgnoreCase(name)) {
 			pingLogActivitiesCount = Integer.parseInt(value);
 		} else if (StreamProperties.PROP_PING_LOG_ACTIVITY_DELAY.equalsIgnoreCase(name)) {
@@ -287,6 +296,9 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 		}
 		if (StreamProperties.PROP_EXECUTORS_BOUNDED.equalsIgnoreCase(name)) {
 			return boundedExecutorModel;
+		}
+		if (StreamProperties.PROP_EXECUTORS_IMMEDIATE_SHUTDOWN.equalsIgnoreCase(name)) {
+			return executorImmediateShutdown;
 		}
 		if (StreamProperties.PROP_STREAM_NAME.equalsIgnoreCase(name)) {
 			return this.name;
@@ -741,9 +753,11 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 			return;
 		}
 
-		streamExecutorService.shutdown();
 		try {
-			streamExecutorService.awaitTermination(executorsTerminationTimeout, TimeUnit.SECONDS);
+			if (!executorImmediateShutdown) {
+				streamExecutorService.shutdown();
+				streamExecutorService.awaitTermination(executorsTerminationTimeout, TimeUnit.SECONDS);
+			}
 		} catch (InterruptedException exc) {
 			halt(true);
 		} finally {
@@ -794,8 +808,10 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 						if (streamExecutorService == null) {
 							processActivityItem_(item, failureFlag);
 						} else {
-							streamExecutorService
-									.submit(new ActivityItemProcessingTask(item, failureFlag, getActivityPosition()));
+							if (!isShotDown()) {
+								streamExecutorService.submit(
+										new ActivityItemProcessingTask(item, failureFlag, getActivityPosition()));
+							}
 						}
 					}
 				} catch (IllegalStateException ise) {

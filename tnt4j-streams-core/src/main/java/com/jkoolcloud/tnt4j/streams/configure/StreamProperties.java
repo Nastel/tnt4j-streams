@@ -106,6 +106,11 @@ public interface StreamProperties extends OutputProperties {
 	/**
 	 * Constant for name of built-in {@value} property.
 	 */
+	String PROP_EXECUTORS_IMMEDIATE_SHUTDOWN = "ExecutorsImmediateShutdown"; // NON-NLS
+
+	/**
+	 * Constant for name of built-in {@value} property.
+	 */
 	String PROP_KEYSTORE = "Keystore"; // NON-NLS
 
 	/**

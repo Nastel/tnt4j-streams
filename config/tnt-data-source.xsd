@@ -688,6 +688,15 @@
                 </xs:annotation>
             </xs:enumeration>
 
+            <xs:enumeration value="ExecutorsImmediateShutdown">
+                <xs:annotation>
+                    <xs:documentation>
+                        Property identifies whether executor service shutdown shall be immediate (dropping all pending tasks) or graceful
+                        (trying to complete processing of pending tasks).
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
             <xs:enumeration value="Keystore">
                 <xs:annotation>
                     <xs:documentation>

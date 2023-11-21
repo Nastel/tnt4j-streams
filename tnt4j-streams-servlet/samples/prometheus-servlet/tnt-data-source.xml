@@ -35,6 +35,7 @@
         <property name="ExecutorsTerminationTimeout" value="20"/>
         <property name="ExecutorsBoundedModel" value="true"/>
         <property name="ExecutorRejectedTaskOfferTimeout" value="20"/>
+        <property name="ExecutorsImmediateShutdown" value="true"/>
 
         <tnt4j-properties>
             <!-- Set your Prometheus data center name -->

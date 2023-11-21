@@ -24,6 +24,7 @@
         <!--<property name="ExecutorsTerminationTimeout" value="20"/>-->
         <!--<property name="ExecutorsBoundedModel" value="false"/>-->
         <!--<property name="ExecutorRejectedTaskOfferTimeout" value="20"/>-->
+        <!--<property name="ExecutorsImmediateShutdown" value="false"/>-->
 
         <scenario name="PG Statistics reporting scenario"
                   url="jdbc:postgresql://[PG_HOST]:5432/postgres"

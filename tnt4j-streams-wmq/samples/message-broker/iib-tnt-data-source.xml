@@ -148,6 +148,7 @@
         <property name="ExecutorsTerminationTimeout" value="20"/>
         <property name="ExecutorsBoundedModel" value="true"/>
         <property name="ExecutorRejectedTaskOfferTimeout" value="20"/>
+        <property name="ExecutorsImmediateShutdown" value="false"/>
 
         <parser-ref name="EventParser"/>
     </stream>

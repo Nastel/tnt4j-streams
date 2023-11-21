@@ -50,6 +50,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="ExecutorRejectedTaskOfferTimeout"/&gt;
  *     &lt;enumeration value="ExecutorsTerminationTimeout"/&gt;
  *     &lt;enumeration value="ExecutorsBoundedModel"/&gt;
+ *     &lt;enumeration value="ExecutorsImmediateShutdown"/&gt;
  *     &lt;enumeration value="Keystore"/&gt;
  *     &lt;enumeration value="KeystorePass"/&gt;
  *     &lt;enumeration value="KeyPass"/&gt;
@@ -253,6 +254,16 @@ public enum StreamProperties {
 	 */
 	@XmlEnumValue("ExecutorsBoundedModel")
 	EXECUTORS_BOUNDED_MODEL("ExecutorsBoundedModel"),
+
+	/**
+	 * 
+	 * Property identifies whether executor service shutdown shall be immediate (dropping all pending tasks) or graceful
+	 * (trying to complete processing of pending tasks).
+	 * 
+	 * 
+	 */
+	@XmlEnumValue("ExecutorsImmediateShutdown")
+	EXECUTORS_IMMEDIATE_SHUTDOWN("ExecutorsImmediateShutdown"),
 
 	/**
 	 * 
