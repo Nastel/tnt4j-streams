@@ -749,7 +749,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	}
 
 	private synchronized void shutdownExecutors() {
-		if (streamExecutorService == null || streamExecutorService.isShutdown()) {
+		if (isExecutorServiceDown()) {
 			return;
 		}
 
@@ -805,12 +805,16 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 							halt(false); // no more data items to process
 						}
 					} else {
-						if (streamExecutorService == null) {
+						if (isExecutorServiceOff()) {
 							processActivityItem_(item, failureFlag);
 						} else {
-							if (!isShotDown()) {
+							if (!isExecutorServiceDown()) {
 								streamExecutorService.submit(
 										new ActivityItemProcessingTask(item, failureFlag, getActivityPosition()));
+							} else {
+								logger().log(OpLevel.DEBUG,
+										StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+										"TNTInputStream.task.rejected", item);
 							}
 						}
 					}
@@ -845,6 +849,18 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 		} finally {
 			shutdownStream();
 		}
+	}
+
+	private boolean isExecutorServiceOff() {
+		return streamExecutorService == null;
+	}
+
+	private boolean isExecutorServiceDown() {
+		return isExecutorServiceOff() || streamExecutorService.isShutdown();
+	}
+
+	private boolean isExecutorServiceTerminated() {
+		return isExecutorServiceDown() || streamExecutorService.isTerminated();
 	}
 
 	/**
@@ -956,7 +972,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *         otherwise
 	 */
 	protected boolean hasPendingExecutions() {
-		return streamExecutorService != null && !((ThreadPoolExecutor) streamExecutorService).getQueue().isEmpty();
+		return !isExecutorServiceOff() && !((ThreadPoolExecutor) streamExecutorService).getQueue().isEmpty();
 	}
 
 	/**
