@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.impl.bootstrap.HttpServer;
 import org.apache.hc.core5.http.impl.bootstrap.ServerBootstrap;
@@ -218,7 +219,8 @@ public class HttpStream extends AbstractBufferedStream<Map<String, ?>> {
 						"HttpStream.connection.timed.out");
 			} else if (ex instanceof ConnectionClosedException) {
 				LOGGER.log(OpLevel.ERROR, Utils.getExceptionMessages(ex));
-			} else if (ex instanceof SocketException && ex.getMessage().contains("closed")) { // NON-NLS
+			} else if (ex instanceof SocketException
+					&& StringUtils.containsAnyIgnoreCase(ex.getMessage(), "closed", "interrupted")) { // NON-NLS
 				LOGGER.log(OpLevel.WARNING, ex.getMessage());
 			} else if (ex instanceof javax.net.ssl.SSLHandshakeException) {
 				LOGGER.log(OpLevel.ERROR, Utils.getExceptionMessages(ex));
