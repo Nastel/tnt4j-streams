@@ -2833,7 +2833,6 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @return boolean value resolved from provided {@code value}, or {@code null} if {@code value} does not represent
 	 *         boolean
 	 *
-	 * @see org.apache.commons.lang3.BooleanUtils#toBoolean(int)
 	 * @see org.apache.commons.lang3.BooleanUtils#toBoolean(String)
 	 */
 	public static Boolean getBoolean(Object value) {
@@ -2844,6 +2843,33 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			String vStr = toString(value);
 
 			return BooleanUtils.toBoolean(vStr);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Converts provided object type {@code value} to a Boolean.
+	 * <p>
+	 * {@code value} will be converted to real boolean value only if string representation of it is {@code "true"} or
+	 * {@code "false"} (case insensitive). In all other cases {@code null} is returned.
+	 *
+	 * @param value
+	 *            object value to convert to a Boolean
+	 * @return boolean value resolved from provided {@code value}, or {@code null} if {@code value} does not represent
+	 *         boolean
+	 */
+	public static Boolean getBooleanStrict(Object value) {
+		if (value != null) {
+			String vStr = toString(value);
+
+			if ("true".equalsIgnoreCase(vStr)) { // NON-NLS
+				return true;
+			}
+
+			if ("false".equalsIgnoreCase(vStr)) { // NON-NLS
+				return false;
+			}
 		}
 
 		return null;

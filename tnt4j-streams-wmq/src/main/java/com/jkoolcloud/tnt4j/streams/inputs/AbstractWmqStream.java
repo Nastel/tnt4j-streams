@@ -239,7 +239,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 			}
 
 			if (mqcVal != null) {
-				Object cVal = Utils.getBoolean(value);
+				Object cVal = Utils.getBooleanStrict(value);
 				if (cVal == null) {
 					try {
 						cVal = Integer.parseInt(value);
