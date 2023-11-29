@@ -42,7 +42,7 @@
             <!--<property name="event.sink.factory.EventSinkFactory.ap.LogSink" value="file:./logs/tnt4j-streams_samples_socket.log"/>-->
             <property name="event.sink.factory.EventSinkFactory.ap.LogSink" value="null"/>
             <property name="event.sink.factory.EventSinkFactory.ap.Host" value="localhost"/>
-            <property name="event.sink.factory.EventSinkFactory.ap.Port" value="6060"/>
+            <property name="event.sink.factory.EventSinkFactory.ap.Port" value="6063"/>
 
             <!-- Activities routing by activity field "RoutePath" value "ap" or null -->
             <property name="event.sink.factory.EventSinkFactory.ap.Filter"
@@ -96,7 +96,7 @@
                         <matchExp><![CDATA[
                                StringUtils.isNotEmpty(${Token})
                             && ${TokenExpires} > 0
-                            && (System.currentTimeMillis () - ${TokenExpires}) < TimeUnit.SECONDS.toMillis(10)
+                            && (System.currentTimeMillis () - ${TokenExpires}) < TimeUnit.MINUTES.toMillis(5)
                        ]]></matchExp>
                     </condition>
 
@@ -113,6 +113,7 @@
                 <property name="AzureESBNamespace" value="xxxxxx"/>
                 <!-- The interval (i.e. timegrain) of the query. Values may be: PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H, P1D -->
                 <property name="AzureMetricsInterval" value="PT5M"/>
+                <property name="FilteredTopLimit" value="500"/>
 
                 <!--<schedule-cron expression="0 0/5 * * * ?"/>-->
                 <schedule-simple interval="5" units="Minutes" startDelay="10" startDelayUnits="Seconds" repeatCount="-1"/>
@@ -174,7 +175,7 @@
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
 
-                <request id="GetEntitiesMetricsCount"><![CDATA[
+                <request id="GetEntityMetricsCount"><![CDATA[
                     https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
@@ -187,12 +188,12 @@
                     <req-param id="timespan" value="${Timespan}"/>
                     <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="EntityName eq '*'"/>
-                    <req-param id="top" value="500"/>
+                    <req-param id="top" value="${FilteredTopLimit}"/>
 
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
 
-                <request id="GetEntitiesMetricsTotal"><![CDATA[
+                <request id="GetEntityMetricsTotal"><![CDATA[
                     https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
@@ -205,12 +206,12 @@
                     <req-param id="timespan" value="${Timespan}"/>
                     <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="EntityName eq '*'"/>
-                    <req-param id="top" value="500"/>
+                    <req-param id="top" value="${FilteredTopLimit}"/>
 
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
 
-                <request id="GetEntitiesMetricsMin"><![CDATA[
+                <request id="GetEntityMetricsMin"><![CDATA[
                     https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
@@ -223,12 +224,12 @@
                     <req-param id="timespan" value="${Timespan}"/>
                     <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="EntityName eq '*'"/>
-                    <req-param id="top" value="500"/>
+                    <req-param id="top" value="${FilteredTopLimit}"/>
 
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
 
-                <request id="GetEntitiesMetricsMax"><![CDATA[
+                <request id="GetEntityMetricsMax"><![CDATA[
                     https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
@@ -241,12 +242,12 @@
                     <req-param id="timespan" value="${Timespan}"/>
                     <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="EntityName eq '*'"/>
-                    <req-param id="top" value="500"/>
+                    <req-param id="top" value="${FilteredTopLimit}"/>
 
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
 
-                <request id="GetEntitiesMetricsAvg"><![CDATA[
+                <request id="GetEntityMetricsAvg"><![CDATA[
                     https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
@@ -259,12 +260,12 @@
                     <req-param id="timespan" value="${Timespan}"/>
                     <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="EntityName eq '*'"/>
-                    <req-param id="top" value="500"/>
+                    <req-param id="top" value="${FilteredTopLimit}"/>
 
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
 
-                <request id="GetThrottleMetrics"><![CDATA[
+                <request id="GetErrorSubCodeMetrics"><![CDATA[
                     https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
@@ -276,10 +277,46 @@
                     <req-param id="timespan" value="${Timespan}"/>
                     <req-param id="interval" value="${AzureMetricsInterval}"/>
                     <req-param id="$filter" value="MessagingErrorSubCode eq '*'"/>
-                    <req-param id="top" value="500"/>
+                    <req-param id="top" value="${FilteredTopLimit}"/>
 
                     <parser-ref name="AzureESBMetricsParser"/>
                 </request>
+
+                <!-- Filtering by OperationResult does not work -->
+                <!--request id="GetOperationResultMetrics"><![CDATA[
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                ]]>
+
+                    <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
+
+                    <req-param id="api-version" value="2021-05-01"/>
+                    <req-param id="metricnames" value="SuccessfulRequests,ServerErrors,UserErrors"/>
+                    <req-param id="aggregation" value="count,total,minimum,maximum,average"/>
+                    <req-param id="timespan" value="${Timespan}"/>
+                    <req-param id="interval" value="${AzureMetricsInterval}"/>
+                    <req-param id="$filter" value="OperationResult eq '*'"/>
+                    <req-param id="top" value="${FilteredTopLimit}"/>
+
+                    <parser-ref name="AzureESBMetricsParser"/>
+                </request-->
+
+                <!-- Requires Premium tier -->
+                <!--request id="GetReplicaMetrics"><![CDATA[
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                ]]>
+
+                    <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
+
+                    <req-param id="api-version" value="2021-05-01"/>
+                    <req-param id="metricnames" value="NamespaceCpuUsage,NamespaceMemoryUsage"/>
+                    <req-param id="aggregation" value="count,total,minimum,maximum,average"/>
+                    <req-param id="timespan" value="${Timespan}"/>
+                    <req-param id="interval" value="${AzureMetricsInterval}"/>
+                    <req-param id="$filter" value="Replica eq '*'"/>
+                    <req-param id="top" value="${FilteredTopLimit}"/>
+
+                    <parser-ref name="AzureESBMetricsParser"/>
+                </request-->
             </step>
         </scenario>
     </stream>
