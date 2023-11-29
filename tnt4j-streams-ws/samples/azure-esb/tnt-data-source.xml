@@ -83,8 +83,8 @@
 
                 <property name="SynchronizeRequests" value="true"/>
 
-                <!--<schedule-cron expression="0 0 0/1 * * ?"/>-->
-                <schedule-simple interval="1" units="Hours" startDelay="0" startDelayUnits="Seconds" repeatCount="-1"/>
+                <!--<schedule-cron expression="0 0/5 * * * ?"/>-->
+                <schedule-simple interval="5" units="Minutes" startDelay="0" startDelayUnits="Seconds" repeatCount="-1"/>
 
                 <request id="GetToken"><![CDATA[
                    grant_type=client_credentials&resource=https://management.azure.com&client_id=${AzureAppId}&client_secret=${AzureSecret}
@@ -96,7 +96,7 @@
                         <matchExp><![CDATA[
                                StringUtils.isNotEmpty(${Token})
                             && ${TokenExpires} > 0
-                            && (System.currentTimeMillis () - ${TokenExpires}) < TimeUnit.MINUTES.toMillis(5)
+                            && (${TokenExpires} - System.currentTimeMillis ()) > TimeUnit.MINUTES.toMillis(5)
                        ]]></matchExp>
                     </condition>
 
