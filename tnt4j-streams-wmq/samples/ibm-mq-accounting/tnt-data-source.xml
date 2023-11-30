@@ -4,7 +4,7 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-wmq/config/tnt-data-source-wmq_pcf.xsd">
 
     <!-- Include the MQ full accounting parser, which includes most MQ data elements  -->
-    <resource-ref id="MQCommon" type="Parser" uri="MQ_full_accounting_parser.xml"/>
+    <resource-ref id="MQAccountingCommon" type="Parser" uri="MQ_full_accounting_parser.xml"/>
 
     <!-- this section specifies the connection to the queue manager. It can be repeated for multiple queue managers. -->
 
