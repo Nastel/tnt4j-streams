@@ -49,7 +49,7 @@ public class VoidRequestException extends Exception {
 	}
 
 	/**
-	 * Constructs an {@code MissingFieldValueException} with the specified detail message and cause.
+	 * Constructs an {@code VoidRequestException} with the specified detail message and cause.
 	 *
 	 * @param message
 	 *            the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
