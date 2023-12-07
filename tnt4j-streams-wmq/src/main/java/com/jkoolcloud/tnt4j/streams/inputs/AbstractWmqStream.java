@@ -223,7 +223,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 				mqConnProps.put(CMQC.PASSWORD_PROPERTY, decPassword(value));
 			}
 		} else if (StreamProperties.PROP_RECONNECT_DELAY.equalsIgnoreCase(name)) {
-			reconnectDelay = Integer.decode(value);
+			reconnectDelay = TimeUnit.SECONDS.toMillis(Integer.decode(value));
 		} else if (WmqStreamProperties.OPEN_OPTIONS.equalsIgnoreCase(name)) {
 			openOptions = initOpenOptions(value);
 		} else if (!StreamsConstants.isStreamCfgProperty(name, WmqStreamProperties.class)) {
