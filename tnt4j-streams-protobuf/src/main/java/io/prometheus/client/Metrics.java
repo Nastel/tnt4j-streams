@@ -4541,7 +4541,7 @@ public final class Metrics {
 
     /**
      * <pre>
-     * Buckets for the conventional histogram.
+     * Buckets for the classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -4550,7 +4550,7 @@ public final class Metrics {
         getBucketList();
     /**
      * <pre>
-     * Buckets for the conventional histogram.
+     * Buckets for the classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -4558,7 +4558,7 @@ public final class Metrics {
     io.prometheus.client.Metrics.Bucket getBucket(int index);
     /**
      * <pre>
-     * Buckets for the conventional histogram.
+     * Buckets for the classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -4566,7 +4566,7 @@ public final class Metrics {
     int getBucketCount();
     /**
      * <pre>
-     * Buckets for the conventional histogram.
+     * Buckets for the classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -4575,7 +4575,7 @@ public final class Metrics {
         getBucketOrBuilderList();
     /**
      * <pre>
-     * Buckets for the conventional histogram.
+     * Buckets for the classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -5181,7 +5181,7 @@ public final class Metrics {
     private java.util.List<io.prometheus.client.Metrics.Bucket> bucket_;
     /**
      * <pre>
-     * Buckets for the conventional histogram.
+     * Buckets for the classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -5192,7 +5192,7 @@ public final class Metrics {
     }
     /**
      * <pre>
-     * Buckets for the conventional histogram.
+     * Buckets for the classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -5204,7 +5204,7 @@ public final class Metrics {
     }
     /**
      * <pre>
-     * Buckets for the conventional histogram.
+     * Buckets for the classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -5215,7 +5215,7 @@ public final class Metrics {
     }
     /**
      * <pre>
-     * Buckets for the conventional histogram.
+     * Buckets for the classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -5226,7 +5226,7 @@ public final class Metrics {
     }
     /**
      * <pre>
-     * Buckets for the conventional histogram.
+     * Buckets for the classic histogram.
      * </pre>
      *
      * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6535,7 +6535,7 @@ public final class Metrics {
 
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6549,7 +6549,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6563,7 +6563,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6577,7 +6577,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6598,7 +6598,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6616,7 +6616,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6636,7 +6636,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6657,7 +6657,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6675,7 +6675,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6693,7 +6693,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6712,7 +6712,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6729,7 +6729,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6746,7 +6746,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6757,7 +6757,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6771,7 +6771,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6786,7 +6786,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6797,7 +6797,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -6809,7 +6809,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * Buckets for the conventional histogram.
+       * Buckets for the classic histogram.
        * </pre>
        *
        * <code>repeated .io.prometheus.client.Bucket bucket = 3 [(.gogoproto.nullable) = false];</code>
@@ -12911,6 +12911,18 @@ public final class Metrics {
      */
     io.prometheus.client.Metrics.MetricOrBuilder getMetricOrBuilder(
         int index);
+
+    /**
+     * <code>string unit = 5;</code>
+     * @return The unit.
+     */
+    java.lang.String getUnit();
+    /**
+     * <code>string unit = 5;</code>
+     * @return The bytes for unit.
+     */
+    com.google.protobuf.ByteString
+        getUnitBytes();
   }
   /**
    * Protobuf type {@code io.prometheus.client.MetricFamily}
@@ -12929,6 +12941,7 @@ public final class Metrics {
       help_ = "";
       type_ = 0;
       metric_ = java.util.Collections.emptyList();
+      unit_ = "";
     }
 
     @java.lang.Override
@@ -12987,6 +13000,12 @@ public final class Metrics {
               }
               metric_.add(
                   input.readMessage(io.prometheus.client.Metrics.Metric.parser(), extensionRegistry));
+              break;
+            }
+            case 42: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              unit_ = s;
               break;
             }
             default: {
@@ -13161,6 +13180,44 @@ public final class Metrics {
       return metric_.get(index);
     }
 
+    public static final int UNIT_FIELD_NUMBER = 5;
+    private volatile java.lang.Object unit_;
+    /**
+     * <code>string unit = 5;</code>
+     * @return The unit.
+     */
+    @java.lang.Override
+    public java.lang.String getUnit() {
+      java.lang.Object ref = unit_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        unit_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string unit = 5;</code>
+     * @return The bytes for unit.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getUnitBytes() {
+      java.lang.Object ref = unit_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        unit_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -13187,6 +13244,9 @@ public final class Metrics {
       for (int i = 0; i < metric_.size(); i++) {
         output.writeMessage(4, metric_.get(i));
       }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(unit_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, unit_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -13210,6 +13270,9 @@ public final class Metrics {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, metric_.get(i));
       }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(unit_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, unit_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -13232,6 +13295,8 @@ public final class Metrics {
       if (type_ != other.type_) return false;
       if (!getMetricList()
           .equals(other.getMetricList())) return false;
+      if (!getUnit()
+          .equals(other.getUnit())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -13253,6 +13318,8 @@ public final class Metrics {
         hash = (37 * hash) + METRIC_FIELD_NUMBER;
         hash = (53 * hash) + getMetricList().hashCode();
       }
+      hash = (37 * hash) + UNIT_FIELD_NUMBER;
+      hash = (53 * hash) + getUnit().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -13399,6 +13466,8 @@ public final class Metrics {
         } else {
           metricBuilder_.clear();
         }
+        unit_ = "";
+
         return this;
       }
 
@@ -13438,6 +13507,7 @@ public final class Metrics {
         } else {
           result.metric_ = metricBuilder_.build();
         }
+        result.unit_ = unit_;
         onBuilt();
         return result;
       }
@@ -13522,6 +13592,10 @@ public final class Metrics {
               metricBuilder_.addAllMessages(other.metric_);
             }
           }
+        }
+        if (!other.getUnit().isEmpty()) {
+          unit_ = other.unit_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -13998,6 +14072,82 @@ public final class Metrics {
         }
         return metricBuilder_;
       }
+
+      private java.lang.Object unit_ = "";
+      /**
+       * <code>string unit = 5;</code>
+       * @return The unit.
+       */
+      public java.lang.String getUnit() {
+        java.lang.Object ref = unit_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          unit_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string unit = 5;</code>
+       * @return The bytes for unit.
+       */
+      public com.google.protobuf.ByteString
+          getUnitBytes() {
+        java.lang.Object ref = unit_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          unit_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string unit = 5;</code>
+       * @param value The unit to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUnit(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        unit_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string unit = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearUnit() {
+        
+        unit_ = getDefaultInstance().getUnit();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string unit = 5;</code>
+       * @param value The bytes for unit to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUnitBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        unit_ = value;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -14162,14 +14312,14 @@ public final class Metrics {
       "mmary\022.\n\007untyped\030\005 \001(\0132\035.io.prometheus.c" +
       "lient.Untyped\0222\n\thistogram\030\007 \001(\0132\037.io.pr" +
       "ometheus.client.Histogram\022\024\n\014timestamp_m" +
-      "s\030\006 \001(\003\"\216\001\n\014MetricFamily\022\014\n\004name\030\001 \001(\t\022\014" +
+      "s\030\006 \001(\003\"\234\001\n\014MetricFamily\022\014\n\004name\030\001 \001(\t\022\014" +
       "\n\004help\030\002 \001(\t\022.\n\004type\030\003 \001(\0162 .io.promethe" +
       "us.client.MetricType\0222\n\006metric\030\004 \003(\0132\034.i" +
-      "o.prometheus.client.MetricB\004\310\336\037\000*b\n\nMetr" +
-      "icType\022\013\n\007COUNTER\020\000\022\t\n\005GAUGE\020\001\022\013\n\007SUMMAR" +
-      "Y\020\002\022\013\n\007UNTYPED\020\003\022\r\n\tHISTOGRAM\020\004\022\023\n\017GAUGE" +
-      "_HISTOGRAM\020\005B\026Z\024io_prometheus_clientb\006pr" +
-      "oto3"
+      "o.prometheus.client.MetricB\004\310\336\037\000\022\014\n\004unit" +
+      "\030\005 \001(\t*b\n\nMetricType\022\013\n\007COUNTER\020\000\022\t\n\005GAU" +
+      "GE\020\001\022\013\n\007SUMMARY\020\002\022\013\n\007UNTYPED\020\003\022\r\n\tHISTOG" +
+      "RAM\020\004\022\023\n\017GAUGE_HISTOGRAM\020\005B\026Z\024io_prometh" +
+      "eus_clientb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -14248,7 +14398,7 @@ public final class Metrics {
     internal_static_io_prometheus_client_MetricFamily_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_io_prometheus_client_MetricFamily_descriptor,
-        new java.lang.String[] { "Name", "Help", "Type", "Metric", });
+        new java.lang.String[] { "Name", "Help", "Type", "Metric", "Unit", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.google.protobuf.GoGoProtos.nullable);
