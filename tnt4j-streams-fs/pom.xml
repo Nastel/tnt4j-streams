@@ -14,7 +14,7 @@
     <artifactId>tnt4j-streams-fs</artifactId>
 
     <properties>
-        <jsch.version>0.2.13</jsch.version>
+        <jsch.version>0.2.14</jsch.version>
         <jsch-nio.version>1.0.14</jsch-nio.version>
         <sftp-fs.version>3.3</sftp-fs.version>
     </properties>
