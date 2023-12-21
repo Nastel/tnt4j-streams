@@ -16,7 +16,7 @@
     <properties>
         <jsch.version>0.2.15</jsch.version>
         <jsch-nio.version>1.0.14</jsch-nio.version>
-        <sftp-fs.version>3.3</sftp-fs.version>
+        <sftp-fs.version>3.3.1</sftp-fs.version>
     </properties>
 
     <build>
