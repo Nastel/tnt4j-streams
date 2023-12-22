@@ -774,7 +774,7 @@ definitions, and you need to split them into separate events maintaining some `t
 ### Field value transformations
 
 In streams configuration you can define field or locator resolved values transformations. In general, transformations performs resolved
-activity value post-processing before sending it to [jKoolCloud](https://www.jkoolcloud.com/): e.g., extracts file name from resolved
+activity value post-processing before sending it to [meshIQ](https://www.meshiq.com/): e.g., extracts file name from resolved
 activity file path.
 
 To pass a resolved field/locator value to a transformation script/expression, use the predefined variable placeholder `$fieldValue`. You can
@@ -1241,7 +1241,7 @@ Sample files can be found in `samples/single-log` directory.
 `orders.log` file contains set of order activity events. Single file line defines data of single order activity event.
 
 **NOTE:** Records in this file are from year `2011`, e.g. `12 Jul 2011`, so when sending the events data to
-[jKoolCloud](https://www.jkoolcloud.com/), please do not forget to adjust the dashboard time frame to that period!
+[meshIQ](https://www.meshiq.com/), please do not forget to adjust the dashboard time frame to that period!
 
 Sample stream configuration:
 ```xml
@@ -1296,7 +1296,7 @@ Sample files can be found in `samples/multiple-logs` directory.
 event.
 
 **NOTE:** Records in this file are from year `2011`, e.g. `12 Jul 2011`, so when sending the events data to
-[jKoolCloud](https://www.jkoolcloud.com/), please do not forget to adjust the dashboard time frame to that period!
+[meshIQ](https://www.meshiq.com/), please do not forget to adjust the dashboard time frame to that period!
 
 Sample configuration and sample idea is same as ['Single Log file'](#single-log-file) with one single difference:
 ```xml
@@ -1313,7 +1313,7 @@ Sample files can be found in `samples/piping-stream` directory.
 `orders.log` file contains set of order activity events. Single file line defines data of single order activity event.
 
 **NOTE:** Records in this file are from year `2011`, e.g. `12 Jul 2011`, so when sending the events data to
-[jKoolCloud](https://www.jkoolcloud.com/), please do not forget to adjust the dashboard time frame to that period!
+[meshIQ](https://www.meshiq.com/), please do not forget to adjust the dashboard time frame to that period!
 
 `jk-pipe.bat` or `jk-pipe.sh` files are wrappers to `bin/tnt4j-streams` executables to minimize parameters. All what you need is to pass
 file name of stream parsers configuration, e.g., `parsers.xml`
@@ -1535,7 +1535,7 @@ Sample files can be found in `samples/apache-access-single-log` directory.
 `access.log` is sample Apache access log file depicting some HTTP server activity.
 
 **NOTE:** Records in this file are from year `2004`, e.g. `07/Mar/2004`, so when sending the events data to
-[jKoolCloud](https://www.jkoolcloud.com/), please do not forget to adjust the dashboard time frame to that period!
+[meshIQ](https://www.meshiq.com/), please do not forget to adjust the dashboard time frame to that period!
 
 Sample stream configuration:
 ```xml
@@ -1715,7 +1715,7 @@ Sample files can be found in `samples/apache-access-multi-log` directory.
 `localhost_access_log.[DATE].txt` is sample Apache access log files depicting some HTTP server activity.
 
 **NOTE:** Records in this file are from year `2015` ranging from April until November, so when sending the events data to
-[jKoolCloud](https://www.jkoolcloud.com/), please do not forget to adjust the dashboard time frame to that period!
+[meshIQ](https://www.meshiq.com/), please do not forget to adjust the dashboard time frame to that period!
 
 Sample configuration and sample idea is same as ['Apache Access log single file'](#apache-access-log-single-file) with one single
 difference:
@@ -3589,8 +3589,7 @@ Fill in these configuration value placeholders:
 #### Redirecting TNT4J streams
 
 This sample shows how to redirect `tnt4j-stream-jmx` (may be from multiple running instances) produced trackables
-to [jKoolCloud](https://www.jkoolcloud.com/)
-over single `TNT4J-Streams` stream instance.
+to [meshIQ](https://www.meshiq.com/) over single `TNT4J-Streams` stream instance.
 
 Sample files can be found in `samples/stream-jmx` directory.
 
@@ -3634,7 +3633,7 @@ accepted, stream reads incoming data from connection dedicated socket.
 `RestartOnInputClose` property indicates that stream should initiate new instance of server socket if listened one gets closed or fails to
 accept inbound connection.
 
-Stream referenced object `JMXRedirectOutput` sends JSON formatted data to [jKoolCloud](https://www.jkoolcloud.com/).
+Stream referenced object `JMXRedirectOutput` sends JSON formatted data to [meshIQ](https://www.meshiq.com/).
 
 Stream also additionally sets one TNT4J framework property `event.formatter`. This allows us to use customized JSON formatter and avoid
 additional JSON reformatting in default TNT4J data flow.
@@ -3665,7 +3664,7 @@ This sample shows how to stream MS Excel workbook rows as activity events.
 Sample files can be found in `samples/xlsx-rows` directory.
 
 **NOTE:** Records in this file are from year `2010`, e.g. `12 Jul 2010`, so when sending the events data to
-[jKoolCloud](https://www.jkoolcloud.com/), please do not forget to adjust the dashboard time frame to that period!
+[meshIQ](https://www.meshiq.com/), please do not forget to adjust the dashboard time frame to that period!
 
 Sample stream configuration:
 ```xml
@@ -3732,7 +3731,7 @@ This sample shows how to stream MS Excel workbook sheets as activity events.
 Sample files can be found in `samples/xlsx-sheets` directory.
 
 **NOTE:** Records in this file are from year `2010`, e.g. `12 Jul 2010`, so when sending the events data to
-[jKoolCloud](https://www.jkoolcloud.com/), please do not forget to adjust the dashboard time frame to that period!
+[meshIQ](https://www.meshiq.com/), please do not forget to adjust the dashboard time frame to that period!
 
 Sample stream configuration:
 ```xml
@@ -4331,7 +4330,7 @@ Configuration data format is same for all sources now.
 
 Because TNT4J-Streams is based on TNT4J first you need to configure TNT4J (if have not done this yet). Default location
 of `tnt4j.properties` file is in project `config` directory. At least you must make one change:
-`event.sink.factory.Token:YOUR-TOKEN` replace `YOUR-TOKEN` with [jKoolCloud](https://www.jkoolcloud.com/) token assigned for you.
+`event.sink.factory.Token:YOUR-TOKEN` replace `YOUR-TOKEN` with [meshIQ](https://www.meshiq.com/) token assigned for you.
 
 To define `tnt4j.properties` file location use system property `-Dtnt4j.config`, e.g., `-Dtnt4j.config="./config/tnt4j.properties"`.
 
@@ -4381,16 +4380,16 @@ tracking.selector.Repository:com.jkoolcloud.tnt4j.repository.FileTokenRepository
 }
 ```
 
-#### [jKoolCloud](https://www.jkoolcloud.com/) sink configuration
+#### [meshIQ](https://www.meshiq.com/) sink configuration
 
 ```properties
 #### jKoolCloud event sink factory configuration ####
 event.sink.factory:com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory
 event.sink.factory.LogSink:file:./logs/tnt4j-streams-activities.log
 
-event.sink.factory.Url:http://data.jkoolcloud.com:6580
-#event.sink.factory.Url: https://data.jkoolcloud.com:6585
-#event.sink.factory.Url: https://data.jkoolcloud.com
+event.sink.factory.Url:http://stream.meshiq.com:6580
+#event.sink.factory.Url: https://stream.meshiq.com:6585
+#event.sink.factory.Url: https://stream.meshiq.com
 event.sink.factory.Token:<YOUR TOKEN>
 #### jKoolCloud event sink factory configuration end ####
 ```
@@ -4701,7 +4700,7 @@ Stream output can be configured using these configuration properties:
   is: `SourceType1=${FieldName1}#SourceType2=${FieldName2}#SourceType3=${FieldName3}...`. Default value -
   `APPL=${ApplName}#USER=${UserName}#SERVER=${ServerName}#NETADDR=${ServerIp}#GEOADDR=${Location}`. (Optional)
 * `SendStreamStates` - flag indicating whether to send stream status change messages (`startup`/`shutdown`) to output endpoint e.g.
-  [jKoolCloud](https://www.jkoolcloud.com/). Default value - `true`. (Optional)
+  [meshIQ](https://www.meshiq.com/). Default value - `true`. (Optional)
 
 Sample:
 ```xml
@@ -5839,7 +5838,7 @@ use [TNT4J-Streams predefined custom XPath functions](#tnt4j-streams-predefined-
 Sample:
 ```xml
 <property name="Namespace" value="xsi=http://www.w3.org/2001/XMLSchema-instance"/>
-<property name="Namespace" value="tnt4j=https://jkool.jkoolcloud.com/jKool/xsds"/>
+<property name="Namespace" value="tnt4j=https://xray.meshiq.com/xray/xsds"/>
 <property name="NamespaceAware" value="false"/>
 ```
 

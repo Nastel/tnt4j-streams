@@ -28,7 +28,7 @@ npm start
 You need to inject 3 objects: JsTimedProcess, Tnt4jStreamsFormatter and `njsTrace`.
 
 JsTimedProcess comes with timeout option (in this case 10);
-If you want to send only error traces to [jKoolCloud](https://www.jkoolcloud.com) use option "true" in Tnt4jStreamsFormatter;
+If you want to send only error traces to [meshIQ](https://www.meshiq.com) use option "true" in Tnt4jStreamsFormatter;
 `njsTrace` comes with filter witch files to instrument, and if function arguments should be inspected;
 
 ```js

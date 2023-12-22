@@ -31,7 +31,7 @@
          is `localhost`.
       1. change AutoPilot sink port value (property `event.sink.factory.EventSinkFactory.ap.Port`) to match your AutoPilot instance. Default
          is `6060`.
-      1. change `https://data.jkoolcloud.com` to your jKool/XRay streaming endpoint URL. 
+      1. change `https://stream.meshiq.com` to your jKool/XRay streaming endpoint URL. 
       1. change `xray-access-token` placeholder to your jKool/XRay streaming token if you are willing to stream into that repo
    1. [parsers.xml](parsers.xml) - TNT4J-Streams parsers configuration
 
@@ -124,7 +124,7 @@ Major entities in stream configuration are
       instance. Default is `6060`.
   * properties group starting `event.sink.factory.EventSinkFactory.xray` defines jKool/XRay dedicated sink configuration
     * change jKool/XRay sink (id `xray`) URL value (property `event.sink.factory.EventSinkFactory.xray.Url`) to match your jKool/XRay
-      instance. Default is `https://data.jkoolcloud.com`.
+      instance. Default is `https://stream.meshiq.com`.
     * change jKool/XRay sink (id `xray`) token placeholder value (property `event.sink.factory.EventSinkFactory.xray.Token`) to your 
       jKool/XRay streaming token if you are willing to stream into that repo. Placeholder value is `xray-access-token`.
 * `KinesisFirehoseParser` reference to bootstrap parser of incoming metrics data package

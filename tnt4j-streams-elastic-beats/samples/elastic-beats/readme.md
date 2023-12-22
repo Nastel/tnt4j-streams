@@ -19,6 +19,6 @@
 # Importing dashboard into your jKool repository
 
 You can import provided Dashboards into jKool:
-* Login your `jkool.jkoolcloud.com`
+* Login your `https://xray.meshiq.com`
 * menu -> import/export -> dashboards -> import -> import dashboards -> chose file
 * select dashboard file from `samples/elastic-beats/dashboards` directory

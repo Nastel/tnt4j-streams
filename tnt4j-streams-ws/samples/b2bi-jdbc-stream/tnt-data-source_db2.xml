@@ -19,7 +19,7 @@
         <!--<property name="QueryMaxRows" value="10000"/>-->
 
         <tnt4j-properties>
-            <property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://test.jkoolcloud.com:6585"/>
+            <property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://test.meshiq.com:6585"/>
             <property name="event.sink.factory.EventSinkFactory.prod.Token" value="YOUR_REPO_TOKEN"/>
         </tnt4j-properties>
 

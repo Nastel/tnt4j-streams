@@ -7,7 +7,7 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
 * Configure XRay access:
   * Set your XRay access token:
     ```xml
-    <property name="event.sink.factory.EventSinkFactory.xray.Url" value="https://data.jkoolcloud.com"/>
+    <property name="event.sink.factory.EventSinkFactory.xray.Url" value="https://stream.meshiq.com"/>
     <property name="event.sink.factory.EventSinkFactory.xray.Token" value="388xxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxb3"/>
     ```
 * To receive Prometheus metrics data TNT4J-Streams runs HTTP server. It requires such configuration:

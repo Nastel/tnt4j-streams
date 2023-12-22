@@ -69,7 +69,7 @@
             <property name="event.sink.factory.EventSinkFactory.xray" value="com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory"/>
             <property name="event.sink.factory.EventSinkFactory.xray.LogSink"
                       value="slf4j:com.jkoolcloud.tnt4j.streams.activities_jkool_log"/>
-            <property name="event.sink.factory.EventSinkFactory.xray.Url" value="https://data.jkoolcloud.com"/>
+            <property name="event.sink.factory.EventSinkFactory.xray.Url" value="https://stream.meshiq.com"/>
             <property name="event.sink.factory.EventSinkFactory.xray.Token" value="jkool-access-token"/>
 
             <property name="event.sink.factory.EventSinkFactory.xray.Formatter" value="com.jkoolcloud.tnt4j.format.JSONFormatter"/>
