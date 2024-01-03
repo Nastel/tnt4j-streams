@@ -3596,11 +3596,11 @@ Sample files can be found in `samples/stream-jmx` directory.
 To redirect `tnt4j-stream-jmx` (or any other TNT4J based producer) produced trackables, producer configuration file `tnt4j.properties`
 should contain such stanza:
 ```properties
-event.sink.factory.EventSinkFactory:com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory
-event.sink.factory.EventSinkFactory.LogSink:null
-event.sink.factory.EventSinkFactory.Host:IP_OF_STREAMS_RUNNING_MACHINE
-event.sink.factory.EventSinkFactory.Port:9009
-event.formatter:com.jkoolcloud.tnt4j.format.JSONFormatter
+event.sink.factory.EventSinkFactory: com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory
+event.sink.factory.EventSinkFactory.LogSink: null
+event.sink.factory.EventSinkFactory.Host: IP_OF_STREAMS_RUNNING_MACHINE
+event.sink.factory.EventSinkFactory.Port: 9009
+event.formatter: com.jkoolcloud.tnt4j.format.JSONFormatter
 ```
 **NOTE:** change `IP_OF_STREAMS_RUNNING_MACHINE` to IP of machine running `TNT4J-Streams` `RedirectTNT4JStream`.
 
@@ -4350,21 +4350,21 @@ sinks are meant to act in sync, especially when sink (e.g., `JKCloud`, `Mqtt`, `
 ```properties
 # Stanza used for TNT4J-Streams sources
 {
-source:com.jkoolcloud.tnt4j.streams
-source.factory:com.jkoolcloud.tnt4j.source.SourceFactoryImpl
-source.factory.GEOADDR:<YOUR GEO ADDRESS>
-source.factory.DATACENTER:<YOUR DATA CENTER NAME>
-source.factory.RootFQN:RUNTIME=?#SERVER=?#NETADDR=?#DATACENTER=?#GEOADDR=?
-source.factory.RootSSN:tnt4j-streams
+source: com.jkoolcloud.tnt4j.streams
+source.factory: com.jkoolcloud.tnt4j.source.SourceFactoryImpl
+source.factory.GEOADDR: <YOUR GEO ADDRESS>
+source.factory.DATACENTER: <YOUR DATA CENTER NAME>
+source.factory.RootFQN: RUNTIME=?#SERVER=?#NETADDR=?#DATACENTER=?#GEOADDR=?
+source.factory.RootSSN: tnt4j-streams
 
-tracker.factory:com.jkoolcloud.tnt4j.tracker.DefaultTrackerFactory
-dump.sink.factory:com.jkoolcloud.tnt4j.dump.DefaultDumpSinkFactory
-tracker.default.snapshot.category:TNT4J-Streams-event-snapshot
+tracker.factory: com.jkoolcloud.tnt4j.tracker.DefaultTrackerFactory
+dump.sink.factory: com.jkoolcloud.tnt4j.dump.DefaultDumpSinkFactory
+tracker.default.snapshot.category: TNT4J-Streams-event-snapshot
 
 # event sink configuration: destination and data format
 <YOUR EVENT SINK CONFIGURATION: jKoolCloud, Kafka, MQTT, etc.>
 
-event.formatter:com.jkoolcloud.tnt4j.format.JSONFormatter
+event.formatter: com.jkoolcloud.tnt4j.format.JSONFormatter
 #event.formatter.Newline: true
 
 # Configure default sink filter based on level and time (elapsed/wait)
@@ -4375,8 +4375,8 @@ event.formatter:com.jkoolcloud.tnt4j.format.JSONFormatter
 ##event.sink.factory.Filter.ElapsedUsec: 100
 ##event.sink.factory.Filter.WaitUsec: 100
 
-tracking.selector:com.jkoolcloud.tnt4j.selector.DefaultTrackingSelector
-tracking.selector.Repository:com.jkoolcloud.tnt4j.repository.FileTokenRepository
+tracking.selector: com.jkoolcloud.tnt4j.selector.DefaultTrackingSelector
+tracking.selector.Repository: com.jkoolcloud.tnt4j.repository.FileTokenRepository
 }
 ```
 
@@ -4384,13 +4384,13 @@ tracking.selector.Repository:com.jkoolcloud.tnt4j.repository.FileTokenRepository
 
 ```properties
 #### jKoolCloud event sink factory configuration ####
-event.sink.factory:com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory
-event.sink.factory.LogSink:file:./logs/tnt4j-streams-activities.log
+event.sink.factory: com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory
+event.sink.factory.LogSink: file:./logs/tnt4j-streams-activities.log
 
-event.sink.factory.Url:http://stream.meshiq.com:6580
+event.sink.factory.Url: http://stream.meshiq.com:6580
 #event.sink.factory.Url: https://stream.meshiq.com:6585
 #event.sink.factory.Url: https://stream.meshiq.com
-event.sink.factory.Token:<YOUR TOKEN>
+event.sink.factory.Token: <YOUR TOKEN>
 #### jKoolCloud event sink factory configuration end ####
 ```
 
@@ -4399,8 +4399,8 @@ event.sink.factory.Token:<YOUR TOKEN>
 If your `TNT4J` event sink configuration has `Filename` property, e.g.:
 ```properties
 #### jKoolCloud event sink factory configuration ####
-event.sink.factory:com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory
-event.sink.factory.Filename:./logs/tnt4j-streams-activities.log
+event.sink.factory: com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory
+event.sink.factory.Filename: ./logs/tnt4j-streams-activities.log
 ...
 ```
 then all streamed activities are logged into one text file just by adding logged activity to the end of that file. But over some time file
@@ -4467,9 +4467,9 @@ Configuration requires two steps:
 
 ```properties
 #### Kafka event sink factory configuration ####
-event.sink.factory:com.jkoolcloud.tnt4j.sink.impl.kafka.KafkaEventSinkFactory
-event.sink.factory.propFile:<YOUR PATH>/tnt4j-kafka.properties
-event.sink.factory.topic:<YOUR TOPIC>
+event.sink.factory: com.jkoolcloud.tnt4j.sink.impl.kafka.KafkaEventSinkFactory
+event.sink.factory.propFile: <YOUR PATH>/tnt4j-kafka.properties
+event.sink.factory.topic: <YOUR TOPIC>
 #### Kafka event sink factory configuration end ####
 ```
 
@@ -4477,11 +4477,11 @@ event.sink.factory.topic:<YOUR TOPIC>
 
 ```properties
 #### MQTT event sink factory configuration ####
-event.sink.factory:com.jkoolcloud.tnt4j.sink.impl.mqtt.MqttEventSinkFactory
-event.sink.factory.mqtt-server-url:<YOUR MQTT SERVER ULR> #
-event.sink.factory.mqtt-topic:<YOUR TOPIC> #
-event.sink.factory.mqtt-user:<MQTT-USER> #
-event.sink.factory.mqtt-pwd:<MQTT-PWD>
+event.sink.factory: com.jkoolcloud.tnt4j.sink.impl.mqtt.MqttEventSinkFactory
+event.sink.factory.mqtt-server-url: <YOUR MQTT SERVER ULR>
+event.sink.factory.mqtt-topic: <YOUR TOPIC>
+event.sink.factory.mqtt-user: <MQTT-USER>
+event.sink.factory.mqtt-pwd: <MQTT-PWD>
 #### MQTT event sink factory configuration end ####
 ```
 
@@ -4495,20 +4495,20 @@ To define streams data source configuration file location, use program argument 
      tnt4j-streams -f:./tnt4j-streams-core/samples/single-log/tnt-data-source.xml
 ```
 Or you can refer streams data source configuration file over System property named `tnt4j.streams.config` e.g.:
-```properties
+```bash
     -Dtnt4j.streams.config=./tnt4j-streams-core/samples/single-log/tnt-data-source.xml
 ```
 
 **NOTE:** `TNT4J-Streams` can perform `tnt-data-source` configuration XML validation against XSD schema. Found validation failures are
 listed in `TNT4J-Streams` log as `WARNING` level entries. To enable this XML-XSD validation use system property
 `com.jkoolcloud.tnt4j.streams.validate.config.xsd`:
-```properties
+```bash
     -Dcom.jkoolcloud.tnt4j.streams.validate.config.xsd=true
 ```
 **NOTE:** by default, `TNT4J-Streams` performs `tnt-data-source` configuration defined transformations, filters and matchers script
 expressions validation. Found validation failures are listed in `TNT4J-Streams` log as `ERROR` level entries. To disable script expressions
 validation use system property `com.jkoolcloud.tnt4j.streams.validate.config.exp`:
-```properties
+```bash
     -Dcom.jkoolcloud.tnt4j.streams.validate.config.exp=false
 ```
 
