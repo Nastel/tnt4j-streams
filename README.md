@@ -704,24 +704,24 @@ aggregation into parent activity. Attribute has two possible values:
   having collection of child activities resolved by stacked parsers. **NOTE:** this value has alias `Join` left for backward compatibility,
   but it is not recommended using it anymore and should be changed right away for existing configurations. Activity entities can have these
   relations:
-    * `ACTIVITY` - can have any entity as child: `ACTIVITY`, `EVENT`, `SNAPSHOT`
-    * `EVENT` - can have only `SNAPSHOT` as a child
-    * `SNAPSHOT` - can't have any child entities
+    * `ACTIVITY` - can have any entity as child: `ACTIVITY`, `EVENT`, `SNAPSHOT` or `DATASET`
+    * `EVENT` - can have only `SNAPSHOT` or `DATASET` as a child
+    * `SNAPSHOT`/`DATASET` - can't have any child entities
 
   Be sure that each parser or sub-parser that creates an activity entity to be sent to jKool/AP Insight as a JSON record has a field line:
     ```xml
     <field name="EventType" value="vvvv"/>
     ```
-  where `vvvv` is one of values: `ACTIVITY`, `SNAPSHOT` or `EVENT` (`EVENT` also maps from values `OTHER`, `CALL`, `START`, `STOP`,
-  `OPEN`, `CLOSE`, `SEND`, `RECEIVE`, `INQUIRE`, `SET`, `BROWSE`, `ADD`, `UPDATE`, `REMOVE`, `CLEAR`, `DATAGRAM`).
+  where `vvvv` is one of values: `ACTIVITY`, `SNAPSHOT`/`DATASET` or `EVENT` (`EVENT` also maps from values `OTHER`, `CALL`, `START`, 
+  `STOP`, `OPEN`, `CLOSE`, `SEND`, `RECEIVE`, `INQUIRE`, `SET`, `BROWSE`, `ADD`, `UPDATE`, `REMOVE`, `CLEAR`, `DATAGRAM`).
   **NOTE:** If none of the above values applies to your case, you may use `NOOP` value. Then, however, the activity entity JSON record will
   not be created and not sent to jKoolCloud, e.g.:
     ```xml
     <field name="EventType" value="NOOP"/>
     ```
 * `Relate_Flat` - resolved activity entities are collected as children of root activity entity. It is useful when related activity entities
-  hierarchy can become as tree structure, but because of `EVENT` and `SNAPSHOT` hierarchy restrictions (see `Relate` definition), it can't
-  be sent to JKool directly.
+  hierarchy can become as tree structure, but because of `EVENT` and `SNAPSHOT`/`DATASET` hierarchy restrictions (see `Relate` definition),
+  it can't be sent to JKool directly.
 
 For a `Relate` and `Relate_Flat` type aggregations there is related stream output parameter `SplitRelatives`:
 ```xml
