@@ -3,24 +3,20 @@ package com.jkoolcloud.tnt4j.streams.parsers;
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
-import io.burt.jmespath.Expression;
-import io.burt.jmespath.jackson.JacksonRuntime;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
-//import com.jayway.jsonpath.*;
-//import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
-//import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import com.fasterxml.jackson.databind.node.BinaryNode;
+import com.fasterxml.jackson.databind.node.POJONode;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.ParserProperties;
@@ -33,15 +29,16 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
-import io.burt.jmespath.JmesPath;
+import io.burt.jmespath.Expression;
 import io.burt.jmespath.RuntimeConfiguration;
+import io.burt.jmespath.jackson.JacksonRuntime;
 
 /**
  * Implements an activity data parser that assumes each activity data item is an JSON format string. JSON parsing is
- * performed using JMESPath API over the Jackson deserialization framework under the hood. Activity fields
- * locator values are treated as JsonPath expressions.
+ * performed using JMESPath API over the Jackson deserialization framework under the hood. Activity fields locator
+ * values are treated as JMESPath expressions.
  * <p>
- * See <a href="https://github.com/jayway/JsonPath">JsonPath API</a> for more details.
+ * See <a href="https://github.com/burtcorp/jmespath-java">JMESPath Java API</a> for more details.
  * <p>
  * This parser supports the following configuration properties (in addition to those supported by
  * {@link GenericActivityParser}):
@@ -55,8 +52,6 @@ import io.burt.jmespath.RuntimeConfiguration;
  * {@link com.fasterxml.jackson.databind.MapperFeature} for more details. (Optional)</li>
  * <li>List of JsonParser.[FEATURE_NAME] - defines set of Jackson Object Mapper's parser configuration features. See
  * {@link JsonParser.Feature} for more details. (Optional)</li>
- * <li>List of Option.[OPTION_NAME] - defines set of JsonPath configuration options. See
- * {@link com.jayway.jsonpath.Option} for more details. (Optional)</li>
  * </ul>
  * <p>
  * This activity parser supports those activity field locator types:
@@ -71,283 +66,314 @@ import io.burt.jmespath.RuntimeConfiguration;
  * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#EnvVariable}</li>
  * </ul>
  *
- * @version $Revision: 2 $
+ * @version $Revision: 1 $
  */
 public class ActivityJMESParser extends GenericActivityParser<JsonNode> {
-    private static final EventSink LOGGER = LoggerUtils.getLoggerSink(ActivityJMESParser.class);
+	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(ActivityJMESParser.class);
 
-    private static final String JSON_PATH_ROOT = "$";// NON-NLS
-    private static final String JSON_PATH_SEPARATOR = StreamsConstants.DEFAULT_PATH_DELIM;
+	private static final String JSON_PATH_ROOT = "$";// NON-NLS
+	private static final String JSON_PATH_SEPARATOR = StreamsConstants.DEFAULT_PATH_DELIM;
 
-    private static final String DESERIALIZATION_FEATURE = "DeserializationFeature."; // NON-NLS
-    private static final String MAPPER_FEATURE = "MapperFeature."; // NON-NLS
-    private static final String PARSER_FEATURE = "JsonParser."; // NON-NLS
-    private static final String OPTION = "Option."; // NON-NLS
-    private static final String[] PARSER_CFG_TOKENS = new String[] { DESERIALIZATION_FEATURE, MAPPER_FEATURE,
-            PARSER_FEATURE, OPTION };
+	private static final String DESERIALIZATION_FEATURE = "DeserializationFeature."; // NON-NLS
+	private static final String MAPPER_FEATURE = "MapperFeature."; // NON-NLS
+	private static final String PARSER_FEATURE = "JsonParser."; // NON-NLS
+	private static final String OPTION = "Option."; // NON-NLS
+	private static final String[] PARSER_CFG_TOKENS = new String[] { DESERIALIZATION_FEATURE, MAPPER_FEATURE,
+			PARSER_FEATURE, OPTION };
 
-    private Map<String, String> parseProperties = new LinkedHashMap<>();
-    private RuntimeConfiguration parseConfiguration;
+	private final Map<String, Expression<JsonNode>> expressionsMap = new HashMap<>();
 
-    private JacksonRuntime runtime;
+	private Map<String, String> parseProperties = new LinkedHashMap<>();
+	private RuntimeConfiguration parseConfiguration;
 
-    /**
-     * Constructs a new ActivityJMESParser.
-     */
-    public ActivityJMESParser() {
-        super(ActivityFieldDataType.AsInput);
-    }
+	private JacksonRuntime runtime;
 
-    @Override
-    protected EventSink logger() {
-        return LOGGER;
-    }
+	/**
+	 * Constructs a new ActivityJMESParser.
+	 */
+	public ActivityJMESParser() {
+		super(ActivityFieldDataType.AsInput);
+	}
 
-    @Override
-    public void setProperties(Collection<Map.Entry<String, String>> props) {
-        super.setProperties(props);
+	@Override
+	protected EventSink logger() {
+		return LOGGER;
+	}
 
-        ObjectMapper mapper = new ObjectMapper();
-        if (parseProperties.isEmpty()) {
-            parseConfiguration = RuntimeConfiguration.defaultConfiguration();
-        } else {
-            for (Map.Entry<String, String> pProp : parseProperties.entrySet()) {
-                if (pProp.getKey().startsWith(DESERIALIZATION_FEATURE)) {
-                    DeserializationFeature df = DeserializationFeature
-                            .valueOf(pProp.getKey().substring(DESERIALIZATION_FEATURE.length()));
-                    mapper.configure(df, Utils.toBoolean(pProp.getValue()));
-                } else if (pProp.getKey().startsWith(MAPPER_FEATURE)) {
-                    MapperFeature mf = MapperFeature.valueOf(pProp.getKey().substring(MAPPER_FEATURE.length()));
-                    mapper.configure(mf, Utils.toBoolean(pProp.getValue()));
-                } else if (pProp.getKey().startsWith(PARSER_FEATURE)) {
-                    JsonParser.Feature pf = JsonParser.Feature
-                            .valueOf(pProp.getKey().substring(PARSER_FEATURE.length()));
-                    mapper.configure(pf, Utils.toBoolean(pProp.getValue()));
-                }
-            }
+	@Override
+	public void setProperties(Collection<Map.Entry<String, String>> props) {
+		super.setProperties(props);
 
-            parseConfiguration = RuntimeConfiguration.builder() //
-                    .withSilentTypeErrors(false) //
-                    .build();
-        }
+		ObjectMapper mapper = new ObjectMapper();
+		if (parseProperties.isEmpty()) {
+			parseConfiguration = RuntimeConfiguration.defaultConfiguration();
+		} else {
+			for (Map.Entry<String, String> pProp : parseProperties.entrySet()) {
+				if (pProp.getKey().startsWith(DESERIALIZATION_FEATURE)) {
+					DeserializationFeature df = DeserializationFeature
+							.valueOf(pProp.getKey().substring(DESERIALIZATION_FEATURE.length()));
+					mapper.configure(df, Utils.toBoolean(pProp.getValue()));
+				} else if (pProp.getKey().startsWith(MAPPER_FEATURE)) {
+					MapperFeature mf = MapperFeature.valueOf(pProp.getKey().substring(MAPPER_FEATURE.length()));
+					mapper.configure(mf, Utils.toBoolean(pProp.getValue()));
+				} else if (pProp.getKey().startsWith(PARSER_FEATURE)) {
+					JsonParser.Feature pf = JsonParser.Feature
+							.valueOf(pProp.getKey().substring(PARSER_FEATURE.length()));
+					mapper.configure(pf, Utils.toBoolean(pProp.getValue()));
+				}
+			}
 
-        runtime = new JacksonRuntime(parseConfiguration, mapper);
-    }
+			parseConfiguration = RuntimeConfiguration.builder() //
+					.withSilentTypeErrors(false) //
+					.build();
+		}
 
-    @Override
-    @SuppressWarnings("deprecation")
-    public void setProperty(String name, String value) {
-        super.setProperty(name, value);
+		runtime = new JacksonRuntime(parseConfiguration, mapper);
+	}
 
-        if (ParserProperties.PROP_READ_LINES.equalsIgnoreCase(name)) {
-            activityDelim = Utils.toBoolean(value) ? ActivityDelim.EOL.name() : ActivityDelim.EOF.name();
+	@Override
+	@SuppressWarnings("deprecation")
+	public void setProperty(String name, String value) {
+		super.setProperty(name, value);
 
-            logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-                    "ActivityParser.setting", name, value);
-        } else if (StringUtils.startsWithAny(name, PARSER_CFG_TOKENS)) {
-            parseProperties.put(name, value);
+		if (ParserProperties.PROP_READ_LINES.equalsIgnoreCase(name)) {
+			activityDelim = Utils.toBoolean(value) ? ActivityDelim.EOL.name() : ActivityDelim.EOF.name();
 
-            logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-                    "ActivityParser.setting", name, value);
-        }
-    }
+			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+					"ActivityParser.setting", name, value);
+		} else if (StringUtils.startsWithAny(name, PARSER_CFG_TOKENS)) {
+			parseProperties.put(name, value);
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public Object getProperty(String name) {
-        if (ParserProperties.PROP_READ_LINES.equalsIgnoreCase(name)) {
-            return activityDelim;
-        }
+			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+					"ActivityParser.setting", name, value);
+		}
+	}
 
-        Object pValue = super.getProperty(name);
-        if (pValue != null) {
-            return pValue;
-        }
+	@SuppressWarnings("deprecation")
+	@Override
+	public Object getProperty(String name) {
+		if (ParserProperties.PROP_READ_LINES.equalsIgnoreCase(name)) {
+			return activityDelim;
+		}
 
-        return parseProperties.get(name);
-    }
+		Object pValue = super.getProperty(name);
+		if (pValue != null) {
+			return pValue;
+		}
 
-    /**
-     * Returns whether this parser supports the given format of the activity data. This is used by activity streams to
-     * determine if the parser can parse the data in the format that the stream has it.
-     * <p>
-     * This parser supports the following class types (and all classes extending/implementing any of these):
-     * <ul>
-     * <li>{@link java.lang.String}</li>
-     * <li>{@code byte[]}</li>
-     * <li>{@link java.nio.ByteBuffer}</li>
-     * <li>{@link java.io.Reader}</li>
-     * <li>{@link java.io.InputStream}</li>
-     * </ul>
-     *
-     * @param data
-     *            data object whose class is to be verified
-     * @return {@code true} if this parser can process data in the specified format, {@code false} - otherwise
-     */
-    @Override
-    protected boolean isDataClassSupportedByParser(Object data) {
-        return data instanceof JsonNode || super.isDataClassSupportedByParser(data);
-    }
+		return parseProperties.get(name);
+	}
 
-    @Override
-    public boolean canHaveDelimitedLocators() {
-        return false;
-    }
+	/**
+	 * Returns whether this parser supports the given format of the activity data. This is used by activity streams to
+	 * determine if the parser can parse the data in the format that the stream has it.
+	 * <p>
+	 * This parser supports the following class types (and all classes extending/implementing any of these):
+	 * <ul>
+	 * <li>{@link java.lang.String}</li>
+	 * <li>{@code byte[]}</li>
+	 * <li>{@link java.nio.ByteBuffer}</li>
+	 * <li>{@link java.io.Reader}</li>
+	 * <li>{@link java.io.InputStream}</li>
+	 * </ul>
+	 *
+	 * @param data
+	 *            data object whose class is to be verified
+	 * @return {@code true} if this parser can process data in the specified format, {@code false} - otherwise
+	 */
+	@Override
+	protected boolean isDataClassSupportedByParser(Object data) {
+		return data instanceof JsonNode || super.isDataClassSupportedByParser(data);
+	}
 
-    @Override
-    protected ActivityContext prepareItem(TNTInputStream<?, ?> stream, Object data) throws ParseException {
-        JsonNode jsonDoc;
-        String jsonString = null;
-        try {
-            if (data instanceof JsonNode) {
-                jsonDoc = (JsonNode) data;
-            } else if (data instanceof InputStream) {
-                jsonString = getNextActivityString(data);
-                jsonDoc = runtime.parseString(jsonString);
-            } else {
-                jsonString = getNextActivityString(data);
-                if (StringUtils.isEmpty(jsonString)) {
-                    return null;
-                }
-                jsonDoc = runtime.parseString(jsonString);
-            }
-        } catch (Exception e) {
-            ParseException pe = new ParseException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
-                    "ActivityJMESParser.jsonDocument.parse.error"), 0);
-            pe.initCause(e);
+	@Override
+	public boolean canHaveDelimitedLocators() {
+		return false;
+	}
 
-            throw pe;
-        }
+	@Override
+	protected ActivityContext prepareItem(TNTInputStream<?, ?> stream, Object data) throws ParseException {
+		JsonNode jsonDoc;
+		String jsonString = null;
+		try {
+			if (data instanceof JsonNode) {
+				jsonDoc = (JsonNode) data;
+			} else {
+				jsonString = getNextActivityString(data);
+				if (StringUtils.isEmpty(jsonString)) {
+					return null;
+				}
+				jsonDoc = runtime.parseString(jsonString);
+			}
+		} catch (Exception e) {
+			ParseException pe = new ParseException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
+					"ActivityJMESParser.jsonDocument.parse.error"), 0);
+			pe.initCause(e);
 
-        if (jsonString == null) {
-            jsonString = jsonDoc.toString();
-        }
+			throw pe;
+		}
 
-        ActivityContext cData = new ActivityContext(stream, data, jsonDoc).setParser(this);
-        cData.setMessage(jsonString);
+		if (jsonString == null) {
+			jsonString = jsonDoc.toString();
+		}
 
-        return cData;
-    }
+		ActivityContext cData = new ActivityContext(stream, data, jsonDoc).setParser(this);
+		cData.setMessage(jsonString);
 
-    /**
-     * Reads RAW activity data JSON package string from {@link BufferedReader}.
-     *
-     * @param rdr
-     *            reader to use for reading
-     * @return non empty RAW activity data JSON package string, or {@code null} if the end of the stream has been
-     *         reached
-     */
-    @Override
-    protected String readNextActivity(BufferedReader rdr) {
-        StringBuilder jsonStringBuilder = new StringBuilder(1024);
-        String line;
+		return cData;
+	}
 
-        nextLock.lock();
-        try {
-            try {
-                while ((line = rdr.readLine()) != null) {
-                    jsonStringBuilder.append(line);
-                    if (ActivityDelim.EOL.name().equals(activityDelim)) {
-                        break;
-                    }
-                }
-            } catch (EOFException eof) {
-                Utils.logThrowable(logger(), OpLevel.DEBUG,
-                        StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "ActivityParser.data.end",
-                        getActivityDataType()[0], eof);
-            } catch (IOException ioe) {
-                Utils.logThrowable(logger(), OpLevel.WARNING,
-                        StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-                        "ActivityParser.error.reading", getActivityDataType()[0], ioe);
-            }
-        } finally {
-            nextLock.unlock();
-        }
+	/**
+	 * Reads RAW activity data JSON package string from {@link BufferedReader}.
+	 *
+	 * @param rdr
+	 *            reader to use for reading
+	 * @return non empty RAW activity data JSON package string, or {@code null} if the end of the stream has been
+	 *         reached
+	 */
+	@Override
+	protected String readNextActivity(BufferedReader rdr) {
+		StringBuilder jsonStringBuilder = new StringBuilder(1024);
+		String line;
 
-        return jsonStringBuilder.toString();
-    }
+		nextLock.lock();
+		try {
+			try {
+				while ((line = rdr.readLine()) != null) {
+					jsonStringBuilder.append(line);
+					if (ActivityDelim.EOL.name().equals(activityDelim)) {
+						break;
+					}
+				}
+			} catch (EOFException eof) {
+				Utils.logThrowable(logger(), OpLevel.DEBUG,
+						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "ActivityParser.data.end",
+						getActivityDataType()[0], eof);
+			} catch (IOException ioe) {
+				Utils.logThrowable(logger(), OpLevel.WARNING,
+						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						"ActivityParser.error.reading", getActivityDataType()[0], ioe);
+			}
+		} finally {
+			nextLock.unlock();
+		}
 
-    private static final String[] ACTIVITY_DATA_TYPES = { "JSON", "TEXT" }; // NON-NLS
+		return jsonStringBuilder.toString();
+	}
 
-    /**
-     * Returns types of RAW activity data entries.
-     *
-     * @return types of RAW activity data entries - {@code "JSON"} and {@code "TEXT"}
-     */
-    @Override
-    protected String[] getActivityDataType() {
-        return ACTIVITY_DATA_TYPES;
-    }
+	private static final String[] ACTIVITY_DATA_TYPES = { "JSON", "TEXT" }; // NON-NLS
 
-    /**
-     * Gets field raw data value resolved by locator and formats it according locator definition.
-     *
-     * @param locator
-     *            activity field locator
-     * @param cData
-     *            {@link com.jayway.jsonpath.JsonPath} document context to read
-     * @param formattingNeeded
-     *            flag to set if value formatting is not needed
-     * @return value formatted based on locator definition or {@code null} if locator is not defined
-     *
-     * @throws ParseException
-     *             if exception occurs while resolving raw data value or applying locator format properties to specified
-     *             value
-     *
-     * @see ActivityFieldLocator#formatValue(Object)
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    protected Object resolveLocatorValue(ActivityFieldLocator locator, ActivityContext cData,
-                                         AtomicBoolean formattingNeeded) throws ParseException {
-        Object val = null;
-        String locStr = locator.getLocator();
+	/**
+	 * Returns types of RAW activity data entries.
+	 *
+	 * @return types of RAW activity data entries - {@code "JSON"} and {@code "TEXT"}
+	 */
+	@Override
+	protected String[] getActivityDataType() {
+		return ACTIVITY_DATA_TYPES;
+	}
 
-        if (StringUtils.isNotEmpty(locStr)) {
-            Object jsonValue;
-            try {
-                Expression<JsonNode> exp = runtime.compile(locStr);
-                JsonNode jsonNode = cData.getData();
-                jsonValue = exp.search(jsonNode);
-            } catch (Exception exc) {
-                jsonValue = null;
-            }
+	/**
+	 * Gets field raw data value resolved by locator and formats it according locator definition.
+	 *
+	 * @param locator
+	 *            activity field locator
+	 * @param cData
+	 *            {@link com.fasterxml.jackson.databind.JsonNode} document context to read
+	 * @param formattingNeeded
+	 *            flag to set if value formatting is not needed
+	 * @return value formatted based on locator definition or {@code null} if locator is not defined
+	 *
+	 * @throws ParseException
+	 *             if exception occurs while resolving raw data value or applying locator format properties to specified
+	 *             value
+	 *
+	 * @see ActivityFieldLocator#formatValue(Object)
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	protected Object resolveLocatorValue(ActivityFieldLocator locator, ActivityContext cData,
+			AtomicBoolean formattingNeeded) throws ParseException {
+		Object val = null;
+		String locStr = locator.getLocator();
 
-            if (jsonValue != null) {
-                if (jsonValue instanceof List) {
-                    List<Object> jsonValuesList = (List<Object>) jsonValue;
-                    List<Object> valuesList = new ArrayList<>(jsonValuesList.size());
-                    for (Object jsonValues : jsonValuesList) {
-                        valuesList.add(locator.formatValue(jsonValues));
-                    }
-                    val = valuesList;
-                } else {
-                    val = locator.formatValue(jsonValue);
-                }
-                formattingNeeded.set(false);
-            }
-        }
+		if (StringUtils.isNotEmpty(locStr)) {
+			JsonNode jsonValue;
+			try {
+				Expression<JsonNode> exp = expressionsMap.computeIfAbsent(locStr, new Function<>() {
+					@Override
+					public Expression<JsonNode> apply(String expression) {
+						return runtime.compile(expression);
+					}
+				});
+				jsonValue = exp.search(cData.getData());
+			} catch (Exception exc) {
+				jsonValue = null;
+			}
 
-        return val;
-    }
+			val = getNodeValue(jsonValue);
 
-    @SuppressWarnings("deprecation")
-    private static final EnumSet<ActivityFieldLocatorType> UNSUPPORTED_LOCATOR_TYPES = EnumSet
-            .of(ActivityFieldLocatorType.Index, ActivityFieldLocatorType.Range, ActivityFieldLocatorType.REMatchId);
+			if (val != null) {
+				if (val instanceof List) {
+					// List<Object> jsonValuesList = (List<Object>) jsonValue;
+					// List<Object> valuesList = new ArrayList<>(jsonValuesList.size());
+					// for (Object jsonValues : jsonValuesList) {
+					// valuesList.add(locator.formatValue(jsonValues));
+					// }
+					// val = valuesList;
+				} else {
+					val = locator.formatValue(val);
+				}
+				formattingNeeded.set(false);
+			}
+		}
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Unsupported activity locator types are:
-     * <ul>
-     * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Index}</li>
-     * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Range}</li>
-     * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#REMatchId}</li>
-     * </ul>
-     */
-    @Override
-    protected EnumSet<ActivityFieldLocatorType> getUnsupportedLocatorTypes() {
-        return UNSUPPORTED_LOCATOR_TYPES;
-    }
+		return val;
+	}
+
+	protected Object getNodeValue(JsonNode jsonValue) {
+		if (jsonValue != null) {
+			switch (jsonValue.getNodeType()) {
+			case STRING:
+				return jsonValue.textValue();
+			case NUMBER:
+				return jsonValue.numberValue();
+			case BOOLEAN:
+				return jsonValue.booleanValue();
+			case BINARY:
+				return ((BinaryNode) jsonValue).binaryValue();
+			case POJO:
+				return ((POJONode) jsonValue).getPojo();
+			case ARRAY:
+				return jsonValue.elements();
+			case OBJECT:
+				return jsonValue.properties();
+			case NULL:
+			case MISSING:
+			default:
+				break;
+			}
+		}
+
+		return null;
+	}
+
+	@SuppressWarnings("deprecation")
+	private static final EnumSet<ActivityFieldLocatorType> UNSUPPORTED_LOCATOR_TYPES = EnumSet
+			.of(ActivityFieldLocatorType.Index, ActivityFieldLocatorType.Range, ActivityFieldLocatorType.REMatchId);
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Unsupported activity locator types are:
+	 * <ul>
+	 * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Index}</li>
+	 * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Range}</li>
+	 * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#REMatchId}</li>
+	 * </ul>
+	 */
+	@Override
+	protected EnumSet<ActivityFieldLocatorType> getUnsupportedLocatorTypes() {
+		return UNSUPPORTED_LOCATOR_TYPES;
+	}
 }
-
