@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tnt-data-source
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
+
+    <parser name="CallsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser" manualFieldsOrder="true">
+        <field name="EventType" value="Snapshot"/>
+        <field name="type" value="InlineTXEntry"/>
+        <field name="from" locator="from" locator-type="Label"/>
+        <field name="to" locator="to" locator-type="Label"/>
+        <field name="EventName" separator="_">
+            <field-locator locator="^.EventName" locator-type="Activity"/>
+            <field-locator locator="$indexOf$" locator-type="Activity"/>
+        </field>
+        <field name="Category" value="Inline TX entry"/>
+
+        <field name="originTxFrom" locator="^.fromCall" locator-type="Activity"/>
+        <field name="originTxTo" locator="^.toCall" locator-type="Activity"/>
+
+        <field name="level" locator="^.level" locator-type="Activity">
+            <field-transform lang="groovy"><![CDATA[
+                $fieldValue == null ? 1 : $fieldValue + 1
+            ]]></field-transform>
+        </field>
+
+        <field name="value" locator="value" locator-type="Label" datatype="Number" format="double">
+            <field-transform lang="groovy"><![CDATA[
+                ($fieldValue != null) ? $fieldValue / 1000000000000000000 : null;
+            ]]></field-transform>
+        </field>
+        <field name="valueWei" locator="value" locator-type="Label" datatype="Number" value-type="crypto.eth.wei"/>
+
+        <embedded-activity name="calls" locator="calls" locator-type="Label">
+            <parser-ref name="CallsParser" aggregation="Relate"/>
+        </embedded-activity>
+
+        <field name="transaction" locator="^.transaction" locator-type="Activity"/>
+
+        <filter name="Value Filter">
+            <expression handle="exclude" lang="groovy"><![CDATA[
+                ${valueWei} == null || ${valueWei} == 0
+            ]]></expression>
+        </filter>
+    </parser>
+
+    <parser name="traceParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJMESParser">
+        <property name="ActivityDelim" value="EOF"/>
+
+        <field name="EventType" value="Event"/>
+
+        <field name="transaction" locator="id" locator-type="Label"/>
+        <field name="EventName" locator="id" locator-type="Label"/>
+        <field name="guid" locator="id" locator-type="Label"/>
+
+        <field name="fromCall" locator="result.from" locator-type="Label" transparent="true"/>
+        <field name="toCall" locator="result.to" locator-type="Label" transparent="true"/>
+        <field name="InlineTXEntrySum" locator="result.calls.[?(@.type=='CALL')].value" locator-type="Label">
+            <field-transform name="ETHTokenSymbolTransform" lang="groovy"><![CDATA[
+                if ($fieldValue != null && $fieldValue.getClass().isArray()) {
+                    BigInteger[] numbers = new BigInteger[$fieldValue.size()]
+                    for(int n = 0; n < $fieldValue.size(); n++) {
+                        numbers[n] = new BigInteger($fieldValue[n].substring(2), 16);
+                    }
+                    return numbers.sum()
+                } else {
+                    return $fieldValue
+                }
+            ]]></field-transform>
+        </field>
+
+        <field name="Error" locator="error.code" locator-type="Label"/>
+
+        <embedded-activity name="calls" locator="result.calls" locator-type="Label">
+            <parser-ref name="CallsParser" aggregation="Relate"/>
+        </embedded-activity>
+    </parser>
+
+    <!--TO STREAM FROM SAMPLE STATS JSON FILE-->
+    <stream name="RecursiveSampleStream" class="com.jkoolcloud.tnt4j.streams.inputs.CharacterStream">
+        <property name="FileName" value="./tnt4j-streams-core/samples/json-recursive/sample2.json"/>
+        <property name="SendStreamStates" value="false"/>
+
+        <parser-ref name="traceParser"/>
+    </stream>
+</tnt-data-source>
