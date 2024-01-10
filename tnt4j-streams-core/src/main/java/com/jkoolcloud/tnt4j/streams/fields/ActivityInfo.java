@@ -44,8 +44,8 @@ import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
 import com.jkoolcloud.tnt4j.uuid.DefaultUUIDFactory;
 
 /**
- * This class represents an {@link com.jkoolcloud.tnt4j.core.Trackable} entity (e.g. activity/event/snapshot/dataset) to
- * record to jKoolCloud.
+ * This class represents an {@link com.jkoolcloud.tnt4j.core.Trackable} entity (e.g.
+ * activity/event/snapshot/dataset/log) to record to jKoolCloud.
  *
  * @version $Revision: 3 $
  */
@@ -720,9 +720,9 @@ public class ActivityInfo {
 
 	/**
 	 * Creates the appropriate data package {@link com.jkoolcloud.tnt4j.tracker.TrackingActivity},
-	 * {@link com.jkoolcloud.tnt4j.tracker.TrackingEvent}, {@link com.jkoolcloud.tnt4j.core.PropertySnapshot} or
-	 * {@link com.jkoolcloud.tnt4j.core.Dataset} using the specified tracker for this activity data entity to be sent to
-	 * jKoolCloud.
+	 * {@link com.jkoolcloud.tnt4j.tracker.TrackingEvent}, {@link com.jkoolcloud.tnt4j.core.PropertySnapshot},
+	 * {@link com.jkoolcloud.tnt4j.core.Dataset} or {@link com.jkoolcloud.tnt4j.core.LogEntry} using the specified
+	 * tracker for this activity data entity to be sent to jKoolCloud.
 	 *
 	 * @param tracker
 	 *            {@link com.jkoolcloud.tnt4j.tracker.Tracker} instance to be used to build
@@ -754,6 +754,8 @@ public class ActivityInfo {
 			return buildSnapshot(tracker, eventName, trackingId);
 		} else if (eventType == OpType.DATASET) {
 			return buildDataset(tracker, eventName, trackingId);
+		} else if (eventType == OpType.LOG) {
+			return buildLogEntry(tracker, eventName, trackingId);
 		} else {
 			return buildEvent(tracker, eventName, trackingId, childMap);
 		}
@@ -794,9 +796,9 @@ public class ActivityInfo {
 
 	/**
 	 * Creates the appropriate data package {@link com.jkoolcloud.tnt4j.tracker.TrackingActivity},
-	 * {@link com.jkoolcloud.tnt4j.tracker.TrackingEvent}, {@link com.jkoolcloud.tnt4j.core.PropertySnapshot} or
-	 * {@link com.jkoolcloud.tnt4j.core.Dataset} using the specified tracker for this activity data entity to be sent to
-	 * jKoolCloud.
+	 * {@link com.jkoolcloud.tnt4j.tracker.TrackingEvent}, {@link com.jkoolcloud.tnt4j.core.PropertySnapshot},
+	 * {@link com.jkoolcloud.tnt4j.core.Dataset} or {@link com.jkoolcloud.tnt4j.core.LogEntry} using the specified
+	 * tracker for this activity data entity to be sent to jKoolCloud.
 	 * <p>
 	 * Does same as {@link #buildTrackable(com.jkoolcloud.tnt4j.tracker.Tracker, java.util.Map)} where {@code childMap}
 	 * list is {@code null}.
@@ -1047,7 +1049,7 @@ public class ActivityInfo {
 	}
 
 	private static boolean isSnapshotType(OpType opType) {
-		return opType == OpType.SNAPSHOT || opType == OpType.DATASET;
+		return opType == OpType.SNAPSHOT || opType == OpType.DATASET || opType == OpType.LOG;
 	}
 
 	private static boolean isOperation(Trackable trackable) {
@@ -1175,6 +1177,8 @@ public class ActivityInfo {
 			return OpType.EVENT.name();
 		} else if (trackable instanceof Dataset) {
 			return OpType.DATASET.name();
+		} else if (trackable instanceof LogEntry) {
+			return OpType.LOG.name();
 		} else if (trackable instanceof Snapshot) {
 			return OpType.SNAPSHOT.name();
 		} else {
@@ -1184,9 +1188,9 @@ public class ActivityInfo {
 
 	private static String resolveChildTypesFor(Trackable trackable) {
 		if (trackable instanceof Activity) {
-			return "ACTIVITY, EVENT, SNAPSHOT, DATASET"; // NON-NLS
+			return "ACTIVITY, EVENT, SNAPSHOT, DATASET, LOG"; // NON-NLS
 		} else if (trackable instanceof TrackingEvent) {
-			return "SNAPSHOT, DATASET"; // NON-NLS
+			return "SNAPSHOT, DATASET, LOG"; // NON-NLS
 		} else if (trackable instanceof Snapshot) {
 			return "NONE"; // NON-NLS
 		} else {
@@ -1226,7 +1230,7 @@ public class ActivityInfo {
 	}
 
 	/**
-	 * Builds {@link com.jkoolcloud.tnt4j.core.Dataset} for activity data recording.
+	 * Builds {@link com.jkoolcloud.tnt4j.core.Dataset} for activity named properties data recording.
 	 *
 	 * @param tracker
 	 *            communication gateway to use to record dataset
@@ -1243,6 +1247,27 @@ public class ActivityInfo {
 		fillSnapshot(dataset, trackId);
 
 		return dataset;
+	}
+
+	/**
+	 * Builds {@link com.jkoolcloud.tnt4j.core.LogEntry} for activity log entry data recording.
+	 *
+	 * @param tracker
+	 *            communication gateway to use to record log entry
+	 * @param trackName
+	 *            name of log entry
+	 * @param trackId
+	 *            identifier (signature) of log entry
+	 * @return log entry instance
+	 */
+	protected LogEntry buildLogEntry(Tracker tracker, String trackName, String trackId) {
+		trackName = getVerifiedEntityName(trackName, trackId, LogEntry.class);
+
+		LogEntry logEntry = category != null ? tracker.newLogEntry(category, trackName)
+				: tracker.newLogEntry(trackName);
+		fillSnapshot(logEntry, trackId);
+
+		return logEntry;
 	}
 
 	private String getVerifiedEntityName(String trackName, String trackId, Class<?> eClass) {
