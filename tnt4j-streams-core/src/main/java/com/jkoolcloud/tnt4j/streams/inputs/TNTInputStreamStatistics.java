@@ -110,13 +110,13 @@ public class TNTInputStreamStatistics
 					startTimeGauge = new DefaultSettableGauge<>(System.currentTimeMillis());
 				}
 				Gauge<?> startTime = metrics.register(streamName + START_TIME_KEY, startTimeGauge);
-				Gauge<String> elapsedTimeGauge = metrics.register(streamName + ":elapsed time", new Gauge<String>() { // NON-NLS
+				Gauge<String> elapsedTimeGauge = metrics.register(streamName + ":elapsed time", new Gauge<>() { // NON-NLS
 					@Override
 					public String getValue() {
 						return Duration.durationHMS((Long) startTime.getValue());
 					}
 				});
-				Gauge<String> cacheGauge = metrics.register(streamName + ":cache load", new Gauge<String>() { // NON-NLS
+				Gauge<String> cacheGauge = metrics.register(streamName + ":cache load", new Gauge<>() { // NON-NLS
 					@Override
 					public String getValue() {
 						return StreamsCache.cacheSize() + "/" + StreamsCache.cacheMaxSize(); // NON-NLS
@@ -127,7 +127,7 @@ public class TNTInputStreamStatistics
 		} else {
 			Counter startTime = metrics.counter(streamName + START_TIME_KEY);
 			startTime.inc(System.currentTimeMillis());
-			Gauge<String> elapsedTimeGauge = metrics.register(streamName + ":elapsed time", new Gauge<String>() { // NON-NLS
+			Gauge<String> elapsedTimeGauge = metrics.register(streamName + ":elapsed time", new Gauge<>() { // NON-NLS
 				@Override
 				public String getValue() {
 					return Duration.durationHMS(startTime.getCount());
@@ -151,13 +151,13 @@ public class TNTInputStreamStatistics
 		outputSnapshots = metrics.counter(streamName + ":output:snapshots"); // NON-NLS
 		outputOther = metrics.counter(streamName + ":output:others"); // NON-NLS
 
-		bytesTotal = metrics.register(streamName + ":total bytes", new Gauge<Long>() { // NON-NLS
+		bytesTotal = metrics.register(streamName + ":total bytes", new Gauge<>() { // NON-NLS
 			@Override
 			public Long getValue() {
 				return getTotalBytesCount();
 			}
 		});
-		activitiesTotal = metrics.register(streamName + ":total activities", new Gauge<Integer>() { // NON-NLS
+		activitiesTotal = metrics.register(streamName + ":total activities", new Gauge<>() { // NON-NLS
 			@Override
 			public Integer getValue() {
 				return getTotalActivitiesCount();
@@ -427,6 +427,7 @@ public class TNTInputStreamStatistics
 					break;
 				case SNAPSHOT:
 				case DATASET:
+				case LOG:
 					outputSnapshots.inc();
 					getMainStatisticsModule().outputSnapshots.inc();
 					break;
