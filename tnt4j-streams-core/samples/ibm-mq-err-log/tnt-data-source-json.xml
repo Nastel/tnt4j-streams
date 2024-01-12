@@ -7,7 +7,11 @@
         <property name="UseActivityDataAsMessageForUnset" value="true"/>
 
         <field name="EventType" value="EVENT"/>
-        <field name="ResourceName" locator="FileName" locator-type="StreamProp"/>
+        <field name="ResourceName" locator="StreamedFileName" locator-type="StreamProp">
+            <field-transform lang="groovy" phase="raw"><![CDATA[
+                $fieldValue == null ? null : Utils.toString($fieldValue)
+            ]]></field-transform>
+        </field>
 
         <field name="StartTime" locator="$.ibm_datetime" format="yyyy-MM-dd'T'HH:mm:ss.SSSX" locator-type="Label"/>
         <field name="Process" locator="$.ibm_processName" locator-type="Label"/>

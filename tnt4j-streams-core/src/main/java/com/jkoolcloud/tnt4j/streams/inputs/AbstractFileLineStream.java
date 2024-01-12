@@ -83,6 +83,11 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 	private static final long DEFAULT_DELAY_PERIOD = TimeUnit.SECONDS.toMillis(15);
 
 	/**
+	 * Constant for name of built-in stream property {@value}.
+	 */
+	protected static final String PROP_STREAMED_FILE_NAME = "StreamedFileName"; // NON-NLS;
+
+	/**
 	 * Stream attribute defining file name or file name pattern.
 	 */
 	protected String fileName = null;
@@ -197,6 +202,10 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 		if (StreamProperties.PROP_CHARSET.equalsIgnoreCase(name)) {
 			return charsetName;
 		}
+		if (PROP_STREAMED_FILE_NAME.equalsIgnoreCase(name)) {
+			return fileWatcher == null ? null : fileWatcher.fileToRead;
+		}
+
 		return super.getProperty(name);
 	}
 
