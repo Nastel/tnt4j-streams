@@ -427,10 +427,10 @@ public class TNTInputStreamStatistics
 					break;
 				case SNAPSHOT:
 				case DATASET:
-				case LOG:
 					outputSnapshots.inc();
 					getMainStatisticsModule().outputSnapshots.inc();
 					break;
+				case LOG:
 				default:
 					outputEvents.inc();
 					getMainStatisticsModule().outputEvents.inc();

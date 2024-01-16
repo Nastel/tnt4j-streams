@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.jkoolcloud.tnt4j.tracker.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -37,10 +38,6 @@ import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.source.SourceType;
 import com.jkoolcloud.tnt4j.streams.configure.ParserProperties;
 import com.jkoolcloud.tnt4j.streams.utils.*;
-import com.jkoolcloud.tnt4j.tracker.TimeTracker;
-import com.jkoolcloud.tnt4j.tracker.Tracker;
-import com.jkoolcloud.tnt4j.tracker.TrackingActivity;
-import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
 import com.jkoolcloud.tnt4j.uuid.DefaultUUIDFactory;
 
 /**
@@ -1049,7 +1046,7 @@ public class ActivityInfo {
 	}
 
 	private static boolean isSnapshotType(OpType opType) {
-		return opType == OpType.SNAPSHOT || opType == OpType.DATASET || opType == OpType.LOG;
+		return opType == OpType.SNAPSHOT || opType == OpType.DATASET;
 	}
 
 	private static boolean isOperation(Trackable trackable) {
@@ -1173,12 +1170,12 @@ public class ActivityInfo {
 	private static String resolveTrackableType(Trackable trackable) {
 		if (trackable instanceof Activity) {
 			return OpType.ACTIVITY.name();
+		} else if (trackable instanceof LogEntry) {
+			return OpType.LOG.name();
 		} else if (trackable instanceof TrackingEvent) {
 			return OpType.EVENT.name();
 		} else if (trackable instanceof Dataset) {
 			return OpType.DATASET.name();
-		} else if (trackable instanceof LogEntry) {
-			return OpType.LOG.name();
 		} else if (trackable instanceof Snapshot) {
 			return OpType.SNAPSHOT.name();
 		} else {
@@ -1261,13 +1258,84 @@ public class ActivityInfo {
 	 * @return log entry instance
 	 */
 	protected LogEntry buildLogEntry(Tracker tracker, String trackName, String trackId) {
-		trackName = getVerifiedEntityName(trackName, trackId, LogEntry.class);
+		trackName = getVerifiedEntityName(trackName, trackId, TrackingEvent.class);
 
-		LogEntry logEntry = category != null ? tracker.newLogEntry(category, trackName)
-				: tracker.newLogEntry(trackName);
-		fillSnapshot(logEntry, trackId);
+		LogEntry event = tracker.newLogEntry(severity == null ? OpLevel.INFO : severity, trackName, (String) null,
+				(String) null, (Object[]) null);
+		event.setTrackingId(trackId);
+		event.setParentId(parentId);
+		if (StringUtils.isNotEmpty(guid)) {
+			event.setGUID(guid);
+			event.setCorrelator(guid);
+		}
+		if (CollectionUtils.isNotEmpty(correlator)) {
+			event.setCorrelator(correlator);
+		}
+		if (CollectionUtils.isNotEmpty(tag)) {
+			event.setTag(tag);
+		}
+		if (message != null) {
+			if (message instanceof byte[]) {
+				byte[] binData = (byte[]) message;
+				event.setMessage(binData, (Object[]) null);
+			} else {
+				String strData = Utils.toString(message);
+				event.setMessage(strData, (Object[]) null);
+			}
 
-		return logEntry;
+			if (msgLength != null) {
+				event.setSize(msgLength);
+			}
+		}
+		if (StringUtils.isNotEmpty(msgMimeType)) {
+			event.setMimeType(msgMimeType);
+		}
+		if (StringUtils.isNotEmpty(msgEncoding)) {
+			event.setEncoding(msgEncoding);
+		}
+		if (StringUtils.isNotEmpty(msgCharSet)) {
+			event.setCharset(msgCharSet);
+		}
+		if (msgAge > 0L) {
+			event.setMessageAge(msgAge);
+		}
+
+		event.getOperation().setCompCode(compCode == null ? OpCompCode.SUCCESS : compCode);
+		event.getOperation().setReasonCode(reasonCode);
+		event.getOperation().setType(eventType == null ? OpType.EVENT : eventType);
+		event.getOperation().setException(exception);
+		if (StringUtils.isNotEmpty(location)) {
+			event.getOperation().setLocation(location);
+		}
+		event.getOperation().setResource(resourceName);
+		event.getOperation().setUser(StringUtils.isEmpty(userName) ? tracker.getSource().getUser() : userName);
+		event.getOperation().setTID(threadId == null ? Thread.currentThread().getId() : threadId);
+		event.getOperation().setPID(processId == null ? Utils.getVMPID() : processId);
+		// event.getOperation().setSeverity(severity == null ? OpLevel.INFO : severity);
+		if (eventStatus != null) {
+			addActivityProperty(JSONFormatter.JSON_STATUS_FIELD, eventStatus);
+		}
+		if (StringUtils.isNotEmpty(category)) {
+			addActivityProperty(JSONFormatter.JSON_CATEGORY_FIELD, category);
+		}
+		event.start(startTime);
+		event.stop(endTime, elapsedTime);
+		event.setTTL(ttl);
+
+		if (activityProperties != null) {
+			for (Property ap : activityProperties.values()) {
+				if (ap.getValue() instanceof Snapshot) {
+					if (ap.isTransient()) {
+						continue;
+					}
+					event.getOperation().addSnapshot((Snapshot) ap.getValue());
+				} else {
+					event.getOperation().addProperty(ap);
+				}
+			}
+		}
+
+		return event;
 	}
 
 	private String getVerifiedEntityName(String trackName, String trackId, Class<?> eClass) {

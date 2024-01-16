@@ -6,7 +6,7 @@
     <parser name="MQErrLogParser" class="com.jkoolcloud.tnt4j.streams.custom.parsers.IBMMQLogParser">
         <property name="UseActivityDataAsMessageForUnset" value="true"/>
 
-        <field name="EventType" value="EVENT"/>
+        <field name="EventType" value="Log"/>
         <field name="ResourceName" locator="FileName" locator-type="StreamProp"/>
 
         <field name="StartTimeCommon" separator=" " format="MM/dd/yyyy HH:mm:ss" datatype="DateTime" transparent="true">
