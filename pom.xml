@@ -77,7 +77,7 @@
         <gpg.skip>true</gpg.skip>
 
         <junit.version>5.10.1</junit.version>
-        <mockito.version>5.8.0</mockito.version>
+        <mockito.version>5.9.0</mockito.version>
     </properties>
 
     <profiles>
@@ -199,7 +199,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.3</version>
+                <version>3.2.5</version>
                 <inherited>true</inherited>
                 <configuration>
                     <systemProperties>
