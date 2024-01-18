@@ -61,6 +61,7 @@
 
         <field name="Rest" locator="#" locator-type="Label"/>
     </parser>
+
     <parser name="ValueParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="NOOP"/>
 

@@ -35,8 +35,9 @@
             <property name="source.factory.RootFQN" value="DATACENTER=?"/>
             <property name="tracker.default.snapshot.category" value="Azure-metrics"/>
 
-            <!-- Sequence of sinks to broadcast stream produced activities. You may leave just one of them to sent data to single endpoint -->
+            <!-- Sequence of sinks to broadcast stream produced activities. Values may be one or combination of: ap, xray -->
             <property name="event.sink.factory.BroadcastSequence" value="ap"/>
+            <!--<property name="event.sink.factory.BroadcastSequence" value="ap,xray"/>-->
 
             <property name="event.sink.factory.EventSinkFactory.ap" value="com.jkoolcloud.tnt4j.sink.impl.SocketEventSinkFactory"/>
             <!--<property name="event.sink.factory.EventSinkFactory.ap.LogSink" value="file:./logs/tnt4j-streams_samples_socket.log"/>-->
@@ -64,6 +65,23 @@
             <property name="event.sink.factory.EventSinkFactory.ap.Formatter.PathLevelAttributes">
                 domain;subscription;resourceGroup;provider;namespace;metric;entityName,messagingErrorSubCode;
             </property>
+
+            <!-- JKool/XRay sink -->
+            <property name="event.sink.factory.EventSinkFactory.xray" value="com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory"/>
+            <!--<property name="event.sink.factory.EventSinkFactory.xray.LogSink"
+                      value="slf4j:com.jkoolcloud.tnt4j.streams.activities_prod_log"/>-->
+            <property name="event.sink.factory.EventSinkFactory.xray.LogSink" value="null"/>
+            <property name="event.sink.factory.EventSinkFactory.xray.Url" value="https://stream.meshiq.com"/>
+            <property name="event.sink.factory.EventSinkFactory.xray.Token" value="xray-access-token"/>
+
+            <property name="event.sink.factory.EventSinkFactory.xray.Formatter" value="com.jkoolcloud.tnt4j.format.JSONFormatter"/>
+
+            <!-- Activities routing by activity field "RoutePath" value "xray" -->
+            <property name="event.sink.factory.EventSinkFactory.xray.Filter"
+                      value="com.jkoolcloud.tnt4j.streams.sink.filters.EventMatchExpressionFilter"/>
+            <property name="event.sink.factory.EventSinkFactory.xray.Filter.MatchExp"><![CDATA[
+                groovy:StringUtils.equals(${RoutePath}, "xray")
+            ]]></property>
 
             <property name="event.sink.factory.RateLimit" value="false"/>
             <property name="event.sink.factory.RateMaxMPS" value="45"/>

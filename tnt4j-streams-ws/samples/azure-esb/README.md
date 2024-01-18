@@ -25,7 +25,17 @@
 
 All required configuration shall be done in [tnt-data-source.xml](tnt-data-source.xml) file.
 
-* Configure XRay access:
+* Configure streamed data broadcasting:
+  * Route streamed data to Autopilot only, set: `<property name="event.sink.factory.BroadcastSequence" value="ap"/>`
+  * Route streamed data to XRay only, set: `<property name="event.sink.factory.BroadcastSequence" value="xray"/>`
+  * Route streamed data to both Autopilot and XRay simultaneously, set: `<property name="event.sink.factory.BroadcastSequence" value="ap,xray"/>`   
+* Configure XRay access (optional if not present in broadcasting sequence):
+  * Set your XRay access token:
+    ```xml
+    <property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://data.jkoolcloud.com"/>
+    <property name="event.sink.factory.EventSinkFactory.prod.Token" value="388xxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxb3"/>
+    ```
+* Configure AutoPilot access (optional if not present in broadcasting sequence):
   * Set your AutoPilot CEP facts streaming endpoint:
     ```xml
     <property name="event.sink.factory.EventSinkFactory.ap.Host" value="<AP_CEP_IP/HOST>"/>

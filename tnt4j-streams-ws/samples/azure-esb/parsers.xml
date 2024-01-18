@@ -32,7 +32,7 @@
         </field>
     </parser>
 
-    <parser name="MetricDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+    <parser name="MetricDataParserAP" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="Snapshot"/>
 
         <!--field name="Guid" separator="_">
@@ -95,6 +95,53 @@
         </field>
     </parser>
 
+    <parser name="MetricDataParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="Snapshot"/>
+
+        <field name="Guid" separator="_">
+            <field-locator id="MetricName" locator="^.MetricName" locator-type="Activity" datatype="String"/>
+            <field-locator id="MetricEntityName" locator="^.EntityName" locator-type="Activity" datatype="String">
+                <field-transform lang="groovy"><![CDATA[
+                       $fieldValue == null //|| $fieldValue.equals("-NamespaceOnlyMetric-")
+                            ? ${NamespaceName}
+                            : $fieldValue
+                    ]]></field-transform>
+            </field-locator>
+            <field-locator id="MetricRegion" locator="^.Region" locator-type="Activity" datatype="String"/>
+            <field-locator id="MetricTimeStamp" locator="timeStamp" locator-type="Label" datatype="String"/>
+            <field-locator id="MessagingErrorSubCode" locator="^.MessagingErrorSubCode" locator-type="Activity" datatype="String"/>
+        </field>
+        <field name="NamespaceName" locator="^.NamespaceName" locator-type="Activity" transparent="true"/>
+        <field name="StartTime" locator="timeStamp" locator-type="Label" datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ssX"/>
+        <field name="EndTime" locator="StartTime" locator-type="Activity"/>
+
+        <field name="Total" locator="total" locator-type="Label" datatype="Number" format="long" value-type="${ValueType}">
+            <field-locator id="ValueType" locator="ValueType" locator-type="Activity"/>
+        </field>
+        <field name="Count" locator="count" locator-type="Label" datatype="Number" format="long" value-type="${ValueType}">
+            <field-locator id="ValueType" locator="ValueType" locator-type="Activity"/>
+        </field>
+        <field name="Maximum" locator="maximum" locator-type="Label" datatype="Number" format="double" value-type="${ValueType}">
+            <field-locator id="ValueType" locator="ValueType" locator-type="Activity"/>
+        </field>
+        <field name="Minimum" locator="minimum" locator-type="Label" datatype="Number" format="double" value-type="${ValueType}">
+            <field-locator id="ValueType" locator="ValueType" locator-type="Activity"/>
+        </field>
+        <field name="Average" locator="average" locator-type="Label" datatype="Number" format="double" value-type="${ValueType}">
+            <field-locator id="ValueType" locator="ValueType" locator-type="Activity"/>
+        </field>
+
+        <field name="ValueType" locator="^.MetricUnit" locator-type="Activity" datatype="String">
+            <field-map source="Bytes" target="size.byte"/>
+            <field-map source="MilliSeconds" target="age.msec"/>
+            <field-map source="Percent" target="percent"/>
+            <field-map source="CPU" target="percent"/>
+            <field-map source="Memory Usage" target="percent"/>
+            <field-map source="MemoryUsage" target="percent"/>
+            <field-map source="" target="counter"/>
+        </field>
+    </parser>
+
     <parser name="MetricTimeseriesParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="NOOP"/>
 
@@ -102,12 +149,18 @@
             <parser-ref name="MetadataParser" aggregation="Merge"/>
         </embedded-activity>
         <embedded-activity name="Data" locator="data" locator-type="Label">
-            <parser-ref name="MetricDataParser" aggregation="Relate"/>
+            <parser-ref name="MetricDataParser" aggregation="Relate" tags="continuous">
+                <matchExp>groovy:$stream.getOutput ().hasSink ("xray");</matchExp>
+            </parser-ref>
+            <parser-ref name="MetricDataParserAP" aggregation="Relate" tags="continuous">
+                <matchExp>groovy:$stream.getOutput ().hasSink ("ap");</matchExp>
+            </parser-ref>
         </embedded-activity>
     </parser>
 
-    <parser name="ESBMetricParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+    <parser name="ESBMetricParserAP" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
         <field name="EventType" value="NOOP"/>
+        <field name="RoutePath" value="ap" transparent="true"/>
 
         <field name="EventName" value="snapName">
             <field-transform lang="groovy"><![CDATA[
@@ -154,11 +207,73 @@
         </embedded-activity>
     </parser>
 
+    <parser name="ESBMetricParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityMapParser">
+        <field name="EventType" value="NOOP"/>
+        <field name="RoutePath" value="xray" transparent="true"/>
+
+        <field name="EventName" locator="MetricName" locator-type="Activity" separator="String"/>
+        <field name="Category" locator="MetricType" locator-type="Activity" separator="String"/>
+
+        <field name="MetricId" locator="id" locator-type="Label" datatype="String"/>
+        <field name="ResourceName" value="">
+            <field-transform lang="groovy"><![CDATA[
+                  return StringUtils.substringBefore(${MetricId}, "/providers/Microsoft.Insights/metrics");
+              ]]></field-transform>
+        </field>
+        <field name="NamespaceName" value="">
+            <field-transform lang="groovy"><![CDATA[
+                  return StringUtils.substringAfterLast(${ResourceName}, "/");
+              ]]></field-transform>
+        </field>
+
+        <field name="idTokens" value="" datatype="AsInput" transparent="true">
+            <field-transform lang="groovy" phase="aggregated"><![CDATA[
+                   StringUtils.isEmpty(${MetricId})
+                       ? new String[0]
+                       : ${MetricId}.split("/")
+               ]]></field-transform>
+        </field>
+        <field name="Subscription" value="" datatype="String">
+            <field-transform lang="groovy"><![CDATA[
+                ${idTokens}.length > 2 ? ${idTokens}[2] : null;
+            ]]></field-transform>
+        </field>
+        <field name="ResourceGroup" value="" datatype="String">
+            <field-transform lang="groovy"><![CDATA[
+                ${idTokens}.length > 4 ? ${idTokens}[4] : null;
+            ]]></field-transform>
+        </field>
+        <field name="Provider" value="" datatype="String">
+            <field-transform lang="groovy"><![CDATA[
+                ${idTokens}.length > 6 ? ${idTokens}[6] : null;
+            ]]></field-transform>
+        </field>
+        <field name="Namespace" value="" datatype="String">
+            <field-transform lang="groovy"><![CDATA[
+                ${idTokens}.length > 8 ? ${idTokens}[8] : null;
+            ]]></field-transform>
+        </field>
+        <field name="MetricProvider" value="" datatype="String">
+            <field-transform lang="groovy"><![CDATA[
+                ${idTokens}.length > 10 ? ${idTokens}[10] : null;
+            ]]></field-transform>
+        </field>
+
+        <field name="MetricType" locator="type" locator-type="Label" datatype="String"/>
+        <field name="MetricName" locator="name.value" locator-type="Label" datatype="String"/>
+        <field name="MetricNameLocalized" locator="name.localizedValue" locator-type="Label" datatype="String"/>
+        <field name="MetricDisplayDescription" locator="displayDescription" locator-type="Label" datatype="String"/>
+        <field name="MetricUnit" locator="unit" locator-type="Label" datatype="String"/>
+        <field name="MetricErrCode" locator="errorCode" locator-type="Label" datatype="String"/>
+        <embedded-activity name="TimeSeries" locator="timeseries" locator-type="Label">
+            <parser-ref name="MetricTimeseriesParser" aggregation="Relate"/>
+        </embedded-activity>
+    </parser>
+
     <parser name="AzureESBMetricsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityJsonParser">
         <property name="ActivityDelim" value="EOF"/>
 
         <field name="@SplitRelatives@" value="true" transparent="true"/>
-        <field name="RoutePath" value="ap" transparent="true"/>
 
         <field name="EventType" value="NOOP"/>
 
@@ -180,7 +295,12 @@
         <field name="MetricsStartTime" locator="TimespanEnd" locator-type="Activity" transparent="true"/>
 
         <embedded-activity name="MetricValues" locator="$.value" locator-type="Label">
-            <parser-ref name="ESBMetricParser" aggregation="Relate"/>
+            <parser-ref name="ESBMetricParser" aggregation="Relate" tags="continuous">
+                <matchExp>groovy:$stream.getOutput ().hasSink ("xray");</matchExp>
+            </parser-ref>
+            <parser-ref name="ESBMetricParserAP" aggregation="Relate" tags="continuous">
+                <matchExp>groovy:$stream.getOutput ().hasSink ("ap");</matchExp>
+            </parser-ref>
         </embedded-activity>
     </parser>
 
