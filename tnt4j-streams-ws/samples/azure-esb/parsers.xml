@@ -125,7 +125,7 @@
         <field name="Category" locator="MetricType" locator-type="Activity"/>
         <field name="domain" value="" transparent="true" emptyAsNull="false"/>
 
-        <field name="MetricId" locator="id" locator-type="Label" datatype="String"/>
+        <field name="MetricId" locator="id" locator-type="Label" datatype="String" transparent="true"/>
         <field name="ResourceName" value="" transparent="true">
             <field-transform lang="groovy"><![CDATA[
                 return StringUtils.substringBefore(${MetricId}, "/providers/Microsoft.Insights/metrics");
@@ -144,8 +144,8 @@
             ]]></field-transform>
         </field>
         <field name="MetricType" locator="type" locator-type="Label" datatype="String"/>
-        <field name="MetricName" locator="name.value" locator-type="Label" datatype="String"/>
-        <field name="MetricNameLocalized" locator="name.localizedValue" locator-type="Label" datatype="String"/>
+        <field name="MetricName" locator="name.value" locator-type="Label" datatype="String" transparent="true"/>
+        <field name="MetricNameLocalized" locator="name.localizedValue" locator-type="Label" datatype="String" transparent="true"/>
         <field name="MetricDisplayDescription" locator="displayDescription" locator-type="Label" datatype="String"/>
         <field name="MetricUnit" locator="unit" locator-type="Label" datatype="String"/>
         <field name="MetricErrCode" locator="errorCode" locator-type="Label" datatype="String"/>
