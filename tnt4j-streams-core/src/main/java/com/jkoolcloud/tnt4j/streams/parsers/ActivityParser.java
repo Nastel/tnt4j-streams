@@ -231,7 +231,7 @@ public abstract class ActivityParser implements NamedObject {
 					logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 							"ActivityParser.stacked.parser.input.value.type", name, field, parserRef,
 							valueToParse == null ? null : valueToParse.getClass().getName());
-					applied = applyStackedParser(field, parserRef, valueToParse, cData);
+					applied |= applyStackedParser(field, parserRef, valueToParse, cData);
 
 					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 							"ActivityParser.stacked.parser.applied", name, field, parserRef, applied);
