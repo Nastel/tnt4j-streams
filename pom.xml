@@ -362,7 +362,6 @@
     <modules>
         <module>tnt4j-streams-core</module>
         <module>tnt4j-streams-fs</module>
-        <module>tnt4j-streams-hdfs</module>
         <module>tnt4j-streams-jms</module>
         <module>tnt4j-streams-kafka</module>
         <module>tnt4j-streams-mqtt</module>
@@ -370,15 +369,17 @@
         <module>tnt4j-streams-wmq</module>
         <module>tnt4j-streams-ws</module>
         <module>tnt4j-streams-servlet</module>
-        <module>tnt4j-streams-chronicle</module>
-        <module>tnt4j-streams-flume-plugin</module>
-        <module>tnt4j-streams-elastic-beats</module>
         <module>tnt4j-streams-samples</module>
-        <!--<module>tnt4j-streams-vfs</module>-->
         <module>tnt4j-streams-compress</module>
         <module>tnt4j-streams-protobuf</module>
         <module>tnt4j-streams-prometheus</module>
         <module>tnt4j-streams-otel</module>
+<!-- ### disabled mainstream modules ### -->
+        <!--<module>tnt4j-streams-hdfs</module>-->
+        <!--<module>tnt4j-streams-chronicle</module>-->
+        <!--<module>tnt4j-streams-flume-plugin</module>-->
+        <!--<module>tnt4j-streams-elastic-beats</module>-->
+<!-- ################################### -->
         <module>tnt4j-streams--distribution</module>
     </modules>
 </project>
