@@ -190,8 +190,7 @@ public enum FieldNames {
 
 	/**
 	 * 
-	 * Indicates severity of the activity - Value can either be a label in OperationSeverity enumeration or a numeric
-	 * value.
+	 * Indicates severity of the activity - value can either be a label in OpLevel enumeration or a numeric value.
 	 * 
 	 * 
 	 */
@@ -278,6 +277,15 @@ public enum FieldNames {
 	 */
 	@XmlEnumValue("MsgMimeType")
 	MSG_MIME_TYPE("MsgMimeType"),
+
+	/**
+	 * 
+	 * Type of log entry - value can either be a label in LogType enumeration or a numeric value.
+	 * 
+	 * 
+	 */
+	@XmlEnumValue("LogType")
+	LOG_TYPE("LogType"),
 
 	/**
 	 * 

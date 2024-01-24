@@ -276,8 +276,7 @@
             <xs:enumeration value="Severity">
                 <xs:annotation>
                     <xs:documentation>
-                        Indicates severity of the activity - Value can either be a label in OperationSeverity enumeration or a numeric
-                        value.
+                        Indicates severity of the activity - value can either be a label in OpLevel enumeration or a numeric value.
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
@@ -350,6 +349,14 @@
                 <xs:annotation>
                     <xs:documentation>
                         MIME type of activity entity message data.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="LogType">
+                <xs:annotation>
+                    <xs:documentation>
+                        Type of log entry - value can either be a label in LogType enumeration or a numeric value.
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>

@@ -165,6 +165,11 @@ public enum StreamFieldType {
 	MsgCharSet(String.class),
 
 	/**
+	 * Type of log entry.
+	 */
+	LogType(String.class),
+
+	/**
 	 * Age of activity event message.
 	 */
 	MessageAge(Long.class),
