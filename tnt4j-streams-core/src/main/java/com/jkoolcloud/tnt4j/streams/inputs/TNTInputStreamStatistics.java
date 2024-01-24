@@ -16,6 +16,7 @@
 
 package com.jkoolcloud.tnt4j.streams.inputs;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -24,16 +25,15 @@ import java.util.concurrent.TimeUnit;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 
 import com.codahale.metrics.*;
 import com.codahale.metrics.jmx.JmxReporter;
 import com.codahale.metrics.jmx.ObjectNameFactory;
 import com.codahale.metrics.jvm.JmxAttributeGauge;
-import com.jkoolcloud.tnt4j.core.Activity;
-import com.jkoolcloud.tnt4j.core.OpLevel;
-import com.jkoolcloud.tnt4j.core.OpType;
-import com.jkoolcloud.tnt4j.core.Trackable;
+import com.jkoolcloud.tnt4j.core.*;
+import com.jkoolcloud.tnt4j.core.Snapshot;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.outputs.OutputStreamListener;
@@ -84,6 +84,8 @@ public class TNTInputStreamStatistics
 	private Counter outputEvents;
 	private Counter outputActivities;
 	private Counter outputSnapshots;
+	private Counter outputDatasets;
+	private Counter outputLogs;
 	private Counter outputOther;
 	private Gauge<Long> bytesTotal;
 	private Gauge<Integer> activitiesTotal;
@@ -149,6 +151,8 @@ public class TNTInputStreamStatistics
 		outputEvents = metrics.counter(streamName + ":output:events"); // NON-NLS
 		outputActivities = metrics.counter(streamName + ":output:activities"); // NON-NLS
 		outputSnapshots = metrics.counter(streamName + ":output:snapshots"); // NON-NLS
+		outputDatasets = metrics.counter(streamName + ":output:datasets"); // NON-NLS
+		outputLogs = metrics.counter(streamName + ":output:logs"); // NON-NLS
 		outputOther = metrics.counter(streamName + ":output:others"); // NON-NLS
 
 		bytesTotal = metrics.register(streamName + ":total bytes", new Gauge<>() { // NON-NLS
@@ -426,10 +430,16 @@ public class TNTInputStreamStatistics
 					getMainStatisticsModule().outputActivities.inc();
 					break;
 				case SNAPSHOT:
-				case DATASET:
-				case LOG:
 					outputSnapshots.inc();
 					getMainStatisticsModule().outputSnapshots.inc();
+					break;
+				case DATASET:
+					outputDatasets.inc();
+					getMainStatisticsModule().outputDatasets.inc();
+					break;
+				case LOG:
+					outputLogs.inc();
+					getMainStatisticsModule().outputLogs.inc();
 					break;
 				default:
 					outputEvents.inc();
@@ -442,16 +452,23 @@ public class TNTInputStreamStatistics
 
 	@Override
 	public void onItemRecorded(Object item, Trackable trackable) {
-		Integer snapshotCount = null;
+		Collection<Snapshot> snapshots = null;
 		if (trackable instanceof Activity) {
-			snapshotCount = ((Activity) trackable).getSnapshotCount();
+			snapshots = ((Activity) trackable).getSnapshots();
 		} else if (trackable instanceof TrackingEvent) {
-			snapshotCount = ((TrackingEvent) trackable).getOperation().getSnapshotCount();
+			snapshots = ((TrackingEvent) trackable).getOperation().getSnapshots();
 		}
 
-		if (snapshotCount != null) {
-			outputSnapshots.inc(snapshotCount);
-			getMainStatisticsModule().outputSnapshots.inc(snapshotCount);
+		if (CollectionUtils.isNotEmpty(snapshots)) {
+			int snapshotCount = snapshots.size();
+			Snapshot snapshot = snapshots.iterator().next();
+			if (snapshot instanceof Dataset) {
+				outputDatasets.inc(snapshotCount);
+				getMainStatisticsModule().outputDatasets.inc(snapshotCount);
+			} else {
+				outputSnapshots.inc(snapshotCount);
+				getMainStatisticsModule().outputSnapshots.inc(snapshotCount);
+			}
 		}
 	}
 
