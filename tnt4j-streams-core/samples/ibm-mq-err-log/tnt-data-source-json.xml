@@ -38,7 +38,7 @@
         <field name="Host" locator="$.host" locator-type="Label"/>
         <field name="InstallationDir" locator="$.ibm_installationDir" locator-type="Label"/>
         <!-- type field is reserved, value always 'mq_log' -->
-        <!--<field name="LogType" locator="$.type" locator-type="Label"/>-->
+        <!--<field name="EntryType" locator="$.type" locator-type="Label"/>-->
 
     </parser>
 
