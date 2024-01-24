@@ -336,20 +336,19 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
 		if (jsonAsLine) {
 			try {
-				map = (Map<String, ?>) gson.fromJson(getStringLine(jsonData), map.getClass());
+				map = gson.fromJson(getStringLine(jsonData), map.getClass());
 			} catch (IOException ioe) {
 				throw new JsonIOException(ioe);
 			}
 		} else {
 			if (jsonData instanceof String) {
-				map = (Map<String, ?>) gson.fromJson((String) jsonData, map.getClass());
+				map = gson.fromJson((String) jsonData, map.getClass());
 			} else if (jsonData instanceof byte[]) {
-				map = (Map<String, ?>) gson.fromJson(getString((byte[]) jsonData), map.getClass());
+				map = gson.fromJson(getString((byte[]) jsonData), map.getClass());
 			} else if (jsonData instanceof Reader) {
-				map = (Map<String, ?>) gson.fromJson((Reader) jsonData, map.getClass());
+				map = gson.fromJson((Reader) jsonData, map.getClass());
 			} else if (jsonData instanceof InputStream) {
-				map = (Map<String, ?>) gson.fromJson(new BufferedReader(new InputStreamReader((InputStream) jsonData)),
-						map.getClass());
+				map = gson.fromJson(new BufferedReader(new InputStreamReader((InputStream) jsonData)), map.getClass());
 			}
 		}
 
