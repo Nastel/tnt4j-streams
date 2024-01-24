@@ -37,10 +37,7 @@ import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.source.SourceType;
 import com.jkoolcloud.tnt4j.streams.configure.ParserProperties;
 import com.jkoolcloud.tnt4j.streams.utils.*;
-import com.jkoolcloud.tnt4j.tracker.TimeTracker;
-import com.jkoolcloud.tnt4j.tracker.Tracker;
-import com.jkoolcloud.tnt4j.tracker.TrackingActivity;
-import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
+import com.jkoolcloud.tnt4j.tracker.*;
 import com.jkoolcloud.tnt4j.uuid.DefaultUUIDFactory;
 
 /**
@@ -93,6 +90,7 @@ public class ActivityInfo {
 	private String msgMimeType = null;
 	private long msgAge = -1L;
 	private long ttl = TTL.TTL_DEFAULT;
+	private LogType logType = null;
 
 	private Integer processId = null;
 	private Integer threadId = null;
@@ -269,6 +267,10 @@ public class ActivityInfo {
 				break;
 			case MsgMimeType:
 				msgMimeType = substitute(msgMimeType, getStringValue(fieldValue, field));
+				break;
+			case LogType:
+				LogType lType = fieldValue instanceof LogType ? (LogType) fieldValue : LogType.valueOf(fieldValue);
+				logType = substitute(logType, lType);
 				break;
 			case MessageAge:
 				msgAge = substitute(msgAge, getNumberValue(fieldValue, Long.class, field));
@@ -721,7 +723,7 @@ public class ActivityInfo {
 	/**
 	 * Creates the appropriate data package {@link com.jkoolcloud.tnt4j.tracker.TrackingActivity},
 	 * {@link com.jkoolcloud.tnt4j.tracker.TrackingEvent}, {@link com.jkoolcloud.tnt4j.core.PropertySnapshot},
-	 * {@link com.jkoolcloud.tnt4j.core.Dataset} or {@link com.jkoolcloud.tnt4j.core.LogEntry} using the specified
+	 * {@link com.jkoolcloud.tnt4j.core.Dataset} or {@link com.jkoolcloud.tnt4j.tracker.LogEntry} using the specified
 	 * tracker for this activity data entity to be sent to jKoolCloud.
 	 *
 	 * @param tracker
@@ -797,7 +799,7 @@ public class ActivityInfo {
 	/**
 	 * Creates the appropriate data package {@link com.jkoolcloud.tnt4j.tracker.TrackingActivity},
 	 * {@link com.jkoolcloud.tnt4j.tracker.TrackingEvent}, {@link com.jkoolcloud.tnt4j.core.PropertySnapshot},
-	 * {@link com.jkoolcloud.tnt4j.core.Dataset} or {@link com.jkoolcloud.tnt4j.core.LogEntry} using the specified
+	 * {@link com.jkoolcloud.tnt4j.core.Dataset} or {@link com.jkoolcloud.tnt4j.tracker.LogEntry} using the specified
 	 * tracker for this activity data entity to be sent to jKoolCloud.
 	 * <p>
 	 * Does same as {@link #buildTrackable(com.jkoolcloud.tnt4j.tracker.Tracker, java.util.Map)} where {@code childMap}
@@ -834,7 +836,6 @@ public class ActivityInfo {
 
 		TrackingEvent event = tracker.newEvent(severity == null ? OpLevel.INFO : severity, trackName, (String) null,
 				(String) null, (Object[]) null);
-		event.setTrackingId(trackId);
 		event.setParentId(parentId);
 		if (StringUtils.isNotEmpty(guid)) {
 			event.setGUID(guid);
@@ -843,6 +844,50 @@ public class ActivityInfo {
 		if (CollectionUtils.isNotEmpty(correlator)) {
 			event.setCorrelator(correlator);
 		}
+
+		fillEvent(event, trackId, tracker.getSource().getUser());
+
+		// addFieldsAsProperties(event);
+
+		if (hasChildren()) {
+			buildChildren(tracker, event, childMap);
+		}
+
+		return event;
+	}
+
+	/**
+	 * Builds {@link com.jkoolcloud.tnt4j.tracker.LogEntry} for activity log entry data recording.
+	 *
+	 * @param tracker
+	 *            communication gateway to use to record log entry
+	 * @param trackName
+	 *            name of log entry
+	 * @param trackId
+	 *            identifier (signature) of log entry
+	 * @return log entry instance
+	 */
+	protected LogEntry buildLogEntry(Tracker tracker, String trackName, String trackId) {
+		trackName = getVerifiedEntityName(trackName, trackId, LogEntry.class);
+
+		LogEntry logEntry = tracker.newLogEntry(severity == null ? OpLevel.INFO : severity, trackName, (String) null,
+				null, null);
+		if (StringUtils.isNotEmpty(guid)) {
+			logEntry.setGUID(guid);
+		}
+
+		logEntry.setLogType(logType == null ? LogType.GENERAL : logType);
+
+		fillEvent(logEntry, trackId, tracker.getSource().getUser());
+
+		// addFieldsAsProperties(logEntry);
+
+		return logEntry;
+	}
+
+	private void fillEvent(TrackingEvent event, String trackId, String sourceUser) {
+		event.setTrackingId(trackId);
+
 		if (CollectionUtils.isNotEmpty(tag)) {
 			event.setTag(tag);
 		}
@@ -880,7 +925,7 @@ public class ActivityInfo {
 			event.getOperation().setLocation(location);
 		}
 		event.getOperation().setResource(resourceName);
-		event.getOperation().setUser(StringUtils.isEmpty(userName) ? tracker.getSource().getUser() : userName);
+		event.getOperation().setUser(StringUtils.isEmpty(userName) ? sourceUser : userName);
 		event.getOperation().setTID(threadId == null ? Thread.currentThread().getId() : threadId);
 		event.getOperation().setPID(processId == null ? Utils.getVMPID() : processId);
 		// event.getOperation().setSeverity(severity == null ? OpLevel.INFO : severity);
@@ -902,16 +947,10 @@ public class ActivityInfo {
 					}
 					event.getOperation().addSnapshot((Snapshot) ap.getValue());
 				} else {
-					event.getOperation().addProperty(ap);
+					event.addProperty(ap);
 				}
 			}
 		}
-
-		if (hasChildren()) {
-			buildChildren(tracker, event, childMap);
-		}
-
-		return event;
 	}
 
 	/**
@@ -1005,6 +1044,8 @@ public class ActivityInfo {
 			}
 		}
 
+		// addFieldsAsProperties(activity);
+
 		if (hasChildren()) {
 			buildChildren(tracker, activity, childMap);
 		}
@@ -1049,7 +1090,7 @@ public class ActivityInfo {
 	}
 
 	private static boolean isSnapshotType(OpType opType) {
-		return opType == OpType.SNAPSHOT || opType == OpType.DATASET || opType == OpType.LOG;
+		return opType == OpType.SNAPSHOT || opType == OpType.DATASET;
 	}
 
 	private static boolean isOperation(Trackable trackable) {
@@ -1173,12 +1214,12 @@ public class ActivityInfo {
 	private static String resolveTrackableType(Trackable trackable) {
 		if (trackable instanceof Activity) {
 			return OpType.ACTIVITY.name();
+		} else if (trackable instanceof LogEntry) {
+			return OpType.LOG.name();
 		} else if (trackable instanceof TrackingEvent) {
 			return OpType.EVENT.name();
 		} else if (trackable instanceof Dataset) {
 			return OpType.DATASET.name();
-		} else if (trackable instanceof LogEntry) {
-			return OpType.LOG.name();
 		} else if (trackable instanceof Snapshot) {
 			return OpType.SNAPSHOT.name();
 		} else {
@@ -1226,6 +1267,8 @@ public class ActivityInfo {
 				: tracker.newSnapshot(trackName));
 		fillSnapshot(snapshot, trackId);
 
+		// addFieldsAsProperties(snapshot);
+
 		return snapshot;
 	}
 
@@ -1246,28 +1289,9 @@ public class ActivityInfo {
 		Dataset dataset = category != null ? tracker.newDataset(category, trackName) : tracker.newDataset(trackName);
 		fillSnapshot(dataset, trackId);
 
+		// addFieldsAsProperties(dataset);
+
 		return dataset;
-	}
-
-	/**
-	 * Builds {@link com.jkoolcloud.tnt4j.core.LogEntry} for activity log entry data recording.
-	 *
-	 * @param tracker
-	 *            communication gateway to use to record log entry
-	 * @param trackName
-	 *            name of log entry
-	 * @param trackId
-	 *            identifier (signature) of log entry
-	 * @return log entry instance
-	 */
-	protected LogEntry buildLogEntry(Tracker tracker, String trackName, String trackId) {
-		trackName = getVerifiedEntityName(trackName, trackId, LogEntry.class);
-
-		LogEntry logEntry = category != null ? tracker.newLogEntry(category, trackName)
-				: tracker.newLogEntry(trackName);
-		fillSnapshot(logEntry, trackId);
-
-		return logEntry;
 	}
 
 	private String getVerifiedEntityName(String trackName, String trackId, Class<?> eClass) {
@@ -1357,10 +1381,47 @@ public class ActivityInfo {
 
 		if (activityProperties != null) {
 			for (Property ap : activityProperties.values()) {
-				snapshot.add(ap);
+				snapshot.addProperty(ap);
 			}
 		}
 	}
+
+	// protected void addFieldsAsProperties(Trackable trackable) {
+	// Source source = trackable.getSource();
+	// String srcServer = source.getSource(SourceType.SERVER).getName();
+	// String srcAddress = source.getSource(SourceType.NETADDR).getName();
+	// String srcAppl = source.getSource(SourceType.APPL).getName();
+	//
+	// if (StringUtils.isEmpty(srcServer)) {
+	// trackable.addProperty(new Property(StreamFieldType.ServerName.name(), serverName));
+	// }
+	// if (StringUtils.isEmpty(srcAddress)) {
+	// trackable.addProperty(new Property(StreamFieldType.ServerIp.name(), serverIp));
+	// }
+	// if (StringUtils.isEmpty(srcAppl)) {
+	// trackable.addProperty(new Property(StreamFieldType.ApplName.name(), applName));
+	// }
+	//
+	// switch (trackable.getType()) {
+	// case ACTIVITY:
+	// trackable.addProperty(new Property(StreamFieldType.LogType.name(), logType));
+	// break;
+	// case LOG:
+	// trackable.addProperty(new Property(StreamFieldType.Correlator.name(), correlator));
+	// trackable.addProperty(new Property(StreamFieldType.ParentId.name(), parentId));
+	// break;
+	// case SNAPSHOT:
+	// case DATASET:
+	// trackable.addProperty(new Property(StreamFieldType.EndTime.name(), endTime));
+	// trackable.addProperty(new Property(StreamFieldType.ElapsedTime.name(), elapsedTime));
+	// trackable.addProperty(new Property(StreamFieldType.LogType.name(), logType));
+	// break;
+	// case EVENT:
+	// default:
+	// trackable.addProperty(new Property(StreamFieldType.LogType.name(), logType));
+	// break;
+	// }
+	// }
 
 	/**
 	 * Resolves server name and/or IP Address based on values specified.
@@ -1571,6 +1632,9 @@ public class ActivityInfo {
 		}
 		if (msgAge == -1L) {
 			msgAge = otherAi.msgAge;
+		}
+		if (logType != null) {
+			logType = otherAi.logType;
 		}
 		if (ttl == TTL.TTL_DEFAULT) {
 			ttl = otherAi.ttl;
@@ -1889,6 +1953,15 @@ public class ActivityInfo {
 	 */
 	public String getMsgMimeType() {
 		return msgMimeType;
+	}
+
+	/**
+	 * Gets log entry type.
+	 *
+	 * @return the log entry type
+	 */
+	public LogType getLogType() {
+		return logType;
 	}
 
 	/**
@@ -2258,6 +2331,7 @@ public class ActivityInfo {
 		sb.append(", msgEncoding=").append(Utils.sQuote(msgEncoding)); // NON-NLS
 		sb.append(", msgLength=").append(msgLength); // NON-NLS
 		sb.append(", msgMimeType=").append(Utils.sQuote(msgMimeType)); // NON-NLS
+		sb.append(", logType=").append(Utils.sQuote(logType)); // NON-NLS
 		sb.append(", msgAge=").append(msgAge); // NON-NLS
 		sb.append(", ttl=").append(ttl); // NON-NLS
 		sb.append(", processId=").append(processId); // NON-NLS
@@ -2387,6 +2461,8 @@ public class ActivityInfo {
 				return ai.msgLength;
 			case MsgMimeType:
 				return ai.msgMimeType;
+			case LogType:
+				return ai.logType;
 			case MessageAge:
 				return ai.msgAge;
 			case TTL:
@@ -2643,6 +2719,9 @@ public class ActivityInfo {
 		}
 		if (mp.matcher(StreamFieldType.MsgMimeType.name()).matches()) {
 			valuesMap.put(StreamFieldType.MsgMimeType.name(), ai.msgMimeType);
+		}
+		if (mp.matcher(StreamFieldType.LogType.name()).matches()) {
+			valuesMap.put(StreamFieldType.LogType.name(), ai.logType);
 		}
 		if (mp.matcher(StreamFieldType.MessageAge.name()).matches()) {
 			valuesMap.put(StreamFieldType.MessageAge.name(), ai.msgAge);
