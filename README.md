@@ -4392,9 +4392,8 @@ tracking.selector.Repository: com.jkoolcloud.tnt4j.repository.FileTokenRepositor
 event.sink.factory: com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory
 event.sink.factory.LogSink: file:./logs/tnt4j-streams-activities.log
 
-event.sink.factory.Url: http://stream.meshiq.com:6580
-#event.sink.factory.Url: https://stream.meshiq.com:6585
-#event.sink.factory.Url: https://stream.meshiq.com
+event.sink.factory.Url: https://stream.meshiq.com
+#event.sink.factory.Url: http://stream.meshiq.com:6580
 event.sink.factory.Token: <YOUR TOKEN>
 #### jKoolCloud event sink factory configuration end ####
 ```

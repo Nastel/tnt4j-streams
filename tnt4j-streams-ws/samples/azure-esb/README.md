@@ -32,7 +32,7 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
 * Configure XRay access (optional if not present in broadcasting sequence):
   * Set your XRay access token:
     ```xml
-    <property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://data.jkoolcloud.com"/>
+    <property name="event.sink.factory.EventSinkFactory.prod.Url" value="https://stream.meshiq.com"/>
     <property name="event.sink.factory.EventSinkFactory.prod.Token" value="388xxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxb3"/>
     ```
 * Configure AutoPilot access (optional if not present in broadcasting sequence):
