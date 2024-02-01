@@ -215,9 +215,10 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 				item.addParameter(param);
 			}
 
-			param.setValue(rs.getRow());
+			int rowNumber = rs.getRow();
+			param.setValue(rowNumber);
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
-					"JDBCStream.rs.consumption.marker.new", item.getOriginalRequest().getId(), rs.getRow());
+					"JDBCStream.rs.consumption.marker.new", item.getOriginalRequest().getId(), rowNumber);
 
 			return false;
 		} catch (SQLException exc) {
@@ -231,24 +232,14 @@ public class JDBCStream extends AbstractWsStream<String, ResultSet> {
 
 	@Override
 	protected void closeResponse(ResultSet rs) {
-		Statement st = null;
-		Connection conn = null;
-
-		try {
-			st = rs.getStatement();
-		} catch (SQLException exc) {
-		}
-		try {
-			conn = st == null ? null : st.getConnection();
+		try (Statement st = rs.getStatement(); Connection conn = st == null ? null : st.getConnection()) {
 			if (conn != null && !conn.getAutoCommit()) {
 				conn.commit();
 			}
 		} catch (SQLException exc) {
+		} finally {
+			Utils.close(rs);
 		}
-
-		Utils.close(rs);
-		Utils.close(st);
-		Utils.close(conn);
 	}
 
 	@Override
