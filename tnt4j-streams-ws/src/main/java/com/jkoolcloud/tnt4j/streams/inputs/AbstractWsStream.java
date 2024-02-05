@@ -726,15 +726,16 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 	protected Object getReqContextProperty(String varName, DataFillContext context) {
 		Object rValue = context.getReqParameter(varName);
 		if (rValue == null) {
-			WsScenarioStep reqStep = context.getRequest().getScenarioStep();
+			WsRequest<?> req = context.getRequest();
+			WsScenarioStep reqStep = req == null ? null : req.getScenarioStep();
 			if (reqStep != null) {
 				rValue = reqStep.getProperty(varName);
-			}
 
-			if (rValue == null) {
-				WsScenario reqScenario = reqStep.getScenario();
-				if (reqScenario != null) {
-					rValue = reqScenario.getProperty(varName);
+				if (rValue == null) {
+					WsScenario reqScenario = reqStep.getScenario();
+					if (reqScenario != null) {
+						rValue = reqScenario.getProperty(varName);
+					}
 				}
 			}
 		}
