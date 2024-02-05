@@ -870,7 +870,7 @@ public class ActivityField extends AbstractFieldEntity {
 		fieldValue = filterFieldValue(fieldValue, ai);
 
 		if (fieldValue != null) {
-			if (fieldValue != null && isEmptyAsNull() && Utils.isEmptyContent(fieldValue, true)) {
+			if (isEmptyAsNull() && Utils.isEmptyContent(fieldValue, true)) {
 				LoggerUtils.log(LOGGER, OpLevel.TRACE,
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"ActivityField.field.empty.as.null", this, fieldValue);
@@ -921,9 +921,9 @@ public class ActivityField extends AbstractFieldEntity {
 	 * null}, if field is set as "optional" using attribute {@code required=false}.
 	 *
 	 * @param value
-	 *            value to apply filters @param ai activity info instance to alter "filtered out" flag @return value
-	 *            after filtering applied: {@code null} if value gets filtered out and field is optional, or same as
-	 *            passed over parameters - otherwise
+	 *            value to apply filters
+	 * @param ai
+	 *            activity info instance to alter "filtered out" flag
 	 * @return value filters were applied on, or {@code null} if filters gets field value "filtered out"
 	 *
 	 * @see #filterValue(Object, ActivityInfo)
@@ -999,9 +999,9 @@ public class ActivityField extends AbstractFieldEntity {
 	 * Field referenced stacked parser reference definition.
 	 */
 	public static class FieldParserReference extends MatchingParserReference {
-		private MatchingParserReference parserRef;
-		private AggregationType aggregationType;
-		private ParserApplyType applyOn;
+		private final MatchingParserReference parserRef;
+		private final AggregationType aggregationType;
+		private final ParserApplyType applyOn;
 
 		/**
 		 * Constructs a new ParserReference.
