@@ -45,6 +45,7 @@ public abstract class AbstractFieldEntity {
 	protected String requiredVal = ""; /* string to allow no value */
 
 	protected boolean emptyAsNull = true;
+	protected boolean unwrapSingleValue = true;
 
 	/**
 	 * Field entity transformations list used to transform values.
@@ -130,6 +131,29 @@ public abstract class AbstractFieldEntity {
 	 */
 	public AbstractFieldEntity setEmptyAsNull(boolean emptyAsNull) {
 		this.emptyAsNull = emptyAsNull;
+
+		return this;
+	}
+
+	/**
+	 * Determines whether an item value shall be unwrapped if array or collection containing single item.
+	 *
+	 * @return flag indicating an item value shall be unwrapped if array or collection containing single item
+	 */
+	public boolean isUnwrapSingleValue() {
+		return unwrapSingleValue;
+	}
+
+	/**
+	 * Sets flag indicating an item value shall be unwrapped if array or collection containing single item.
+	 * 
+	 * @param unwrapSingleValue
+	 *            flag indicating an item value shall be unwrapped if array or collection containing single item
+	 *
+	 * @return instance of this field entity
+	 */
+	public AbstractFieldEntity setUnwrapSingleValue(boolean unwrapSingleValue) {
+		this.unwrapSingleValue = unwrapSingleValue;
 
 		return this;
 	}

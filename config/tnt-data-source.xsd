@@ -1369,10 +1369,10 @@
             </xs:annotation>
         </xs:attribute>
 
-        <xs:attribute name="cacheKey" use="optional" type="xs:string">
+        <xs:attribute name="unwrapSingleValue" use="optional" type="xs:boolean" default="true">
             <xs:annotation>
                 <xs:documentation>
-                    Stream cache key to store resolved value.
+                    Flag indicating an item value shall be unwrapped if array or collection containing single item.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
@@ -1388,7 +1388,7 @@
         <xs:attribute name="emptyAsNull" use="optional" type="xs:boolean" default="true">
             <xs:annotation>
                 <xs:documentation>
-                    Flag indicating an empty value (i.e. string "") shall be treated as null.
+                    Flag indicating an empty value (i.e. string "", empty array or collection) shall be treated as null.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
@@ -1961,11 +1961,10 @@
             </xs:annotation>
         </xs:attribute>
 
-        <xs:attribute name="split" use="optional" type="xs:boolean">
+        <xs:attribute name="split" use="optional" type="xs:boolean" default="false">
             <xs:annotation>
                 <xs:documentation>
-                    Specifies whether resolved array or collection type field value should be split into separate produced
-                    activity fields.
+                    Specifies whether resolved array or collection type field value should be split into separate produced activity fields.
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>

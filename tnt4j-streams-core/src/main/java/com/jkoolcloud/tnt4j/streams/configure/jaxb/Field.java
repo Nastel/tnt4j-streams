@@ -134,9 +134,9 @@ public class Field {
 	@XmlAttribute(name = "id")
 	@Generated(value = "com.sun.tools.internal.xjc.Driver", date = "2017-06-02T02:29:59+03:00", comments = "JAXB RI v2.2.4-2")
 	protected String id;
-	@XmlAttribute(name = "cacheKey")
+	@XmlAttribute(name = "unwrapSingleValue")
 	@Generated(value = "com.sun.tools.internal.xjc.Driver", date = "2017-06-02T02:29:59+03:00", comments = "JAXB RI v2.2.4-2")
-	protected String cacheKey;
+	protected Boolean unwrapSingleValue;
 	@XmlAttribute(name = "charset")
 	@Generated(value = "com.sun.tools.internal.xjc.Driver", date = "2017-06-02T02:29:59+03:00", comments = "JAXB RI v2.2.4-2")
 	protected String charset;
@@ -822,26 +822,26 @@ public class Field {
 	}
 
 	/**
-	 * Gets the value of the cacheKey property.
+	 * Gets the value of the unwrapSingleValue property.
 	 * 
-	 * @return possible object is {@link String }
+	 * @return possible object is {@link Boolean }
 	 * 
 	 */
 	@Generated(value = "com.sun.tools.internal.xjc.Driver", date = "2017-06-02T02:29:59+03:00", comments = "JAXB RI v2.2.4-2")
-	public String getCacheKey() {
-		return cacheKey;
+	public Boolean isUnwrapSingleValue() {
+		return unwrapSingleValue;
 	}
 
 	/**
-	 * Sets the value of the cacheKey property.
+	 * Sets the value of the unwrapSingleValue property.
 	 * 
 	 * @param value
-	 *            allowed object is {@link String }
+	 *            allowed object is {@link Boolean }
 	 * 
 	 */
 	@Generated(value = "com.sun.tools.internal.xjc.Driver", date = "2017-06-02T02:29:59+03:00", comments = "JAXB RI v2.2.4-2")
-	public void setCacheKey(String value) {
-		this.cacheKey = value;
+	public void setUnwrapSingleValue(Boolean value) {
+		this.unwrapSingleValue = value;
 	}
 
 	/**

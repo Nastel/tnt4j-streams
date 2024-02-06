@@ -210,7 +210,7 @@ Mapping of streamed data to activity event fields are performed by parser. To ma
     * `required` - indicates whether a non-null value resolution is required for this field. If present, it takes precedence over the parser
       property `RequireDefault`.
     * `id` - field identifier
-    * `cacheKey` - cache key to store resolved field value
+    * `unwrapSingleValue` - flag indicating an item value shall be unwrapped if array or collection containing single item.
     * `charset` - defines a [Java supported charset/encoding](https://docs.oracle.com/javase/7/docs/technotes/guides/intl/encoding.doc.html)
       name (in string format) for field Raw binary data; used to convert between Unicode and a number of other character encodings. Default
       value is the running streams JVM default charset (in most cases `UTF8`).

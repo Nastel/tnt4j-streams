@@ -248,6 +248,10 @@ public class ConfigParserHandler extends DefaultHandler {
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag attribute {@value}.
 	 */
+	private static final String UNWRAP_SINGLE_VALUE = "unwrapSingleValue"; // NON-NLS
+	/**
+	 * Constant for name of TNT4J-Streams XML configuration tag attribute {@value}.
+	 */
 	private static final String SOURCE_ATTR = "source";
 	/**
 	 * Constant for name of TNT4J-Streams XML configuration tag attribute {@value}.
@@ -707,10 +711,11 @@ public class ConfigParserHandler extends DefaultHandler {
 		int radix = 10;
 		String reqVal = "";
 		Boolean transparent = null;
-		boolean split = false;
+		boolean splitIterable = false;
 		String id = null;
 		String charset = null;
 		Boolean emptyAsNull = null;
+		boolean unwrapSingleValue = true;
 		for (int i = 0; i < attrs.getLength(); i++) {
 			String attName = attrs.getQName(i);
 			String attValue = attrs.getValue(i);
@@ -745,13 +750,15 @@ public class ConfigParserHandler extends DefaultHandler {
 			} else if (TRANSPARENT_ATTR.equals(attName)) {
 				transparent = Utils.toBoolean(attValue);
 			} else if (SPLIT_ATTR.equals(attName)) {
-				split = Utils.toBoolean(attValue);
+				splitIterable = Utils.toBoolean(attValue);
 			} else if (ID_ATTR.equals(attName)) {
 				id = attValue;
 			} else if (CHARSET_ATTR.equals(attName)) {
 				charset = attValue;
 			} else if (EMPTY_AS_NULL.equals(attName)) {
 				emptyAsNull = Utils.toBoolean(attValue);
+			} else if (UNWRAP_SINGLE_VALUE.equals(attName)) {
+				unwrapSingleValue = Utils.toBoolean(attValue);
 			} else {
 				unknownAttribute(FIELD_ELMT, attName);
 			}
@@ -807,6 +814,7 @@ public class ConfigParserHandler extends DefaultHandler {
 				afl.setCharset(charset);
 			}
 			afl.setEmptyAsNull(emptyAsNull);
+			afl.setUnwrapSingleValue(unwrapSingleValue);
 			currField.addLocator(afl);
 		} else if (StringUtils.isNotEmpty(locator)) {
 			currField.hasLocValAttr = true;
@@ -836,6 +844,7 @@ public class ConfigParserHandler extends DefaultHandler {
 						afl.setCharset(charset);
 					}
 					afl.setEmptyAsNull(emptyAsNull);
+					afl.setUnwrapSingleValue(unwrapSingleValue);
 					currField.addLocator(afl);
 				}
 			}
@@ -856,8 +865,9 @@ public class ConfigParserHandler extends DefaultHandler {
 			af.setTransparent(transparent);
 		}
 		af.setRequired(reqVal);
-		af.setSplitCollection(split);
+		af.setSplitCollection(splitIterable);
 		af.setEmptyAsNull(emptyAsNull);
+		af.setUnwrapSingleValue(unwrapSingleValue);
 	}
 
 	/**
@@ -1067,6 +1077,8 @@ public class ConfigParserHandler extends DefaultHandler {
 				currLocatorData.charset = attValue;
 			} else if (EMPTY_AS_NULL.equals(attName)) {
 				currLocatorData.emptyAsNull = Utils.toBoolean(attValue);
+			} else if (UNWRAP_SINGLE_VALUE.equals(attName)) {
+				currLocatorData.unwrapSingleValue = Utils.toBoolean(attValue);
 			} else {
 				unknownAttribute(FIELD_LOC_ELMT, attName);
 			}
@@ -2352,6 +2364,7 @@ public class ConfigParserHandler extends DefaultHandler {
 			afl.setCharset(currLocatorData.charset);
 		}
 		afl.setEmptyAsNull(currLocatorData.emptyAsNull == null ? true : currLocatorData.emptyAsNull);
+		afl.setUnwrapSingleValue(currLocatorData.unwrapSingleValue);
 
 		currField.addLocator(afl);
 	}
@@ -2608,6 +2621,7 @@ public class ConfigParserHandler extends DefaultHandler {
 		String id;
 		String charset;
 		Boolean emptyAsNull = null;
+		boolean unwrapSingleValue = true;
 
 		List<ValueMapData> valueMapItems;
 		List<ValueTransformation<Object, Object>> valueTransforms;
@@ -2631,6 +2645,7 @@ public class ConfigParserHandler extends DefaultHandler {
 			id = null;
 			charset = null;
 			emptyAsNull = null;
+			unwrapSingleValue = true;
 
 			if (valueMapItems == null) {
 				valueMapItems = new ArrayList<>();
