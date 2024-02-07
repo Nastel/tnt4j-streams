@@ -828,7 +828,8 @@ public class ActivityField extends AbstractFieldEntity {
 	public Object aggregateFieldValue(Object value, ActivityInfo ai) throws ParseException {
 		LoggerUtils.log(LOGGER, OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 				"ActivityField.aggregating.field", this, value);
-		Object[] values = Utils.makeArray(Utils.simplifyValue(value));
+		value = isUnwrapSingleValue() ? Utils.simplifyValue(value) : value;
+		Object[] values = Utils.isObjArray(value) ? (Object[]) value : new Object[] { value };
 
 		if (values != null && CollectionUtils.isNotEmpty(locators)) {
 			if (values.length == 1 && locators.size() > 1) {
@@ -861,7 +862,7 @@ public class ActivityField extends AbstractFieldEntity {
 			}
 		}
 
-		Object fieldValue = Utils.simplifyValue(values);
+		Object fieldValue = isUnwrapSingleValue() ? Utils.simplifyValue(values) : values;
 
 		LoggerUtils.log(LOGGER, OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 				"ActivityField.aggregating.field.value", this, fieldValue);

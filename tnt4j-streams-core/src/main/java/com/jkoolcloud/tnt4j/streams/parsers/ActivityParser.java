@@ -218,11 +218,13 @@ public abstract class ActivityParser implements NamedObject {
 			throws IllegalStateException, ParseException {
 
 		ActivityInfo ai = cData.getActivity();
+		value = field.aggregateFieldValue(value, ai);
 		applyFieldValue(ai, field, value);
 
-		if (value != null && CollectionUtils.isNotEmpty(field.getStackedParsers())) {
+		Collection<ActivityField.FieldParserReference> stackedParsers = field.getStackedParsers();
+		if (value != null && CollectionUtils.isNotEmpty(stackedParsers)) {
 			boolean applied = false;
-			for (ActivityField.FieldParserReference parserRef : field.getStackedParsers()) {
+			for (ActivityField.FieldParserReference parserRef : stackedParsers) {
 				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"ActivityParser.stacked.parser.applying", name, field, parserRef);
 				try {

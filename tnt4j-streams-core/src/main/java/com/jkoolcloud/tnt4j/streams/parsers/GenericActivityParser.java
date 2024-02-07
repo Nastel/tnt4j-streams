@@ -842,13 +842,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		Object value;
 		for (ActivityField aField : fieldList) {
 			cData.setField(aField);
-			value = Utils.simplifyValue(parseLocatorValues(aField, cData));
-
-			// if (value != null && aField.isEmptyAsNull() && Utils.isEmptyContent(value, true)) {
-			// logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-			// "ActivityParser.field.empty.as.null", aField, toString(value));
-			// value = null;
-			// }
+			value = parseLocatorValues(aField, cData);
 
 			applyFieldValue(aField, value, cData);
 		}
@@ -984,7 +978,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 				if (filteredOut) {
 					fValue = null;
 				}
-				super.applyFieldValue(tField, Utils.simplifyValue(fValue), cData);
+				super.applyFieldValue(tField, fValue, cData);
 			}
 		} catch (Exception e) {
 			ParseException pe = new ParseException(StreamsResources.getStringFormatted(
@@ -1116,7 +1110,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 				if (locator.getBuiltInType() == ActivityFieldLocatorType.StreamProp) {
 					val = cData.getStream().getProperty(locStr);
 				} else if (locator.getBuiltInType() == ActivityFieldLocatorType.Cache) {
-					val = Utils.simplifyValue(StreamsCache.getValue(cData.getActivity(), locStr, getName()));
+					val = StreamsCache.getValue(cData.getActivity(), locStr, getName());
 				} else if (locator.getBuiltInType() == ActivityFieldLocatorType.Activity) {
 					val = resolveActivityValue(locator, cData);
 				} else if (LOC_FOR_COMPLETE_ACTIVITY_DATA.equals(locStr)) {

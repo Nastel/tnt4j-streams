@@ -170,7 +170,7 @@ public class ActivityInfo {
 	 * @see com.jkoolcloud.tnt4j.streams.fields.ActivityField#aggregateFieldValue(Object, ActivityInfo)
 	 */
 	public void applyField(ActivityField field, Object value) throws ParseException {
-		applyFieldValue(field, field.aggregateFieldValue(value, this));
+		applyFieldValue(field, value);
 	}
 
 	/**
