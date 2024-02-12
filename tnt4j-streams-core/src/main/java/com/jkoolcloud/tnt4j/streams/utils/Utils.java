@@ -27,12 +27,15 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.FileSystem;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiPredicate;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -1994,10 +1997,15 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
-	 * Searches for files matching name pattern. Name pattern also may contain path of directory, where file search
-	 * should be performed, e.g., C:/Tomcat/logs/localhost_access_log.*.txt. If no path is defined (just file name
-	 * pattern) then files are searched in {@code System.getProperty("user.dir")}. Files array is ordered by file
-	 * modification timestamp in ascending order. Used file system is {@link java.nio.file.FileSystems#getDefault()}.
+	 * Searches for files matching name pattern with wildcards.
+	 * <p>
+	 * Name pattern also may contain path of directory, where file search should be performed, e.g.:
+	 * {@code "/opt/usr/Tomcat/logs/localhost_access_log.*.txt"}. It also may contain multi-directory wildcard pattern
+	 * {@code "**"}, e.g: "./tnt4j-streams-edi/samples/**&#047;*.xml".
+	 * <p>
+	 * If no path is defined (just file name pattern) then files are searched in {@code System.getProperty("user.dir")}.
+	 * Files array is ordered by file modification timestamp in ascending order. Used file system is
+	 * {@link java.nio.file.FileSystems#getDefault()}.
 	 *
 	 * @param namePattern
 	 *            name pattern to find files
@@ -2011,10 +2019,14 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
-	 * Searches for files matching name pattern. Name pattern also may contain path of directory, where file search
-	 * should be performed, e.g., C:/Tomcat/logs/localhost_access_log.*.txt. If no path is defined (just file name
-	 * pattern) then files are searched in {@code System.getProperty("user.dir")}. Files array is ordered by file
-	 * modification timestamp in ascending order.
+	 * Searches for files matching name pattern with wildcards.
+	 * <p>
+	 * Name pattern may contain path of directory, where file search should be performed, e.g:
+	 * {@code "/opt/usr/Tomcat/logs/localhost_access_log.*.txt"}. It also may contain multi-directory wildcard pattern
+	 * {@code "**"}, e.g: "./tnt4j-streams-edi/samples/**&#047;*.xml".
+	 * <p>
+	 * If no path is defined (just file name pattern) then files are searched in {@code System.getProperty("user.dir")}.
+	 * Files array is ordered by file modification timestamp in ascending order.
 	 *
 	 * @param namePattern
 	 *            name pattern to find files
@@ -2037,7 +2049,9 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			dir = f.toAbsolutePath().getParent();
 			glob = "*";
 		} catch (InvalidPathException e) {
-			int lastSeparator = Math.max(namePattern.lastIndexOf(fs.getSeparator()), namePattern.lastIndexOf("/"));
+			int wIdx = StringUtils.indexOfAny(namePattern, "*?");
+			String startPath = wIdx == -1 ? namePattern : namePattern.substring(0, wIdx);
+			int lastSeparator = Math.max(startPath.lastIndexOf(fs.getSeparator()), startPath.lastIndexOf("/"));
 			if (lastSeparator != -1) {
 				dir = fs.getPath(namePattern.substring(0, lastSeparator));
 				glob = namePattern.substring(lastSeparator + 1);
@@ -2048,12 +2062,15 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		}
 
 		List<Path> files = new ArrayList<>();
-		try (DirectoryStream<Path> activityFiles = Files.newDirectoryStream(dir, glob)) {
-			for (Path p : activityFiles) {
-				if (!Files.isDirectory(p)) {
-					files.add(p);
-				}
+		PathMatcher matcher = fs.getPathMatcher("glob:" + glob);
+		Path startPath = dir;
+		try (Stream<Path> activityFiles = Files.find(startPath, 10, new BiPredicate<>() {
+			@Override
+			public boolean test(Path path, BasicFileAttributes basicFileAttributes) {
+				return basicFileAttributes.isRegularFile() && matcher.matches(startPath.relativize(path));
 			}
+		})) {
+			activityFiles.forEach(path -> files.add(path));
 		}
 
 		files.sort(new Comparator<>() {

@@ -133,14 +133,11 @@ public class UtilsTest {
 
 	@Test
 	public void testFromJsonToMap() {
-		Map<String, String> testMap = new HashMap<String, String>() {
-			private static final long serialVersionUID = 1L;
-			{
-				put("TEST", "TESTVAL"); // NON-NLS
-				put("TEST2", "TESTVAL2"); // NON-NLS
-				put("TEST3", "TESTVAL3"); // NON-NLS
-			}
-		};
+		Map<String, String> testMap = new HashMap<>();
+		testMap.put("TEST", "TESTVAL"); // NON-NLS
+		testMap.put("TEST2", "TESTVAL2"); // NON-NLS
+		testMap.put("TEST3", "TESTVAL3"); // NON-NLS
+
 		String testString = "{\"TEST2\"=\"TESTVAL2\", \"TEST3\"=\"TESTVAL3\", \"TEST\"=\"TESTVAL\"}"; // NON-NLS
 		// Gson gson = new Gson();
 		// final String json = gson.toJson(testMap);
@@ -251,7 +248,8 @@ public class UtilsTest {
 	@Test
 	public void searchFilesTest() throws IOException {
 		String exampleFilesPath = ".." + "/config/*.properties"; // NON-NLS
-		Utils.searchFiles(exampleFilesPath);
+		Path[] fPath = Utils.searchFiles(exampleFilesPath);
+		assertTrue(fPath.length >= 6);
 	}
 
 	@Test
