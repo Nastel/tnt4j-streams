@@ -340,6 +340,7 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 	protected abstract class FileWatcher extends InputProcessor {
 
 		protected T fileToRead = null;
+		protected int readFileIndex = -1;
 		protected Charset fileCharset = Charset.defaultCharset();
 
 		protected T[] availableFiles;
@@ -497,7 +498,86 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 			if (stateHandler != null) {
 				stateHandler.setStreamedFile(file);
 			}
+
+			if (!pollingOn) {
+				lastReadTime = -1;
+			}
+
+			readFileIndex = getReadFileIndex(file, availableFiles);
 		}
+
+		private int getReadFileIndex(T file, T[] availableFiles) {
+			if (ArrayUtils.isNotEmpty(availableFiles)) {
+				for (int i = 0; i < availableFiles.length; i++) {
+					if (file.equals(availableFiles[i])) {
+						return i;
+					}
+				}
+			}
+
+			return -1;
+		}
+
+		/**
+		 * Checks if array of available files is consumed.
+		 * <p>
+		 * Available files array is considered consumed when:
+		 * <ul>
+		 * <li>array of available files is empty</li>
+		 * <li>read file index is out of bounds</li>
+		 * </ul>
+		 * 
+		 * @return {@code true} if array of available files is empty or read file index is out of array bounds,
+		 *         {@code false} - otherwise
+		 */
+		protected boolean isAvailableFilesConsumed() {
+			return ArrayUtils.isEmpty(availableFiles) || readFileIndex == -1
+					|| (readFileIndex >= availableFiles.length - 1);
+		}
+
+		/**
+		 * Returns next file to read lines.
+		 * 
+		 * @param files
+		 *            array of available files
+		 * @param lastModif
+		 *            last read file modification time
+		 * @return next file to read
+		 * 
+		 * @throws IOException
+		 *             if next file can't be obtained
+		 */
+		protected T getNextFile(T[] files, Long lastModif) throws IOException {
+			return pollingOn ? getNextPollingFile(files, lastModif) : getNextStaticFile();
+		}
+
+		/**
+		 * Returns next file to read lines from available files array.
+		 * 
+		 * @return next file to read
+		 */
+		private T getNextStaticFile() {
+			if (ArrayUtils.isNotEmpty(availableFiles)
+					&& (readFileIndex >= 0 && readFileIndex < availableFiles.length)) {
+				return availableFiles[readFileIndex + 1];
+			}
+
+			return null;
+		}
+
+		/**
+		 * Returns next polled file to read lines.
+		 * 
+		 * @param files
+		 *            array of available files
+		 * @param lastModif
+		 *            last read file modification time
+		 * @return next file to read
+		 * 
+		 * @throws IOException
+		 *             if next file can't be obtained
+		 */
+		protected abstract T getNextPollingFile(T[] files, Long lastModif) throws IOException;
 
 		/**
 		 * Persists file access state.

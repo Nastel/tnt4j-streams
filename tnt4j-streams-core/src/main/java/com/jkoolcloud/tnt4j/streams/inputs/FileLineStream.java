@@ -359,10 +359,7 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 
 			if (Utils.isWildcardString(fileName)) {
 				try {
-					availableFiles = Utils.searchFiles(fileName, fs);
-					updateDataTotals(availableFiles);
-					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"FileLineStream.found.files", availableFiles.length, fileName);
+					updateAvailableFiles();
 
 					Path prevFile = ArrayUtils.getLength(availableFiles) < 2 ? null
 							: availableFiles[availableFiles.length - 2];
@@ -394,13 +391,9 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 
 			if (Utils.isWildcardString(fileName)) {
 				try {
-					availableFiles = Utils.searchFiles(fileName, fs);
-					updateDataTotals(availableFiles);
+					updateAvailableFiles();
 
-					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"FileLineStream.found.files", availableFiles.length, fileName);
-
-					Path nextFile = Utils.getFirstNewer(availableFiles, lastModifTime);
+					Path nextFile = getNextFile(availableFiles, lastModifTime);
 
 					if (nextFile == null || Files.isSameFile(nextFile, fileToRead)) {
 						logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
@@ -422,6 +415,21 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 			}
 
 			return false;
+		}
+
+		private void updateAvailableFiles() throws IOException {
+			if (isAvailableFilesConsumed()) {
+				availableFiles = Utils.searchFiles(fileName, fs);
+				updateDataTotals(availableFiles);
+
+				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						"FileLineStream.found.files", availableFiles.length, fileName);
+			}
+		}
+
+		@Override
+		protected Path getNextPollingFile(Path[] files, Long lastModif) throws IOException {
+			return Utils.getFirstNewer(files, lastModif);
 		}
 
 		private void updateDataTotals(Path[] activityFiles) throws IOException {

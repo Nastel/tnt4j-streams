@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -378,14 +379,7 @@ public class HdfsFileLineStream extends AbstractFileLineStream<Path> {
 
 			if (Utils.isWildcardString(fileName)) {
 				try {
-					URI fileUri = new URI(fileName);
-					Path filePath = new Path(fileUri);
-
-					availableFiles = searchFiles(filePath, fs);
-					updateDataTotals(availableFiles, fs);
-
-					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"FileLineStream.found.files", availableFiles.length, fileName);
+					updateAvailableFiles();
 
 					Path prevFile = ArrayUtils.getLength(availableFiles) < 2 ? null
 							: availableFiles[availableFiles.length - 2];
@@ -417,16 +411,9 @@ public class HdfsFileLineStream extends AbstractFileLineStream<Path> {
 
 			if (Utils.isWildcardString(fileName)) {
 				try {
-					URI fileUri = new URI(fileName);
-					Path filePath = new Path(fileUri);
+					updateAvailableFiles();
 
-					availableFiles = searchFiles(filePath, fs);
-					updateDataTotals(availableFiles, fs);
-
-					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-							"FileLineStream.found.files", availableFiles.length, fileName);
-
-					Path nextFile = getFirstNewer(availableFiles, lastModifTime, fs);
+					Path nextFile = getNextFile(availableFiles, lastModifTime);
 
 					if (nextFile == null || nextFile.equals(fileToRead)) {
 						logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
@@ -450,7 +437,21 @@ public class HdfsFileLineStream extends AbstractFileLineStream<Path> {
 			return false;
 		}
 
-		private Path getFirstNewer(Path[] files, Long lastModif, FileSystem fs) throws IOException {
+		private void updateAvailableFiles() throws IOException, URISyntaxException {
+			if (isAvailableFilesConsumed()) {
+				URI fileUri = new URI(fileName);
+				Path filePath = new Path(fileUri);
+
+				availableFiles = searchFiles(filePath, fs);
+				updateDataTotals(availableFiles, fs);
+
+				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						"FileLineStream.found.files", availableFiles.length, fileName);
+			}
+		}
+
+		@Override
+		protected Path getNextPollingFile(Path[] files, Long lastModif) throws IOException {
 			Path last = null;
 
 			if (ArrayUtils.isNotEmpty(files)) {
