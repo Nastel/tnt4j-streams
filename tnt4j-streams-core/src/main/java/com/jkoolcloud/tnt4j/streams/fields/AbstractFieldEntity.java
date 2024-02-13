@@ -203,7 +203,7 @@ public abstract class AbstractFieldEntity {
 				"AbstractFieldEntity.value.before.transformations", this, phase, Utils.toString(fieldValue));
 		Object tValue = fieldValue;
 		for (ValueTransformation<Object, Object> vt : transformations) {
-			if (vt.getPhase().equals(phase)) {
+			if (vt.getPhase() == phase) {
 				tValue = vt.transform(tValue, context);
 				logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"AbstractFieldEntity.value.after.transformation", this, vt.getName(), Utils.toString(tValue));
@@ -270,6 +270,25 @@ public abstract class AbstractFieldEntity {
 		if (transformations != null) {
 			for (ValueTransformation<?, ?> vt : transformations) {
 				if (vt.hasActivityReferences()) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks if this entity has any transformations bound to provided phase.
+	 * 
+	 * @param phase
+	 *            phase to check for transformations
+	 * @return {@code true} if this entity has any transformations bound to provided phase, {@code false} - otherwise
+	 */
+	public boolean hasTransformationsOfPhase(ValueTransformation.Phase phase) {
+		if (transformations != null) {
+			for (ValueTransformation<?, ?> vt : transformations) {
+				if (vt.getPhase() == phase) {
 					return true;
 				}
 			}

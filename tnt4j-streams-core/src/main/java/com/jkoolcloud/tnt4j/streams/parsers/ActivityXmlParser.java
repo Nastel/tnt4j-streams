@@ -43,6 +43,7 @@ import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.configure.ParserProperties;
 import com.jkoolcloud.tnt4j.streams.fields.*;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
+import com.jkoolcloud.tnt4j.streams.transform.ValueTransformation;
 import com.jkoolcloud.tnt4j.streams.utils.*;
 
 /**
@@ -388,16 +389,18 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 					}
 				}
 
-				if (val instanceof Node) {
-					val = getTextOnDemand((Node) val, locator, cData, formattingNeeded);
-				} else if (Utils.isObjCollection(val)) {
-					Object[] nodes = Utils.makeArray(val, Object.class);
-					for (int i = 0; i < nodes.length; i++) {
-						if (nodes[i] instanceof Node) {
-							nodes[i] = getTextOnDemand((Node) nodes[i], locator, cData, formattingNeeded);
+				if (!locator.hasTransformationsOfPhase(ValueTransformation.Phase.RAW)) {
+					if (val instanceof Node) {
+						val = getTextOnDemand((Node) val, locator, cData, formattingNeeded);
+					} else if (Utils.isObjCollection(val)) {
+						Object[] nodes = Utils.makeArray(val, Object.class);
+						for (int i = 0; i < nodes.length; i++) {
+							if (nodes[i] instanceof Node) {
+								nodes[i] = getTextOnDemand((Node) nodes[i], locator, cData, formattingNeeded);
+							}
 						}
+						val = Utils.makeArray(nodes);
 					}
-					val = Utils.makeArray(nodes);
 				}
 			} catch (XPathExpressionException exc) {
 				ParseException pe = new ParseException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,

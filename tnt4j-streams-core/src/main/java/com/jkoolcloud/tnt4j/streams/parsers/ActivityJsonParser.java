@@ -40,6 +40,7 @@ import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldDataType;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocator;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
+import com.jkoolcloud.tnt4j.streams.transform.ValueTransformation;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
@@ -327,7 +328,7 @@ public class ActivityJsonParser extends GenericActivityParser<DocumentContext> {
 				jsonValue = null;
 			}
 
-			if (jsonValue != null) {
+			if (jsonValue != null && !locator.hasTransformationsOfPhase(ValueTransformation.Phase.RAW)) {
 				if (jsonValue instanceof List) {
 					List<Object> jsonValuesList = (List<Object>) jsonValue;
 					List<Object> valuesList = new ArrayList<>(jsonValuesList.size());
