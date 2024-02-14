@@ -467,11 +467,13 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 
 	/**
 	 * Gets field locator identifier.
+	 * <p>
+	 * If identifier is not defined, then locator value is used.
 	 *
 	 * @return field locator identifier
 	 */
 	public String getId() {
-		return id;
+		return StringUtils.isEmpty(id) ? locator : id;
 	}
 
 	/**
