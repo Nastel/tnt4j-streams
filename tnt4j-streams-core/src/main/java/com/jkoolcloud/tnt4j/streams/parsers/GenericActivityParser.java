@@ -599,6 +599,8 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 * @param rdr
 	 *            reader to use for reading
 	 * @return non-empty RAW activity data text string, or {@code null} if the end of the stream has been reached
+	 * 
+	 * @see #doIncludeDelimiter()
 	 */
 	protected String readNextActivity(BufferedReader rdr) {
 		String str = null;
@@ -606,7 +608,13 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		nextLock.lock();
 		try {
 			try {
-				str = ActivityDelim.EOL.name().equals(activityDelim) ? Utils.getNonEmptyLine(rdr) : Utils.readAll(rdr);
+				if (ActivityDelim.EOL.name().equals(activityDelim)) {
+					str = Utils.getNonEmptyLine(rdr);
+				} else if (ActivityDelim.EOF.name().equals(activityDelim)) {
+					str = Utils.readAll(rdr);
+				} else {
+					str = Utils.scanReader(rdr, activityDelim, doIncludeDelimiter());
+				}
 			} catch (EOFException eof) {
 				Utils.logThrowable(logger(), OpLevel.DEBUG,
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "ActivityParser.data.end",
@@ -621,6 +629,15 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		}
 
 		return str;
+	}
+
+	/**
+	 * Returns flag indicating whether RAW activity data text string shall include activity delimiter.
+	 * 
+	 * @return {@code true} if RAW activity data text string shall include activity delimiter. {@code false} - otherwise
+	 */
+	protected boolean doIncludeDelimiter() {
+		return false;
 	}
 
 	private static final String[] ACTIVITY_DATA_TYPES = { "TEXT" }; // NON-NLS

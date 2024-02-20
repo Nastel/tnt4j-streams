@@ -5,6 +5,7 @@
 
     <parser name="MQErrLogParser" class="com.jkoolcloud.tnt4j.streams.custom.parsers.IBMMQLogParser">
         <property name="UseActivityDataAsMessageForUnset" value="true"/>
+        <property name="ActivityDelim" value="----[\n\r]+"/>
 
         <field name="EventType" value="EVENT"/>
         <field name="ResourceName" locator="StreamedFileName" locator-type="StreamProp">

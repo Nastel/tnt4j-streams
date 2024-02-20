@@ -16,7 +16,9 @@
 
 package com.jkoolcloud.tnt4j.streams.parsers;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
@@ -587,49 +589,9 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 		return null;
 	}
 
-	/**
-	 * Reads RAW activity data XML package string from {@link BufferedReader}. If the data input source contains
-	 * multiple XML documents, then each document must start with {@code "&lt;?xml"}, and be separated by a new line.
-	 *
-	 * @param rdr
-	 *            reader to use for reading
-	 * @return non empty RAW activity data XML package string, or {@code null} if the end of the stream has been reached
-	 */
 	@Override
-	protected String readNextActivity(BufferedReader rdr) {
-		String xmlString = null;
-		StringBuilder xmlBuffer = new StringBuilder(1024);
-
-		nextLock.lock();
-		try {
-			try {
-				for (String line; xmlString == null && (line = rdr.readLine()) != null;) {
-					if (line.startsWith("<?xml")) { // NON-NLS
-						if (xmlBuffer.length() > 0) {
-							xmlString = xmlBuffer.toString();
-							xmlBuffer.setLength(0);
-						}
-					}
-					xmlBuffer.append(line);
-				}
-			} catch (EOFException eof) {
-				Utils.logThrowable(logger(), OpLevel.DEBUG,
-						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "ActivityParser.data.end",
-						getActivityDataType()[0], eof);
-			} catch (IOException ioe) {
-				Utils.logThrowable(logger(), OpLevel.WARNING,
-						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"ActivityParser.error.reading", getActivityDataType()[0], ioe);
-			}
-		} finally {
-			nextLock.unlock();
-		}
-
-		if (xmlString == null && xmlBuffer.length() > 0) {
-			xmlString = xmlBuffer.toString();
-		}
-
-		return xmlString;
+	protected boolean doIncludeDelimiter() {
+		return true;
 	}
 
 	private static final String[] ACTIVITY_DATA_TYPES = { "XML", "TEXT" }; // NON-NLS

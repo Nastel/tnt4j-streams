@@ -16,8 +16,6 @@
 
 package com.jkoolcloud.tnt4j.streams.custom.parsers;
 
-import java.io.BufferedReader;
-import java.io.EOFException;
 import java.io.IOException;
 import java.nio.CharBuffer;
 import java.util.HashMap;
@@ -170,49 +168,9 @@ public class IBMMQLogParser extends AbstractActivityMapParser {
 		return dataMap;
 	}
 
-	/**
-	 * Reads RAW IBM MQ error log entry string from {@link BufferedReader}. If the data input source contains multiple
-	 * error log entries, then each document must ends with {@value ENTRIES_DELIM}, and be separated by a new line.
-	 * 
-	 * @param rdr
-	 *            reader to use for reading
-	 * @return non empty RAW IBM MQ error log entry string, or {@code null} if the end of the stream has been reached
-	 */
 	@Override
-	protected String readNextActivity(BufferedReader rdr) {
-		String entryString = null;
-		StringBuilder entryBuffer = new StringBuilder(1024);
-
-		nextLock.lock();
-		try {
-			try {
-				for (String line; entryString == null && (line = rdr.readLine()) != null;) {
-					entryBuffer.append(line);
-					if (line.endsWith(ENTRIES_DELIM)) {
-						if (entryBuffer.length() > 0) {
-							entryString = entryBuffer.toString();
-							entryBuffer.setLength(0);
-						}
-					}
-				}
-			} catch (EOFException eof) {
-				Utils.logThrowable(logger(), OpLevel.DEBUG,
-						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "ActivityParser.data.end",
-						getActivityDataType()[0], eof);
-			} catch (IOException ioe) {
-				Utils.logThrowable(logger(), OpLevel.WARNING,
-						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"ActivityParser.error.reading", getActivityDataType()[0], ioe);
-			}
-		} finally {
-			nextLock.unlock();
-		}
-
-		if (entryString == null && entryBuffer.length() > 0) {
-			entryString = entryBuffer.toString();
-		}
-
-		return entryString;
+	protected boolean doIncludeDelimiter() {
+		return true;
 	}
 
 	private static final String[] ACTIVITY_DATA_TYPES = { "IBM MQ ERR LOG", "TEXT" }; // NON-NLS

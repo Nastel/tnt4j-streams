@@ -16,9 +16,6 @@
 
 package com.jkoolcloud.tnt4j.streams.parsers;
 
-import java.io.BufferedReader;
-import java.io.EOFException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
@@ -240,44 +237,6 @@ public class ActivityJsonParser extends GenericActivityParser<DocumentContext> {
 		cData.setMessage(jsonString);
 
 		return cData;
-	}
-
-	/**
-	 * Reads RAW activity data JSON package string from {@link BufferedReader}.
-	 *
-	 * @param rdr
-	 *            reader to use for reading
-	 * @return non empty RAW activity data JSON package string, or {@code null} if the end of the stream has been
-	 *         reached
-	 */
-	@Override
-	protected String readNextActivity(BufferedReader rdr) {
-		StringBuilder jsonStringBuilder = new StringBuilder(1024);
-		String line;
-
-		nextLock.lock();
-		try {
-			try {
-				while ((line = rdr.readLine()) != null) {
-					jsonStringBuilder.append(line);
-					if (ActivityDelim.EOL.name().equals(activityDelim)) {
-						break;
-					}
-				}
-			} catch (EOFException eof) {
-				Utils.logThrowable(logger(), OpLevel.DEBUG,
-						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "ActivityParser.data.end",
-						getActivityDataType()[0], eof);
-			} catch (IOException ioe) {
-				Utils.logThrowable(logger(), OpLevel.WARNING,
-						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"ActivityParser.error.reading", getActivityDataType()[0], ioe);
-			}
-		} finally {
-			nextLock.unlock();
-		}
-
-		return jsonStringBuilder.toString();
 	}
 
 	private static final String[] ACTIVITY_DATA_TYPES = { "JSON", "TEXT" }; // NON-NLS
