@@ -30,6 +30,7 @@ import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.streams.configure.ParserProperties;
@@ -613,7 +614,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 				} else if (ActivityDelim.EOF.name().equals(activityDelim)) {
 					str = Utils.readAll(rdr);
 				} else {
-					str = Utils.scanReader(rdr, activityDelim, doIncludeDelimiter());
+					str = scanReader(rdr, activityDelim, doIncludeDelimiter());
 				}
 			} catch (EOFException eof) {
 				Utils.logThrowable(logger(), OpLevel.DEBUG,
@@ -629,6 +630,28 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		}
 
 		return str;
+	}
+
+	private ImmutablePair<BufferedReader, Scanner> scannerPair;
+
+	private String scanReader(BufferedReader rdr, String delimiter, boolean includeDelim) throws IOException {
+		if (scannerPair == null || scannerPair.getLeft().hashCode() != rdr.hashCode()) {
+			scannerPair = new ImmutablePair<>(rdr, new Scanner(rdr));
+		}
+
+		Scanner scanner = scannerPair.getRight();
+		scanner.useDelimiter(delimiter);
+
+		if (scanner.hasNext()) {
+			String str = scanner.next();
+			if (includeDelim) {
+				String dStr = scanner.findWithinHorizon(delimiter, 100);
+				str += dStr;
+			}
+			return str;
+		} else {
+			return Utils.readAll(rdr);
+		}
 	}
 
 	/**

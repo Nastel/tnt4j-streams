@@ -710,56 +710,6 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
-	 * Reads a string from provided reader {@code rdr}, where end of the string is defined by provided {@code delimiter}
-	 * (RegEx pattern).
-	 * <p>
-	 * When delimiter is not found within reader data, reader data gets read fully by using
-	 * {@link #readAll(java.io.BufferedReader)}.
-	 * <p>
-	 * To include strings delimiter within returned string, use {@code includeDelim} flag to indicate desired behaviour.
-	 * 
-	 * @param rdr
-	 *            reader to use for reading
-	 * @param delimiter
-	 *            a string specifying a delimiting pattern
-	 * @param includeDelim
-	 *            flag indicating whether to include delimiter within returned string
-	 * @return string read from provided reader
-	 * 
-	 * @throws IOException
-	 *             If an I/O error occurs
-	 * 
-	 * @see #readAll(java.io.BufferedReader)
-	 */
-	public static String scanReader(BufferedReader rdr, String delimiter, boolean includeDelim) throws IOException {
-		Scanner scanner = new Scanner(rdr);
-		scanner.useDelimiter(delimiter);
-		Field ncField = FieldUtils.getDeclaredField(BufferedReader.class, "nextChar", true); // NON-NLS
-
-		try {
-			int rdrPos = (int) ncField.get(rdr);
-
-			if (scanner.hasNext()) {
-				String str = scanner.next();
-				String dStr = scanner.findWithinHorizon(delimiter, 100);
-				if (includeDelim) {
-					str += dStr;
-				}
-				int scannerPos = includeDelim ? str.length() : str.length() + dStr.length();
-				ncField.set(rdr, rdrPos + scannerPos);
-
-				return str;
-			} else {
-				return readAll(rdr);
-			}
-		} catch (IllegalArgumentException | IllegalAccessException exc) {
-			throw new IOException(
-					StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME, "Utils.reader.reset.failed"),
-					exc);
-		}
-	}
-
-	/**
 	 * Gets a string representation of specified object for use in debugging, which includes the value of each object
 	 * field.
 	 *
