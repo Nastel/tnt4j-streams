@@ -186,7 +186,7 @@ public class FileLineStream extends AbstractFileLineStream<Path> {
 
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"FileLineStream.stream.file.watcher.initialized", FileLineStream.this.getName(),
-					file.toAbsolutePath(), lineNumber < 0 ? 0 : lineNumber);
+					file == null ? null : file.toAbsolutePath(), lineNumber < 0 ? 0 : lineNumber);
 		}
 
 		/**
