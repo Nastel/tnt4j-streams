@@ -704,6 +704,7 @@ public class ActivityField extends AbstractFieldEntity {
 		tField.parser = parser;
 		tField.transformations = transformations;
 		tField.filter = filter;
+		tField.groupLocator = groupLocator;
 
 		return tField;
 	}

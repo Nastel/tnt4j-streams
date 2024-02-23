@@ -1001,7 +1001,8 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		}
 
 		Map<String, Object> dValMap = parseDynamicValues(cData, field.getDynamicLocators());
-		Iterable<?> fValues = Utils.makeIterable(value, true);
+		Iterable<?> fValues = field.isSplitCollection() ? Utils.makeIterable(value, true)
+				: Collections.singleton(value);
 
 		int valuesCount = IterableUtils.size(fValues);
 		List<ActivityField> tFieldsList = new ArrayList<>(valuesCount);
