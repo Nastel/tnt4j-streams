@@ -104,6 +104,7 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 	protected NamespaceMap namespaces = null;
 
 	private XPath xPath;
+	private static final Map<String, XPathExpression> expCache = new HashMap<>();
 	private DocumentBuilder builder;
 
 	private final ReentrantLock xPathLock = new ReentrantLock();
@@ -439,7 +440,13 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 	private XPathExpression getXPathExpr(String locStr) throws XPathExpressionException {
 		xPathLock.lock();
 		try {
-			return xPath.compile(locStr);
+			XPathExpression exp = expCache.get(locStr);
+			if (exp == null) {
+				exp = xPath.compile(locStr);
+				expCache.put(locStr, exp);
+			}
+
+			return exp;
 		} finally {
 			xPathLock.unlock();
 		}
