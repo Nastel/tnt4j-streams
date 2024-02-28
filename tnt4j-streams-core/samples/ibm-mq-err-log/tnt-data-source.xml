@@ -8,10 +8,13 @@
         <property name="ActivityDelim" value="----[\n\r]+"/>
 
         <field name="EventType" value="EVENT"/>
-        <field name="ResourceName" locator="StreamedFileName" locator-type="StreamProp">
-            <field-transform lang="groovy" phase="raw"><![CDATA[
-                $fieldValue == null ? null : Utils.toString($fieldValue)
-            ]]></field-transform>
+        <field name="ResourceName" formattingPattern="{0}={1}">
+            <field-locator id="ResType" value="FILE"/>
+            <field-locator locator="$METADATA$.MD_FILE_NAME" locator-type="Label" datatype="String">
+                <field-transform lang="groovy" phase="formatted"><![CDATA[
+                    Utils.getFileName($fieldValue)
+                ]]></field-transform>
+            </field-locator>
         </field>
 
         <field name="StartTimeCommon" separator=" " format="MM/dd/yyyy HH:mm:ss" datatype="DateTime" transparent="true">

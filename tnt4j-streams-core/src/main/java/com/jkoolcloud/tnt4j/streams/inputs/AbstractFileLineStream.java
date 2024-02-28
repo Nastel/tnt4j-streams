@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -81,11 +83,6 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  */
 public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<AbstractFileLineStream.Line> {
 	private static final long DEFAULT_DELAY_PERIOD = TimeUnit.SECONDS.toMillis(15);
-
-	/**
-	 * Constant for name of built-in stream property {@value}.
-	 */
-	protected static final String PROP_STREAMED_FILE_NAME = "StreamedFileName"; // NON-NLS;
 
 	/**
 	 * Stream attribute defining file name or file name pattern.
@@ -201,9 +198,6 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 		}
 		if (StreamProperties.PROP_CHARSET.equalsIgnoreCase(name)) {
 			return charsetName;
-		}
-		if (PROP_STREAMED_FILE_NAME.equalsIgnoreCase(name)) {
-			return fileWatcher == null ? null : fileWatcher.fileToRead;
 		}
 
 		return super.getProperty(name);
@@ -453,7 +447,7 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 			}
 
 			if (sb.length() > 0) {
-				addLineToBuffer(sb, lineNumber);
+				addLineToBuffer(sb, lineNumber, fileToRead);
 			}
 		}
 
@@ -464,7 +458,7 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 			}
 
 			if (lineHasActivityDelim(line)) {
-				addLineToBuffer(sb, lineNumber);
+				addLineToBuffer(sb, lineNumber, fileToRead);
 			}
 		}
 
@@ -478,8 +472,8 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 			}
 		}
 
-		private void addLineToBuffer(StringBuilder sb, int lineNumber) {
-			addInputToBuffer(new Line(sb.toString(), lineNumber));
+		private void addLineToBuffer(StringBuilder sb, int lineNumber, T fileName) {
+			addInputToBuffer(new Line(sb.toString(), lineNumber, String.valueOf(fileName)));
 			sb.setLength(0);
 		}
 
@@ -609,7 +603,8 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 	 * File line data package defining line text string and line number in file.
 	 */
 	public static class Line extends CommonActivityData<String> {
-		private int lineNr;
+		private static final String MD_LINE_KEY = "MD_LINE_NUMBER"; // NON-NLS
+		private static final String MD_FILE_KEY = "MD_FILE_NAME"; // NON-NLS
 
 		/**
 		 * Creates a new Line.
@@ -618,10 +613,19 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 		 *            line text string
 		 * @param lineNumber
 		 *            line number in file
+		 * @param fileName
+		 *            file name line is picked from
 		 */
-		public Line(String text, int lineNumber) {
-			super(text);
-			this.lineNr = lineNumber;
+		public Line(String text, int lineNumber, String fileName) {
+			super(text, fillMetadata(lineNumber, fileName));
+		}
+
+		private static Map<String, Object> fillMetadata(int lineNumber, String fileName) {
+			Map<String, Object> metadata = new HashMap<>(2);
+			metadata.put(MD_LINE_KEY, lineNumber);
+			metadata.put(MD_FILE_KEY, fileName);
+
+			return metadata;
 		}
 
 		/**
@@ -630,7 +634,16 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 		 * @return line number in file
 		 */
 		public int getLineNumber() {
-			return lineNr;
+			return (Integer) getMetadata().get(MD_LINE_KEY);
+		}
+
+		/**
+		 * Returns file name line was picked from.
+		 *
+		 * @return file name line was picked from
+		 */
+		public String getFileName() {
+			return (String) getMetadata().get(MD_FILE_KEY);
 		}
 
 		@Override
