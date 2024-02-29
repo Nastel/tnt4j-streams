@@ -51,6 +51,8 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * This activity stream requires parsers that can support {@code RS} defined type data to parse
  * {@link com.jkoolcloud.tnt4j.streams.scenario.WsResponse#getData()} provided data.
  * <p>
+ * This activity stream provides activity data request parameters accessible over {@code $METADATA$} locator.
+ * <p>
  * This activity stream supports the following configuration properties (in addition to those supported by
  * {@link com.jkoolcloud.tnt4j.streams.inputs.AbstractBufferedStream}):
  * <ul>

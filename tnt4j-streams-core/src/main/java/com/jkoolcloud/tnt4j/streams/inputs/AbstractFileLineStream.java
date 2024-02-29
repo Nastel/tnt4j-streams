@@ -44,6 +44,13 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * <p>
  * This activity stream requires parsers that can support {@link String} data.
  * <p>
+ * This activity stream provides the following activity metadata values accessible over {@code $METADATA$} locator:
+ * <ul>
+ * <li>MD_FILE_NAME - file name the line was read from. <b>NOTE:</b> when file is rolling, file name is subject to
+ * change at the time of roll occurs</li>
+ * <li>MD_LINE_NUMBER - line number in the file</li>
+ * </ul>
+ * <p>
  * This activity stream supports the following configuration properties (in addition to those supported by
  * {@link AbstractBufferedStream}):
  * <ul>
@@ -77,7 +84,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * returned by {@link java.nio.charset.Charset#defaultCharset()}. (Optional)</li>
  * </ul>
  *
- * @version $Revision: 3 $
+ * @version $Revision: 4 $
  *
  * @see ActivityParser#isDataClassSupported(Object)
  */
