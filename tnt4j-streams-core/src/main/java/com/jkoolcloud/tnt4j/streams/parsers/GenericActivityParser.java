@@ -83,6 +83,12 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	protected static final String LOC_FOR_COMPLETE_ACTIVITY_DATA = "$DATA$"; // NON-NLS
 
 	/**
+	 * Constant defining locator placeholder {@value}, used to resolve complete activity RAW data package. It is useful
+	 * to redirect complete RAW activity data to stacked parser.
+	 */
+	protected static final String LOC_FOR_COMPLETE_ACTIVITY_RAW_DATA = "$RAWDATA$"; // NON-NLS
+
+	/**
 	 * Constant defining locator placeholder {@value}, used to resolve activity metadata package.
 	 */
 	protected static final String LOC_FOR_COMPLETE_ACTIVITY_METADATA = "$METADATA$"; // NON-NLS
@@ -694,8 +700,6 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 			return null;
 		}
 
-		data.setData(pData);
-
 		ActivityContext cData = prepareItem(stream, pData);
 		if (cData == null || !cData.isValid()) {
 			logger().log(OpLevel.INFO, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
@@ -703,7 +707,10 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 			return null;
 		}
 
+		cData.setRawData(data.getData());
 		cData.setMetadata(data.getMetadata());
+		data.setData(pData);
+
 		if (pContextData != null) {
 			cData.setParentContext(pContextData);
 			cData.setParentActivity(pContextData.getActivity());
@@ -1165,6 +1172,8 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 					val = cData.getData();
 				} else if (LOC_FOR_COMPLETE_ACTIVITY_METADATA.equals(locStr)) {
 					val = cData.getMetadata();
+				} else if (LOC_FOR_COMPLETE_ACTIVITY_RAW_DATA.equals(locStr)) {
+					val = cData.getRawData();
 				} else if (locStr.startsWith(LOC_FOR_COMPLETE_ACTIVITY_METADATA)) {
 					val = Utils.getMapValueByPath(locStr.substring(LOC_FOR_COMPLETE_ACTIVITY_METADATA.length() + 1),
 							cData.getMetadata());
@@ -1499,6 +1508,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		private static final long serialVersionUID = 702832545435507437L;
 
 		private static final String RAW_DATA_KEY = "CTX_RAW_ACTIVITY_DATA"; // NON-NLS
+		private static final String PREPARSED_DATA_KEY = "CTX_PREPARSED_ACTIVITY_DATA"; // NON-NLS
 		private static final String PARENT_ACTIVITY_KEY = "CTX_PARENT_ACTIVITY_DATA"; // NON-NLS
 		private static final String PARENT_CONTEXT_KEY = "CTX_PARENT_CONTEXT_DATA"; // NON-NLS
 
@@ -1515,11 +1525,11 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 * 
 		 * @param stream
 		 *            stream providing activity data
-		 * @param rawData
-		 *            stream provided RAW activity data
+		 * @param preparsedData
+		 *            preparsed activity data
 		 */
-		public ActivityContext(TNTInputStream<?, ?> stream, Object rawData) {
-			this(stream, rawData, null);
+		public ActivityContext(TNTInputStream<?, ?> stream, Object preparsedData) {
+			this(stream, preparsedData, null);
 		}
 
 		/**
@@ -1527,14 +1537,14 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 *
 		 * @param stream
 		 *            stream providing activity data
-		 * @param rawData
-		 *            stream provided RAW activity data
+		 * @param preparsedData
+		 *            preparsed activity data
 		 * @param preparedData
 		 *            parser prepared activity data compatible to locate values
 		 */
-		public ActivityContext(TNTInputStream<?, ?> stream, Object rawData, T preparedData) {
+		public ActivityContext(TNTInputStream<?, ?> stream, Object preparsedData, T preparedData) {
 			put(StreamsConstants.CTX_STREAM_KEY, stream);
-			put(RAW_DATA_KEY, rawData);
+			put(PREPARSED_DATA_KEY, preparsedData);
 			put(PREPARED_DATA_KEY, preparedData);
 		}
 
@@ -1555,6 +1565,28 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		}
 
 		/**
+		 * Returns preparsed activity data.
+		 *
+		 * @return preparsed activity data
+		 */
+		public Object getPreparsedData() {
+			return get(PREPARSED_DATA_KEY);
+		}
+
+		/**
+		 * Sets stream provided RAW activity data.
+		 * 
+		 * @param rawData
+		 *            stream provided RAW activity data
+		 * @return this context instance
+		 */
+		public ActivityContext setRawData(Object rawData) {
+			put(RAW_DATA_KEY, rawData);
+
+			return this;
+		}
+
+		/**
 		 * Returns stream provided RAW activity data.
 		 *
 		 * @return stream provided RAW activity data
@@ -1568,6 +1600,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 * 
 		 * @param parser
 		 *            parsing activity data
+		 * @return this context instance
 		 */
 		public ActivityContext setParser(ActivityParser parser) {
 			put(StreamsConstants.CTX_PARSER_KEY, parser);
@@ -1580,6 +1613,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 * 
 		 * @param preparedData
 		 *            parser prepared activity data
+		 * @return this context instance
 		 */
 		public ActivityContext setData(T preparedData) {
 			put(PREPARED_DATA_KEY, preparedData);
@@ -1625,6 +1659,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 *
 		 * @param ai
 		 *            resolved activity entity data
+		 * @return this context instance
 		 */
 		public ActivityContext setActivity(ActivityInfo ai) {
 			put(StreamsConstants.CTX_ACTIVITY_DATA_KEY, ai);
@@ -1642,6 +1677,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 *
 		 * @param pai
 		 *            parent activity entity data
+		 * @return this context instance
 		 */
 		public ActivityContext setParentActivity(ActivityInfo pai) {
 			put(PARENT_ACTIVITY_KEY, pai);
@@ -1663,6 +1699,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 *
 		 * @param message
 		 *            activity data string representation to be used as 'Message' field data
+		 * @return this context instance
 		 */
 		public ActivityContext setMessage(String message) {
 			put(MESSAGE_DATA_KEY, message);
@@ -1684,6 +1721,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 * 
 		 * @param pContext
 		 *            parent parser context data
+		 * @return this context instance
 		 */
 		public ActivityContext setParentContext(ActivityParserContext pContext) {
 			put(PARENT_CONTEXT_KEY, pContext);
@@ -1705,6 +1743,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 *
 		 * @param field
 		 *            currently parsed field instance
+		 * @return this context instance
 		 */
 		public ActivityContext setField(ActivityField field) {
 			put(StreamsConstants.CTX_FIELD_KEY, field);

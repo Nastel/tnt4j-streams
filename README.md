@@ -3972,6 +3972,7 @@ Sample stream configuration:
 
     <parser name="MQErrLogParser" class="com.jkoolcloud.tnt4j.streams.custom.parsers.IBMMQLogParser">
         <property name="UseActivityDataAsMessageForUnset" value="true"/>
+        <property name="ActivityDelim" value="----[\n\r]+"/>
 
         <field name="EventType" value="EVENT"/>
         <field name="ResourceName" locator="FileName" locator-type="StreamProp"/>
@@ -5739,6 +5740,8 @@ Sample:
 * `$DATA$` - allows setting complete activity data as field value and redirect it to stacked parser if such is defined for that field.
 * `$METADATA$` - allows accessing activity bound meta-data map. Activity meta-data binding is stream specific: some streams may not provide
   any meta-data. To get list of stream provided meta-data entries, see particular stream documentation (both JavaDoc and readme).
+* `$RAWDATA$` - allows setting complete RAW activity data (one before preparsing other preparations) as field value and redirect it to 
+  stacked parser if such is defined for that field.  
 * field wildcard locators having `*` symbol within field name e.g. `FieldNameFragment*` are used to capture map of activity entity field
   values, where map entry key is field name and value is field value.
 

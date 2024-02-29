@@ -50,8 +50,9 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
  * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#StreamProp}</li>
  * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Cache}</li>
  * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Activity}</li>
- * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Label} - only for locator
- * {@value #LOC_FOR_COMPLETE_ACTIVITY_DATA}</li>
+ * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Label} - only for locators
+ * {@value #LOC_FOR_COMPLETE_ACTIVITY_DATA}, {@value #LOC_FOR_COMPLETE_ACTIVITY_RAW_DATA} and
+ * {@value #LOC_FOR_COMPLETE_ACTIVITY_METADATA}</li>
  * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#Expression}</li>
  * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#ParserProp}</li>
  * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#SystemProp}</li>
