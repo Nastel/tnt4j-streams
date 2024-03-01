@@ -287,6 +287,7 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 
 		ActivityContext cData = new ActivityContext(stream, data, xmlDoc).setParser(this);
 		cData.setMessage(xmlString);
+		cData.setRawData(xmlString);
 
 		return cData;
 	}
@@ -594,11 +595,6 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 		}
 
 		return null;
-	}
-
-	@Override
-	protected boolean doIncludeDelimiter() {
-		return true;
 	}
 
 	private static final String[] ACTIVITY_DATA_TYPES = { "XML", "TEXT" }; // NON-NLS

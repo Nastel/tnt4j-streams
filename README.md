@@ -5715,8 +5715,10 @@ Sample:
   defined for that field in stream parser configuration or value was not resolved by parser from Raw activity data. **NOTE:** it is
   recommended to use it for **DEBUGGING** purposes only. For a production version of your software, remove this property form stream parser
   configuration. Default value - `false`. (Optional)
-* `ActivityDelim` - defines activities delimiter symbol used by parsers. Value can be one of: `EOL` - end of line, or `EOF` - end of
+* `ActivityDelim` - defines activities delimiter symbol/token used by parsers. Value can be one of: `EOL` - end of line, or `EOF` - end of
   file/stream. Default value - `EOL`. (Optional)
+* `IncludeDelimiter` - flag indicating whether RAW activity data text string shall include customly defined activity delimiter symbol/token.
+  Default value - `true`. (Optional)
 * `RequireDefault` - indicates that all parser fields/locators by default are required to resolve to non-null values. Default value -
   `false`. (Optional). The `field` attribute `required="true"` (or `false`) may be used to take precedence over the `RequireDefault`
   property. See `required` attribute definition in ['TNT4J Events field mappings'](#tnt4j-events-field-mappings).

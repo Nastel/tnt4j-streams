@@ -168,11 +168,6 @@ public class IBMMQLogParser extends AbstractActivityMapParser {
 		return dataMap;
 	}
 
-	@Override
-	protected boolean doIncludeDelimiter() {
-		return true;
-	}
-
 	private static final String[] ACTIVITY_DATA_TYPES = { "IBM MQ ERR LOG", "TEXT" }; // NON-NLS
 
 	/**
