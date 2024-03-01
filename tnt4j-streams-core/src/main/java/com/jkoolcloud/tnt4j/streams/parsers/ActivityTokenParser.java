@@ -201,6 +201,7 @@ public class ActivityTokenParser extends GenericActivityParser<String[]> {
 
 		ActivityContext cData = new ActivityContext(stream, data, fields).setParser(this);
 		// cData.setMessage(getRawDataAsMessage(fields));
+		cData.setRawData(dataStr);
 
 		return cData;
 	}

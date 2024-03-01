@@ -168,6 +168,7 @@ public class ActivityRegExParser extends GenericActivityParser<Matcher> {
 
 		ActivityContext cData = new ActivityContext(stream, data, matcher).setParser(this);
 		cData.setMessage(dataStr);
+		cData.setRawData(dataStr);
 
 		if (matchStrategy == Strategy.FIND) {
 			Map<String, String> matches = findMatches(matcher);
