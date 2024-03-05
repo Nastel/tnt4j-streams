@@ -38,8 +38,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.jkoolcloud.tnt4j.streams.transform.FuncFindRegex;
 import com.jkoolcloud.tnt4j.streams.transform.FuncGetFileName;
 import com.jkoolcloud.tnt4j.streams.transform.FuncGetObjectName;
+import com.jkoolcloud.tnt4j.streams.transform.FuncReplaceRegex;
 
 /**
  * General XML utility methods used by TNT4J-Streams.
@@ -88,6 +90,8 @@ public final class StreamsXMLUtils {
 	 * @see com.jkoolcloud.tnt4j.streams.utils.NamespaceMap
 	 * @see com.jkoolcloud.tnt4j.streams.transform.FuncGetFileName
 	 * @see com.jkoolcloud.tnt4j.streams.transform.FuncGetObjectName
+	 * @see com.jkoolcloud.tnt4j.streams.transform.FuncReplaceRegex
+	 * @see com.jkoolcloud.tnt4j.streams.transform.FuncFindRegex
 	 */
 	public static XPath getStreamsXPath() {
 		XPath xPath = XPathFactory.newInstance().newXPath();
@@ -104,6 +108,8 @@ public final class StreamsXMLUtils {
 		static {
 			fMap.put(FuncGetFileName.FUNCTION_NAME, new FuncGetFileName());
 			fMap.put(FuncGetObjectName.FUNCTION_NAME, new FuncGetObjectName());
+			fMap.put(FuncReplaceRegex.FUNCTION_NAME, new FuncReplaceRegex());
+			fMap.put(FuncFindRegex.FUNCTION_NAME, new FuncFindRegex());
 		}
 
 		@Override

@@ -814,6 +814,10 @@ Streams predefined custom XPath functions to be used in transformation expressio
     * resolution options: `DEFAULT`, `BEFORE`, `AFTER`, `REPLACE`, `FULL`. (Optional)
     * search symbols. (Optional)
     * replacement symbols. (Optional)
+* `ts:replaceRegex(text, regex, replacement)` - implemented by transformation bean `com.jkoolcloud.tnt4j.streams.transform.FuncReplaceRegex`.
+  Replaces `regex` matching segments within provided `text` with provided `replacement`. 
+* `ts:findRegex(text, regex, group)` - implemented by transformation bean `com.jkoolcloud.tnt4j.streams.transform.FuncFindRegex`. Finds 
+  `regex` matching segment within provided `text`.
 
 You may also define your own customized XPath functions. To do this your API has to:
 * implement interface `javax.xml.xpath.XPathFunction`

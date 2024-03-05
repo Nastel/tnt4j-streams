@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2023 JKOOL, LLC.
+ * Copyright 2014-2024 JKOOL, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,20 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
  * Data value transformation function resolving file name from provided file path.
  * <p>
- * Syntax to be use in code: 'ts:getFileName(filePath)' were:
+ * Syntax to be use in code: 'ts:getFileName(filePath)' where:
  * <ul>
  * <li>'ts:' is function namespace</li>
  * <li>'getFileName' - function name</li>
  * <li>'filePath' - function argument defining file path</li>
  * </ul>
  *
- * @version $Revision: 1 $
+ * @version $Revision: 2 $
  */
 public class FuncGetFileName extends AbstractFunction<String> {
 
@@ -52,15 +50,16 @@ public class FuncGetFileName extends AbstractFunction<String> {
 	}
 
 	/**
-	 * Resolves file name from provided file path. File path can be provided as {@link java.lang.String},
-	 * {@link org.w3c.dom.Node} or {@link org.w3c.dom.NodeList} (first node item containing file path).
+	 * Resolves file name from provided file path.
+	 * <p>
+	 * File path can be provided as {@link java.lang.String}, {@link org.w3c.dom.Node} or {@link org.w3c.dom.NodeList}
+	 * (first node item containing file path).
 	 *
 	 * @param args
 	 *            arguments list containing file path as first item
 	 * @return file name resolved from provided path
 	 *
-	 * @see org.w3c.dom.Node
-	 * @see org.w3c.dom.NodeList
+	 * @see #getText(Object)
 	 * @see Utils#getFileName(String)
 	 */
 	@Override
@@ -72,19 +71,7 @@ public class FuncGetFileName extends AbstractFunction<String> {
 			return param;
 		}
 
-		String filePath = null;
-		if (param instanceof String) {
-			filePath = (String) param;
-		} else if (param instanceof Node) {
-			filePath = ((Node) param).getTextContent();
-		} else if (param instanceof NodeList) {
-			NodeList nodes = (NodeList) param;
-
-			if (nodes.getLength() > 0) {
-				Node node = nodes.item(0);
-				filePath = node.getTextContent();
-			}
-		}
+		String filePath = getText(param);
 
 		return StringUtils.trim(Utils.getFileName(filePath));
 	}
