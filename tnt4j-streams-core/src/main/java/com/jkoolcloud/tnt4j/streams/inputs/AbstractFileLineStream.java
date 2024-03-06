@@ -214,6 +214,16 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 	protected void applyProperties() throws Exception {
 		super.applyProperties();
 
+		if (!storeState) {
+			int bSize = (int) getProperty(StreamProperties.PROP_BUFFER_SIZE);
+			if (bSize == 1) {
+				boolean useExec = (boolean) getProperty(StreamProperties.PROP_USE_EXECUTOR_SERVICE);
+				int tQty = (int) getProperty(StreamProperties.PROP_EXECUTOR_THREADS_QTY);
+
+				setProperty(StreamProperties.PROP_BUFFER_SIZE, useExec ? String.valueOf(tQty) : String.valueOf(2));
+			}
+		}
+
 		lineRange = IntRange.getRange(rangeValue);
 	}
 
