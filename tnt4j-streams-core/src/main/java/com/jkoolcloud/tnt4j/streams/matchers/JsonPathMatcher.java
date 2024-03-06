@@ -37,9 +37,9 @@ public class JsonPathMatcher implements Matcher {
 	}
 
 	/**
-	 * Returns instance of JSON matcher to be used by {@link com.jkoolcloud.tnt4j.streams.matchers.Matchers} facade.
+	 * Returns instance of JSONPath matcher to be used by {@link com.jkoolcloud.tnt4j.streams.matchers.Matchers} facade.
 	 *
-	 * @return default instance of JSON matcher
+	 * @return default instance of JSONPath matcher
 	 */
 	static synchronized JsonPathMatcher getInstance() {
 		if (instance == null) {
