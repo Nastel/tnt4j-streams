@@ -27,16 +27,12 @@
             <field-map source="info" target="ERROR"/>
         </field>
 
-        <field name="StartTime">
-            <field-locator locator="/*[local-name() = 'logs']/*[local-name() = 'timestamp']" locator-type="Label" datatype="DateTime"
-                           format="yyyy-MM-dd'T'HH:mm:ss.SSSX">
-                <field-transform name="PadDateTimeMillis" lang="groovy" phase="raw">
-                    <![CDATA[
-                        regex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
-                        ($fieldValue ==~ regex) ? $fieldValue : $fieldValue[0..-2]+'.000Z';
-                    ]]>
-                </field-transform>
-            </field-locator>
+        <field name="StartTime" locator="string(/*[local-name() = 'logs']/*[local-name() = 'timestamp'])" locator-type="Label"
+               datatype="DateTime" format="yyyy-MM-dd'T'HH:mm:ss.SSSX">
+            <field-transform name="PadDateTimeMillis" lang="groovy" phase="raw"><![CDATA[
+                regex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
+                ($fieldValue ==~ regex) ? $fieldValue : $fieldValue[0..-2]+'.000Z';
+            ]]></field-transform>
         </field>
 
     </parser>
@@ -93,14 +89,13 @@
         <property name="Namespace" value="S=http://schemas.xmlsoap.org/soap/envelope/"/>
         <property name="Namespace" value="ns2=http://www.approuter.com/schemas/2008/1/lognotif/types"/>
         <property name="Namespace" value="ns3=http://www.approuter.com/schemas/2008/1/lognotif"/>
-        <!--		 <property name="Namespace" value="sec=http://www.approuter.com/schemas/2008/1/security"/>
+        <!--         <property name="Namespace" value="sec=http://www.approuter.com/schemas/2008/1/security"/>
                 <property name="Namespace" value="orc=http://www.approuter.com/schemas/2008/1/orcmon"/> -->
 
         <field name="EventType" value="Activity"/>
         <field name="ApplName" value="CastIron"/>
 
-        <embedded-activity name="Logs"
-                           locator="/S:Envelope/S:Body/*/*" locator-type="Label">
+        <embedded-activity name="Logs" locator="/S:Envelope/S:Body//*[local-name() = 'logs']" locator-type="Label">
             <parser-ref name="LogsParser" aggregation="Relate"/>
         </embedded-activity>
 
@@ -156,8 +151,7 @@
             <field-map source="" target="UNKNOWN"/>
         </field>
 
-        <embedded-activity name="JobEvents"
-                           locator="/S:Envelope/S:Body/*/*/*" locator-type="Label">
+        <embedded-activity name="JobEvents" locator="/*[local-name() = 'jobs']/*[local-name() = 'event']" locator-type="Label">
             <parser-ref name="JobEventsParser" aggregation="Relate"/>
         </embedded-activity>
 
@@ -171,8 +165,7 @@
         <field name="EventType" value="Activity"/>
         <field name="ApplName" value="CastIron"/>
 
-        <embedded-activity name="Jobs"
-                           locator="/S:Envelope/S:Body/*/*" locator-type="Label">
+        <embedded-activity name="Jobs" locator="/S:Envelope/S:Body//*[local-name() = 'jobs']" locator-type="Label">
             <parser-ref name="JobsParser" aggregation="Relate"/>
         </embedded-activity>
 
@@ -184,7 +177,7 @@
         <property name="Namespace" value="ns2=http://www.approuter.com/schemas/2008/1/security/02"/>
 
         <field name="EventType" value="NOOP"/>
-        <field name="Token" locator="/S:Envelope/S:Body/*/*" locator-type="Label"/>
+        <field name="Token" locator="/S:Envelope/S:Body//*[local-name() = 'sessionId']" locator-type="Label"/>
     </parser>
 
     <parser name="LogsCountParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser" manualFieldsOrder="true">
@@ -194,12 +187,13 @@
 
         <field name="EventType" value="NOOP"/>
         <field name="LastLogCount" locator="CurrentLogCount" locator-type="Cache" datatype="Number"/>
-        <field name="CurrentLogCount" locator="/S:Envelope/S:Body/*/*" locator-type="Label" datatype="Number"/>
+        <field name="CurrentLogCount" locator="count(/S:Envelope/S:Body//*[local-name() = 'logs'])" locator-type="Label" datatype="Number"
+               format="int"/>
 
         <field name="LogCountDiff" value="">
             <field-transform lang="groovy" name="DiffTransform"><![CDATA[
-			   (${LastLogCount} != null && ${CurrentLogCount} != null) ? (${CurrentLogCount} - ${LastLogCount}) as Integer : 2
-			]]>
+               (${LastLogCount} != null && ${CurrentLogCount} != null) ? (${CurrentLogCount} - ${LastLogCount}) as Integer : 2
+            ]]>
             </field-transform>
         </field>
 
@@ -215,12 +209,13 @@
 
         <field name="EventType" value="NOOP"/>
         <field name="LastJobsCount" locator="CurrentJobsCount" locator-type="Cache" datatype="Number"/>
-        <field name="CurrentJobsCount" locator="/S:Envelope/S:Body/*/*" locator-type="Label" datatype="Number"/>
+        <field name="CurrentJobsCount" locator="count(/S:Envelope/S:Body//*[local-name() = 'jobs'])" locator-type="Label"
+               datatype="Number" format="int"/>
 
         <field name="JobsCountDiff" value="">
             <field-transform lang="groovy" name="DiffTransform"><![CDATA[
-			   (${LastJobsCount} != null && ${CurrentJobsCount} != null) ? (${CurrentJobsCount} - ${LastJobsCount}) as Integer : 2
-			]]>
+               (${LastJobsCount} != null && ${CurrentJobsCount} != null) ? (${CurrentJobsCount} - ${LastJobsCount}) as Integer : 2
+            ]]>
             </field-transform>
         </field>
     </parser>

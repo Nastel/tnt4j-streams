@@ -1,0 +1,32 @@
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+    <S:Body>
+        <ns2:searchJobsResponse xmlns:ns6="http://www.approuter.com/schemas/2004/1/orcmon"
+                                xmlns:ns5="http://www.approuter.com/schema/router/1000/logging.xsd"
+                                xmlns:ns4="http://www.approuter.com/schemas/2004/1/orcmon/"
+                                xmlns:ns3="http://www.approuter.com/schemas/2008/1/orcmon"
+                                xmlns:ns2="http://www.approuter.com/schemas/2005/1/monitoringProps/">
+            <ns3:jobs status="1" startTime="2010-04-15T10:40:02.665Z"
+                      path="CloudProvideProject_2/1.0/Default/Orchestrations/ProvideOnCloud"
+                      id="ADCF71CCD81139F8CF16F815998B4B73" endTime="2010-04-15T10:40:38.066Z">
+                <ns6:event seqNum="0">
+                    <ns6:eventType>
+                        <ns4:taskStartLoggedEvent>
+                            <ns4:taskId>ADCF71CCD81139F8CF16F815998B4B73</ns4:taskId>
+                            <ns4:sequenceNumber>0</ns4:sequenceNumber>
+                            <ns4:time>2010-04-15T10:40:02.665Z</ns4:time>
+                        </ns4:taskStartLoggedEvent>
+                    </ns6:eventType>
+                </ns6:event>
+                <ns6:event seqNum="1">
+                    <ns6:eventType>
+                        <ns4:setStatusLoggedEvent>
+                            <ns4:taskId>ADCF71CCD81139F8CF16F815998B4B73</ns4:taskId>
+                            <ns4:sequenceNumber>1</ns4:sequenceNumber>
+                            <ns4:status>2</ns4:status>
+                        </ns4:setStatusLoggedEvent>
+                    </ns6:eventType>
+                </ns6:event>
+            </ns3:jobs>
+        </ns2:searchJobsResponse>
+    </S:Body>
+</S:Envelope>
