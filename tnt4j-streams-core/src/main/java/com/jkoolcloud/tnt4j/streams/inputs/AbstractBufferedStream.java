@@ -162,7 +162,15 @@ public abstract class AbstractBufferedStream<T> extends TNTParseableInputStream<
 			if (forceClear) {
 				inputBuffer.clear();
 			}
-			inputBuffer.offer(DIE_MARKER);
+			try {
+				boolean added = inputBuffer.offer(DIE_MARKER);
+				if (!added) {
+					inputBuffer.put(DIE_MARKER);
+				}
+			} catch (InterruptedException exc) {
+				logger().log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						"AbstractBufferedStream.put.interrupted", "DIE_MARKER"); // NON-NLS
+			}
 		}
 	}
 

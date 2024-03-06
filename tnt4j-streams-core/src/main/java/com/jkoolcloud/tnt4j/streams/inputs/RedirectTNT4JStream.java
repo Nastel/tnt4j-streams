@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang3.StringUtils;
@@ -66,7 +65,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * @version $Revision: 1 $
  *
  * @see ArrayBlockingQueue
- * @see BlockingQueue#offer(Object, long, TimeUnit)
+ * @see BlockingQueue#offer(Object)
  * @see RedirectTNT4JStreamFormatter
  * @see ReaderFeed
  */
@@ -313,7 +312,19 @@ public class RedirectTNT4JStream extends TNTInputStream<String, String> {
 			if (forceClear) {
 				inputBuffer.clear();
 			}
-			inputBuffer.offer(DIE_MARKER);
+			offerDieMarker(inputBuffer);
+		}
+	}
+
+	private static void offerDieMarker(BlockingQueue<Object> inputBuffer) {
+		try {
+			boolean added = inputBuffer.offer(DIE_MARKER);
+			if (!added) {
+				inputBuffer.put(DIE_MARKER);
+			}
+		} catch (InterruptedException exc) {
+			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+					"AbstractBufferedStream.put.interrupted", "DIE_MARKER"); // NON-NLS
 		}
 	}
 
@@ -403,7 +414,7 @@ public class RedirectTNT4JStream extends TNTInputStream<String, String> {
 
 			activeFeedersList.clear();
 
-			inputBuffer.offer(DIE_MARKER);
+			offerDieMarker(inputBuffer);
 		}
 
 		@Override
