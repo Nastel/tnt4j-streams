@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.xml.XMLConstants;
@@ -107,8 +108,8 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 	private static final Map<String, XPathExpression> expCache = new HashMap<>();
 	private DocumentBuilder builder;
 
-	private final ReentrantLock xPathLock = new ReentrantLock();
-	private final ReentrantLock builderLock = new ReentrantLock();
+	private final Lock xPathLock = new ReentrantLock();
+	private final Lock builderLock = new ReentrantLock();
 
 	/**
 	 * Property indicating that parser shall be namespace aware.
@@ -266,8 +267,8 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 				xmlDoc = parseXmlDoc(IOUtils.toInputStream(xmlString, StandardCharsets.UTF_8));
 			}
 		} catch (Exception e) {
-			ParseException pe = new ParseException(StreamsResources.getString(StreamsResources.RESOURCE_BUNDLE_NAME,
-					"ActivityXmlParser.xmlDocument.parse.error"), 0);
+			ParseException pe = new ParseException(StreamsResources.getStringFormatted(
+					StreamsResources.RESOURCE_BUNDLE_NAME, "ActivityXmlParser.xmlDocument.parse.error", xmlString), 0);
 			pe.initCause(e);
 
 			throw pe;
@@ -355,7 +356,6 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 	 *             if exception occurs while resolving raw data value or applying locator format properties to specified
 	 *             value
 	 *
-	 * @see ActivityFieldLocator#formatValue(Object)
 	 * @see #getTextOnDemand(org.w3c.dom.Node, com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocator,
 	 *      com.jkoolcloud.tnt4j.streams.parsers.GenericActivityParser.ActivityContext,
 	 *      java.util.concurrent.atomic.AtomicBoolean)
@@ -535,6 +535,8 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 	 * @return resolved textual value formatted based on the locator's formatting properties
 	 * @throws ParseException
 	 *             if exception occurs applying locator format properties to specified value
+	 * 
+	 * @see ActivityFieldLocator#formatValue(Object)
 	 */
 	protected static Object getTextContent(ActivityFieldLocator locator, Node node, AtomicBoolean formattingNeeded)
 			throws ParseException {
