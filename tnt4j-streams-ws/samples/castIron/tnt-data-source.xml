@@ -86,6 +86,8 @@
     </parser>
 
     <parser name="SearchLogsResponseParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
+        <property name="ActivityDelim" value="EOF"/>
+
         <property name="Namespace" value="S=http://schemas.xmlsoap.org/soap/envelope/"/>
         <property name="Namespace" value="ns2=http://www.approuter.com/schemas/2008/1/lognotif/types"/>
         <property name="Namespace" value="ns3=http://www.approuter.com/schemas/2008/1/lognotif"/>
@@ -158,6 +160,8 @@
     </parser>
 
     <parser name="SearchJobsResponseParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
+        <property name="ActivityDelim" value="EOF"/>
+
         <property name="Namespace" value="S=http://schemas.xmlsoap.org/soap/envelope/"/>
         <property name="Namespace" value="ns2=http://www.approuter.com/schemas/2008/1/lognotif/types"/>
         <property name="Namespace" value="ns3=http://www.approuter.com/schemas/2008/1/lognotif"/>
@@ -172,6 +176,8 @@
     </parser>
 
     <parser name="LoginParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
+        <property name="ActivityDelim" value="EOF"/>
+
         <property name="Namespace" value="sec=http://www.approuter.com/schemas/2008/1/security"/>
         <property name="Namespace" value="ns3=http://www.approuter.com/schemas/2008/1/security/03"/>
         <property name="Namespace" value="ns2=http://www.approuter.com/schemas/2008/1/security/02"/>
@@ -181,6 +187,8 @@
     </parser>
 
     <parser name="LogsCountParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser" manualFieldsOrder="true">
+        <property name="ActivityDelim" value="EOF"/>
+
         <property name="Namespace" value="sec=http://www.approuter.com/schemas/2008/1/security"/>
         <property name="Namespace" value="ns3=http://www.approuter.com/schemas/2008/1/security/03"/>
         <property name="Namespace" value="ns2=http://www.approuter.com/schemas/2008/1/security/02"/>
@@ -200,6 +208,7 @@
     </parser>
 
     <parser name="JobsCountParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser" manualFieldsOrder="true">
+        <property name="ActivityDelim" value="EOF"/>
 
         <property name="Namespace" value="ns6=http://www.approuter.com/schemas/2004/1/orcmon"/>
         <property name="Namespace" value="ns5=http://www.approuter.com/schema/router/1000/logging.xsd"/>
@@ -218,6 +227,24 @@
             ]]>
             </field-transform>
         </field>
+    </parser>
+
+    <parser name="CIBootstrapParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser">
+        <property name="ActivityDelim" value="EOF"/>
+
+        <field name="EventType" value="NOOP"/>
+
+        <embedded-activity name="CIResponseXML" locator="$DATA$" locator-type="Label">
+            <parser-ref name="LoginParser" aggregation="Merge">
+                <matchExp>string:contains(loginResponse)</matchExp>
+            </parser-ref>
+            <parser-ref name="SearchJobsResponseParser" aggregation="Merge">
+                <matchExp>string:contains(searchJobsResponse)</matchExp>
+            </parser-ref>
+            <parser-ref name="SearchLogsResponseParser" aggregation="Merge">
+                <matchExp>string:contains(searchLogsResponse)</matchExp>
+            </parser-ref>
+        </embedded-activity>
     </parser>
 
     <cache>
@@ -249,7 +276,7 @@
         </entry>
     </cache>
 
-    <stream name="CastIronStreamSearchLogs" class="com.jkoolcloud.tnt4j.streams.custom.inputs.castiron.CastIronWsStream">
+    <stream name="CastIronSearchStream" class="com.jkoolcloud.tnt4j.streams.custom.inputs.castiron.CastIronWsStream">
         <property name="HaltIfNoParser" value="false"/>
 
         <property name="DisableSSL" value="true"/>
@@ -308,39 +335,9 @@
                     <parser-ref name="SearchLogsResponseParser"/>
                 </request>
             </step>
-        </scenario>
-    </stream>
-
-    <stream name="CastIronStreamSearchJobs" class="com.jkoolcloud.tnt4j.streams.custom.inputs.castiron.CastIronWsStream">
-        <property name="HaltIfNoParser" value="false"/>
-
-        <property name="DisableSSL" value="true"/>
-        <property name="SynchronizeRequests" value="true"/>
-
-        <property name="SecurityResponseParserTag" value="login"/>
-        <property name="SecurityCachedTokenKey" value="Token"/>
-        <property name="WsEndpoint" value="https://192.168.3.3/ws"/>
-
-        <!-- NOTE: when streaming to AutoPilot set "SendStreamStates" to false if stream START/STOP events are not in scope of interest -->
-        <!--<property name="SendStreamStates" value="false"/>-->
-
-        <scenario name="Sample job poll scenario">
-            <step name="Login" url="${WsEndpoint}/security">
-                <request>
-                    <![CDATA[
-                        SOAPAction:${WsEndpoint}/security
-                        <sec:login xmlns:sec="http://www.approuter.com/schemas/2008/1/security">
-                            <sec:username>admin</sec:username>
-                            <sec:password>slabs123!</sec:password>
-                        </sec:login>
-                    ]]>
-
-                    <parser-ref name="LoginParser"/>
-                </request>
-            </step>
             <step name="PollJobs"
                   url="${WsEndpoint}/orcmon">
-                <schedule-simple interval="35" units="Seconds" repeatCount="-1"/>
+                <schedule-simple interval="30" units="Seconds" repeatCount="-1" startDelay="5" startDelayUnits="Seconds"/>
                 <request>
                     <![CDATA[
                         SOAPAction:${WsEndpoint}/orcmon
@@ -377,20 +374,10 @@
 
     <!-- CastIron Jobs search dump TEST stream -->
     <!--<stream name="JobsFileStream" class="com.jkoolcloud.tnt4j.streams.inputs.CharacterStream">-->
-    <!--<property name="FileName" value="./tnt4j-streams-ws/samples/castIron/responses/searchJobsResponse.xml"/>-->
+    <!--<property name="FileName" value="./tnt4j-streams-ws/samples/castIron/responses/*.xml"/>-->
     <!--<property name="SplitRelatives" value="true"/>-->
     <!--<property name="SendStreamStates" value="false"/>-->
 
-    <!--<parser-ref name="SearchJobsResponseParser"/>-->
+    <!--<parser-ref name="CIBootstrapParser"/>-->
     <!--</stream>-->
-
-    <!-- CastIron Logs search dump TEST stream -->
-    <!--<stream name="LogsFileStream" class="com.jkoolcloud.tnt4j.streams.inputs.CharacterStream">-->
-    <!--<property name="FileName" value="./tnt4j-streams-ws/samples/castIron/responses/searchLogsResponse.xml"/>-->
-    <!--<property name="SplitRelatives" value="true"/>-->
-    <!--<property name="SendStreamStates" value="false"/>-->
-
-    <!--<parser-ref name="SearchLogsResponseParser"/>-->
-    <!--</stream>-->
-
 </tnt-data-source>
