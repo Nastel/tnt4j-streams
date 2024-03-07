@@ -657,12 +657,15 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	private ImmutablePair<BufferedReader, Scanner> scannerPair;
 
 	private String scanReader(BufferedReader rdr, String delimiter, boolean includeDelim) throws IOException {
+		Scanner scanner;
 		if (scannerPair == null || scannerPair.getLeft().hashCode() != rdr.hashCode()) {
-			scannerPair = new ImmutablePair<>(rdr, new Scanner(rdr));
-		}
+			scanner = new Scanner(rdr);
+			scanner.useDelimiter(delimiter);
 
-		Scanner scanner = scannerPair.getRight();
-		scanner.useDelimiter(delimiter);
+			scannerPair = new ImmutablePair<>(rdr, scanner);
+		} else {
+			scanner = scannerPair.getRight();
+		}
 
 		if (scanner.hasNext()) {
 			String str = scanner.next();
