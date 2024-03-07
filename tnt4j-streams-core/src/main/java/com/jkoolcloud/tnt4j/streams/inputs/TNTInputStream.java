@@ -43,6 +43,7 @@ import com.jkoolcloud.tnt4j.utils.SecurityUtils;
  * <li>UseExecutors - identifies whether stream should use executor service to process activities data items
  * asynchronously or not. Default value - {@code false}. (Optional)</li>
  * <li>ExecutorThreadsQuantity - defines executor service thread pool size. Default value - {@code 4}. (Optional)</li>
+ * <li>ExecutorQueueDepth - defines executor service bound tasks queue depth. Default value - {@code 8}. (Optional)</li>
  * <li>ExecutorRejectedTaskOfferTimeout - time to wait (in seconds) for a executor service to terminate. Default value -
  * {@code 20}. (Optional)</li>
  * <li>ExecutorsBoundedModel - identifies whether executor service should use bounded tasks queue model. Default value -
@@ -111,6 +112,7 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	// executor service related properties
 	private boolean boundedExecutorModel = false;
 	private int executorThreadsQty = DEFAULT_EXECUTOR_THREADS_QTY;
+	private int executorQueueDepth = -1;
 	private int executorsTerminationTimeout = DEFAULT_EXECUTORS_TERMINATION_TIMEOUT;
 	private int executorRejectedTaskOfferTimeout = DEFAULT_EXECUTOR_REJECTED_TASK_TIMEOUT;
 	private boolean executorImmediateShutdown = false;
@@ -237,6 +239,8 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 			useExecutorService = Utils.toBoolean(value);
 		} else if (StreamProperties.PROP_EXECUTOR_THREADS_QTY.equalsIgnoreCase(name)) {
 			executorThreadsQty = Integer.parseInt(value);
+		} else if (StreamProperties.PROP_EXECUTOR_QUEUE_DEPTH.equalsIgnoreCase(name)) {
+			executorQueueDepth = Integer.parseInt(value);
 		} else if (StreamProperties.PROP_EXECUTOR_REJECTED_TASK_OFFER_TIMEOUT.equalsIgnoreCase(name)) {
 			executorRejectedTaskOfferTimeout = Integer.parseInt(value);
 		} else if (StreamProperties.PROP_EXECUTORS_TERMINATION_TIMEOUT.equalsIgnoreCase(name)) {
@@ -287,6 +291,9 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 		}
 		if (StreamProperties.PROP_EXECUTOR_THREADS_QTY.equalsIgnoreCase(name)) {
 			return executorThreadsQty;
+		}
+		if (StreamProperties.PROP_EXECUTOR_QUEUE_DEPTH.equalsIgnoreCase(name)) {
+			return executorQueueDepth;
 		}
 		if (StreamProperties.PROP_EXECUTOR_REJECTED_TASK_OFFER_TIMEOUT.equalsIgnoreCase(name)) {
 			return executorRejectedTaskOfferTimeout;
@@ -344,9 +351,9 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 		out.initialize();
 
 		if (useExecutorService) {
-			streamExecutorService = boundedExecutorModel
-					? getBoundedExecutorService(executorThreadsQty, executorRejectedTaskOfferTimeout)
-					: getDefaultExecutorService(executorThreadsQty);
+			streamExecutorService = boundedExecutorModel ? getBoundedExecutorService(executorThreadsQty,
+					executorQueueDepth == -1 ? executorThreadsQty * 2 : executorQueueDepth,
+					executorRejectedTaskOfferTimeout) : getDefaultExecutorService(executorThreadsQty);
 		} else {
 			out.handleConsumerThread(isOwned() ? ownerThread : Thread.currentThread());
 		}
@@ -430,13 +437,15 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 
 	/**
 	 * Creates thread pool executor service for a given number of threads with bounded tasks queue - queue size is
-	 * 2x{@code threadsQty}. When queue size is reached, new tasks are offered to queue using defined offer timeout. If
+	 * {@code queueDepth}. When queue size is reached, new tasks are offered to queue using defined offer timeout. If
 	 * task can't be put into queue over this time, task is skipped with making warning log entry. Thus memory use does
 	 * not grow drastically if consumers can't keep up the pace of producers filling in the queue, making producers
 	 * synchronize with consumers.
 	 *
 	 * @param threadsQty
 	 *            the number of threads in the pool
+	 * @param queueDepth
+	 *            executor service bound tasks queue depth
 	 * @param offerTimeout
 	 *            how long to wait before giving up on offering task to queue
 	 *
@@ -444,12 +453,12 @@ public abstract class TNTInputStream<T, O> implements Runnable, NamedObject {
 	 *
 	 * @see ThreadPoolExecutor#ThreadPoolExecutor(int, int, long, TimeUnit, BlockingQueue, ThreadFactory)
 	 */
-	private ExecutorService getBoundedExecutorService(int threadsQty, int offerTimeout) {
+	private ExecutorService getBoundedExecutorService(int threadsQty, int queueDepth, int offerTimeout) {
 		StreamsThreadFactory stf = new StreamsThreadFactory("StreamBoundedExecutorThread-"); // NON-NLS
 		stf.addThreadFactoryListener(new StreamsThreadFactoryListener());
 
 		ThreadPoolExecutor tpe = new ThreadPoolExecutor(threadsQty, threadsQty, 0L, TimeUnit.MILLISECONDS,
-				new LinkedBlockingQueue<>(threadsQty * 2), stf);
+				new LinkedBlockingQueue<>(queueDepth), stf);
 
 		tpe.setRejectedExecutionHandler(new RejectedExecutionHandler() {
 			@Override

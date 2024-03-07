@@ -4609,6 +4609,8 @@ These parameters are applicable to all types of streams.
   value - `false`. (Optional)
     * `ExecutorThreadsQuantity` - defines executor service thread pool size. Default value - `4`. (Optional) Actual only if `UseExecutors`
       is set to `true`
+    * `ExecutorQueueDepth` - defines executor service bound tasks queue depth. Default value - `2 * ExecutorThreadsQuantity`. (Optional) 
+      Actual only if `UseExecutors` is set to `true`
     * `ExecutorsTerminationTimeout` - time to wait (in seconds) for a executor service to terminate. Default value - `20sec`. (Optional)
       Actual only if `UseExecutors` is set to `true`
     * `ExecutorsBoundedModel` - identifies whether executor service should use bounded tasks queue model. Default value - `false`. (Optional)

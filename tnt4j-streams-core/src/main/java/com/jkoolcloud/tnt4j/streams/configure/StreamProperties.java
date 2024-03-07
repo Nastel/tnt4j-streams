@@ -89,6 +89,11 @@ public interface StreamProperties extends OutputProperties {
 	String PROP_EXECUTOR_THREADS_QTY = "ExecutorThreadsQuantity"; // NON-NLS
 
 	/**
+	 * Constant for name of built-in {@value} property.
+	 */
+	String PROP_EXECUTOR_QUEUE_DEPTH = "ExecutorQueueDepth"; // NON-NLS
+
+	/**
 	 * Constant for name of built-in {@value} property. Value in seconds.
 	 */
 	String PROP_EXECUTOR_REJECTED_TASK_OFFER_TIMEOUT = "ExecutorRejectedTaskOfferTimeout"; // NON-NLS
