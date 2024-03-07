@@ -264,9 +264,9 @@ public class ActivityInfoTest {
 		String[] fieldValue = { "TestValue" };
 		ai.applyField(af, fieldValue);
 		Object value = ai.getFieldValue("TestField");
+		assertEquals(value, "TestValue");
 		assertEquals(value, af.aggregateFieldValue(fieldValue, ai));
 		assertEquals(value, ai.getFieldValue("TestField"));
-		assertEquals(value, "TestValue");
 	}
 
 	/**

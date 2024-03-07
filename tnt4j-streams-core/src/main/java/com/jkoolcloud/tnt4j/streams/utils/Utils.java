@@ -518,13 +518,34 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @return found uuid
 	 */
 	public static UUID findUUID(String str) {
-		Matcher m = UUID_PATTERN.matcher(str);
 		String fnUUID = null;
-		if (m.find()) {
-			fnUUID = m.group();
+		if (StringUtils.isNotEmpty(str)) {
+			Matcher m = UUID_PATTERN.matcher(str);
+			if (m.find()) {
+				fnUUID = m.group();
+			}
 		}
 
 		return StringUtils.isEmpty(fnUUID) ? null : UUID.fromString(fnUUID);
+	}
+
+	/**
+	 * Returns UUIDs list found in provided string.
+	 *
+	 * @param str
+	 *            string to find UUIDs
+	 * @return found uuid list
+	 */
+	public static List<String> findUUIDs(String str) {
+		List<String> uuids = new ArrayList<>();
+		if (StringUtils.isNotEmpty(str)) {
+			Matcher m = UUID_PATTERN.matcher(str);
+			while (m.find()) {
+				uuids.add(m.group());
+			}
+		}
+
+		return uuids;
 	}
 
 	/**
@@ -545,6 +566,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes"); // NON-NLS
 		transformer.setOutputProperty(OutputKeys.ENCODING, UTF8);
 		transformer.setOutputProperty(OutputKeys.VERSION, "1.1"); // NON-NLS
+		// transformer.setOutputProperty(OutputKeys.STANDALONE, "yes"); // NON-NLS
 
 		transformer.transform(new DOMSource(doc), new StreamResult(sw));
 
@@ -1301,6 +1323,9 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 * @return string representation of object
 	 */
 	public static String toString(Object value) {
+		if (value instanceof String) {
+			return (String) value;
+		}
 		if (value instanceof byte[]) {
 			return getString((byte[]) value);
 			// return Arrays.toString((byte[]) value);
