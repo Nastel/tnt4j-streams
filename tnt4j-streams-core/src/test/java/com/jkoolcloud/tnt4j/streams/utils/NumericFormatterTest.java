@@ -49,7 +49,7 @@ public class NumericFormatterTest {
 
 	@Test
 	public void testParseObjectHex() throws ParseException {
-		NumericFormatter formatter = new NumericFormatter();
+		NumericFormatter formatter = NumericFormatter.getInstance();
 		assertEquals(342, formatter.parse("0xAB", 2)); // NON-NLS
 		assertEquals(171, formatter.parse(0XAB));
 		assertEquals(new BigInteger("1000000000000000000000"),
@@ -66,55 +66,48 @@ public class NumericFormatterTest {
 
 	@Test
 	public void testRadix() {
-		NumericFormatter formatter = new NumericFormatter(5);
+		NumericFormatter formatter = NumericFormatter.getInstance(5);
 		assertEquals(5, formatter.getRadix());
-		formatter.setRadix(6);
-		assertEquals(6, formatter.getRadix());
 	}
 
 	@Test
 	public void testPattern() throws Exception {
-		NumericFormatter formatter = new NumericFormatter();
-		formatter.setPattern("#", null); // NON-NLS
+		NumericFormatter formatter = NumericFormatter.getInstance("#", null); // NON-NLS
 		assertEquals("#", formatter.getPattern());
 		formatter.parse("2");
 	}
 
 	@Test
 	public void testGeneric() throws Exception {
-		NumericFormatter formatter = new NumericFormatter();
-		formatter.setPattern("any", Locale.US.toString());
+		NumericFormatter formatter = NumericFormatter.getInstance("any", Locale.US.toString()); // NON-NLS
 		assertEquals(123456.789, formatter.parse("123,456.789")); // NON-NLS
 
-		formatter = new NumericFormatter();
-		formatter.setPattern("any", "lt-LT"); // NON-NLS
-		assertEquals(-5896456.7898658, formatter.parse("-5896456,7898658")); // NON-NLS
+		formatter = NumericFormatter.getInstance("any", "lt-LT"); // NON-NLS
+		assertEquals(-5896456.7898658, formatter.parse("−5896456,7898658")); // NON-NLS //NOTE: minus sign is not
+																				// ordinary "-"
 
-		formatter = new NumericFormatter();
-		formatter.setPattern("any", Locale.US.toString()); // NON-NLS
+		formatter = NumericFormatter.getInstance("any", Locale.US.toString()); // NON-NLS
 		assertEquals(30L, formatter.parse("30hj00")); // NON-NLS
 
-		formatter = new NumericFormatter();
+		formatter = NumericFormatter.getInstance();
 		assertEquals(25, formatter.parse("25")); // NON-NLS
 
-		formatter = new NumericFormatter();
+		formatter = NumericFormatter.getInstance();
 		assertEquals(171, formatter.parse("0xAB")); // NON-NLS
 
-		formatter = new NumericFormatter();
+		formatter = NumericFormatter.getInstance();
 		assertEquals(123.456789, formatter.parse("123.456789")); // NON-NLS
 
-		formatter = new NumericFormatter();
+		formatter = NumericFormatter.getInstance();
 		assertEquals(1.0f, formatter.parse("1.0")); // NON-NLS
 
-		formatter = new NumericFormatter();
-		formatter.setPattern("long", null);
+		formatter = NumericFormatter.getInstance("long", null); // NON-NLS
 		assertEquals(90000L, formatter.parse("0x15f90"));
 	}
 
 	@Test(expected = ParseException.class)
 	public void testGenericFail() throws Exception {
-		NumericFormatter formatter = new NumericFormatter();
-		formatter.setPattern(null, "lt-LT"); // NON-NLS
+		NumericFormatter formatter = NumericFormatter.getInstance(null, "lt-LT"); // NON-NLS
 		assertEquals(30, formatter.parse("30hj00")); // NON-NLS
 	}
 

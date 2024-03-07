@@ -23,6 +23,8 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -36,13 +38,16 @@ import org.apache.commons.lang3.math.NumberUtils;
  */
 public class NumericFormatter {
 
-	private int radix = 10;
-	private FormatterContext formatter = null;
+	private final int radix;
+	private final FormatterContext formatter;
+
+	private static final Map<String, NumericFormatter> FORMATTERS_MAP = new HashMap<>();
+	private static final Lock accessLock = new ReentrantLock();
 
 	/**
 	 * Creates a number formatter using the default numeric representation.
 	 */
-	public NumericFormatter() {
+	protected NumericFormatter() {
 		this(null, null);
 	}
 
@@ -52,8 +57,10 @@ public class NumericFormatter {
 	 * @param radix
 	 *            the radix to use while parsing numeric strings
 	 */
-	public NumericFormatter(int radix) {
+	protected NumericFormatter(int radix) {
 		this.radix = radix;
+
+		this.formatter = null;
 	}
 
 	/**
@@ -64,10 +71,66 @@ public class NumericFormatter {
 	 * @param locale
 	 *            locale for decimal format to use, or {@code null} if default locale shall be used
 	 *
-	 * @see #setPattern(String, String)
+	 * @see #createFormatterContext(String, String)
 	 */
-	public NumericFormatter(String pattern, String locale) {
-		setPattern(pattern, locale);
+	protected NumericFormatter(String pattern, String locale) {
+		this.radix = 10;
+
+		this.formatter = createFormatterContext(pattern, locale);
+	}
+
+	/**
+	 * Gets cached or creates the number formatter/parser for numbers using the default numeric representation.
+	 * 
+	 * @return number formatter/parser instance
+	 */
+	public static NumericFormatter getInstance() {
+		accessLock.lock();
+		try {
+			return FORMATTERS_MAP.computeIfAbsent(getFormatterKey(null, null, -1), k -> new NumericFormatter());
+		} finally {
+			accessLock.unlock();
+		}
+	}
+
+	/**
+	 * Gets cached or creates the number formatter/parser for numbers using the default numeric representation in the
+	 * specified radix.
+	 * 
+	 * @param radix
+	 *            the radix to use while parsing numeric strings
+	 * @return number formatter/parser instance
+	 */
+	public static NumericFormatter getInstance(int radix) {
+		accessLock.lock();
+		try {
+			return FORMATTERS_MAP.computeIfAbsent(getFormatterKey(null, null, radix), k -> new NumericFormatter(radix));
+		} finally {
+			accessLock.unlock();
+		}
+	}
+
+	/**
+	 * Gets cached or creates the number formatter/parser for numbers using the specified format pattern.
+	 * 
+	 * @param pattern
+	 *            format pattern - can be set to {@code null} to use default representation
+	 * @param locale
+	 *            locale for decimal format to use, or {@code null} if default locale shall be used
+	 * @return number formatter/parser instance
+	 */
+	public static NumericFormatter getInstance(String pattern, String locale) {
+		accessLock.lock();
+		try {
+			return FORMATTERS_MAP.computeIfAbsent(getFormatterKey(pattern, locale, -1),
+					k -> new NumericFormatter(pattern, locale));
+		} finally {
+			accessLock.unlock();
+		}
+	}
+
+	private static String getFormatterKey(String pattern, String locale, int radix) {
+		return pattern + "|&:&|" + locale + "|&:&|" + radix; // NON-NLS
 	}
 
 	/**
@@ -77,16 +140,6 @@ public class NumericFormatter {
 	 */
 	public int getRadix() {
 		return radix;
-	}
-
-	/**
-	 * Sets the radix used by this formatter.
-	 *
-	 * @param radix
-	 *            the radix to use while parsing numeric strings
-	 */
-	public void setRadix(int radix) {
-		this.radix = radix;
 	}
 
 	/**
@@ -130,8 +183,8 @@ public class NumericFormatter {
 	 * @param locale
 	 *            locale for decimal format to use, or {@code null} if default locale shall be used
 	 */
-	public void setPattern(String pattern, String locale) {
-		formatter = new FormatterContext(pattern, locale);
+	protected FormatterContext createFormatterContext(String pattern, String locale) {
+		return new FormatterContext(pattern, locale);
 	}
 
 	/**

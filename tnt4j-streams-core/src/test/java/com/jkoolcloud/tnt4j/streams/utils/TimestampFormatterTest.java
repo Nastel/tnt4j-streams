@@ -48,7 +48,7 @@ public class TimestampFormatterTest {
 	@Test
 	public void testParse() throws ParseException {
 		Date date = new Date();
-		TimestampFormatter formatter = new TimestampFormatter(TimeUnit.MILLISECONDS);
+		TimestampFormatter formatter = TimestampFormatter.getInstance(TimeUnit.MILLISECONDS);
 		assertNotNull(TimestampFormatter.parse(TimeUnit.MILLISECONDS, date));
 		assertNotNull(formatter.parseAny(date));
 		assertNotNull(TimestampFormatter.parse(TimeUnit.MICROSECONDS, Calendar.getInstance()));
@@ -74,14 +74,14 @@ public class TimestampFormatterTest {
 
 	@Test(expected = ParseException.class)
 	public void testParseExcepion2() throws ParseException {
-		TimestampFormatter formatter = new TimestampFormatter(TimeUnit.MILLISECONDS);
+		TimestampFormatter formatter = TimestampFormatter.getInstance(TimeUnit.MILLISECONDS);
 		formatter.parseAny(this);
 	}
 
 	@Test
 	public void testTimeZone() {
 		String timezone = TimeZone.getDefault().toString();
-		TimestampFormatter formatter = new TimestampFormatter(TimeUnit.MILLISECONDS, timezone);
+		TimestampFormatter formatter = TimestampFormatter.getInstance(TimeUnit.MILLISECONDS, timezone);
 		assertEquals(timezone, formatter.getTimeZone());
 	}
 

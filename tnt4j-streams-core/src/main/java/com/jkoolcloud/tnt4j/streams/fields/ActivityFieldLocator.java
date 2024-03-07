@@ -59,9 +59,6 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	private Map<Object, Object> valueMap = null;
 	private Object mapCatchAll = null;
 
-	private NumericFormatter numberParser = null;
-	private TimestampFormatter timeParser = null;
-
 	/**
 	 * Constructs a new activity field locator for either a built-in type or a custom type.
 	 *
@@ -418,13 +415,11 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 		this.format = format;
 		this.locale = locale;
 
-		this.builtInFormat = null;
 		try {
-			builtInFormat = ActivityFieldFormatType.valueOf(this.format);
-		} catch (Exception e) {
+			this.builtInFormat = ActivityFieldFormatType.valueOf(this.format);
+		} catch (Throwable e) {
+			this.builtInFormat = null;
 		}
-		this.numberParser = null;
-		this.timeParser = null;
 	}
 
 	/**
@@ -709,14 +704,18 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	 */
 	protected String formatStringValue(Object value) {
 		if (value instanceof byte[]) {
-			if (builtInFormat == ActivityFieldFormatType.base64Binary) {
-				return Utils.base64EncodeStr((byte[]) value);
-			} else if (builtInFormat == ActivityFieldFormatType.hexBinary) {
-				return Utils.encodeHex((byte[]) value);
-			} else if (builtInFormat == ActivityFieldFormatType.bytes) {
-				return Utils.toHexString((byte[]) value);
-			} else { // if (builtInFormat == ActivityFieldFormatType.string) {
-				return Utils.getString((byte[]) value, charset);
+			byte[] bValue = (byte[]) value;
+
+			switch (builtInFormat) {
+			case base64Binary:
+				return Utils.base64EncodeStr(bValue);
+			case hexBinary:
+				return Utils.encodeHex(bValue);
+			case bytes:
+				return Utils.toHexString(bValue);
+			case string:
+			default:
+				return Utils.getString(bValue, charset);
 			}
 		} else if (value instanceof UsecTimestamp) {
 			return ((UsecTimestamp) value).toString(format, timeZone);
@@ -725,11 +724,9 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 		} else if (value instanceof Number) {
 			return NumericFormatter.toString(format, value, locale);
 		} else if (value instanceof String) {
-			if (builtInFormat == ActivityFieldFormatType.base64Binary) {
-				return Utils.base64Decode((String) value, charset);
-			} else {
-				return (String) value;
-			}
+			String strValue = (String) value;
+			return builtInFormat == ActivityFieldFormatType.base64Binary ? Utils.base64Decode(strValue, charset)
+					: strValue;
 		} else {
 			return Utils.toString(value);
 		}
@@ -754,12 +751,15 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	 */
 	protected Object formatBinaryValue(Object value) {
 		if (value instanceof String) {
-			if (builtInFormat == ActivityFieldFormatType.base64Binary) {
-				value = Utils.base64Decode(String.valueOf(value));
-			} else if (builtInFormat == ActivityFieldFormatType.hexBinary) {
-				value = Utils.decodeHex(String.valueOf(value));
-			} else { // if (builtInFormat == ActivityFieldFormatType.string) {
-				value = String.valueOf(value).getBytes();
+			switch (builtInFormat) {
+			case base64Binary:
+				return Utils.base64Decode(String.valueOf(value));
+			case hexBinary:
+				return Utils.decodeHex(String.valueOf(value));
+			case bytes:
+			case string:
+			default:
+				return String.valueOf(value).getBytes();
 			}
 		}
 
@@ -777,9 +777,7 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	 *             format, etc.)
 	 */
 	protected Number formatNumericValue(Object value) throws ParseException {
-		if (numberParser == null) {
-			numberParser = new NumericFormatter(format, locale);
-		}
+		NumericFormatter numberParser = NumericFormatter.getInstance(format, locale);
 
 		Object val = value;
 
@@ -810,11 +808,11 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 		if (timestamp != null) {
 			return timestamp;
 		}
-		if (timeParser == null) {
-			timeParser = dataType == ActivityFieldDataType.Timestamp || dataType == ActivityFieldDataType.Number
-					? new TimestampFormatter(getBuiltInUnits(TimeUnit.MILLISECONDS))
-					: new TimestampFormatter(format, timeZone, locale);
-		}
+
+		TimestampFormatter timeParser = dataType == ActivityFieldDataType.Timestamp
+				|| dataType == ActivityFieldDataType.Number
+						? TimestampFormatter.getInstance(getBuiltInUnits(TimeUnit.MILLISECONDS))
+						: TimestampFormatter.getInstance(format, timeZone, locale);
 		return timeParser.parse(value);
 	}
 

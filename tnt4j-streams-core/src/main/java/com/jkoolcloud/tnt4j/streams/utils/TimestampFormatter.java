@@ -17,13 +17,14 @@
 package com.jkoolcloud.tnt4j.streams.utils;
 
 import java.sql.Timestamp;
+import java.text.Format;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.Temporal;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -53,11 +54,15 @@ import com.jkoolcloud.tnt4j.core.UsecTimestamp;
  */
 public class TimestampFormatter {
 
-	private String pattern = null;
-	private String timeZone = null;
-	private TimeUnit units = null;
-	private FastDateFormat formatter = null;
-	private String locale = null;
+	private final String pattern;
+	private final String timeZone;
+	private final TimeUnit units;
+	private final String locale;
+
+	private final Format formatter;
+
+	private static final Map<String, TimestampFormatter> FORMATTERS_MAP = new HashMap<>();
+	private static final Lock accessLock = new ReentrantLock();
 
 	/**
 	 * Creates a timestamp formatter/parser for numeric timestamps with the specified resolution.
@@ -65,7 +70,7 @@ public class TimestampFormatter {
 	 * @param units
 	 *            resolution of timestamp values
 	 */
-	public TimestampFormatter(TimeUnit units) {
+	protected TimestampFormatter(TimeUnit units) {
 		this(units, null);
 	}
 
@@ -78,9 +83,13 @@ public class TimestampFormatter {
 	 *            time zone ID, or {@code null} to use the default time zone or to assume pattern contains time zone
 	 *            specification
 	 */
-	public TimestampFormatter(TimeUnit units, String timeZone) {
-		setUnits(units);
-		setTimeZone(timeZone);
+	protected TimestampFormatter(TimeUnit units, String timeZone) {
+		this.pattern = null;
+		this.units = units;
+		this.timeZone = timeZone;
+		this.locale = null;
+
+		this.formatter = initFormatter();
 	}
 
 	/**
@@ -95,9 +104,80 @@ public class TimestampFormatter {
 	 * @param locale
 	 *            locale for date format to use.
 	 */
-	public TimestampFormatter(String pattern, String timeZone, String locale) {
-		setTimeZone(timeZone);
-		setPattern(pattern, locale);
+	protected TimestampFormatter(String pattern, String timeZone, String locale) {
+		this.pattern = pattern;
+		this.units = null;
+		this.timeZone = timeZone;
+		this.locale = locale;
+
+		this.formatter = initFormatter();
+	}
+
+	/**
+	 * Gets cached or creates the timestamp formatter/parser instance for numeric timestamps with the specified
+	 * resolution.
+	 * 
+	 * @param units
+	 *            resolution of timestamp values
+	 * @return timestamp formatter/parser instance
+	 */
+	public static TimestampFormatter getInstance(TimeUnit units) {
+		accessLock.lock();
+		try {
+			return FORMATTERS_MAP.computeIfAbsent(getFormatterKey(null, null, null, units),
+					k -> new TimestampFormatter(units));
+		} finally {
+			accessLock.unlock();
+		}
+	}
+
+	/**
+	 * Gets cached or creates the timestamp formatter/parser instance for numeric timestamps with the specified
+	 * resolution and timezone.
+	 * 
+	 * @param units
+	 *            resolution of timestamp values
+	 * @param timeZone
+	 *            time zone ID, or {@code null} to use the default time zone or to assume pattern contains time zone
+	 *            specification
+	 * @return timestamp formatter/parser instance
+	 */
+	public static TimestampFormatter getInstance(TimeUnit units, String timeZone) {
+		accessLock.lock();
+		try {
+			return FORMATTERS_MAP.computeIfAbsent(getFormatterKey(null, timeZone, null, units),
+					k -> new TimestampFormatter(units, timeZone));
+		} finally {
+			accessLock.unlock();
+		}
+	}
+
+	/**
+	 * Gets cached or creates the timestamp formatter/parser instance for date/time expressions, using the specified
+	 * format pattern.
+	 * 
+	 * @param pattern
+	 *            date/time format pattern - can be set to {@code null} to use the default locale format, or multiple
+	 *            patterns delimited using {@code "|"} delimiter
+	 * @param timeZone
+	 *            time zone ID, or {@code null} to use the default time zone or to assume pattern contains time zone
+	 *            specification
+	 * @param locale
+	 *            locale for date format to use.
+	 * @return timestamp formatter/parser instance
+	 */
+	public static TimestampFormatter getInstance(String pattern, String timeZone, String locale) {
+		accessLock.lock();
+		try {
+			return FORMATTERS_MAP.computeIfAbsent(getFormatterKey(pattern, timeZone, locale, null),
+					k -> new TimestampFormatter(pattern, timeZone, locale));
+		} finally {
+			accessLock.unlock();
+		}
+	}
+
+	private static String getFormatterKey(String pattern, String timeZone, String locale, TimeUnit timeUnit) {
+		return pattern + "|&:&|" + timeZone + "|&:&|" + locale + "|&:&|" + timeUnit; // NON-NLS
 	}
 
 	/**
@@ -110,19 +190,12 @@ public class TimestampFormatter {
 	}
 
 	/**
-	 * Sets the format pattern string for this formatter.
-	 *
-	 * @param pattern
-	 *            date/time format pattern - can be set to {@code null} to use the default locale format, or multiple
-	 *            patterns delimited using {@code "|"} delimiter
-	 * @param locale
-	 *            locale for date format to use
+	 * Initializes date/time format using provided pattern, timezone and locale.
+	 * 
+	 * @return date/time format instance
 	 */
-	protected void setPattern(String pattern, String locale) {
-		this.pattern = pattern;
-		this.units = null;
-		this.locale = locale;
-		formatter = StringUtils.isEmpty(pattern) //
+	protected Format initFormatter() {
+		return StringUtils.isEmpty(pattern) //
 				? FastDateFormat.getInstance() //
 				: FastDateFormat.getInstance(pattern,
 						StringUtils.isEmpty(timeZone) ? null : TimeZone.getTimeZone(timeZone),
@@ -139,19 +212,6 @@ public class TimestampFormatter {
 	}
 
 	/**
-	 * Sets the units for numeric timestamps.
-	 *
-	 * @param units
-	 *            resolution of timestamp values
-	 */
-	protected void setUnits(TimeUnit units) {
-		this.units = units;
-		this.pattern = null;
-		this.formatter = null;
-		this.locale = null;
-	}
-
-	/**
 	 * Gets the time zone ID that date/time strings are assumed to be in.
 	 *
 	 * @return time zone for date/time strings {@code null} indicates deriving from format string or default is being
@@ -159,16 +219,6 @@ public class TimestampFormatter {
 	 */
 	public String getTimeZone() {
 		return timeZone;
-	}
-
-	/**
-	 * Sets the time zone ID that date/time strings are assumed to be in.
-	 *
-	 * @param timeZone
-	 *            time zone ID for time zone of date/time strings
-	 */
-	protected void setTimeZone(String timeZone) {
-		this.timeZone = timeZone;
 	}
 
 	/**
@@ -551,7 +601,7 @@ public class TimestampFormatter {
 	 * @return date /time formatted as a string
 	 */
 	public static String format(String pattern, Object value, String locale, String timeZone) {
-		TimestampFormatter formatter = new TimestampFormatter(pattern, timeZone, locale);
+		TimestampFormatter formatter = getInstance(pattern, timeZone, locale);
 		return formatter.format(value);
 	}
 
