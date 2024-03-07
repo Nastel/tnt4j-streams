@@ -47,6 +47,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="HaltIfNoParser"/&gt;
  *     &lt;enumeration value="UseExecutors"/&gt;
  *     &lt;enumeration value="ExecutorThreadsQuantity"/&gt;
+ *     &lt;enumeration value="ExecutorQueueDepth"/&gt;
  *     &lt;enumeration value="ExecutorRejectedTaskOfferTimeout"/&gt;
  *     &lt;enumeration value="ExecutorsTerminationTimeout"/&gt;
  *     &lt;enumeration value="ExecutorsBoundedModel"/&gt;
@@ -226,6 +227,15 @@ public enum StreamProperties {
 	 */
 	@XmlEnumValue("ExecutorThreadsQuantity")
 	EXECUTOR_THREADS_QUANTITY("ExecutorThreadsQuantity"),
+
+	/**
+	 * 
+	 * Property defines executor service bound tasks queue depth.
+	 * 
+	 * 
+	 */
+	@XmlEnumValue("ExecutorQueueDepth")
+	EXECUTOR_QUEUE_DEPTH("ExecutorQueueDepth"),
 
 	/**
 	 * 

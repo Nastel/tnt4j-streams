@@ -670,6 +670,14 @@
                 </xs:annotation>
             </xs:enumeration>
 
+            <xs:enumeration value="ExecutorQueueDepth">
+                <xs:annotation>
+                    <xs:documentation>
+                        Property defines executor service bound tasks queue depth.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
             <xs:enumeration value="ExecutorRejectedTaskOfferTimeout">
                 <xs:annotation>
                     <xs:documentation>

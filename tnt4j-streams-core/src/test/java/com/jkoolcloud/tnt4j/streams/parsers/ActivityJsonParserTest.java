@@ -124,7 +124,7 @@ public class ActivityJsonParserTest {
 		props.put(StreamProperties.PROP_EXECUTOR_THREADS_QTY, String.valueOf(5));
 		stream.setProperties(props.entrySet());
 		ActivityFieldLocator aLocator = new ActivityFieldLocator(ActivityFieldLocatorType.StreamProp,
-				"ExecutorThreadsQuantity", ActivityFieldDataType.Number); // NON-NLS
+				StreamProperties.PROP_EXECUTOR_THREADS_QTY, ActivityFieldDataType.Number);
 		String jsonString = "{\"test\":\"OK\",\"status\":\"finished\"}"; // NON-NLS
 		DocumentContext jsonContext = JsonPath.parse(jsonString);
 		assertEquals(5, parser.getLocatorValue(aLocator, makeContext(stream, jsonContext)));

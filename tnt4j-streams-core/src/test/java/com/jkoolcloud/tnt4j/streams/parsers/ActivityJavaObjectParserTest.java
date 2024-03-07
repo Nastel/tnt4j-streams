@@ -99,7 +99,7 @@ public class ActivityJavaObjectParserTest {
 	public void getLocatorValueWhenTypeisStreamPropTest() throws Exception {
 		ActivityJavaObjectParser testParser = new ActivityJavaObjectParser();
 		ActivityFieldLocator fieldLocator = new ActivityFieldLocator(ActivityFieldLocatorType.StreamProp,
-				"ExecutorThreadsQuantity"); // NON-NLS
+				StreamProperties.PROP_EXECUTOR_THREADS_QTY);
 		Map<String, String> props = new HashMap<>(2);
 		props.put(StreamProperties.PROP_HALT_ON_PARSER, String.valueOf(true));
 		props.put(StreamProperties.PROP_EXECUTOR_THREADS_QTY, "5");
