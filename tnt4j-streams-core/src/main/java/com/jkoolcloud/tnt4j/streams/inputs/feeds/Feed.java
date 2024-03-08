@@ -39,18 +39,44 @@ public interface Feed<T> extends Closeable {
 	T getInput();
 
 	/**
-	 * Returns whether or not the input stream has been closed.
+	 * Returns whether or not the input has been closed.
 	 *
-	 * @return {@code true} if stream is closed, {@code false} if still open
+	 * @return {@code true} if input is closed, {@code false} if still open
 	 */
 	boolean isClosed();
 
 	/**
-	 * Returns whether or not an error/exception occurred on the input stream.
+	 * Returns whether or not an error/exception occurred on the input access.
 	 *
 	 * @return {@code true} if error/exception occurred, {@code false} if not
 	 */
 	boolean hasError();
+
+	/**
+	 * Returns whether or not the input has ended and no more data available to read.
+	 * 
+	 * @return {@code true} if input has ended and no more data available to read, {@code false} - otherwise
+	 */
+	boolean hasEnded();
+
+	/**
+	 * Returns whether input is invalid - closed or unrecoverable error has occurred accessing it.
+	 * 
+	 * @return {@code true} if input is closed or error unrecoverable has occurred accessing it, {@code false} -
+	 *         otherwise
+	 */
+	default boolean isInvalid() {
+		return isClosed() || hasError();
+	}
+
+	/**
+	 * Returns whether input is terminated - invalid or ended.
+	 * 
+	 * @return {@code true} if input is invalid or ended, {@code false} - otherwise
+	 */
+	default boolean isTerminated() {
+		return isInvalid() || hasEnded();
+	}
 
 	/**
 	 * Adds defined {@code FeedListener} to feed listeners list.

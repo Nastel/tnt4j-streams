@@ -296,7 +296,7 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 					return null;
 				}
 			}
-			if (dataFeed.isClosed() || dataFeed.hasError()) {
+			if (dataFeed.isTerminated()) {
 				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"FeedInputStream.reader.terminated");
 				if (feedInput.canContinue()) {

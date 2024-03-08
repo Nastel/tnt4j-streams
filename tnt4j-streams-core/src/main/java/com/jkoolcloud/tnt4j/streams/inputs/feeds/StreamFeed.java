@@ -63,6 +63,15 @@ public class StreamFeed extends AbstractFeed<BufferedInputStream> {
 		setInput(new FeedS(in, size));
 	}
 
+	@Override
+	public boolean hasEnded() {
+		try {
+			return getInput().available() <= 0;
+		} catch (IOException exc) {
+			return true;
+		}
+	}
+
 	private class FeedS extends BufferedInputStream {
 		private FeedS(InputStream in) {
 			super(in);
@@ -87,11 +96,7 @@ public class StreamFeed extends AbstractFeed<BufferedInputStream> {
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "AbstractFeed.read.bytes",
 						() -> Utils.args(b == -1 ? "EOF" : String.format("%02X ", b))); // NON-NLS
 
-				if (b == -1) {
-					close();
-				} else {
-					notifyBytesRead(1);
-				}
+				postRead(b == -1 ? b : 1);
 
 				return b;
 			} catch (EOFException exc) {
@@ -117,11 +122,7 @@ public class StreamFeed extends AbstractFeed<BufferedInputStream> {
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME), "AbstractFeed.read.bytes",
 						() -> Utils.args(total == -1 ? "EOF" : Utils.toHexDump(b, off, total)));
 
-				if (total == -1) {
-					close();
-				} else {
-					notifyBytesRead(total);
-				}
+				postRead(total);
 
 				return total;
 			} catch (EOFException exc) {
@@ -130,6 +131,24 @@ public class StreamFeed extends AbstractFeed<BufferedInputStream> {
 				setError(true);
 				throw ioe;
 			}
+		}
+
+		private void postRead(int bytesRead) throws IOException {
+			if (bytesRead == -1) {
+				close();
+			} else {
+				notifyBytesRead(bytesRead);
+			}
+
+			// boolean ready = false;
+			// try {
+			// ready = available() > 0;
+			// } catch (IOException exc) {
+			// }
+			//
+			// if (!ready) {
+			// close();
+			// }
 		}
 
 		@Override

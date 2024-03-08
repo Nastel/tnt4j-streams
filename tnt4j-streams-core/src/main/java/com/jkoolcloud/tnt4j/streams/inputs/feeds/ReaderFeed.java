@@ -88,6 +88,15 @@ public class ReaderFeed extends AbstractFeed<BufferedReader> {
 		this(new InputStreamReader(in), size);
 	}
 
+	@Override
+	public boolean hasEnded() {
+		try {
+			return !getInput().ready();
+		} catch (IOException exc) {
+			return true;
+		}
+	}
+
 	private class FeedR extends BufferedReader {
 		private FeedR(Reader in) {
 			super(in);
@@ -111,11 +120,7 @@ public class ReaderFeed extends AbstractFeed<BufferedReader> {
 				LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"AbstractFeed.read.line", line);
 
-				if (line == null) {
-					close();
-				} else {
-					notifyBytesRead(line.getBytes().length);
-				}
+				postRead(line == null ? -1 : line.getBytes().length);
 
 				return line;
 			} catch (EOFException exc) {
@@ -142,11 +147,7 @@ public class ReaderFeed extends AbstractFeed<BufferedReader> {
 				LOGGER.log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"AbstractFeed.read.line", line);
 
-				if (total == -1) {
-					close();
-				} else {
-					notifyBytesRead(total);
-				}
+				postRead(total);
 
 				return total;
 			} catch (EOFException exc) {
@@ -155,6 +156,24 @@ public class ReaderFeed extends AbstractFeed<BufferedReader> {
 				setError(true);
 				throw ioe;
 			}
+		}
+
+		private void postRead(int bytesRead) throws IOException {
+			if (bytesRead == -1) {
+				close();
+			} else {
+				notifyBytesRead(bytesRead);
+			}
+
+			// boolean ready = false;
+			// try {
+			// ready = ready();
+			// } catch (IOException exc) {
+			// }
+			//
+			// if (!ready) {
+			// close();
+			// }
 		}
 
 		@Override
