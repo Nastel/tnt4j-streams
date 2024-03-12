@@ -134,12 +134,11 @@
                         <includes>
                             <include>*-all.jar</include>
                             <include>*-interceptor.jar</include>
-                            <include>*.war</include>
                         </includes>
                     </fileSet>
                     <!-- module configurations -->
                     <fileSet>
-                        <directory>/config</directory>
+                        <directory>config</directory>
                         <includes>
                             <include>**/*.*</include>
                         </includes>

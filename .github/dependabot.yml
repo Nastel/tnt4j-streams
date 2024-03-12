@@ -21,12 +21,12 @@ updates:
       - dependency-name: "org.glassfish.jaxb:jaxb-runtime"
         versions: "[3.x,)"
       - dependency-name: "org.apache.activemq:activemq-client"
-        versions: "[6.x,)"  
+        versions: "[6.x,)"
       - dependency-name: "com.lmax:disruptor"
-        versions: "[4.x,)"        
+        versions: "[4.x,)"
       # Maven plugins
-      - dependency-name: "org.apache.maven.plugins:maven-assembly-plugin"
-        versions: "[3.1.1,)"
+  #      - dependency-name: "org.apache.maven.plugins:maven-assembly-plugin"
+  #        versions: "[3.1.1,)"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
