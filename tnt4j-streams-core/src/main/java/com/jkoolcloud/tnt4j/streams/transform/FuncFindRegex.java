@@ -17,11 +17,11 @@
 package com.jkoolcloud.tnt4j.streams.transform;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import com.jkoolcloud.tnt4j.streams.transform.beans.Strings;
 
 /**
  * Data value transformation function finding {@code regex} matching segment within provided {@code text}.
@@ -44,7 +44,7 @@ public class FuncFindRegex extends AbstractRegexFunction {
 	public static final String FUNCTION_NAME = "findRegex"; // NON-NLS
 
 	/**
-	 * Constructs a new replaceRegex() function instance.
+	 * Constructs a new findRegex() function instance.
 	 */
 	public FuncFindRegex() {
 		setName(FUNCTION_NAME); // NON-NLS
@@ -58,17 +58,17 @@ public class FuncFindRegex extends AbstractRegexFunction {
 	 * <p>
 	 * Function arguments sequence:
 	 * <ul>
-	 * <li>1 - text to find text segment. Required.</li>
+	 * <li>1 - text string to find segment. Required.</li>
 	 * <li>2 - regex expression to find. Required.</li>
 	 * <li>3 - segment match group name. Optional. By default 1st group will be assigned to result</li>
 	 * </ul>
 	 *
 	 * @param args
 	 *            function arguments list
-	 * @return text string having regex matching sections replaced with provided replacement
+	 * @return text string having regex matching segment
 	 *
 	 * @see #getText(Object)
-	 * @see java.util.regex.Matcher#replaceAll(String)
+	 * @see Strings#findRegex(String, String, String)
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
@@ -84,20 +84,6 @@ public class FuncFindRegex extends AbstractRegexFunction {
 
 		String text = getText(textParam);
 
-		Matcher m;
-		regexLock.lock();
-		try {
-			Pattern regexPattern = REGEX_MAP.computeIfAbsent(regex, rKey -> Pattern.compile(regex));
-			m = regexPattern.matcher(text);
-		} finally {
-			regexLock.unlock();
-		}
-
-		String match = null;
-		if (m.find()) {
-			match = StringUtils.isEmpty(group) ? m.group(1) : m.group(group);
-		}
-
-		return match;
+		return Strings.findRegex(text, regex, group);
 	}
 }

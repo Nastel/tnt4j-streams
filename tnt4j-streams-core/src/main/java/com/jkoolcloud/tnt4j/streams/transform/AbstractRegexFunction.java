@@ -16,12 +16,6 @@
 
 package com.jkoolcloud.tnt4j.streams.transform;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.regex.Pattern;
-
 /**
  * Base class for abstract Regular Expressions based data value transformations.
  *
@@ -29,13 +23,4 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractRegexFunction extends AbstractFunction<String> {
 
-	/**
-	 * Compiled regular expressions map.
-	 */
-	protected static final Map<String, Pattern> REGEX_MAP = new HashMap<>();
-
-	/**
-	 * Regular Expression retrieval from map/compilation lock.
-	 */
-	protected Lock regexLock = new ReentrantLock();
 }

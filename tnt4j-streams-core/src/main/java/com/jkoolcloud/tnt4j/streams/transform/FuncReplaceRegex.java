@@ -17,11 +17,11 @@
 package com.jkoolcloud.tnt4j.streams.transform;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import com.jkoolcloud.tnt4j.streams.transform.beans.Strings;
 
 /**
  * Data value transformation function replacing {@code regex} matching segment within provided {@code text} with
@@ -69,7 +69,7 @@ public class FuncReplaceRegex extends AbstractRegexFunction {
 	 * @return text string having regex matching sections replaced with provided replacement
 	 *
 	 * @see #getText(Object)
-	 * @see java.util.regex.Matcher#replaceAll(String)
+	 * @see Strings#replaceRegex(String, String, String)
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
@@ -85,15 +85,6 @@ public class FuncReplaceRegex extends AbstractRegexFunction {
 
 		String text = getText(textParam);
 
-		Matcher m;
-		regexLock.lock();
-		try {
-			Pattern regexPattern = REGEX_MAP.computeIfAbsent(regex, rKey -> Pattern.compile(regex));
-			m = regexPattern.matcher(text);
-		} finally {
-			regexLock.unlock();
-		}
-
-		return m.replaceAll(replacement);
+		return Strings.replaceRegex(text, regex, replacement);
 	}
 }

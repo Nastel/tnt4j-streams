@@ -16,7 +16,13 @@
 
 package com.jkoolcloud.tnt4j.streams.transform.beans;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -205,5 +211,69 @@ public class Strings {
 		String[] tokens = StringUtils.split(string, delim);
 
 		return tokens == null || tokens.length < tIndex || tIndex <= 0 ? null : tokens[tIndex - 1];
+	}
+
+	private static final Map<String, Pattern> REGEX_MAP = new HashMap<>();
+	private static final Lock regexLock = new ReentrantLock();
+
+	/**
+	 * Finds {@code regex} matching segment within provided {@code text}.
+	 * 
+	 * @param text
+	 *            text string to find segment
+	 * @param regex
+	 *            regex expression to find
+	 * @param group
+	 *            segment match group name, when undefined 1st group will be assigned to result
+	 * @return text string having regex matching segment
+	 */
+	public static String findRegex(String text, String regex, String group) {
+		if (StringUtils.isAnyEmpty(text, regex)) {
+			return text;
+		}
+
+		Matcher m;
+		regexLock.lock();
+		try {
+			Pattern regexPattern = REGEX_MAP.computeIfAbsent(regex, rKey -> Pattern.compile(regex));
+			m = regexPattern.matcher(text);
+		} finally {
+			regexLock.unlock();
+		}
+
+		String match = null;
+		if (m.find()) {
+			match = StringUtils.isEmpty(group) ? m.group(1) : m.group(group);
+		}
+
+		return match;
+	}
+
+	/**
+	 * Replaces {@code regex} matching segment within provided {@code text} with provided {@code replacement}.
+	 * 
+	 * @param text
+	 *            text to do replacements
+	 * @param regex
+	 *            regex expression to match
+	 * @param replacement
+	 *            replacement string, {@code null} is treated as {@code ""}
+	 * @return ext string having regex matching sections replaced with provided replacement
+	 */
+	public static String replaceRegex(String text, String regex, String replacement) {
+		if (StringUtils.isAnyEmpty(text, regex)) {
+			return text;
+		}
+
+		Matcher m;
+		regexLock.lock();
+		try {
+			Pattern regexPattern = REGEX_MAP.computeIfAbsent(regex, rKey -> Pattern.compile(regex));
+			m = regexPattern.matcher(text);
+		} finally {
+			regexLock.unlock();
+		}
+
+		return m.replaceAll(replacement == null ? "" : replacement);
 	}
 }
