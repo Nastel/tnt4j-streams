@@ -5002,6 +5002,14 @@ In case using Hdfs file name is defined using URL like `hdfs://[host]:[port]/[pa
 
 Also see ['Generic streams parameters'](#generic-streams-parameters) and ['Buffered streams parameters'](#buffered-streams-parameters).
 
+##### File line stream provided Metadata
+
+File line stream provides such activity metadata entries (accessible using `$METADATA$` locator):
+
+* `MD_FILE_NAME` - file name the line was read from. **NOTE:** when file is rolling, file name is subject to change at the time of roll 
+  occurs.
+* `MD_LINE_NUMBER` - line number in the file
+
 #### Characters/Bytes feed stream parameters
 
 * `FileName` - the system-dependent file name. (Required - just one of: `FileName` or `Port`)
@@ -5020,7 +5028,20 @@ or
 
 Also see ['Generic streams parameters'](#generic-streams-parameters).
 
-**NOTE:** there can be ony one parser referenced to this stream.
+**NOTE:** there can be ony one parser referenced by this stream.
+
+##### Characters/Bytes feed stream provided Metadata
+
+Characters/Bytes feed stream provides such activity metadata entries (accessible using `$METADATA$` locator):
+
+* when data is fed from file:
+    * `MD_FILE_NAME` - file name the feed is read from
+* when data is fed from socket:
+    * `MD_SERVER_PORT` - server port number stream feed was initiated on
+    * `MD_LOCAL_ADDRESS` - local address feed is reading data from
+    * `MD_LOCAL_PORT` - local port number feed is reading data from
+    * `MD_REMOTE_ADDRESS` - remote address activity data is fed
+    * `MD_REMOTE_PORT` - remote port number activity data is fed
 
 #### JSR-203 FileSystem streams parameters
 
@@ -5543,6 +5564,11 @@ Sample:
 <.../>
 ```
 
+###### WS (web service) streams provided Metadata
+
+All request parameters and context properties values can be accessed as metadata entries over locator `$METADATA$.[PARAM_ID]`, where 
+`[PARAM_ID]` is request parameter and context property identifier.
+
 ##### WsStream parameters
 
 * `DisableSSL` - flag indicating that stream should disable SSL context verification. Default value - `false`. (Optional)
@@ -5748,8 +5774,8 @@ Sample:
 * `$DATA$` - allows setting complete activity data as field value and redirect it to stacked parser if such is defined for that field.
 * `$METADATA$` - allows accessing activity bound meta-data map. Activity meta-data binding is stream specific: some streams may not provide
   any meta-data. To get list of stream provided meta-data entries, see particular stream documentation (both JavaDoc and readme).
-* `$RAWDATA$` - allows setting complete RAW activity data (one before preparsing other preparations) as field value and redirect it to 
-  stacked parser if such is defined for that field.  
+* `$RAWDATA$` - allows setting complete RAW activity data (one before pre-parsing other preparations) as field value and redirect it to 
+  stacked parser if such is defined for that field.
 * field wildcard locators having `*` symbol within field name e.g. `FieldNameFragment*` are used to capture map of activity entity field
   values, where map entry key is field name and value is field value.
 

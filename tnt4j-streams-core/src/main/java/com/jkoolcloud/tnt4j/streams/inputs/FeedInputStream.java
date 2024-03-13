@@ -23,15 +23,20 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.streams.configure.StreamProperties;
+import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.inputs.feeds.Feed;
 import com.jkoolcloud.tnt4j.streams.parsers.ActivityParser;
+import com.jkoolcloud.tnt4j.streams.parsers.data.CommonActivityData;
 import com.jkoolcloud.tnt4j.streams.reference.ParserReference;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
@@ -52,6 +57,16 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * NOTE: there can be only one parser referenced with this kind of stream! Because next item returned by this stream is
  * raw input source and parseable value is retrieved inside parser, there is no way to rewind reader position if first
  * parser fails to parse RAW activity data.
+ * <p>
+ * This activity stream provides the following activity metadata values accessible over {@code $METADATA$} locator:
+ * <ul>
+ * <li>MD_FILE_NAME - file name the feed is read from</li>
+ * <li>MD_SERVER_PORT - server port number stream feed was initiated on</li>
+ * <li>MD_LOCAL_ADDRESS - local address feed is reading data from</li>
+ * <li>MD_LOCAL_PORT - local port number feed is reading data from</li>
+ * <li>MD_REMOTE_ADDRESS - remote address activity data is fed</li>
+ * <li>MD_REMOTE_PORT - remote port number activity data is fed</li>
+ * </ul>
  * <p>
  * This activity stream supports the following configuration properties (in addition to those supported by
  * {@link TNTParseableInputStream}):
@@ -323,6 +338,13 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 	}
 
 	@Override
+	protected ActivityInfo applyParsers(Object data, String... tags) throws IllegalStateException, ParseException {
+		CommonActivityData<?> dataPack = new CommonActivityData<>(data, feedInput.getMetadata());
+
+		return super.applyParsers(dataPack, tags);
+	}
+
+	@Override
 	protected void cleanup() {
 		cleanupStreamInternals();
 
@@ -383,6 +405,13 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 		 * Shuts down this feed input by destroying it.
 		 */
 		void shutdown();
+
+		/**
+		 * Returns metadata entries map for this feed input.
+		 * 
+		 * @return metadata entries map
+		 */
+		Map<String, Object> getMetadata();
 	}
 
 	private class SocketInput implements FeedInput {
@@ -390,6 +419,8 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 		private Socket socket = null;
 
 		private int socketPort;
+
+		private final Map<String, Object> metadata = new HashMap<>(5);
 
 		private SocketInput(int socketPort) {
 			this.socketPort = socketPort;
@@ -407,6 +438,12 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 			// only accept one connection, close down server socket
 			Utils.close(srvSocket);
 			srvSocket = null;
+
+			metadata.put("MD_SERVER_PORT", socketPort); // NON-NLS
+			metadata.put("MD_LOCAL_PORT", socket.getLocalPort()); // NON-NLS
+			metadata.put("MD_REMOTE_PORT", socket.getPort()); // NON-NLS
+			metadata.put("MD_LOCAL_ADDRESS", socket.getLocalAddress()); // NON-NLS
+			metadata.put("MD_REMOTE_ADDRESS", socket.getInetAddress()); // NON-NLS
 
 			return socket.getInputStream();
 		}
@@ -434,6 +471,11 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 		public String toString() {
 			return socket == null ? String.valueOf(socketPort) : socket.toString();
 		}
+
+		@Override
+		public Map<String, Object> getMetadata() {
+			return metadata;
+		}
 	}
 
 	private class FileInput implements FeedInput {
@@ -443,6 +485,8 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 
 		private String fileName;
 		private FileSystem fs;
+
+		private final Map<String, Object> metadata = new HashMap<>(1);
 
 		private FileInput(String fileName, FileSystem fs) throws IOException {
 			this.fileName = fileName;
@@ -456,6 +500,7 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 			while (!halt) {
 				if (files.hasNext()) {
 					file = files.next();
+					metadata.put("MD_FILE_NAME", String.valueOf(file)); // NON-NLS
 					if (Files.exists(file)) {
 						try {
 							InputStream fis = Files.newInputStream(file);
@@ -500,6 +545,11 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 		@Override
 		public String toString() {
 			return file == null ? fileName : file.toString();
+		}
+
+		@Override
+		public Map<String, Object> getMetadata() {
+			return metadata;
 		}
 	}
 }
