@@ -18,6 +18,8 @@ package com.jkoolcloud.tnt4j.streams.transform;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
@@ -48,6 +50,9 @@ public class XPathTransformation extends AbstractScriptTransformation<Object> {
 
 	private static final String OWN_FIELD_VALUE_KEY = "<!TNT4J_XPATH_TRSF_FLD_VALUE!>"; // NON-NLS;
 	private static final String OWN_FIELD_NAME_KEY = "<!TNT4J_XPATH_TRSF_FLD_NAME!>"; // NON-NLS;
+
+	private XPath xPath;
+	private Lock xPathLock = new ReentrantLock();
 
 	/**
 	 * Constructs a new XPathTransformation.
@@ -80,6 +85,18 @@ public class XPathTransformation extends AbstractScriptTransformation<Object> {
 	}
 
 	@Override
+	protected void initTransformation() {
+		super.initTransformation();
+
+		xPathLock.lock();
+		try {
+			xPath = StreamsXMLUtils.getStreamsXPath();
+		} finally {
+			xPathLock.unlock();
+		}
+	}
+
+	@Override
 	protected EventSink getLogger() {
 		return LOGGER;
 	}
@@ -107,18 +124,24 @@ public class XPathTransformation extends AbstractScriptTransformation<Object> {
 			}
 		}
 
-		XPath xPath = StreamsXMLUtils.getStreamsXPath();
-		xPath.setXPathVariableResolver(new StreamsVariableResolver(valuesMap));
-
+		xPathLock.lock();
 		try {
-			Object tValue = xPath.evaluate(getExpression(), (Object) null);
+			xPath.setXPathVariableResolver(new StreamsVariableResolver(valuesMap));
 
-			logEvaluationResult(valuesMap, tValue);
+			try {
+				Object tValue = xPath.evaluate(getExpression(), (Object) null);
 
-			return tValue;
-		} catch (Exception exc) {
-			throw new TransformationException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
-					"ValueTransformation.transformation.failed", getName(), getPhase()), exc);
+				logEvaluationResult(valuesMap, tValue);
+
+				return tValue;
+			} catch (Exception exc) {
+				throw new TransformationException(
+						StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+								"ValueTransformation.transformation.failed", getName(), getPhase()),
+						exc);
+			}
+		} finally {
+			xPathLock.unlock();
 		}
 	}
 

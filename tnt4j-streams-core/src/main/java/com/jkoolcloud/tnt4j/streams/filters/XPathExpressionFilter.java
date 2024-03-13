@@ -18,6 +18,8 @@ package com.jkoolcloud.tnt4j.streams.filters;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
@@ -49,6 +51,9 @@ public class XPathExpressionFilter extends AbstractExpressionFilter<Object> {
 	private static final String OWN_FIELD_VALUE_KEY = "<!TNT4J_XPATH_FLTR_FLD_VALUE!>"; // NON-NLS;
 	private static final String OWN_FIELD_NAME_KEY = "<!TNT4J_XPATH_FLTR_FLD_NAME!>"; // NON-NLS;
 
+	private XPath xPath;
+	private final Lock xPathLock = new ReentrantLock();
+
 	/**
 	 * Constructs a new XPathExpressionFilter. Handle type is set to
 	 * {@link com.jkoolcloud.tnt4j.streams.filters.HandleType#INCLUDE}.
@@ -74,6 +79,18 @@ public class XPathExpressionFilter extends AbstractExpressionFilter<Object> {
 		super(handleType, filterExpression);
 
 		initFilter();
+	}
+
+	@Override
+	protected void initFilter() {
+		super.initFilter();
+
+		xPathLock.lock();
+		try {
+			xPath = StreamsXMLUtils.getStreamsXPath();
+		} finally {
+			xPathLock.unlock();
+		}
 	}
 
 	@Override
@@ -123,18 +140,22 @@ public class XPathExpressionFilter extends AbstractExpressionFilter<Object> {
 	}
 
 	private boolean evaluate(Map<String, ?> valuesMap) throws FilterException {
-		XPath xPath = StreamsXMLUtils.getStreamsXPath();
-		xPath.setXPathVariableResolver(new StreamsVariableResolver(valuesMap));
-
+		xPathLock.lock();
 		try {
-			boolean match = "true".equals(xPath.evaluate(getExpression(), (Object) null)); // NON-NLS
+			xPath.setXPathVariableResolver(new StreamsVariableResolver(valuesMap));
 
-			logEvaluationResult(valuesMap, match);
+			try {
+				boolean match = "true".equals(xPath.evaluate(getExpression(), (Object) null)); // NON-NLS
 
-			return isFilteredOut(getHandleType(), match);
-		} catch (Exception exc) {
-			throw new FilterException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
-					"ExpressionFilter.filtering.failed", filterExpression), exc);
+				logEvaluationResult(valuesMap, match);
+
+				return isFilteredOut(getHandleType(), match);
+			} catch (Exception exc) {
+				throw new FilterException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
+						"ExpressionFilter.filtering.failed", filterExpression), exc);
+			}
+		} finally {
+			xPathLock.unlock();
 		}
 	}
 
