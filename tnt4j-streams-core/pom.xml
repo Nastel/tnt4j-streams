@@ -27,7 +27,7 @@
         <jakarta.annotations.api.version>1.3.5</jakarta.annotations.api.version>
         <jaxb.version>2.3.9</jaxb.version>
 
-        <jesl.version>1.2-SNAPSHOT</jesl.version>
+        <jesl.version>1.3-SNAPSHOT</jesl.version>
 
         <httpcomponents.version>5.3.1</httpcomponents.version>
         <zookeeper.version>3.9.2</zookeeper.version>
@@ -251,7 +251,7 @@
         </dependency>
 
         <!-- logging dependencies -->
-        <!-- slf4j-log4j12 logger shall be used by default -->
+        <!-- slf4j-log4j2 logger shall be used by default -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j2-impl</artifactId>
