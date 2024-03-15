@@ -614,9 +614,11 @@ public class ActivityInfo {
 					"ActivityInfo.set.property", propName, Utils.toString(property.getValue()),
 					property.getValueType());
 		} else {
-			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ActivityInfo.replace.property", propName, Utils.toString(property.getValue()),
-					property.getValueType(), Utils.toString(prevValue));
+			if (!prevValue.same(property)) {
+				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						"ActivityInfo.replace.property", propName, Utils.toString(property.getValue()),
+						property.getValueType(), Utils.toString(prevValue));
+			}
 		}
 
 		return prevValue;
