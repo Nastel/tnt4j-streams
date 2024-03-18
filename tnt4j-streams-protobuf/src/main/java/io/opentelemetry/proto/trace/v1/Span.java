@@ -1888,13 +1888,18 @@ private static final long serialVersionUID = 0L;
 
     /**
      * <pre>
-     * Flags, a bit field. 8 least significant bits are the trace
-     * flags as defined in W3C Trace Context specification. Readers
-     * MUST not assume that 24 most significant bits will be zero.
-     * When creating new spans, the most-significant 24-bits MUST be
-     * zero.  To read the 8-bit W3C trace flag (use flags &amp;
-     * SPAN_FLAGS_TRACE_FLAGS_MASK).  [Optional].
+     * Flags, a bit field.
+     * Bits 0-7 (8 least significant bits) are the trace flags as defined in W3C Trace
+     * Context specification. To read the 8-bit W3C trace flag, use
+     * `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
      * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+     * Bits 8 and 9 represent the 3 states of whether the link is remote.
+     * The states are (unknown, is not remote, is remote).
+     * To read whether the value is known, use `(flags &amp; SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK) != 0`.
+     * To read whether the link is remote, use `(flags &amp; SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK) != 0`.
+     * Readers MUST NOT assume that bits 10-31 (22 most significant bits) will be zero.
+     * When creating new spans, bits 10-31 (most-significant 22-bits) MUST be zero.
+     * [Optional].
      * </pre>
      *
      * <code>fixed32 flags = 6;</code>
@@ -2198,13 +2203,18 @@ private static final long serialVersionUID = 0L;
     private int flags_;
     /**
      * <pre>
-     * Flags, a bit field. 8 least significant bits are the trace
-     * flags as defined in W3C Trace Context specification. Readers
-     * MUST not assume that 24 most significant bits will be zero.
-     * When creating new spans, the most-significant 24-bits MUST be
-     * zero.  To read the 8-bit W3C trace flag (use flags &amp;
-     * SPAN_FLAGS_TRACE_FLAGS_MASK).  [Optional].
+     * Flags, a bit field.
+     * Bits 0-7 (8 least significant bits) are the trace flags as defined in W3C Trace
+     * Context specification. To read the 8-bit W3C trace flag, use
+     * `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
      * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+     * Bits 8 and 9 represent the 3 states of whether the link is remote.
+     * The states are (unknown, is not remote, is remote).
+     * To read whether the value is known, use `(flags &amp; SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK) != 0`.
+     * To read whether the link is remote, use `(flags &amp; SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK) != 0`.
+     * Readers MUST NOT assume that bits 10-31 (22 most significant bits) will be zero.
+     * When creating new spans, bits 10-31 (most-significant 22-bits) MUST be zero.
+     * [Optional].
      * </pre>
      *
      * <code>fixed32 flags = 6;</code>
@@ -3237,13 +3247,18 @@ private static final long serialVersionUID = 0L;
       private int flags_ ;
       /**
        * <pre>
-       * Flags, a bit field. 8 least significant bits are the trace
-       * flags as defined in W3C Trace Context specification. Readers
-       * MUST not assume that 24 most significant bits will be zero.
-       * When creating new spans, the most-significant 24-bits MUST be
-       * zero.  To read the 8-bit W3C trace flag (use flags &amp;
-       * SPAN_FLAGS_TRACE_FLAGS_MASK).  [Optional].
+       * Flags, a bit field.
+       * Bits 0-7 (8 least significant bits) are the trace flags as defined in W3C Trace
+       * Context specification. To read the 8-bit W3C trace flag, use
+       * `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
        * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+       * Bits 8 and 9 represent the 3 states of whether the link is remote.
+       * The states are (unknown, is not remote, is remote).
+       * To read whether the value is known, use `(flags &amp; SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK) != 0`.
+       * To read whether the link is remote, use `(flags &amp; SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK) != 0`.
+       * Readers MUST NOT assume that bits 10-31 (22 most significant bits) will be zero.
+       * When creating new spans, bits 10-31 (most-significant 22-bits) MUST be zero.
+       * [Optional].
        * </pre>
        *
        * <code>fixed32 flags = 6;</code>
@@ -3255,13 +3270,18 @@ private static final long serialVersionUID = 0L;
       }
       /**
        * <pre>
-       * Flags, a bit field. 8 least significant bits are the trace
-       * flags as defined in W3C Trace Context specification. Readers
-       * MUST not assume that 24 most significant bits will be zero.
-       * When creating new spans, the most-significant 24-bits MUST be
-       * zero.  To read the 8-bit W3C trace flag (use flags &amp;
-       * SPAN_FLAGS_TRACE_FLAGS_MASK).  [Optional].
+       * Flags, a bit field.
+       * Bits 0-7 (8 least significant bits) are the trace flags as defined in W3C Trace
+       * Context specification. To read the 8-bit W3C trace flag, use
+       * `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
        * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+       * Bits 8 and 9 represent the 3 states of whether the link is remote.
+       * The states are (unknown, is not remote, is remote).
+       * To read whether the value is known, use `(flags &amp; SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK) != 0`.
+       * To read whether the link is remote, use `(flags &amp; SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK) != 0`.
+       * Readers MUST NOT assume that bits 10-31 (22 most significant bits) will be zero.
+       * When creating new spans, bits 10-31 (most-significant 22-bits) MUST be zero.
+       * [Optional].
        * </pre>
        *
        * <code>fixed32 flags = 6;</code>
@@ -3276,13 +3296,18 @@ private static final long serialVersionUID = 0L;
       }
       /**
        * <pre>
-       * Flags, a bit field. 8 least significant bits are the trace
-       * flags as defined in W3C Trace Context specification. Readers
-       * MUST not assume that 24 most significant bits will be zero.
-       * When creating new spans, the most-significant 24-bits MUST be
-       * zero.  To read the 8-bit W3C trace flag (use flags &amp;
-       * SPAN_FLAGS_TRACE_FLAGS_MASK).  [Optional].
+       * Flags, a bit field.
+       * Bits 0-7 (8 least significant bits) are the trace flags as defined in W3C Trace
+       * Context specification. To read the 8-bit W3C trace flag, use
+       * `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
        * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+       * Bits 8 and 9 represent the 3 states of whether the link is remote.
+       * The states are (unknown, is not remote, is remote).
+       * To read whether the value is known, use `(flags &amp; SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK) != 0`.
+       * To read whether the link is remote, use `(flags &amp; SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK) != 0`.
+       * Readers MUST NOT assume that bits 10-31 (22 most significant bits) will be zero.
+       * When creating new spans, bits 10-31 (most-significant 22-bits) MUST be zero.
+       * [Optional].
        * </pre>
        *
        * <code>fixed32 flags = 6;</code>
@@ -3455,17 +3480,22 @@ private static final long serialVersionUID = 0L;
   private int flags_;
   /**
    * <pre>
-   * Flags, a bit field. 8 least significant bits are the trace
-   * flags as defined in W3C Trace Context specification. Readers
-   * MUST not assume that 24 most significant bits will be zero.
-   * To read the 8-bit W3C trace flag, use `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
+   * Flags, a bit field.
+   * Bits 0-7 (8 least significant bits) are the trace flags as defined in W3C Trace
+   * Context specification. To read the 8-bit W3C trace flag, use
+   * `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
+   * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+   * Bits 8 and 9 represent the 3 states of whether a span's parent
+   * is remote. The states are (unknown, is not remote, is remote).
+   * To read whether the value is known, use `(flags &amp; SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK) != 0`.
+   * To read whether the span is remote, use `(flags &amp; SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK) != 0`.
    * When creating span messages, if the message is logically forwarded from another source
    * with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
    * be copied as-is. If creating from a source that does not have an equivalent flags field
-   * (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+   * (such as a runtime representation of an OpenTelemetry span), the high 22 bits MUST
    * be set to zero.
+   * Readers MUST NOT assume that bits 10-31 (22 most significant bits) will be zero.
    * [Optional].
-   * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
    * </pre>
    *
    * <code>fixed32 flags = 16;</code>
@@ -4891,17 +4921,22 @@ private static final long serialVersionUID = 0L;
     private int flags_ ;
     /**
      * <pre>
-     * Flags, a bit field. 8 least significant bits are the trace
-     * flags as defined in W3C Trace Context specification. Readers
-     * MUST not assume that 24 most significant bits will be zero.
-     * To read the 8-bit W3C trace flag, use `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
+     * Flags, a bit field.
+     * Bits 0-7 (8 least significant bits) are the trace flags as defined in W3C Trace
+     * Context specification. To read the 8-bit W3C trace flag, use
+     * `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
+     * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+     * Bits 8 and 9 represent the 3 states of whether a span's parent
+     * is remote. The states are (unknown, is not remote, is remote).
+     * To read whether the value is known, use `(flags &amp; SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK) != 0`.
+     * To read whether the span is remote, use `(flags &amp; SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK) != 0`.
      * When creating span messages, if the message is logically forwarded from another source
      * with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
      * be copied as-is. If creating from a source that does not have an equivalent flags field
-     * (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+     * (such as a runtime representation of an OpenTelemetry span), the high 22 bits MUST
      * be set to zero.
+     * Readers MUST NOT assume that bits 10-31 (22 most significant bits) will be zero.
      * [Optional].
-     * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
      * </pre>
      *
      * <code>fixed32 flags = 16;</code>
@@ -4913,17 +4948,22 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * Flags, a bit field. 8 least significant bits are the trace
-     * flags as defined in W3C Trace Context specification. Readers
-     * MUST not assume that 24 most significant bits will be zero.
-     * To read the 8-bit W3C trace flag, use `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
+     * Flags, a bit field.
+     * Bits 0-7 (8 least significant bits) are the trace flags as defined in W3C Trace
+     * Context specification. To read the 8-bit W3C trace flag, use
+     * `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
+     * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+     * Bits 8 and 9 represent the 3 states of whether a span's parent
+     * is remote. The states are (unknown, is not remote, is remote).
+     * To read whether the value is known, use `(flags &amp; SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK) != 0`.
+     * To read whether the span is remote, use `(flags &amp; SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK) != 0`.
      * When creating span messages, if the message is logically forwarded from another source
      * with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
      * be copied as-is. If creating from a source that does not have an equivalent flags field
-     * (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+     * (such as a runtime representation of an OpenTelemetry span), the high 22 bits MUST
      * be set to zero.
+     * Readers MUST NOT assume that bits 10-31 (22 most significant bits) will be zero.
      * [Optional].
-     * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
      * </pre>
      *
      * <code>fixed32 flags = 16;</code>
@@ -4938,17 +4978,22 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * Flags, a bit field. 8 least significant bits are the trace
-     * flags as defined in W3C Trace Context specification. Readers
-     * MUST not assume that 24 most significant bits will be zero.
-     * To read the 8-bit W3C trace flag, use `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
+     * Flags, a bit field.
+     * Bits 0-7 (8 least significant bits) are the trace flags as defined in W3C Trace
+     * Context specification. To read the 8-bit W3C trace flag, use
+     * `flags &amp; SPAN_FLAGS_TRACE_FLAGS_MASK`.
+     * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
+     * Bits 8 and 9 represent the 3 states of whether a span's parent
+     * is remote. The states are (unknown, is not remote, is remote).
+     * To read whether the value is known, use `(flags &amp; SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK) != 0`.
+     * To read whether the span is remote, use `(flags &amp; SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK) != 0`.
      * When creating span messages, if the message is logically forwarded from another source
      * with an equivalent flags fields (i.e., usually another OTLP span message), the field SHOULD
      * be copied as-is. If creating from a source that does not have an equivalent flags field
-     * (such as a runtime representation of an OpenTelemetry span), the high 24 bits MUST
+     * (such as a runtime representation of an OpenTelemetry span), the high 22 bits MUST
      * be set to zero.
+     * Readers MUST NOT assume that bits 10-31 (22 most significant bits) will be zero.
      * [Optional].
-     * See https://www.w3.org/TR/trace-context-2/#trace-flags for the flag definitions.
      * </pre>
      *
      * <code>fixed32 flags = 16;</code>

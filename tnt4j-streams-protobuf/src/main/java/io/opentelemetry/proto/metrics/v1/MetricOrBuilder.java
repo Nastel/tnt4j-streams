@@ -144,5 +144,79 @@ public interface MetricOrBuilder extends
    */
   io.opentelemetry.proto.metrics.v1.SummaryOrBuilder getSummaryOrBuilder();
 
+  /**
+   * <pre>
+   * Additional metadata attributes that describe the metric. [Optional].
+   * Attributes are non-identifying.
+   * Consumers SHOULD NOT need to be aware of these attributes.
+   * These attributes MAY be used to encode information allowing
+   * for lossless roundtrip translation to / from another data model.
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
+   * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+   */
+  java.util.List<io.opentelemetry.proto.common.v1.KeyValue> 
+      getMetadataList();
+  /**
+   * <pre>
+   * Additional metadata attributes that describe the metric. [Optional].
+   * Attributes are non-identifying.
+   * Consumers SHOULD NOT need to be aware of these attributes.
+   * These attributes MAY be used to encode information allowing
+   * for lossless roundtrip translation to / from another data model.
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
+   * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+   */
+  io.opentelemetry.proto.common.v1.KeyValue getMetadata(int index);
+  /**
+   * <pre>
+   * Additional metadata attributes that describe the metric. [Optional].
+   * Attributes are non-identifying.
+   * Consumers SHOULD NOT need to be aware of these attributes.
+   * These attributes MAY be used to encode information allowing
+   * for lossless roundtrip translation to / from another data model.
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
+   * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+   */
+  int getMetadataCount();
+  /**
+   * <pre>
+   * Additional metadata attributes that describe the metric. [Optional].
+   * Attributes are non-identifying.
+   * Consumers SHOULD NOT need to be aware of these attributes.
+   * These attributes MAY be used to encode information allowing
+   * for lossless roundtrip translation to / from another data model.
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
+   * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+   */
+  java.util.List<? extends io.opentelemetry.proto.common.v1.KeyValueOrBuilder> 
+      getMetadataOrBuilderList();
+  /**
+   * <pre>
+   * Additional metadata attributes that describe the metric. [Optional].
+   * Attributes are non-identifying.
+   * Consumers SHOULD NOT need to be aware of these attributes.
+   * These attributes MAY be used to encode information allowing
+   * for lossless roundtrip translation to / from another data model.
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
+   * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+   */
+  io.opentelemetry.proto.common.v1.KeyValueOrBuilder getMetadataOrBuilder(
+      int index);
+
   public io.opentelemetry.proto.metrics.v1.Metric.DataCase getDataCase();
 }

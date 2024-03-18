@@ -4872,6 +4872,50 @@ public final class Metrics {
      * @return The positiveCount at the given index.
      */
     double getPositiveCount(int index);
+
+    /**
+     * <pre>
+     * Only used for native histograms. These exemplars MUST have a timestamp.
+     * </pre>
+     *
+     * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+     */
+    java.util.List<io.prometheus.client.Metrics.Exemplar> 
+        getExemplarsList();
+    /**
+     * <pre>
+     * Only used for native histograms. These exemplars MUST have a timestamp.
+     * </pre>
+     *
+     * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+     */
+    io.prometheus.client.Metrics.Exemplar getExemplars(int index);
+    /**
+     * <pre>
+     * Only used for native histograms. These exemplars MUST have a timestamp.
+     * </pre>
+     *
+     * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+     */
+    int getExemplarsCount();
+    /**
+     * <pre>
+     * Only used for native histograms. These exemplars MUST have a timestamp.
+     * </pre>
+     *
+     * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+     */
+    java.util.List<? extends io.prometheus.client.Metrics.ExemplarOrBuilder> 
+        getExemplarsOrBuilderList();
+    /**
+     * <pre>
+     * Only used for native histograms. These exemplars MUST have a timestamp.
+     * </pre>
+     *
+     * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+     */
+    io.prometheus.client.Metrics.ExemplarOrBuilder getExemplarsOrBuilder(
+        int index);
   }
   /**
    * Protobuf type {@code io.prometheus.client.Histogram}
@@ -4893,6 +4937,7 @@ public final class Metrics {
       positiveSpan_ = java.util.Collections.emptyList();
       positiveDelta_ = emptyLongList();
       positiveCount_ = emptyDoubleList();
+      exemplars_ = java.util.Collections.emptyList();
     }
 
     @java.lang.Override
@@ -5085,6 +5130,15 @@ public final class Metrics {
 
               break;
             }
+            case 130: {
+              if (!((mutable_bitField0_ & 0x00000080) != 0)) {
+                exemplars_ = new java.util.ArrayList<io.prometheus.client.Metrics.Exemplar>();
+                mutable_bitField0_ |= 0x00000080;
+              }
+              exemplars_.add(
+                  input.readMessage(io.prometheus.client.Metrics.Exemplar.parser(), extensionRegistry));
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -5122,6 +5176,9 @@ public final class Metrics {
         }
         if (((mutable_bitField0_ & 0x00000040) != 0)) {
           positiveCount_.makeImmutable(); // C
+        }
+        if (((mutable_bitField0_ & 0x00000080) != 0)) {
+          exemplars_ = java.util.Collections.unmodifiableList(exemplars_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -5634,6 +5691,66 @@ public final class Metrics {
     }
     private int positiveCountMemoizedSerializedSize = -1;
 
+    public static final int EXEMPLARS_FIELD_NUMBER = 16;
+    private java.util.List<io.prometheus.client.Metrics.Exemplar> exemplars_;
+    /**
+     * <pre>
+     * Only used for native histograms. These exemplars MUST have a timestamp.
+     * </pre>
+     *
+     * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+     */
+    @java.lang.Override
+    public java.util.List<io.prometheus.client.Metrics.Exemplar> getExemplarsList() {
+      return exemplars_;
+    }
+    /**
+     * <pre>
+     * Only used for native histograms. These exemplars MUST have a timestamp.
+     * </pre>
+     *
+     * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends io.prometheus.client.Metrics.ExemplarOrBuilder> 
+        getExemplarsOrBuilderList() {
+      return exemplars_;
+    }
+    /**
+     * <pre>
+     * Only used for native histograms. These exemplars MUST have a timestamp.
+     * </pre>
+     *
+     * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+     */
+    @java.lang.Override
+    public int getExemplarsCount() {
+      return exemplars_.size();
+    }
+    /**
+     * <pre>
+     * Only used for native histograms. These exemplars MUST have a timestamp.
+     * </pre>
+     *
+     * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+     */
+    @java.lang.Override
+    public io.prometheus.client.Metrics.Exemplar getExemplars(int index) {
+      return exemplars_.get(index);
+    }
+    /**
+     * <pre>
+     * Only used for native histograms. These exemplars MUST have a timestamp.
+     * </pre>
+     *
+     * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+     */
+    @java.lang.Override
+    public io.prometheus.client.Metrics.ExemplarOrBuilder getExemplarsOrBuilder(
+        int index) {
+      return exemplars_.get(index);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5709,6 +5826,9 @@ public final class Metrics {
       }
       if (createdTimestamp_ != null) {
         output.writeMessage(15, getCreatedTimestamp());
+      }
+      for (int i = 0; i < exemplars_.size(); i++) {
+        output.writeMessage(16, exemplars_.get(i));
       }
       unknownFields.writeTo(output);
     }
@@ -5813,6 +5933,10 @@ public final class Metrics {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(15, getCreatedTimestamp());
       }
+      for (int i = 0; i < exemplars_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(16, exemplars_.get(i));
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -5865,6 +5989,8 @@ public final class Metrics {
           .equals(other.getPositiveDeltaList())) return false;
       if (!getPositiveCountList()
           .equals(other.getPositiveCountList())) return false;
+      if (!getExemplarsList()
+          .equals(other.getExemplarsList())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5927,6 +6053,10 @@ public final class Metrics {
       if (getPositiveCountCount() > 0) {
         hash = (37 * hash) + POSITIVE_COUNT_FIELD_NUMBER;
         hash = (53 * hash) + getPositiveCountList().hashCode();
+      }
+      if (getExemplarsCount() > 0) {
+        hash = (37 * hash) + EXEMPLARS_FIELD_NUMBER;
+        hash = (53 * hash) + getExemplarsList().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -6059,6 +6189,7 @@ public final class Metrics {
           getBucketFieldBuilder();
           getNegativeSpanFieldBuilder();
           getPositiveSpanFieldBuilder();
+          getExemplarsFieldBuilder();
         }
       }
       @java.lang.Override
@@ -6110,6 +6241,12 @@ public final class Metrics {
         bitField0_ = (bitField0_ & ~0x00000020);
         positiveCount_ = emptyDoubleList();
         bitField0_ = (bitField0_ & ~0x00000040);
+        if (exemplarsBuilder_ == null) {
+          exemplars_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000080);
+        } else {
+          exemplarsBuilder_.clear();
+        }
         return this;
       }
 
@@ -6196,6 +6333,15 @@ public final class Metrics {
           bitField0_ = (bitField0_ & ~0x00000040);
         }
         result.positiveCount_ = positiveCount_;
+        if (exemplarsBuilder_ == null) {
+          if (((bitField0_ & 0x00000080) != 0)) {
+            exemplars_ = java.util.Collections.unmodifiableList(exemplars_);
+            bitField0_ = (bitField0_ & ~0x00000080);
+          }
+          result.exemplars_ = exemplars_;
+        } else {
+          result.exemplars_ = exemplarsBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -6385,6 +6531,32 @@ public final class Metrics {
             positiveCount_.addAll(other.positiveCount_);
           }
           onChanged();
+        }
+        if (exemplarsBuilder_ == null) {
+          if (!other.exemplars_.isEmpty()) {
+            if (exemplars_.isEmpty()) {
+              exemplars_ = other.exemplars_;
+              bitField0_ = (bitField0_ & ~0x00000080);
+            } else {
+              ensureExemplarsIsMutable();
+              exemplars_.addAll(other.exemplars_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.exemplars_.isEmpty()) {
+            if (exemplarsBuilder_.isEmpty()) {
+              exemplarsBuilder_.dispose();
+              exemplarsBuilder_ = null;
+              exemplars_ = other.exemplars_;
+              bitField0_ = (bitField0_ & ~0x00000080);
+              exemplarsBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getExemplarsFieldBuilder() : null;
+            } else {
+              exemplarsBuilder_.addAllMessages(other.exemplars_);
+            }
+          }
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -8268,6 +8440,318 @@ public final class Metrics {
         bitField0_ = (bitField0_ & ~0x00000040);
         onChanged();
         return this;
+      }
+
+      private java.util.List<io.prometheus.client.Metrics.Exemplar> exemplars_ =
+        java.util.Collections.emptyList();
+      private void ensureExemplarsIsMutable() {
+        if (!((bitField0_ & 0x00000080) != 0)) {
+          exemplars_ = new java.util.ArrayList<io.prometheus.client.Metrics.Exemplar>(exemplars_);
+          bitField0_ |= 0x00000080;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          io.prometheus.client.Metrics.Exemplar, io.prometheus.client.Metrics.Exemplar.Builder, io.prometheus.client.Metrics.ExemplarOrBuilder> exemplarsBuilder_;
+
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public java.util.List<io.prometheus.client.Metrics.Exemplar> getExemplarsList() {
+        if (exemplarsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(exemplars_);
+        } else {
+          return exemplarsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public int getExemplarsCount() {
+        if (exemplarsBuilder_ == null) {
+          return exemplars_.size();
+        } else {
+          return exemplarsBuilder_.getCount();
+        }
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public io.prometheus.client.Metrics.Exemplar getExemplars(int index) {
+        if (exemplarsBuilder_ == null) {
+          return exemplars_.get(index);
+        } else {
+          return exemplarsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public Builder setExemplars(
+          int index, io.prometheus.client.Metrics.Exemplar value) {
+        if (exemplarsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureExemplarsIsMutable();
+          exemplars_.set(index, value);
+          onChanged();
+        } else {
+          exemplarsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public Builder setExemplars(
+          int index, io.prometheus.client.Metrics.Exemplar.Builder builderForValue) {
+        if (exemplarsBuilder_ == null) {
+          ensureExemplarsIsMutable();
+          exemplars_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          exemplarsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public Builder addExemplars(io.prometheus.client.Metrics.Exemplar value) {
+        if (exemplarsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureExemplarsIsMutable();
+          exemplars_.add(value);
+          onChanged();
+        } else {
+          exemplarsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public Builder addExemplars(
+          int index, io.prometheus.client.Metrics.Exemplar value) {
+        if (exemplarsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureExemplarsIsMutable();
+          exemplars_.add(index, value);
+          onChanged();
+        } else {
+          exemplarsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public Builder addExemplars(
+          io.prometheus.client.Metrics.Exemplar.Builder builderForValue) {
+        if (exemplarsBuilder_ == null) {
+          ensureExemplarsIsMutable();
+          exemplars_.add(builderForValue.build());
+          onChanged();
+        } else {
+          exemplarsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public Builder addExemplars(
+          int index, io.prometheus.client.Metrics.Exemplar.Builder builderForValue) {
+        if (exemplarsBuilder_ == null) {
+          ensureExemplarsIsMutable();
+          exemplars_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          exemplarsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public Builder addAllExemplars(
+          java.lang.Iterable<? extends io.prometheus.client.Metrics.Exemplar> values) {
+        if (exemplarsBuilder_ == null) {
+          ensureExemplarsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, exemplars_);
+          onChanged();
+        } else {
+          exemplarsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public Builder clearExemplars() {
+        if (exemplarsBuilder_ == null) {
+          exemplars_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000080);
+          onChanged();
+        } else {
+          exemplarsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public Builder removeExemplars(int index) {
+        if (exemplarsBuilder_ == null) {
+          ensureExemplarsIsMutable();
+          exemplars_.remove(index);
+          onChanged();
+        } else {
+          exemplarsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public io.prometheus.client.Metrics.Exemplar.Builder getExemplarsBuilder(
+          int index) {
+        return getExemplarsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public io.prometheus.client.Metrics.ExemplarOrBuilder getExemplarsOrBuilder(
+          int index) {
+        if (exemplarsBuilder_ == null) {
+          return exemplars_.get(index);  } else {
+          return exemplarsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public java.util.List<? extends io.prometheus.client.Metrics.ExemplarOrBuilder> 
+           getExemplarsOrBuilderList() {
+        if (exemplarsBuilder_ != null) {
+          return exemplarsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(exemplars_);
+        }
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public io.prometheus.client.Metrics.Exemplar.Builder addExemplarsBuilder() {
+        return getExemplarsFieldBuilder().addBuilder(
+            io.prometheus.client.Metrics.Exemplar.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public io.prometheus.client.Metrics.Exemplar.Builder addExemplarsBuilder(
+          int index) {
+        return getExemplarsFieldBuilder().addBuilder(
+            index, io.prometheus.client.Metrics.Exemplar.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * Only used for native histograms. These exemplars MUST have a timestamp.
+       * </pre>
+       *
+       * <code>repeated .io.prometheus.client.Exemplar exemplars = 16;</code>
+       */
+      public java.util.List<io.prometheus.client.Metrics.Exemplar.Builder> 
+           getExemplarsBuilderList() {
+        return getExemplarsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          io.prometheus.client.Metrics.Exemplar, io.prometheus.client.Metrics.Exemplar.Builder, io.prometheus.client.Metrics.ExemplarOrBuilder> 
+          getExemplarsFieldBuilder() {
+        if (exemplarsBuilder_ == null) {
+          exemplarsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              io.prometheus.client.Metrics.Exemplar, io.prometheus.client.Metrics.Exemplar.Builder, io.prometheus.client.Metrics.ExemplarOrBuilder>(
+                  exemplars_,
+                  ((bitField0_ & 0x00000080) != 0),
+                  getParentForChildren(),
+                  isClean());
+          exemplars_ = null;
+        }
+        return exemplarsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -14283,7 +14767,7 @@ public final class Metrics {
       "_sum\030\002 \001(\001\0226\n\010quantile\030\003 \003(\0132\036.io.promet" +
       "heus.client.QuantileB\004\310\336\037\000\0225\n\021created_ti" +
       "mestamp\030\004 \001(\0132\032.google.protobuf.Timestam" +
-      "p\"\030\n\007Untyped\022\r\n\005value\030\001 \001(\001\"\360\003\n\tHistogra" +
+      "p\"\030\n\007Untyped\022\r\n\005value\030\001 \001(\001\"\243\004\n\tHistogra" +
       "m\022\024\n\014sample_count\030\001 \001(\004\022\032\n\022sample_count_" +
       "float\030\004 \001(\001\022\022\n\nsample_sum\030\002 \001(\001\0222\n\006bucke" +
       "t\030\003 \003(\0132\034.io.prometheus.client.BucketB\004\310" +
@@ -14296,30 +14780,31 @@ public final class Metrics {
       "ive_count\030\013 \003(\001\022=\n\rpositive_span\030\014 \003(\0132 " +
       ".io.prometheus.client.BucketSpanB\004\310\336\037\000\022\026" +
       "\n\016positive_delta\030\r \003(\022\022\026\n\016positive_count" +
-      "\030\016 \003(\001\"\211\001\n\006Bucket\022\030\n\020cumulative_count\030\001 " +
-      "\001(\004\022\036\n\026cumulative_count_float\030\004 \001(\001\022\023\n\013u" +
-      "pper_bound\030\002 \001(\001\0220\n\010exemplar\030\003 \001(\0132\036.io." +
-      "prometheus.client.Exemplar\",\n\nBucketSpan" +
-      "\022\016\n\006offset\030\001 \001(\021\022\016\n\006length\030\002 \001(\r\"~\n\010Exem" +
-      "plar\0224\n\005label\030\001 \003(\0132\037.io.prometheus.clie" +
-      "nt.LabelPairB\004\310\336\037\000\022\r\n\005value\030\002 \001(\001\022-\n\ttim" +
-      "estamp\030\003 \001(\0132\032.google.protobuf.Timestamp" +
-      "\"\304\002\n\006Metric\0224\n\005label\030\001 \003(\0132\037.io.promethe" +
-      "us.client.LabelPairB\004\310\336\037\000\022*\n\005gauge\030\002 \001(\013" +
-      "2\033.io.prometheus.client.Gauge\022.\n\007counter" +
-      "\030\003 \001(\0132\035.io.prometheus.client.Counter\022.\n" +
-      "\007summary\030\004 \001(\0132\035.io.prometheus.client.Su" +
-      "mmary\022.\n\007untyped\030\005 \001(\0132\035.io.prometheus.c" +
-      "lient.Untyped\0222\n\thistogram\030\007 \001(\0132\037.io.pr" +
-      "ometheus.client.Histogram\022\024\n\014timestamp_m" +
-      "s\030\006 \001(\003\"\234\001\n\014MetricFamily\022\014\n\004name\030\001 \001(\t\022\014" +
-      "\n\004help\030\002 \001(\t\022.\n\004type\030\003 \001(\0162 .io.promethe" +
-      "us.client.MetricType\0222\n\006metric\030\004 \003(\0132\034.i" +
-      "o.prometheus.client.MetricB\004\310\336\037\000\022\014\n\004unit" +
-      "\030\005 \001(\t*b\n\nMetricType\022\013\n\007COUNTER\020\000\022\t\n\005GAU" +
-      "GE\020\001\022\013\n\007SUMMARY\020\002\022\013\n\007UNTYPED\020\003\022\r\n\tHISTOG" +
-      "RAM\020\004\022\023\n\017GAUGE_HISTOGRAM\020\005B\026Z\024io_prometh" +
-      "eus_clientb\006proto3"
+      "\030\016 \003(\001\0221\n\texemplars\030\020 \003(\0132\036.io.prometheu" +
+      "s.client.Exemplar\"\211\001\n\006Bucket\022\030\n\020cumulati" +
+      "ve_count\030\001 \001(\004\022\036\n\026cumulative_count_float" +
+      "\030\004 \001(\001\022\023\n\013upper_bound\030\002 \001(\001\0220\n\010exemplar\030" +
+      "\003 \001(\0132\036.io.prometheus.client.Exemplar\",\n" +
+      "\nBucketSpan\022\016\n\006offset\030\001 \001(\021\022\016\n\006length\030\002 " +
+      "\001(\r\"~\n\010Exemplar\0224\n\005label\030\001 \003(\0132\037.io.prom" +
+      "etheus.client.LabelPairB\004\310\336\037\000\022\r\n\005value\030\002" +
+      " \001(\001\022-\n\ttimestamp\030\003 \001(\0132\032.google.protobu" +
+      "f.Timestamp\"\304\002\n\006Metric\0224\n\005label\030\001 \003(\0132\037." +
+      "io.prometheus.client.LabelPairB\004\310\336\037\000\022*\n\005" +
+      "gauge\030\002 \001(\0132\033.io.prometheus.client.Gauge" +
+      "\022.\n\007counter\030\003 \001(\0132\035.io.prometheus.client" +
+      ".Counter\022.\n\007summary\030\004 \001(\0132\035.io.prometheu" +
+      "s.client.Summary\022.\n\007untyped\030\005 \001(\0132\035.io.p" +
+      "rometheus.client.Untyped\0222\n\thistogram\030\007 " +
+      "\001(\0132\037.io.prometheus.client.Histogram\022\024\n\014" +
+      "timestamp_ms\030\006 \001(\003\"\234\001\n\014MetricFamily\022\014\n\004n" +
+      "ame\030\001 \001(\t\022\014\n\004help\030\002 \001(\t\022.\n\004type\030\003 \001(\0162 ." +
+      "io.prometheus.client.MetricType\0222\n\006metri" +
+      "c\030\004 \003(\0132\034.io.prometheus.client.MetricB\004\310" +
+      "\336\037\000\022\014\n\004unit\030\005 \001(\t*b\n\nMetricType\022\013\n\007COUNT" +
+      "ER\020\000\022\t\n\005GAUGE\020\001\022\013\n\007SUMMARY\020\002\022\013\n\007UNTYPED\020" +
+      "\003\022\r\n\tHISTOGRAM\020\004\022\023\n\017GAUGE_HISTOGRAM\020\005B\026Z" +
+      "\024io_prometheus_clientb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -14368,7 +14853,7 @@ public final class Metrics {
     internal_static_io_prometheus_client_Histogram_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_io_prometheus_client_Histogram_descriptor,
-        new java.lang.String[] { "SampleCount", "SampleCountFloat", "SampleSum", "Bucket", "CreatedTimestamp", "Schema", "ZeroThreshold", "ZeroCount", "ZeroCountFloat", "NegativeSpan", "NegativeDelta", "NegativeCount", "PositiveSpan", "PositiveDelta", "PositiveCount", });
+        new java.lang.String[] { "SampleCount", "SampleCountFloat", "SampleSum", "Bucket", "CreatedTimestamp", "Schema", "ZeroThreshold", "ZeroCount", "ZeroCountFloat", "NegativeSpan", "NegativeDelta", "NegativeCount", "PositiveSpan", "PositiveDelta", "PositiveCount", "Exemplars", });
     internal_static_io_prometheus_client_Bucket_descriptor =
       getDescriptor().getMessageTypes().get(7);
     internal_static_io_prometheus_client_Bucket_fieldAccessorTable = new

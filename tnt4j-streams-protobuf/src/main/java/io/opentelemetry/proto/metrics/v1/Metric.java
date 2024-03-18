@@ -93,6 +93,7 @@ private static final long serialVersionUID = 0L;
     name_ = "";
     description_ = "";
     unit_ = "";
+    metadata_ = java.util.Collections.emptyList();
   }
 
   @java.lang.Override
@@ -115,6 +116,7 @@ private static final long serialVersionUID = 0L;
     if (extensionRegistry == null) {
       throw new java.lang.NullPointerException();
     }
+    int mutable_bitField0_ = 0;
     com.google.protobuf.UnknownFieldSet.Builder unknownFields =
         com.google.protobuf.UnknownFieldSet.newBuilder();
     try {
@@ -213,6 +215,15 @@ private static final long serialVersionUID = 0L;
             dataCase_ = 11;
             break;
           }
+          case 98: {
+            if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+              metadata_ = new java.util.ArrayList<io.opentelemetry.proto.common.v1.KeyValue>();
+              mutable_bitField0_ |= 0x00000001;
+            }
+            metadata_.add(
+                input.readMessage(io.opentelemetry.proto.common.v1.KeyValue.parser(), extensionRegistry));
+            break;
+          }
           default: {
             if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
@@ -230,6 +241,9 @@ private static final long serialVersionUID = 0L;
       throw new com.google.protobuf.InvalidProtocolBufferException(
           e).setUnfinishedMessage(this);
     } finally {
+      if (((mutable_bitField0_ & 0x00000001) != 0)) {
+        metadata_ = java.util.Collections.unmodifiableList(metadata_);
+      }
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
     }
@@ -589,6 +603,96 @@ private static final long serialVersionUID = 0L;
     return io.opentelemetry.proto.metrics.v1.Summary.getDefaultInstance();
   }
 
+  public static final int METADATA_FIELD_NUMBER = 12;
+  private java.util.List<io.opentelemetry.proto.common.v1.KeyValue> metadata_;
+  /**
+   * <pre>
+   * Additional metadata attributes that describe the metric. [Optional].
+   * Attributes are non-identifying.
+   * Consumers SHOULD NOT need to be aware of these attributes.
+   * These attributes MAY be used to encode information allowing
+   * for lossless roundtrip translation to / from another data model.
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
+   * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+   */
+  @java.lang.Override
+  public java.util.List<io.opentelemetry.proto.common.v1.KeyValue> getMetadataList() {
+    return metadata_;
+  }
+  /**
+   * <pre>
+   * Additional metadata attributes that describe the metric. [Optional].
+   * Attributes are non-identifying.
+   * Consumers SHOULD NOT need to be aware of these attributes.
+   * These attributes MAY be used to encode information allowing
+   * for lossless roundtrip translation to / from another data model.
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
+   * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+   */
+  @java.lang.Override
+  public java.util.List<? extends io.opentelemetry.proto.common.v1.KeyValueOrBuilder> 
+      getMetadataOrBuilderList() {
+    return metadata_;
+  }
+  /**
+   * <pre>
+   * Additional metadata attributes that describe the metric. [Optional].
+   * Attributes are non-identifying.
+   * Consumers SHOULD NOT need to be aware of these attributes.
+   * These attributes MAY be used to encode information allowing
+   * for lossless roundtrip translation to / from another data model.
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
+   * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+   */
+  @java.lang.Override
+  public int getMetadataCount() {
+    return metadata_.size();
+  }
+  /**
+   * <pre>
+   * Additional metadata attributes that describe the metric. [Optional].
+   * Attributes are non-identifying.
+   * Consumers SHOULD NOT need to be aware of these attributes.
+   * These attributes MAY be used to encode information allowing
+   * for lossless roundtrip translation to / from another data model.
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
+   * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+   */
+  @java.lang.Override
+  public io.opentelemetry.proto.common.v1.KeyValue getMetadata(int index) {
+    return metadata_.get(index);
+  }
+  /**
+   * <pre>
+   * Additional metadata attributes that describe the metric. [Optional].
+   * Attributes are non-identifying.
+   * Consumers SHOULD NOT need to be aware of these attributes.
+   * These attributes MAY be used to encode information allowing
+   * for lossless roundtrip translation to / from another data model.
+   * Attribute keys MUST be unique (it is not allowed to have more than one
+   * attribute with the same key).
+   * </pre>
+   *
+   * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+   */
+  @java.lang.Override
+  public io.opentelemetry.proto.common.v1.KeyValueOrBuilder getMetadataOrBuilder(
+      int index) {
+    return metadata_.get(index);
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -626,6 +730,9 @@ private static final long serialVersionUID = 0L;
     }
     if (dataCase_ == 11) {
       output.writeMessage(11, (io.opentelemetry.proto.metrics.v1.Summary) data_);
+    }
+    for (int i = 0; i < metadata_.size(); i++) {
+      output.writeMessage(12, metadata_.get(i));
     }
     unknownFields.writeTo(output);
   }
@@ -665,6 +772,10 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(11, (io.opentelemetry.proto.metrics.v1.Summary) data_);
     }
+    for (int i = 0; i < metadata_.size(); i++) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(12, metadata_.get(i));
+    }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
     return size;
@@ -686,6 +797,8 @@ private static final long serialVersionUID = 0L;
         .equals(other.getDescription())) return false;
     if (!getUnit()
         .equals(other.getUnit())) return false;
+    if (!getMetadataList()
+        .equals(other.getMetadataList())) return false;
     if (!getDataCase().equals(other.getDataCase())) return false;
     switch (dataCase_) {
       case 5:
@@ -728,6 +841,10 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getDescription().hashCode();
     hash = (37 * hash) + UNIT_FIELD_NUMBER;
     hash = (53 * hash) + getUnit().hashCode();
+    if (getMetadataCount() > 0) {
+      hash = (37 * hash) + METADATA_FIELD_NUMBER;
+      hash = (53 * hash) + getMetadataList().hashCode();
+    }
     switch (dataCase_) {
       case 5:
         hash = (37 * hash) + GAUGE_FIELD_NUMBER;
@@ -954,6 +1071,7 @@ private static final long serialVersionUID = 0L;
     private void maybeForceBuilderInitialization() {
       if (com.google.protobuf.GeneratedMessageV3
               .alwaysUseFieldBuilders) {
+        getMetadataFieldBuilder();
       }
     }
     @java.lang.Override
@@ -965,6 +1083,12 @@ private static final long serialVersionUID = 0L;
 
       unit_ = "";
 
+      if (metadataBuilder_ == null) {
+        metadata_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000001);
+      } else {
+        metadataBuilder_.clear();
+      }
       dataCase_ = 0;
       data_ = null;
       return this;
@@ -993,6 +1117,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public io.opentelemetry.proto.metrics.v1.Metric buildPartial() {
       io.opentelemetry.proto.metrics.v1.Metric result = new io.opentelemetry.proto.metrics.v1.Metric(this);
+      int from_bitField0_ = bitField0_;
       result.name_ = name_;
       result.description_ = description_;
       result.unit_ = unit_;
@@ -1030,6 +1155,15 @@ private static final long serialVersionUID = 0L;
         } else {
           result.data_ = summaryBuilder_.build();
         }
+      }
+      if (metadataBuilder_ == null) {
+        if (((bitField0_ & 0x00000001) != 0)) {
+          metadata_ = java.util.Collections.unmodifiableList(metadata_);
+          bitField0_ = (bitField0_ & ~0x00000001);
+        }
+        result.metadata_ = metadata_;
+      } else {
+        result.metadata_ = metadataBuilder_.build();
       }
       result.dataCase_ = dataCase_;
       onBuilt();
@@ -1091,6 +1225,32 @@ private static final long serialVersionUID = 0L;
       if (!other.getUnit().isEmpty()) {
         unit_ = other.unit_;
         onChanged();
+      }
+      if (metadataBuilder_ == null) {
+        if (!other.metadata_.isEmpty()) {
+          if (metadata_.isEmpty()) {
+            metadata_ = other.metadata_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+          } else {
+            ensureMetadataIsMutable();
+            metadata_.addAll(other.metadata_);
+          }
+          onChanged();
+        }
+      } else {
+        if (!other.metadata_.isEmpty()) {
+          if (metadataBuilder_.isEmpty()) {
+            metadataBuilder_.dispose();
+            metadataBuilder_ = null;
+            metadata_ = other.metadata_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+            metadataBuilder_ = 
+              com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                 getMetadataFieldBuilder() : null;
+          } else {
+            metadataBuilder_.addAllMessages(other.metadata_);
+          }
+        }
       }
       switch (other.getDataCase()) {
         case GAUGE: {
@@ -1160,6 +1320,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
+    private int bitField0_;
 
     private java.lang.Object name_ = "";
     /**
@@ -2162,6 +2323,426 @@ private static final long serialVersionUID = 0L;
       dataCase_ = 11;
       onChanged();;
       return summaryBuilder_;
+    }
+
+    private java.util.List<io.opentelemetry.proto.common.v1.KeyValue> metadata_ =
+      java.util.Collections.emptyList();
+    private void ensureMetadataIsMutable() {
+      if (!((bitField0_ & 0x00000001) != 0)) {
+        metadata_ = new java.util.ArrayList<io.opentelemetry.proto.common.v1.KeyValue>(metadata_);
+        bitField0_ |= 0x00000001;
+       }
+    }
+
+    private com.google.protobuf.RepeatedFieldBuilderV3<
+        io.opentelemetry.proto.common.v1.KeyValue, io.opentelemetry.proto.common.v1.KeyValue.Builder, io.opentelemetry.proto.common.v1.KeyValueOrBuilder> metadataBuilder_;
+
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public java.util.List<io.opentelemetry.proto.common.v1.KeyValue> getMetadataList() {
+      if (metadataBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(metadata_);
+      } else {
+        return metadataBuilder_.getMessageList();
+      }
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public int getMetadataCount() {
+      if (metadataBuilder_ == null) {
+        return metadata_.size();
+      } else {
+        return metadataBuilder_.getCount();
+      }
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public io.opentelemetry.proto.common.v1.KeyValue getMetadata(int index) {
+      if (metadataBuilder_ == null) {
+        return metadata_.get(index);
+      } else {
+        return metadataBuilder_.getMessage(index);
+      }
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public Builder setMetadata(
+        int index, io.opentelemetry.proto.common.v1.KeyValue value) {
+      if (metadataBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureMetadataIsMutable();
+        metadata_.set(index, value);
+        onChanged();
+      } else {
+        metadataBuilder_.setMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public Builder setMetadata(
+        int index, io.opentelemetry.proto.common.v1.KeyValue.Builder builderForValue) {
+      if (metadataBuilder_ == null) {
+        ensureMetadataIsMutable();
+        metadata_.set(index, builderForValue.build());
+        onChanged();
+      } else {
+        metadataBuilder_.setMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public Builder addMetadata(io.opentelemetry.proto.common.v1.KeyValue value) {
+      if (metadataBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureMetadataIsMutable();
+        metadata_.add(value);
+        onChanged();
+      } else {
+        metadataBuilder_.addMessage(value);
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public Builder addMetadata(
+        int index, io.opentelemetry.proto.common.v1.KeyValue value) {
+      if (metadataBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureMetadataIsMutable();
+        metadata_.add(index, value);
+        onChanged();
+      } else {
+        metadataBuilder_.addMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public Builder addMetadata(
+        io.opentelemetry.proto.common.v1.KeyValue.Builder builderForValue) {
+      if (metadataBuilder_ == null) {
+        ensureMetadataIsMutable();
+        metadata_.add(builderForValue.build());
+        onChanged();
+      } else {
+        metadataBuilder_.addMessage(builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public Builder addMetadata(
+        int index, io.opentelemetry.proto.common.v1.KeyValue.Builder builderForValue) {
+      if (metadataBuilder_ == null) {
+        ensureMetadataIsMutable();
+        metadata_.add(index, builderForValue.build());
+        onChanged();
+      } else {
+        metadataBuilder_.addMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public Builder addAllMetadata(
+        java.lang.Iterable<? extends io.opentelemetry.proto.common.v1.KeyValue> values) {
+      if (metadataBuilder_ == null) {
+        ensureMetadataIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, metadata_);
+        onChanged();
+      } else {
+        metadataBuilder_.addAllMessages(values);
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public Builder clearMetadata() {
+      if (metadataBuilder_ == null) {
+        metadata_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+      } else {
+        metadataBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public Builder removeMetadata(int index) {
+      if (metadataBuilder_ == null) {
+        ensureMetadataIsMutable();
+        metadata_.remove(index);
+        onChanged();
+      } else {
+        metadataBuilder_.remove(index);
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public io.opentelemetry.proto.common.v1.KeyValue.Builder getMetadataBuilder(
+        int index) {
+      return getMetadataFieldBuilder().getBuilder(index);
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public io.opentelemetry.proto.common.v1.KeyValueOrBuilder getMetadataOrBuilder(
+        int index) {
+      if (metadataBuilder_ == null) {
+        return metadata_.get(index);  } else {
+        return metadataBuilder_.getMessageOrBuilder(index);
+      }
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public java.util.List<? extends io.opentelemetry.proto.common.v1.KeyValueOrBuilder> 
+         getMetadataOrBuilderList() {
+      if (metadataBuilder_ != null) {
+        return metadataBuilder_.getMessageOrBuilderList();
+      } else {
+        return java.util.Collections.unmodifiableList(metadata_);
+      }
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public io.opentelemetry.proto.common.v1.KeyValue.Builder addMetadataBuilder() {
+      return getMetadataFieldBuilder().addBuilder(
+          io.opentelemetry.proto.common.v1.KeyValue.getDefaultInstance());
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public io.opentelemetry.proto.common.v1.KeyValue.Builder addMetadataBuilder(
+        int index) {
+      return getMetadataFieldBuilder().addBuilder(
+          index, io.opentelemetry.proto.common.v1.KeyValue.getDefaultInstance());
+    }
+    /**
+     * <pre>
+     * Additional metadata attributes that describe the metric. [Optional].
+     * Attributes are non-identifying.
+     * Consumers SHOULD NOT need to be aware of these attributes.
+     * These attributes MAY be used to encode information allowing
+     * for lossless roundtrip translation to / from another data model.
+     * Attribute keys MUST be unique (it is not allowed to have more than one
+     * attribute with the same key).
+     * </pre>
+     *
+     * <code>repeated .opentelemetry.proto.common.v1.KeyValue metadata = 12;</code>
+     */
+    public java.util.List<io.opentelemetry.proto.common.v1.KeyValue.Builder> 
+         getMetadataBuilderList() {
+      return getMetadataFieldBuilder().getBuilderList();
+    }
+    private com.google.protobuf.RepeatedFieldBuilderV3<
+        io.opentelemetry.proto.common.v1.KeyValue, io.opentelemetry.proto.common.v1.KeyValue.Builder, io.opentelemetry.proto.common.v1.KeyValueOrBuilder> 
+        getMetadataFieldBuilder() {
+      if (metadataBuilder_ == null) {
+        metadataBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+            io.opentelemetry.proto.common.v1.KeyValue, io.opentelemetry.proto.common.v1.KeyValue.Builder, io.opentelemetry.proto.common.v1.KeyValueOrBuilder>(
+                metadata_,
+                ((bitField0_ & 0x00000001) != 0),
+                getParentForChildren(),
+                isClean());
+        metadata_ = null;
+      }
+      return metadataBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

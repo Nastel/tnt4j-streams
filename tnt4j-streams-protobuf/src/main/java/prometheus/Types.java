@@ -21,7 +21,7 @@ public final class Types {
     /**
      * <pre>
      * Represents the metric type, these match the set from Prometheus.
-     * Refer to model/textparse/interface.go for details.
+     * Refer to github.com/prometheus/common/model/metadata.go for details.
      * </pre>
      *
      * <code>.prometheus.MetricMetadata.MetricType type = 1;</code>
@@ -31,7 +31,7 @@ public final class Types {
     /**
      * <pre>
      * Represents the metric type, these match the set from Prometheus.
-     * Refer to model/textparse/interface.go for details.
+     * Refer to github.com/prometheus/common/model/metadata.go for details.
      * </pre>
      *
      * <code>.prometheus.MetricMetadata.MetricType type = 1;</code>
@@ -349,7 +349,7 @@ public final class Types {
     /**
      * <pre>
      * Represents the metric type, these match the set from Prometheus.
-     * Refer to model/textparse/interface.go for details.
+     * Refer to github.com/prometheus/common/model/metadata.go for details.
      * </pre>
      *
      * <code>.prometheus.MetricMetadata.MetricType type = 1;</code>
@@ -361,7 +361,7 @@ public final class Types {
     /**
      * <pre>
      * Represents the metric type, these match the set from Prometheus.
-     * Refer to model/textparse/interface.go for details.
+     * Refer to github.com/prometheus/common/model/metadata.go for details.
      * </pre>
      *
      * <code>.prometheus.MetricMetadata.MetricType type = 1;</code>
@@ -843,7 +843,7 @@ public final class Types {
       /**
        * <pre>
        * Represents the metric type, these match the set from Prometheus.
-       * Refer to model/textparse/interface.go for details.
+       * Refer to github.com/prometheus/common/model/metadata.go for details.
        * </pre>
        *
        * <code>.prometheus.MetricMetadata.MetricType type = 1;</code>
@@ -855,7 +855,7 @@ public final class Types {
       /**
        * <pre>
        * Represents the metric type, these match the set from Prometheus.
-       * Refer to model/textparse/interface.go for details.
+       * Refer to github.com/prometheus/common/model/metadata.go for details.
        * </pre>
        *
        * <code>.prometheus.MetricMetadata.MetricType type = 1;</code>
@@ -871,7 +871,7 @@ public final class Types {
       /**
        * <pre>
        * Represents the metric type, these match the set from Prometheus.
-       * Refer to model/textparse/interface.go for details.
+       * Refer to github.com/prometheus/common/model/metadata.go for details.
        * </pre>
        *
        * <code>.prometheus.MetricMetadata.MetricType type = 1;</code>
@@ -886,7 +886,7 @@ public final class Types {
       /**
        * <pre>
        * Represents the metric type, these match the set from Prometheus.
-       * Refer to model/textparse/interface.go for details.
+       * Refer to github.com/prometheus/common/model/metadata.go for details.
        * </pre>
        *
        * <code>.prometheus.MetricMetadata.MetricType type = 1;</code>
@@ -905,7 +905,7 @@ public final class Types {
       /**
        * <pre>
        * Represents the metric type, these match the set from Prometheus.
-       * Refer to model/textparse/interface.go for details.
+       * Refer to github.com/prometheus/common/model/metadata.go for details.
        * </pre>
        *
        * <code>.prometheus.MetricMetadata.MetricType type = 1;</code>

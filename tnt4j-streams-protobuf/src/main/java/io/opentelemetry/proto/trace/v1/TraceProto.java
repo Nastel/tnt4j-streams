@@ -102,12 +102,14 @@ public final class TraceProto {
       " \001(\0162/.opentelemetry.proto.trace.v1.Stat" +
       "us.StatusCode\"N\n\nStatusCode\022\025\n\021STATUS_CO" +
       "DE_UNSET\020\000\022\022\n\016STATUS_CODE_OK\020\001\022\025\n\021STATUS" +
-      "_CODE_ERROR\020\002J\004\010\001\020\002*H\n\tSpanFlags\022\031\n\025SPAN" +
-      "_FLAGS_DO_NOT_USE\020\000\022 \n\033SPAN_FLAGS_TRACE_" +
-      "FLAGS_MASK\020\377\001Bw\n\037io.opentelemetry.proto." +
-      "trace.v1B\nTraceProtoP\001Z\'go.opentelemetry" +
-      ".io/proto/otlp/trace/v1\252\002\034OpenTelemetry." +
-      "Proto.Trace.V1b\006proto3"
+      "_CODE_ERROR\020\002J\004\010\001\020\002*\234\001\n\tSpanFlags\022\031\n\025SPA" +
+      "N_FLAGS_DO_NOT_USE\020\000\022 \n\033SPAN_FLAGS_TRACE" +
+      "_FLAGS_MASK\020\377\001\022*\n%SPAN_FLAGS_CONTEXT_HAS" +
+      "_IS_REMOTE_MASK\020\200\002\022&\n!SPAN_FLAGS_CONTEXT" +
+      "_IS_REMOTE_MASK\020\200\004Bw\n\037io.opentelemetry.p" +
+      "roto.trace.v1B\nTraceProtoP\001Z\'go.opentele" +
+      "metry.io/proto/otlp/trace/v1\252\002\034OpenTelem" +
+      "etry.Proto.Trace.V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

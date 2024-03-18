@@ -39,6 +39,20 @@ public enum SpanFlags
    * <code>SPAN_FLAGS_TRACE_FLAGS_MASK = 255;</code>
    */
   SPAN_FLAGS_TRACE_FLAGS_MASK(255),
+  /**
+   * <pre>
+   * Bits 8 and 9 are used to indicate that the parent span or link span is remote.
+   * Bit 8 (`HAS_IS_REMOTE`) indicates whether the value is known.
+   * Bit 9 (`IS_REMOTE`) indicates whether the span or link is remote.
+   * </pre>
+   *
+   * <code>SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK = 256;</code>
+   */
+  SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK(256),
+  /**
+   * <code>SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK = 512;</code>
+   */
+  SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK(512),
   UNRECOGNIZED(-1),
   ;
 
@@ -59,6 +73,20 @@ public enum SpanFlags
    * <code>SPAN_FLAGS_TRACE_FLAGS_MASK = 255;</code>
    */
   public static final int SPAN_FLAGS_TRACE_FLAGS_MASK_VALUE = 255;
+  /**
+   * <pre>
+   * Bits 8 and 9 are used to indicate that the parent span or link span is remote.
+   * Bit 8 (`HAS_IS_REMOTE`) indicates whether the value is known.
+   * Bit 9 (`IS_REMOTE`) indicates whether the span or link is remote.
+   * </pre>
+   *
+   * <code>SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK = 256;</code>
+   */
+  public static final int SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK_VALUE = 256;
+  /**
+   * <code>SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK = 512;</code>
+   */
+  public static final int SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK_VALUE = 512;
 
 
   public final int getNumber() {
@@ -87,6 +115,8 @@ public enum SpanFlags
     switch (value) {
       case 0: return SPAN_FLAGS_DO_NOT_USE;
       case 255: return SPAN_FLAGS_TRACE_FLAGS_MASK;
+      case 256: return SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK;
+      case 512: return SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK;
       default: return null;
     }
   }
