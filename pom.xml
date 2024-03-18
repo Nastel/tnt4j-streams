@@ -6,7 +6,7 @@
 
     <groupId>com.jkoolcloud.tnt4j.streams</groupId>
     <artifactId>tnt4j-streams</artifactId>
-    <version>2.1.0</version>
+    <version>2.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>tnt4j-streams</name>
