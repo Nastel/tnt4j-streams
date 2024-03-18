@@ -238,11 +238,11 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 	protected void initialize() throws Exception {
 		boolean useExecService = (boolean) getProperty(StreamProperties.PROP_USE_EXECUTOR_SERVICE);
 		int threadCount = (int) getProperty(StreamProperties.PROP_EXECUTOR_THREADS_QTY);
-		int queueDepth = (int) getProperty(StreamProperties.PROP_EXECUTOR_QUEUE_DEPTH);
-		if (useExecService && (queueDepth == -1 || queueDepth > threadCount)) {
+		if (useExecService && threadCount > 1) {
 			logger().log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"FeedInputStream.resetting.thread.count.property", threadCount);
-			setProperty(StreamProperties.PROP_EXECUTOR_QUEUE_DEPTH, String.valueOf(threadCount));
+					"FeedInputStream.resetting.thread.count.property", 1);
+			setProperty(StreamProperties.PROP_EXECUTOR_THREADS_QTY, String.valueOf(1));
+			setProperty(StreamProperties.PROP_EXECUTOR_QUEUE_DEPTH, String.valueOf(1));
 		}
 
 		super.initialize();
@@ -311,7 +311,7 @@ public abstract class FeedInputStream<R extends Closeable, T> extends TNTParseab
 					return null;
 				}
 			}
-			if (dataFeed.isTerminated()) {
+			if (dataFeed.isInvalid()) {
 				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"FeedInputStream.reader.terminated");
 				if (feedInput.canContinue()) {

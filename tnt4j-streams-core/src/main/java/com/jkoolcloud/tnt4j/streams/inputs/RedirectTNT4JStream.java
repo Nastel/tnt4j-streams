@@ -536,7 +536,7 @@ public class RedirectTNT4JStream extends TNTInputStream<String, String> {
 
 		@Override
 		public void run() {
-			while (!isStopRunning() && !dataReader.isTerminated()) {
+			while (!isStopRunning() && !dataReader.isInvalid()) {
 				try {
 					String line = dataReader.getInput().readLine();
 
