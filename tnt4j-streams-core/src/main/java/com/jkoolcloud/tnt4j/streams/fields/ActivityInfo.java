@@ -1141,6 +1141,7 @@ public class ActivityInfo {
 	 * @see #merge(ActivityInfo)
 	 */
 	public void buildSplitRelatives(Tracker tracker, Map<Trackable, ActivityInfo> childMap) {
+		Map<String, ActivityInfo> duplicatesMap = new HashMap<>();
 		List<ActivityInfo> childList = getFinalChildren();
 		for (ActivityInfo child : childList) {
 			if (!child.isDeliverable()) {
@@ -1151,7 +1152,7 @@ public class ActivityInfo {
 
 			child.determineTrackingId(childList.size() > 1 ? null : this.trackingId);
 			child.mergeAllParents();
-			verifyDuplicates(child, childMap);
+			verifyDuplicates(child, duplicatesMap);
 			Trackable trackable = child.buildTrackable(tracker);
 			if (childMap != null) {
 				childMap.put(trackable, child);
@@ -1159,30 +1160,18 @@ public class ActivityInfo {
 		}
 
 		if (childMap != null && childMap.isEmpty()) {
-			verifyDuplicates(this, childMap);
+			verifyDuplicates(this, duplicatesMap);
 			Trackable trackable = buildTrackable(tracker);
 			childMap.put(trackable, this);
 		}
 	}
 
-	private void verifyDuplicates(ActivityInfo child, Map<Trackable, ActivityInfo> childMap) {
-		Map.Entry<Trackable, ActivityInfo> dCh = getDuplicate(child, childMap);
+	private void verifyDuplicates(ActivityInfo child, Map<String, ActivityInfo> dupsMap) {
+		ActivityInfo dCh = dupsMap.put(child.determineTrackingId(), child);
 		if (dCh != null) {
 			LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ActivityInfo.duplicate.child", child.trackingId, child, dCh.getValue());
+					"ActivityInfo.duplicate.child", child.trackingId, child, dCh);
 		}
-	}
-
-	private Map.Entry<Trackable, ActivityInfo> getDuplicate(ActivityInfo child, Map<Trackable, ActivityInfo> childMap) {
-		if (childMap != null) {
-			for (Map.Entry<Trackable, ActivityInfo> chT : childMap.entrySet()) {
-				if (chT.getKey().getTrackingId().equals(child.determineTrackingId())) {
-					return chT;
-				}
-			}
-		}
-
-		return null;
 	}
 
 	private static boolean addTrackableChild(Trackable parent, Trackable child) {
