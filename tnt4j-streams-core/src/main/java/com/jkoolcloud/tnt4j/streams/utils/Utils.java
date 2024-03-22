@@ -94,8 +94,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	private static final String VAR_EXP_END_TOKEN = "}"; // NON-NLS
 	private static final Pattern CFG_VAR_PATTERN = Pattern.compile("\\$\\{[\\w\\^\\[\\]=:.\\-+*/]+\\}"); // NON-NLS
 	private static final Pattern EXPR_VAR_PATTERN = CFG_VAR_PATTERN;
-	private static final int STACK_TRACE_ENTRIES_TO_LOG = Utils.getInt(
-			"com.jkoolcloud.tnt4j.streams.log.stack.trace.depth", // NON-NLS
+	private static final int STACK_TRACE_ENTRIES_TO_LOG = getInt("com.jkoolcloud.tnt4j.streams.log.stack.trace.depth", // NON-NLS
 			System.getProperties(), -1);
 
 	/**
@@ -2670,7 +2669,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 */
 	public static boolean isNullValue(Object obj) {
 		if (obj != null) {
-			Object[] va = Utils.makeArray(obj);
+			Object[] va = makeArray(obj);
 
 			for (Object ve : va) {
 				if (ve != null) {
@@ -3360,7 +3359,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 			String fValue = propertyValue;
 			if (CollectionUtils.isNotEmpty(exprVars)) {
 				for (String eVar : exprVars) {
-					String varName = Utils.getVarName(eVar);
+					String varName = getVarName(eVar);
 					String val = null;
 					if (varName.startsWith(StreamsConstants.VAR_SCOPE_SYSTEM)) {
 						val = System.getProperty(varName.substring(StreamsConstants.VAR_SCOPE_SYSTEM.length()));
