@@ -549,7 +549,7 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	}
 
 	/**
-	 * Transforms (serializes) XML DOM document to string.
+	 * Transforms (serializes) XML DOM document to string with indentation enabled.
 	 *
 	 * @param doc
 	 *            document to transform to string
@@ -558,14 +558,31 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *             If an exception occurs while transforming XML DOM document to string
 	 */
 	public static String documentToString(Node doc) throws TransformerException {
+		return documentToString(doc, true);
+	}
+
+	/**
+	 * Transforms (serializes) XML DOM document to string.
+	 *
+	 * @param doc
+	 *            document to transform to string
+	 * @param indent
+	 *            flag specifies whether to add additional whitespace when outputting the result string
+	 * @return XML string representation of document
+	 * @throws javax.xml.transform.TransformerException
+	 *             If an exception occurs while transforming XML DOM document to string
+	 */
+	public static String documentToString(Node doc, boolean indent) throws TransformerException {
 		StringWriter sw = new StringWriter();
-		TransformerFactory tf = TransformerFactory.newInstance();
+		TransformerFactory tf = TransformerFactory.newDefaultInstance();
 		Transformer transformer = tf.newTransformer();
 		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no"); // NON-NLS
 		transformer.setOutputProperty(OutputKeys.METHOD, "xml"); // NON-NLS
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes"); // NON-NLS
+		transformer.setOutputProperty(OutputKeys.INDENT, indent ? "yes" : "no"); // NON-NLS
 		transformer.setOutputProperty(OutputKeys.ENCODING, UTF8);
 		transformer.setOutputProperty(OutputKeys.VERSION, "1.1"); // NON-NLS
+		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2"); // NON-NLS
+		transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\n"); // NON-NLS
 		// transformer.setOutputProperty(OutputKeys.STANDALONE, "yes"); // NON-NLS
 
 		transformer.transform(new DOMSource(doc), new StreamResult(sw));
@@ -1890,7 +1907,6 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 	 *            type of array elements
 	 * @return new array instance without {@code null} elements
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T[] tidy(T[] array) {
 		if (array == null) {
 			return null;
