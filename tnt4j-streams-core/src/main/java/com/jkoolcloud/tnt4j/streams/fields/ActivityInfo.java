@@ -420,13 +420,15 @@ public class ActivityInfo {
 
 		ActivityFieldLocator fmLocator = field.getMasterLocator();
 		String tz = fmLocator == null ? null : fmLocator.getTimeZone();
-		try {
-			TimeUnit units = ActivityFieldLocator.getLocatorUnits(fmLocator, TimeUnit.MILLISECONDS);
-			timestamp = TimestampFormatter.parse(units, fieldValue, tz);
-			if (timestamp != null) {
-				return timestamp;
+		if (!Utils.isObjArray(fieldValue)) {
+			try {
+				TimeUnit units = ActivityFieldLocator.getLocatorUnits(fmLocator, TimeUnit.MILLISECONDS);
+				timestamp = TimestampFormatter.parse(units, fieldValue, tz);
+				if (timestamp != null) {
+					return timestamp;
+				}
+			} catch (ParseException exc) {
 			}
-		} catch (ParseException exc) {
 		}
 
 		return TimestampFormatter.parse(fmLocator == null ? null : fmLocator.getFormat(),

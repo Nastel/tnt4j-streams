@@ -34,7 +34,6 @@ import javax.xml.xpath.*;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.*;
 import org.xml.sax.EntityResolver;
@@ -295,49 +294,19 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 
 	@Override
 	protected void parseFields(ActivityContext cData) throws Exception {
-		String[] savedFormats = null;
-		String[] savedUnits = null;
-		String[] savedLocales = null;
-		// apply fields for parser
-		Object[] values;
+		Object value;
 		for (ActivityField aField : fieldList) {
-			values = null;
 			cData.setField(aField);
-			List<ActivityFieldLocator> locators = aField.getLocators();
-			if (locators != null) {
-				// need to save format and units specification from config
-				// in case individual entry in activity data overrides it
-				if (ArrayUtils.getLength(savedFormats) < locators.size()) {
-					savedFormats = new String[locators.size()];
-					savedUnits = new String[locators.size()];
-					savedLocales = new String[locators.size()];
-				}
+			value = parseLocatorValues(aField.getLocators(), cData);
+			value = Utils.simplifyValue(value);
 
-				values = parseLocatorValues(locators, cData);
-				for (int li = 0; li < locators.size(); li++) {
-					ActivityFieldLocator loc = locators.get(li);
-					savedFormats[li] = loc.getFormat();
-					savedUnits[li] = loc.getUnits();
-					savedLocales[li] = loc.getLocale();
-				}
-			}
-
-			Object val = Utils.simplifyValue(values);
-
-			// if (val != null && aField.isEmptyAsNull() && Utils.isEmptyContent(val, true)) {
+			// if (value != null && aField.isEmptyAsNull() && Utils.isEmptyContent(value, true)) {
 			// logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-			// "ActivityParser.field.empty.as.null", aField, toString(val));
-			// val = null;
+			// "ActivityParser.field.empty.as.null", aField, toString(value));
+			// value = null;
 			// }
 
-			applyFieldValue(aField, val, cData);
-			if (locators != null && savedFormats != null) {
-				for (int li = 0; li < locators.size(); li++) {
-					ActivityFieldLocator loc = locators.get(li);
-					loc.setFormat(savedFormats[li], savedLocales[li]);
-					loc.setUnits(savedUnits[li]);
-				}
-			}
+			applyFieldValue(aField, value, cData);
 		}
 	}
 
@@ -566,7 +535,7 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 				attr = attrsMap.getNamedItem(LOCALE_ATTR);
 				String attrLVal = attr == null ? null : attr.getTextContent();
 
-				locCopy.setFormat(attrVal, StringUtils.isEmpty(attrLVal) ? locator.getLocale() : attrLVal);
+				locCopy.setFormat(attrVal, StringUtils.isEmpty(attrLVal) ? locCopy.getLocale() : attrLVal);
 			}
 
 			attr = getFormattingAttr(attrsMap, UNITS_ATTR);

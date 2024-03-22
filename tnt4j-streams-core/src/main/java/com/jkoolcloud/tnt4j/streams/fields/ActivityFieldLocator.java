@@ -416,9 +416,9 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 		this.locale = locale;
 
 		try {
-			this.builtInFormat = ActivityFieldFormatType.valueOf(this.format);
+			builtInFormat = format == null ? null : ActivityFieldFormatType.valueOf(format);
 		} catch (Throwable e) {
-			this.builtInFormat = null;
+			builtInFormat = null;
 		}
 	}
 
