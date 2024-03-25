@@ -275,9 +275,9 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 
 		StreamsXMLUtils.resolveDocumentNamespaces(xmlDoc, namespaces, true);
 
-		if (xmlString == null) {
+		if (xmlString == null && serializeRAWDataToString) {
 			try {
-				xmlString = Utils.documentToString(xmlDoc);
+				xmlString = Utils.documentToString(xmlDoc, false);
 			} catch (Exception exc) {
 				Utils.logThrowable(logger(), OpLevel.WARNING,
 						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
@@ -535,7 +535,7 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 				attr = attrsMap.getNamedItem(LOCALE_ATTR);
 				String attrLVal = attr == null ? null : attr.getTextContent();
 
-				locCopy.setFormat(attrVal, StringUtils.isEmpty(attrLVal) ? locCopy.getLocale() : attrLVal);
+				locCopy.setFormat(attrVal, StringUtils.isEmpty(attrLVal) ? locator.getLocale() : attrLVal);
 			}
 
 			attr = getFormattingAttr(attrsMap, UNITS_ATTR);

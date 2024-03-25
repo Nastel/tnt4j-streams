@@ -683,6 +683,32 @@ public class ActivityField extends AbstractFieldEntity {
 	}
 
 	/**
+	 * Checks if this field uses provided {@code locator} string among defined locators, dynamic locators or group
+	 * locator.
+	 * 
+	 * @param locator
+	 *            locator string to check
+	 * @return {@code true} if field uses defined locator string, {@code false} - otherwise
+	 */
+	public boolean hasLocator(String locator) {
+		return hasLocator(locator, locators) //
+				|| (isDynamic() && hasLocator(locator, dynamicLocators.values())) //
+				|| (groupLocator != null && StringUtils.equals(groupLocator.getLocator(), locator));
+	}
+
+	private static boolean hasLocator(String locator, Collection<ActivityFieldLocator> locators) {
+		if (locators != null) {
+			for (ActivityFieldLocator loc : locators) {
+				if (StringUtils.equals(loc.getLocator(), locator)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Creates temporary field taking this field as template and filling dynamic attributes values with ones from
 	 * dynamic locators resolved values map.
 	 *

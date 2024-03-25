@@ -126,6 +126,11 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	protected String compositeDelim = StreamsConstants.MAP_PROP_NAME_TOKENS_DELIM;
 
 	/**
+	 * Flag indicating whether RAW activity data shall be serialized as String.
+	 */
+	protected boolean serializeRAWDataToString = true;
+
+	/**
 	 * Property indicating that all attributes are required by default.
 	 */
 	protected boolean requireAll = false;
@@ -378,6 +383,12 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityParser.fields.auto.order", fieldList.toString());
 		}
+
+		serializeRAWDataToString = doSerializeRAWDataToString();
+	}
+
+	private boolean doSerializeRAWDataToString() {
+		return useActivityAsMessage || hasLocator(LOC_FOR_COMPLETE_ACTIVITY_RAW_DATA);
 	}
 
 	/**
@@ -622,8 +633,6 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 * @param rdr
 	 *            reader to use for reading
 	 * @return non-empty RAW activity data text string, or {@code null} if the end of the stream has been reached
-	 * 
-	 * @see #doIncludeDelimiter()
 	 */
 	protected String readNextActivity(BufferedReader rdr) {
 		String str = null;
@@ -1508,9 +1517,39 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		return data;
 	}
 
+	/**
+	 * Checks if provided activity data {@code logicalType} is supported by this parser.
+	 * <p>
+	 * Usually this check is needed for pre-parser produced activity data compatibility validation.
+	 *
+	 * @param logicalType
+	 *            activity data logical type name
+	 * @return {@code true} if this parser supports provided logical activity data type, {@code false} - otherwise
+	 */
 	protected boolean isLogicalTypeSupported(String logicalType) {
 		return StringUtils.equalsAny(logicalType, null, "OBJECT", "BINARY", "TEXT") // NON-NLS
 				|| ArrayUtils.contains(getActivityDataType(), logicalType);
+	}
+
+	/**
+	 * Checks if any of this parser fields uses provided {@code locator} string.
+	 *
+	 * @param locator
+	 *            locator string to check
+	 * @return {@code true} if any of this parser fields uses provided locator string, {@code false} - otherwise
+	 * 
+	 * @see ActivityField#hasLocator(String)
+	 */
+	protected boolean hasLocator(String locator) {
+		if (fieldList != null) {
+			for (ActivityField field : fieldList) {
+				if (field.hasLocator(locator)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
