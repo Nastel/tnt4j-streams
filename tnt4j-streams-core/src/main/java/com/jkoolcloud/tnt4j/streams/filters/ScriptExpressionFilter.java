@@ -44,7 +44,7 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils;
  * 
  * @version $Revision: 1 $
  * 
- * @see com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils#compileScript(String, String)
+ * @see com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils#compileScript(String, String, String)
  * @see javax.script.CompiledScript#eval(javax.script.Bindings)
  */
 public class ScriptExpressionFilter extends AbstractExpressionFilter<Object> {
@@ -101,7 +101,7 @@ public class ScriptExpressionFilter extends AbstractExpressionFilter<Object> {
 		super.initFilter();
 
 		try {
-			script = StreamsScriptingUtils.compileScript(lang, getExpression());
+			script = StreamsScriptingUtils.compileScript(lang, null, getExpression());
 		} catch (ScriptException exc) {
 			throw new IllegalArgumentException(
 					StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,

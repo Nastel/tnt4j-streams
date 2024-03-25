@@ -1392,7 +1392,7 @@ public class ConfigParserHandler extends DefaultHandler {
 		}
 
 		if (StringUtils.isEmpty(currTransform.name)) {
-			currTransform.name = currField.field.getFieldTypeName() + "Transform";// NON-NLS
+			currTransform.name = currField.field.getFieldTypeName() + "TransformScript";// NON-NLS
 		}
 
 		if (StringUtils.isNoneEmpty(currTransform.beanRef, currTransform.scriptLang)) {

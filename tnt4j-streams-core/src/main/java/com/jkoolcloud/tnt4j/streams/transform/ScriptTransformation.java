@@ -43,7 +43,7 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils;
  * 
  * @version $Revision: 1 $
  *
- * @see com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils#compileScript(String, String)
+ * @see com.jkoolcloud.tnt4j.streams.utils.StreamsScriptingUtils#compileScript(String, String, String)
  * @see javax.script.CompiledScript#eval(javax.script.Bindings)
  */
 public class ScriptTransformation extends AbstractScriptTransformation<Object> {
@@ -103,7 +103,7 @@ public class ScriptTransformation extends AbstractScriptTransformation<Object> {
 		super.initTransformation();
 
 		try {
-			script = StreamsScriptingUtils.compileScript(lang, getExpression());
+			script = StreamsScriptingUtils.compileScript(lang, getName(), getExpression());
 		} catch (ScriptException exc) {
 			throw new IllegalArgumentException(
 					StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,

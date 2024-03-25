@@ -352,6 +352,8 @@ public final class StreamsScriptingUtils {
 	/**
 	 * Compiles Groovy script code to be ready for later execution.
 	 *
+	 * @param name
+	 *            script name
 	 * @param scriptCode
 	 *            Groovy script code string
 	 * @return compiled instance of Groovy script code
@@ -362,11 +364,12 @@ public final class StreamsScriptingUtils {
 	 * @see javax.script.ScriptEngineManager#getEngineByName(String)
 	 * @see javax.script.Compilable#compile(String)
 	 */
-	public static CompiledScript compileGroovyScript(String scriptCode) throws ScriptException {
+	public static CompiledScript compileGroovyScript(String name, String scriptCode) throws ScriptException {
 		if (GROOVY_SCRIPT_ENGINE == null) {
 			GROOVY_SCRIPT_ENGINE = initGroovyScriptEngine();
 		}
 
+		GROOVY_SCRIPT_ENGINE.getContext().setAttribute(ScriptEngine.FILENAME, name, ScriptContext.ENGINE_SCOPE);
 		return ((Compilable) GROOVY_SCRIPT_ENGINE).compile(scriptCode);
 	}
 
@@ -382,6 +385,8 @@ public final class StreamsScriptingUtils {
 	/**
 	 * Compiles JavaScript script code to be ready for later execution.
 	 *
+	 * @param name
+	 *            script name
 	 * @param scriptCode
 	 *            JavaScript script code string
 	 * @return compiled instance of JavaScript script code
@@ -392,11 +397,12 @@ public final class StreamsScriptingUtils {
 	 * @see javax.script.ScriptEngineManager#getEngineByName(String)
 	 * @see javax.script.Compilable#compile(String)
 	 */
-	public static CompiledScript compileJSScript(String scriptCode) throws ScriptException {
+	public static CompiledScript compileJSScript(String name, String scriptCode) throws ScriptException {
 		if (JS_SCRIPT_ENGINE == null) {
 			JS_SCRIPT_ENGINE = initJSScriptEngine();
 		}
 
+		JS_SCRIPT_ENGINE.getContext().setAttribute(ScriptEngine.FILENAME, name, ScriptContext.ENGINE_SCOPE);
 		return ((Compilable) JS_SCRIPT_ENGINE).compile(addDefaultJSScriptImports(scriptCode));
 	}
 
@@ -412,6 +418,8 @@ public final class StreamsScriptingUtils {
 	 * 
 	 * @param lang
 	 *            script code language
+	 * @param name
+	 *            script name
 	 * @param scriptCode
 	 *            script code string to compile
 	 * @return compiled instance of script code
@@ -419,15 +427,15 @@ public final class StreamsScriptingUtils {
 	 * @throws ScriptException
 	 *             if compilation fails or script language is not supported
 	 * 
-	 * @see #compileGroovyScript(String)
-	 * @see #compileJSScript(String)
+	 * @see #compileGroovyScript(String, String)
+	 * @see #compileJSScript(String, String)
 	 */
-	public static CompiledScript compileScript(String lang, String scriptCode) throws ScriptException {
+	public static CompiledScript compileScript(String lang, String name, String scriptCode) throws ScriptException {
 		switch (lang.toLowerCase()) {
 		case GROOVY_LANG:
-			return compileGroovyScript(scriptCode);
+			return compileGroovyScript(name, scriptCode);
 		case JAVA_SCRIPT_LANG:
-			return compileJSScript(scriptCode);
+			return compileJSScript(name, scriptCode);
 		default:
 			throw new ScriptException("Unknown script language"); // NON-NLS
 		}

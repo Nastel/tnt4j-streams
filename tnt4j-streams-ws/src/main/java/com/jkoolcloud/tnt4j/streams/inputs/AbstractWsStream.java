@@ -775,7 +775,7 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 							WsStreamConstants.RESOURCE_BUNDLE_NAME, "AbstractWsStream.expr.compose.failed", scriptStr));
 				}
 
-				compiledScript = StreamsScriptingUtils.compileGroovyScript(script);
+				compiledScript = StreamsScriptingUtils.compileGroovyScript(null, script);
 				scriptsCache.put(scriptStr, compiledScript);
 			}
 
