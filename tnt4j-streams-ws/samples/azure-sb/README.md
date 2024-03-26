@@ -1,21 +1,21 @@
 
-# Azure ESB metrics streaming over TNT4J
+# Azure SB metrics streaming over TNT4J
 
-## Setup Azure ESB monitoring application service principal
+## Setup Azure SB monitoring application service principal
 
 * Create a service principal and assign Reader role for the sp. (I use Azure CLI to do that)
   ```bash
   az login
   az account set --subscription "<your subscription id>"
-  # ESB resource group format is: /subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP_NAME>
-  #                         like: /subscriptions/c3xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxf8/resourceGroups/AndriusESB-RG
-  az ad sp create-for-rbac -n "readESBMetric" --role Reader --scope "<list of ESB bound resource groups to read metrics>" 
+  # SB resource group format is: /subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP_NAME>
+  #                        like: /subscriptions/c3xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxf8/resourceGroups/AndriusSB-RG
+  az ad sp create-for-rbac -n "readSBMetric" --role Reader --scope "<list of SB bound resource groups to read metrics>" 
   ```
   Last command shall produce output like this:
   ```json
   {
     "appId": "ec599183-xxxx-xxxx-xxxx-xxxxxxxxxc8f",
-    "displayName": "readESBMetric",
+    "displayName": "readSBMetric",
     "password": "FGixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxubwF",
     "tenant": "5029a0f1-xxxx-xxxx-xxxx-xxxxxxxxxx78"
   }
@@ -41,25 +41,25 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
     <property name="event.sink.factory.EventSinkFactory.ap.Host" value="<AP_CEP_IP/HOST>"/>
     <property name="event.sink.factory.EventSinkFactory.ap.Port" value="6060"/>
     ```
-* Configure your Azure ESB namespace access: 
+* Configure your Azure SB namespace access: 
   * Set your REST API access service principle credentials (ones provided by `az ad sp create-for-rbac`):
     ```xml
     <property name="AzureTenant" value="5029a0f1-xxxx-xxxx-xxxx-xxxxxxxxxx78"/>
     <property name="AzureAppId" value="ec599183-xxxx-xxxx-xxxx-xxxxxxxxxc8f"/>
     <property name="AzureSecret" value="FGixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxubwF"/>
     ```
-  * Set your ESB cluster info to collect metrics:
+  * Set your SB cluster info to collect metrics:
     ```xml
     <property name="AzureSubscriptionId" value="c3cbb071-xxxx-xxxx-xxxx-xxxxxxxxxxf8"/>
-    <property name="AzureResourceGroup" value="AndriusESB-RG"/>
-    <property name="AzureESBNamespace" value="meshiq"/>
+    <property name="AzureResourceGroup" value="AndriusSB-RG"/>
+    <property name="AzureSBNamespace" value="meshiq"/>
     ```
   * Set metrics collection request interval (default is `5 minutes`) by changing configuration entries below accordingly:
     ```xml 
     <!-- The interval (i.e. timegrain) of the query. Values may be: PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H, P1D -->
     <property name="AzureMetricsInterval" value="PT5M"/>
     ...
-    <!-- The interval of REST API calls to collect ESB metrics -->
+    <!-- The interval of REST API calls to collect SB metrics -->
     <schedule-simple interval="5" units="Minutes" startDelay="10" startDelayUnits="Seconds" repeatCount="-1"/>
     ...
     <!-- Sets metrics timespan start date and time: groovy expression to calculate timestamp for 5 minutes back from now -->

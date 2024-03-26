@@ -21,7 +21,7 @@
 
     <resource-ref id="AzureMetricsParsers" type="Parser" uri="parsers.xml"/>
 
-    <stream name="AzureESBMonitoringStream" class="com.jkoolcloud.tnt4j.streams.inputs.RestStream">
+    <stream name="AzureSBMonitoringStream" class="com.jkoolcloud.tnt4j.streams.inputs.RestStream">
         <property name="HaltIfNoParser" value="false"/>
         <property name="SplitRelatives" value="true"/>
         <property name="SendStreamStates" value="false"/>
@@ -90,7 +90,7 @@
             <property name="event.sink.factory.RateTimeout" value="-1"/>
         </tnt4j-properties>
 
-        <scenario name="Azure ESB monitoring">
+        <scenario name="Azure SB monitoring">
             <property name="AzureTenant" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
             <property name="AzureAppId" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
             <property name="AzureSecret" value="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"/>
@@ -121,14 +121,14 @@
                     <parser-ref name="AzureTokenParser"/>
                 </request>
             </step>
-            <step name="GetAzureESBMetrics"
+            <step name="GetAzureSBMetrics"
                   method="GET">
 
                 <property name="SynchronizeRequests" value="true"/>
 
                 <property name="AzureSubscriptionId" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
                 <property name="AzureResourceGroup" value="xxxxxxxxxxxxx"/>
-                <property name="AzureESBNamespace" value="xxxxxx"/>
+                <property name="AzureSBNamespace" value="xxxxxx"/>
                 <!-- The interval (i.e. timegrain) of the query. Values may be: PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H, P1D -->
                 <property name="AzureMetricsInterval" value="PT5M"/>
                 <property name="FilteredTopLimit" value="500"/>
@@ -137,7 +137,7 @@
                 <schedule-simple interval="5" units="Minutes" startDelay="10" startDelayUnits="Seconds" repeatCount="-1"/>
 
                 <request id="GetNamespaceMetrics"><![CDATA[
-                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureSBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
                     <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
@@ -190,11 +190,11 @@
                     <!-- The maximum number of records to retrieve. Valid only if $filter is specified. Defaults to 10. -->
                     <!--<req-param id="top" value="50"/>-->
 
-                    <parser-ref name="AzureESBMetricsParser"/>
+                    <parser-ref name="AzureSBMetricsParser"/>
                 </request>
 
                 <request id="GetEntityMetricsCount"><![CDATA[
-                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureSBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
                     <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
@@ -208,11 +208,11 @@
                     <req-param id="$filter" value="EntityName eq '*'"/>
                     <req-param id="top" value="${FilteredTopLimit}"/>
 
-                    <parser-ref name="AzureESBMetricsParser"/>
+                    <parser-ref name="AzureSBMetricsParser"/>
                 </request>
 
                 <request id="GetEntityMetricsTotal"><![CDATA[
-                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureSBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
                     <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
@@ -226,11 +226,11 @@
                     <req-param id="$filter" value="EntityName eq '*'"/>
                     <req-param id="top" value="${FilteredTopLimit}"/>
 
-                    <parser-ref name="AzureESBMetricsParser"/>
+                    <parser-ref name="AzureSBMetricsParser"/>
                 </request>
 
                 <request id="GetEntityMetricsMin"><![CDATA[
-                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureSBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
                     <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
@@ -244,11 +244,11 @@
                     <req-param id="$filter" value="EntityName eq '*'"/>
                     <req-param id="top" value="${FilteredTopLimit}"/>
 
-                    <parser-ref name="AzureESBMetricsParser"/>
+                    <parser-ref name="AzureSBMetricsParser"/>
                 </request>
 
                 <request id="GetEntityMetricsMax"><![CDATA[
-                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureSBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
                     <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
@@ -262,11 +262,11 @@
                     <req-param id="$filter" value="EntityName eq '*'"/>
                     <req-param id="top" value="${FilteredTopLimit}"/>
 
-                    <parser-ref name="AzureESBMetricsParser"/>
+                    <parser-ref name="AzureSBMetricsParser"/>
                 </request>
 
                 <request id="GetEntityMetricsAvg"><![CDATA[
-                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureSBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
                     <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
@@ -280,11 +280,11 @@
                     <req-param id="$filter" value="EntityName eq '*'"/>
                     <req-param id="top" value="${FilteredTopLimit}"/>
 
-                    <parser-ref name="AzureESBMetricsParser"/>
+                    <parser-ref name="AzureSBMetricsParser"/>
                 </request>
 
                 <request id="GetErrorSubCodeMetrics"><![CDATA[
-                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureSBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
                     <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
@@ -297,12 +297,12 @@
                     <req-param id="$filter" value="MessagingErrorSubCode eq '*'"/>
                     <req-param id="top" value="${FilteredTopLimit}"/>
 
-                    <parser-ref name="AzureESBMetricsParser"/>
+                    <parser-ref name="AzureSBMetricsParser"/>
                 </request>
 
                 <!-- Filtering by OperationResult does not work -->
                 <!--request id="GetOperationResultMetrics"><![CDATA[
-                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureSBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
                     <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
@@ -315,12 +315,12 @@
                     <req-param id="$filter" value="OperationResult eq '*'"/>
                     <req-param id="top" value="${FilteredTopLimit}"/>
 
-                    <parser-ref name="AzureESBMetricsParser"/>
+                    <parser-ref name="AzureSBMetricsParser"/>
                 </request-->
 
                 <!-- Requires Premium tier -->
                 <!--request id="GetReplicaMetrics"><![CDATA[
-                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureESBNamespace}/providers/microsoft.insights/metrics
+                    https://management.azure.com/subscriptions/${AzureSubscriptionId}/resourceGroups/${AzureResourceGroup}/providers/Microsoft.ServiceBus/namespaces/${AzureSBNamespace}/providers/microsoft.insights/metrics
                 ]]>
 
                     <req-param id="H:Authorization" value="${TokenType} ${Token}"/>
@@ -333,7 +333,7 @@
                     <req-param id="$filter" value="Replica eq '*'"/>
                     <req-param id="top" value="${FilteredTopLimit}"/>
 
-                    <parser-ref name="AzureESBMetricsParser"/>
+                    <parser-ref name="AzureSBMetricsParser"/>
                 </request-->
             </step>
         </scenario>
