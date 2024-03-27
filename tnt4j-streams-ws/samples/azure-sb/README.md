@@ -7,9 +7,9 @@
   ```bash
   az login
   az account set --subscription "<your subscription id>"
-  # SB resource group format is: /subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP_NAME>
-  #                        like: /subscriptions/c3xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxf8/resourceGroups/AndriusSB-RG
-  az ad sp create-for-rbac -n "readSBMetric" --role Reader --scope "<list of SB bound resource groups to read metrics>" 
+  # Azure SB resource group format is: /subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP_NAME>
+  #                              like: /subscriptions/c3xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxf8/resourceGroups/AndriusSB-RG
+  az ad sp create-for-rbac -n "readSBMetric" --role Reader --scope "<list of Azure SB bound resource groups to read metrics>" 
   ```
   Last command shall produce output like this:
   ```json
@@ -48,7 +48,7 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
     <property name="AzureAppId" value="ec599183-xxxx-xxxx-xxxx-xxxxxxxxxc8f"/>
     <property name="AzureSecret" value="FGixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxubwF"/>
     ```
-  * Set your SB cluster info to collect metrics:
+  * Set your Azure SB cluster info to collect metrics:
     ```xml
     <property name="AzureSubscriptionId" value="c3cbb071-xxxx-xxxx-xxxx-xxxxxxxxxxf8"/>
     <property name="AzureResourceGroup" value="AndriusSB-RG"/>
@@ -59,7 +59,7 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
     <!-- The interval (i.e. timegrain) of the query. Values may be: PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H, P1D -->
     <property name="AzureMetricsInterval" value="PT5M"/>
     ...
-    <!-- The interval of REST API calls to collect SB metrics -->
+    <!-- The interval of REST API calls to collect Azure SB metrics -->
     <schedule-simple interval="5" units="Minutes" startDelay="10" startDelayUnits="Seconds" repeatCount="-1"/>
     ...
     <!-- Sets metrics timespan start date and time: groovy expression to calculate timestamp for 5 minutes back from now -->
