@@ -303,4 +303,16 @@ public abstract class AbstractFieldEntity {
 	 * @return entity name
 	 */
 	public abstract String getName();
+
+	/**
+	 * Checks if attribute value string contains variable expression.
+	 *
+	 * @param attrValue
+	 *            attribute value
+	 *
+	 * @return {@code true} if attribute value string contains variable expression, {@code false} - otherwise
+	 */
+	public static boolean isDynamicAttr(String attrValue) {
+		return Utils.isVariableExpression(attrValue);
+	}
 }

@@ -335,7 +335,7 @@ public class ActivityXmlParser extends GenericActivityParser<Node> {
 		Object val = null;
 		String locStr = locator.getLocator();
 
-		if (ActivityField.isDynamicAttr(locStr)) {
+		if (locator.isDynamic()) {
 			ActivityInfo ai = cData.getActivity();
 			locStr = StreamsCache.fillInKeyPattern(locStr, ai, getName());
 		}

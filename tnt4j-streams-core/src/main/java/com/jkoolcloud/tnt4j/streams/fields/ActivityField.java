@@ -658,18 +658,6 @@ public class ActivityField extends AbstractFieldEntity {
 	}
 
 	/**
-	 * Checks if attribute value string contains variable expression.
-	 *
-	 * @param attrValue
-	 *            attribute value
-	 *
-	 * @return {@code true} if attribute value string contains variable expression, {@code false} - otherwise
-	 */
-	public static boolean isDynamicAttr(String attrValue) {
-		return Utils.isVariableExpression(attrValue);
-	}
-
-	/**
 	 * Checks if dynamic locators map contains entry keyed by identifier variable.
 	 *
 	 * @param dLocIdVar

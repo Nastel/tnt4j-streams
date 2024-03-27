@@ -58,6 +58,7 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	private TimeUnit builtInUnits = null;
 	private Map<Object, Object> valueMap = null;
 	private Object mapCatchAll = null;
+	private boolean dynamicLocator = false;
 
 	/**
 	 * Constructs a new activity field locator for either a built-in type or a custom type.
@@ -152,6 +153,8 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	}
 
 	private void validateLocator() {
+		dynamicLocator = isDynamicAttr(locator);
+
 		if (builtInType == null) {
 			builtInType = StringUtils.isNumeric(locator) ? ActivityFieldLocatorType.Index
 					: ActivityFieldLocatorType.Label;
@@ -182,6 +185,15 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 				}
 			}
 		}
+	}
+
+	/**
+	 * Checks if this field locator instance has dynamic locator definition.
+	 *
+	 * @return {@code true} if locator definition is dynamic, {@code false} - otherwise
+	 */
+	public boolean isDynamic() {
+		return dynamicLocator;
 	}
 
 	@Override
@@ -855,6 +867,7 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 			cafl.mapCatchAll = mapCatchAll;
 			cafl.transformations = transformations;
 			cafl.filter = filter;
+			cafl.dynamicLocator = dynamicLocator;
 
 			return cafl;
 		} catch (CloneNotSupportedException exc) {
