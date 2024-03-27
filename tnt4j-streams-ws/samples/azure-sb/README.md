@@ -1,9 +1,9 @@
 
 # Azure SB metrics streaming over TNT4J
 
-## Setup Azure SB monitoring application service principal
+## Set up Azure SB Monitoring Application Service Principal
 
-* Create a service principal and assign Reader role for the sp. (I use Azure CLI to do that)
+* Create a service principal and assign the Reader role to the service principal. This can be done using these CLI commands:
   ```bash
   az login
   az account set --subscription "<your subscription id>"
@@ -11,7 +11,7 @@
   #                              like: /subscriptions/c3xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxf8/resourceGroups/AndriusSB-RG
   az ad sp create-for-rbac -n "readSBMetric" --role Reader --scope "<list of Azure SB bound resource groups to read metrics>" 
   ```
-  Last command shall produce output like this:
+  The last command in the example above produces output like this:
   ```json
   {
     "appId": "ec599183-xxxx-xxxx-xxxx-xxxxxxxxxc8f",
@@ -21,7 +21,7 @@
   }
   ```
 
-## Setup TNT4J stream
+## Set up TNT4J stream
 
 All required configuration shall be done in [tnt-data-source.xml](tnt-data-source.xml) file.
 
@@ -42,7 +42,8 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
     <property name="event.sink.factory.EventSinkFactory.ap.Port" value="6060"/>
     ```
 * Configure your Azure SB namespace access: 
-  * Set your REST API access service principle credentials (ones provided by `az ad sp create-for-rbac`):
+  * Set your REST API access service principal credentials. (These are the credentials provided by the `az ad sp create-for-rbac` command 
+    executed above):
     ```xml
     <property name="AzureTenant" value="5029a0f1-xxxx-xxxx-xxxx-xxxxxxxxxx78"/>
     <property name="AzureAppId" value="ec599183-xxxx-xxxx-xxxx-xxxxxxxxxc8f"/>
@@ -54,9 +55,10 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
     <property name="AzureResourceGroup" value="AndriusSB-RG"/>
     <property name="AzureSBNamespace" value="meshiq"/>
     ```
-  * Set metrics collection request interval (default is `5 minutes`) by changing configuration entries below accordingly:
+  * Set the metrics collection request interval by changing the configuration entries below accordingly (the default interval is 
+    `5 minutes`): 
     ```xml 
-    <!-- The interval (i.e. timegrain) of the query. Values may be: PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H, P1D -->
+    <!-- The interval (i.e. time grain) of the query. Values may be: PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H, P1D -->
     <property name="AzureMetricsInterval" value="PT5M"/>
     ...
     <!-- The interval of REST API calls to collect Azure SB metrics -->
@@ -65,28 +67,28 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
     <!-- Sets metrics timespan start date and time: groovy expression to calculate timestamp for 5 minutes back from now -->
     <req-param id="timespanStart" value="${groovy:5.minutes.ago}" format="yyyy-MM-dd'T'HH:mm:ss'Z'" timezone="UTC" transient="true"/>
     ```
-* Configure metrics collection properties. There are tree Azure REST API requests named:
+* Configure metrics collection properties. There are three Azure REST API requests named:
   * `GetNamespaceMetrics` - to collect your namespace scoped metrics 
   * `GetEntitiesMetrics` - to collect namespace bound entity scoped metrics 
   * `GetThrottleMetrics` - to collect `ThrottledRequests` scoped by `MessagingErrorSubCode`.
 
-  REST API calls interval is configured over simple scheduler configuration:
+  The REST API calls interval is configured through a simple scheduler configuration:
   ```xml 
   <schedule-simple interval="5" units="Minutes" startDelay="10" startDelayUnits="Seconds" repeatCount="-1"/>
   ```
   * `interval` - defines REST API call interval
   * `units` - defines call interval time units
-  * `startDelay` - defines how long to delay of the request after the application starts. We want to obtain access token before.
+  * `startDelay` - defines how long to delay the request after the application starts. We want to obtain access token before.
   * `startDelayUnits` - defines delay time units
   * `repeatCount` - defines how many requests to schedule. `-1` means infinite.
 
   Azure API call requests have similar parameters to configure:
-  * `metricnames` - the names of the metrics (comma separated) to retrieve. Special case: if a metricname itself has a comma in it then use 
-    `%2` to indicate it. Eg: `Metric,Name1` should be `Metric%2Name1`
-  * `aggregation` - the list of aggregation types (comma separated) to retrieve
+  * `metricnames` - the names of the metrics to retrieve (comma separated). **Special case:** if a metric name contains a comma, use `%2` to 
+    indicate the coma within the name. Example: `Metric,Name1` should be `Metric%2Name1`
+  * `aggregation` - the list of aggregation types to retrieve (comma separated)
   * `timespan` - the timespan of the query. It is a string with the following format `startDateTime_ISO/endDateTime_ISO`. Supported ISO-8601 
      time interval format: `Datetime/Datetime`, `Datetime/Duration`, `Duration/Datetime`, `Duration` 
-  * `interval` - the interval (i.e. timegrain) of the query. Values may be: `PT1M`, `PT5M`, `PT15M`, `PT30M`, `PT1H`, `PT6H`, `PT12H`, `P1D`
+  * `interval` - the interval (i.e. time grain) of the query. Values may be: `PT1M`, `PT5M`, `PT15M`, `PT30M`, `PT1H`, `PT6H`, `PT12H`, `P1D`
   * `$filter` - used to reduce the set of metric data returned. Example: Metric contains metadata A, B and C. 
     - Return all time series of C where A = a1 and B = b1 or b2 `$filter=A eq 'a1' and B eq 'b1' or B eq 'b2' and C eq '*'` 
     - Invalid variant: `$filter=A eq 'a1' and B eq 'b1' and C eq '*' or B = 'b2'`. This is invalid because the logical or operator cannot 
@@ -104,7 +106,7 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
      details. Values may be: `Data`, `Metadata`
   * `top` - the maximum number of records to retrieve. Valid only if `$filter` is specified. Defaults to 10.
 
-### Run TNT4J stream
+### Run the TNT4J stream
 
 Execute shell script:
 * Linux
