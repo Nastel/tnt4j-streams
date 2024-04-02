@@ -33,8 +33,13 @@ import com.google.protobuf.util.JsonFormat;
  */
 public class ProtoMessageToStringPreParser extends AbstractPreParser<Message, String> {
 
-	private static final JsonFormat.Printer jsonPrinter = JsonFormat.printer().includingDefaultValueFields();
-	private static final TextFormat.Printer textPrinter = TextFormat.printer();
+	private static final JsonFormat.Printer jsonPrinter = JsonFormat.printer() //
+			// .alwaysPrintFieldsWithNoPresence() //
+			.preservingProtoFieldNames() //
+	;
+	private static final TextFormat.Printer textPrinter = TextFormat.printer() //
+			.escapingNonAscii(true) //
+	;
 
 	/**
 	 * Protobuf message print format type.

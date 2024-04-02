@@ -44,8 +44,7 @@
                         <version>0.6.1</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <!--protocExecutable>D:\tmp\protoc-3.20.1-win64\bin\protoc.exe</protocExecutable-->
-                            <protocArtifact>com.google.protobuf:protoc:3.21.2:exe:${os.detected.classifier}</protocArtifact>
+                            <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
                             <outputDirectory>src/main/java</outputDirectory>
                             <clearOutputDirectory>false</clearOutputDirectory>
                             <protoSourceRoot>src/main/proto</protoSourceRoot>
