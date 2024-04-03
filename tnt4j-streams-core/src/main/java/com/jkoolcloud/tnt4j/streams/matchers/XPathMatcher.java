@@ -17,12 +17,16 @@
 package com.jkoolcloud.tnt4j.streams.matchers;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +50,8 @@ public class XPathMatcher implements Matcher {
 	private final Lock builderLock = new ReentrantLock();
 
 	private static XPathMatcher instance;
+
+	private static final Map<String, XPathExpression> expCache = new HashMap<>();
 
 	private XPathMatcher() throws Exception {
 		DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
@@ -95,7 +101,8 @@ public class XPathMatcher implements Matcher {
 		}
 		xPathLock.lock();
 		try {
-			String expressionResult = xPath.evaluate(expression, xmlDoc);
+			XPathExpression expr = getXPathExpr(expression);
+			String expressionResult = expr.evaluate(xmlDoc);
 
 			if (StringUtils.equalsAnyIgnoreCase(expressionResult, "true", "false")) { // NON-NLS
 				return Boolean.parseBoolean(expressionResult);
@@ -105,5 +112,15 @@ public class XPathMatcher implements Matcher {
 		} finally {
 			xPathLock.unlock();
 		}
+	}
+
+	private XPathExpression getXPathExpr(String locStr) throws XPathExpressionException {
+		XPathExpression exp = expCache.get(locStr);
+		if (exp == null) {
+			exp = xPath.compile(locStr);
+			expCache.put(locStr, exp);
+		}
+
+		return exp;
 	}
 }
