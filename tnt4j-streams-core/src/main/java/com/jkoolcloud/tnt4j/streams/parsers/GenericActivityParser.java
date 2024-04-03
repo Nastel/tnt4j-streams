@@ -971,8 +971,8 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	 */
 	protected void applyFieldValue(ActivityField field, Object value, ActivityContext cData)
 			throws IllegalStateException, ParseException {
-		logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"ActivityParser.applying.field", getName(), field, Utils.toString(value));
+		LoggerUtils.log(logger(), OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+				"ActivityParser.applying.field", () -> Utils.args(getName(), field, Utils.toString(value)));
 
 		if (field.isDynamic() || (field.isSplitCollection() && Utils.isIterable(value))) {
 			applyDynamicValue(cData, field, value);
@@ -1208,9 +1208,11 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 					val = resolveLocatorValue(locator, cData, formattingNeeded);
 				}
 
-				// logger().log(val == null && !locator.isOptional() ? OpLevel.WARNING : OpLevel.TRACE,
-				logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"ActivityParser.locator.resolved", cData.getField(), locStr, toString(val));
+				Object logVal = val;
+				LoggerUtils.log(logger(), OpLevel.TRACE,
+						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						"ActivityParser.locator.resolved",
+						() -> Utils.args(cData.getField(), locStr, toString(logVal)));
 
 				if (val != null && locator.isEmptyAsNull() && Utils.isEmptyContent(val, true)) {
 					logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),

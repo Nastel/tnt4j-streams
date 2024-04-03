@@ -136,8 +136,8 @@ public class ActivityInfo {
 	 *             format, etc.)
 	 */
 	public void applyFieldValue(ActivityField field, Object value) throws ParseException {
-		LOGGER.log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"ActivityInfo.applying.field", field, Utils.toString(value));
+		LoggerUtils.log(LOGGER, OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+				"ActivityInfo.applying.field", () -> Utils.args(field, Utils.toString(value)));
 
 		if (value == null) {
 			LOGGER.log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
@@ -298,8 +298,8 @@ public class ActivityInfo {
 						StreamsResources.RESOURCE_BUNDLE_NAME, "ActivityInfo.unrecognized.field", field));
 			}
 
-			LOGGER.log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ActivityInfo.set.field", field, Utils.toString(fieldValue));
+			LoggerUtils.log(LOGGER, OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+					"ActivityInfo.set.field", () -> Utils.args(field, Utils.toString(fieldValue)));
 		} else {
 			addCustomActivityProperty(field, fieldValue);
 		}
@@ -612,9 +612,9 @@ public class ActivityInfo {
 		Property prevValue = activityProperties.put(propName, property);
 
 		if (prevValue == null) {
-			LOGGER.log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-					"ActivityInfo.set.property", propName, Utils.toString(property.getValue()),
-					property.getValueType());
+			LoggerUtils.log(LOGGER, OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+					"ActivityInfo.set.property",
+					() -> Utils.args(propName, Utils.toString(property.getValue()), property.getValueType()));
 		} else {
 			if (!prevValue.same(property)) {
 				LOGGER.log(OpLevel.WARNING, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),

@@ -28,6 +28,7 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.filters.StreamFiltersGroup;
 import com.jkoolcloud.tnt4j.streams.transform.ValueTransformation;
+import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
@@ -199,14 +200,18 @@ public abstract class AbstractFieldEntity {
 			return fieldValue;
 		}
 
-		logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-				"AbstractFieldEntity.value.before.transformations", this, phase, Utils.toString(fieldValue));
+		LoggerUtils.log(logger(), OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+				"AbstractFieldEntity.value.before.transformations",
+				() -> Utils.args(this, phase, Utils.toString(fieldValue)));
 		Object tValue = fieldValue;
 		for (ValueTransformation<Object, Object> vt : transformations) {
 			if (vt.getPhase() == phase) {
 				tValue = vt.transform(tValue, context);
-				logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"AbstractFieldEntity.value.after.transformation", this, vt.getName(), Utils.toString(tValue));
+				Object logTValue = tValue;
+				LoggerUtils.log(logger(), OpLevel.TRACE,
+						StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+						"AbstractFieldEntity.value.after.transformation",
+						() -> Utils.args(this, vt.getName(), Utils.toString(logTValue)));
 			}
 		}
 
