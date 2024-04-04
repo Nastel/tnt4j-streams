@@ -102,10 +102,10 @@
             <field-locator id="MetricName" locator="^.MetricName" locator-type="Activity" datatype="String"/>
             <field-locator id="MetricEntityName" locator="^.EntityName" locator-type="Activity" datatype="String">
                 <field-transform lang="groovy"><![CDATA[
-                       $fieldValue == null //|| $fieldValue.equals("-NamespaceOnlyMetric-")
-                            ? ${NamespaceName}
-                            : $fieldValue
-                    ]]></field-transform>
+                   $fieldValue == null //|| $fieldValue.equals("-NamespaceOnlyMetric-")
+                        ? ${NamespaceName}
+                        : $fieldValue
+                ]]></field-transform>
             </field-locator>
             <field-locator id="MetricRegion" locator="^.Region" locator-type="Activity" datatype="String"/>
             <field-locator id="MetricTimeStamp" locator="timeStamp" locator-type="Label" datatype="String"/>
@@ -149,11 +149,11 @@
             <parser-ref name="MetadataParser" aggregation="Merge"/>
         </embedded-activity>
         <embedded-activity name="Data" locator="data" locator-type="Label">
-            <parser-ref name="MetricDataParser" aggregation="Relate" tags="continuous">
-                <matchExp>groovy:$stream.getOutput ().hasSink ("xray");</matchExp>
+            <parser-ref name="MetricDataParser" aggregation="Relate">
+                <matchExp>groovy:$parentCtx.getParser().getName ().equals ("SBMetricParser");</matchExp>
             </parser-ref>
-            <parser-ref name="MetricDataParserAP" aggregation="Relate" tags="continuous">
-                <matchExp>groovy:$stream.getOutput ().hasSink ("ap");</matchExp>
+            <parser-ref name="MetricDataParserAP" aggregation="Relate">
+                <matchExp>groovy:$parentCtx.getParser().getName ().equals ("SBMetricParserAP");</matchExp>
             </parser-ref>
         </embedded-activity>
     </parser>

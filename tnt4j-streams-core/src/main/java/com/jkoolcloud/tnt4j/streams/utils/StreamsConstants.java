@@ -132,6 +132,10 @@ public final class StreamsConstants {
 	 * The constant defining context map entry key {@value} for parsed field reference.
 	 */
 	public static final String CTX_FIELD_KEY = "CTX_PARSED_FIELD"; // NON-NLS
+	/**
+	 * The constant defining context map entry key {@value} for parent context reference.
+	 */
+	public static final String CTX_PARENT_CTX_KEY = "CTX_PARENT_CONTEXT"; // NON-NLS
 
 	private StreamsConstants() {
 	}

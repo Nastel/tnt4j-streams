@@ -56,6 +56,10 @@ public final class StreamsScriptingUtils {
 	 */
 	public static final String PARSER_VARIABLE_NAME = "parser"; // NON-NLS
 	/**
+	 * Constant for parser variable name used in script/expression code.
+	 */
+	public static final String PARENT_CTX_VARIABLE_NAME = "parentCtx"; // NON-NLS
+	/**
 	 * Constant for field value variable expression used in script/expression code.
 	 */
 	public static final String FIELD_VALUE_VARIABLE_EXPR = '$' + FIELD_VALUE_VARIABLE_NAME;
@@ -71,6 +75,10 @@ public final class StreamsScriptingUtils {
 	 * Constant for parser variable expression used in script/expression code.
 	 */
 	public static final String PARSER_VARIABLE_EXPR = '$' + PARSER_VARIABLE_NAME;
+	/**
+	 * Constant for parser variable expression used in script/expression code.
+	 */
+	public static final String PARENT_CTX_VARIABLE_EXPR = '$' + PARENT_CTX_VARIABLE_NAME;
 
 	/**
 	 * Constant for name of scripting/expression language {@value}.
@@ -285,21 +293,25 @@ public final class StreamsScriptingUtils {
 			}
 		}
 
-		Object fValue = vars.get(FIELD_VALUE_VARIABLE_EXPR);
-		if (fValue != null) {
-			appendVariable(varStr, FIELD_VALUE_VARIABLE_EXPR, fValue);
+		Object var = vars.get(FIELD_VALUE_VARIABLE_EXPR);
+		if (var != null) {
+			appendVariable(varStr, FIELD_VALUE_VARIABLE_EXPR, var);
 		}
-		Object fName = vars.get(FIELD_NAME_VARIABLE_EXPR);
-		if (fValue != null) {
-			appendVariable(varStr, FIELD_NAME_VARIABLE_EXPR, fName);
+		var = vars.get(FIELD_NAME_VARIABLE_EXPR);
+		if (var != null) {
+			appendVariable(varStr, FIELD_NAME_VARIABLE_EXPR, var);
 		}
-		Object stream = vars.get(STREAM_VARIABLE_EXPR);
-		if (stream != null) {
-			appendVariable(varStr, STREAM_VARIABLE_EXPR, stream);
+		var = vars.get(STREAM_VARIABLE_EXPR);
+		if (var != null) {
+			appendVariable(varStr, STREAM_VARIABLE_EXPR, var);
 		}
-		Object parser = vars.get(PARSER_VARIABLE_EXPR);
-		if (fValue != null) {
-			appendVariable(varStr, PARSER_VARIABLE_EXPR, parser);
+		var = vars.get(PARSER_VARIABLE_EXPR);
+		if (var != null) {
+			appendVariable(varStr, PARSER_VARIABLE_EXPR, var);
+		}
+		var = vars.get(PARENT_CTX_VARIABLE_EXPR);
+		if (var != null) {
+			appendVariable(varStr, PARENT_CTX_VARIABLE_EXPR, var);
 		}
 
 		if (varStr.length() > 0) {
@@ -446,8 +458,8 @@ public final class StreamsScriptingUtils {
 	 * {@code '$'} symbol) matches valid script expression pattern:
 	 * <ul>
 	 * <li>expression referenced field value is defined using placeholder {@value FIELD_VALUE_VARIABLE_EXPR},
-	 * {@value FIELD_NAME_VARIABLE_EXPR}, {@value STREAM_VARIABLE_EXPR} or {@value PARSER_VARIABLE_EXPR} (case
-	 * sensitive)</li>
+	 * {@value FIELD_NAME_VARIABLE_EXPR}, {@value STREAM_VARIABLE_EXPR}, {@value PARSER_VARIABLE_EXPR} or
+	 * {@value PARENT_CTX_VARIABLE_EXPR} (case sensitive)</li>
 	 * <li>expression referenced activity fields are defined using placeholder {@code ${FIELD_NAME}}, where
 	 * {@code FIELD_NAME} is parser defined filed name or cache entry name</li>
 	 * </ul>
@@ -475,7 +487,7 @@ public final class StreamsScriptingUtils {
 		m = FIELD_VALUE_PLACEHOLDER_PATTERN.matcher(expString);
 		while (m.find()) {
 			if (!StringUtils.equalsAny(m.group(), FIELD_VALUE_VARIABLE_EXPR, FIELD_NAME_VARIABLE_EXPR,
-					STREAM_VARIABLE_EXPR, PARSER_VARIABLE_EXPR)) {
+					STREAM_VARIABLE_EXPR, PARSER_VARIABLE_EXPR, PARENT_CTX_VARIABLE_EXPR)) {
 				return false;
 			}
 		}
@@ -536,6 +548,8 @@ public final class StreamsScriptingUtils {
 		bindings.put(FIELD_NAME_VARIABLE_EXPR, field == null ? null : field.getName());
 		bindings.put(STREAM_VARIABLE_EXPR, context == null ? null : context.get(StreamsConstants.CTX_STREAM_KEY));
 		bindings.put(PARSER_VARIABLE_EXPR, context == null ? null : context.get(StreamsConstants.CTX_PARSER_KEY));
+		bindings.put(PARENT_CTX_VARIABLE_EXPR,
+				context == null ? null : context.get(StreamsConstants.CTX_PARENT_CTX_KEY));
 
 		return bindings;
 	}

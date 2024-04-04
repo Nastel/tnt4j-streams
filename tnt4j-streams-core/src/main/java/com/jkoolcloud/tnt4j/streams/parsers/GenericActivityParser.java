@@ -1563,7 +1563,6 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		private static final String RAW_DATA_KEY = "CTX_RAW_ACTIVITY_DATA"; // NON-NLS
 		private static final String PREPARSED_DATA_KEY = "CTX_PREPARSED_ACTIVITY_DATA"; // NON-NLS
 		private static final String PARENT_ACTIVITY_KEY = "CTX_PARENT_ACTIVITY_DATA"; // NON-NLS
-		private static final String PARENT_CONTEXT_KEY = "CTX_PARENT_CONTEXT_DATA"; // NON-NLS
 
 		private static final String PREPARED_DATA_KEY = "CTX_PREPARED_ACTIVITY_DATA"; // NON-NLS
 		private static final String MESSAGE_DATA_KEY = "CTX_ACT_MESSAGE_DATA"; // NON-NLS
@@ -1777,7 +1776,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 * @return this context instance
 		 */
 		public ActivityContext setParentContext(ActivityParserContext pContext) {
-			put(PARENT_CONTEXT_KEY, pContext);
+			put(StreamsConstants.CTX_PARENT_CTX_KEY, pContext);
 
 			return this;
 		}
@@ -1788,7 +1787,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		 * @return parent parser context data, or {@code null} if no parent parser is available for this context
 		 */
 		public ActivityParserContext getParentContext() {
-			return (ActivityParserContext) get(PARENT_CONTEXT_KEY);
+			return (ActivityParserContext) get(StreamsConstants.CTX_PARENT_CTX_KEY);
 		}
 
 		/**
