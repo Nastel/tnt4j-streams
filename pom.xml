@@ -145,7 +145,7 @@
                 <version>3.13.0</version>
                 <configuration>
                     <verbose>${maven.compiler.verbose}</verbose>
-                    <compilerVersion>${maven.compiler.version}</compilerVersion>
+                    <!--<compilerVersion>${maven.compiler.version}</compilerVersion>-->
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
                     <debuglevel>${maven.compiler.debuglevel}</debuglevel>
@@ -202,7 +202,7 @@
                 <version>3.2.5</version>
                 <inherited>true</inherited>
                 <configuration>
-                    <systemProperties>
+                    <systemPropertyVariables>
                         <property>
                             <name>tnt4j.config</name>
                             <value>../config/tnt4j.properties</value>
@@ -211,7 +211,7 @@
                             <name>log4j2.configurationFile</name>
                             <value>file:../config/log4j2.xml</value>
                         </property>
-                    </systemProperties>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
