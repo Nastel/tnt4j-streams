@@ -605,7 +605,7 @@ public class ActivityInfo {
 	 */
 	public Object addActivityProperty(Property property) {
 		if (activityProperties == null) {
-			activityProperties = new HashMap<>();
+			activityProperties = new ListMap<>();
 		}
 
 		String propName = property.getKey();
@@ -1653,7 +1653,7 @@ public class ActivityInfo {
 
 		if (otherAi.activityProperties != null) {
 			if (activityProperties == null) {
-				activityProperties = new HashMap<>();
+				activityProperties = new ListMap<>();
 			}
 
 			activityProperties.putAll(otherAi.activityProperties);
