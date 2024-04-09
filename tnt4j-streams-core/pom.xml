@@ -32,7 +32,7 @@
         <httpcomponents.version>5.3.1</httpcomponents.version>
         <zookeeper.version>3.9.2</zookeeper.version>
 
-        <groovy.version>4.0.20</groovy.version>
+        <groovy.version>4.0.21</groovy.version>
         <dropwizard.metrics.version>4.2.25</dropwizard.metrics.version>
 
         <org.slf4j.version>2.0.9</org.slf4j.version>
