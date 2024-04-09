@@ -344,7 +344,7 @@ public class NumericFormatter {
 				}
 			} else {
 				try {
-					numValue = strToNumber(strValue, radix);
+					numValue = strToNumber(strValue, radix, formatter.pattern);
 					nfe = null;
 				} catch (NumberFormatException exc) {
 					nfe = exc;
@@ -618,10 +618,10 @@ public class NumericFormatter {
 	 * @return number value built from provided {@code str}, or {@code null} if {@code str} is {@code null}, empty or
 	 *         equals {@code "null"} ignoring case
 	 *
-	 * @see #strToNumber(String, int)
+	 * @see #strToNumber(String, int, String)
 	 */
 	public static Number strToNumber(String str) {
-		return strToNumber(str, 10);
+		return strToNumber(str, 10, null);
 	}
 
 	/**
@@ -631,10 +631,12 @@ public class NumericFormatter {
 	 *            string defining numeric value
 	 * @param radix
 	 *            radix the radix to be used in interpreting {@code str}
+	 * @param typeExpr
+	 *            number type expression containing type name and cast mode prefix
 	 * @return number value built from provided {@code str}, or {@code null} if {@code str} is {@code null}, empty or
 	 *         equals {@code "null"} ignoring case
 	 */
-	public static Number strToNumber(String str, int radix) {
+	public static Number strToNumber(String str, int radix, String typeExpr) {
 		if (isEmptyNumberStr(str)) {
 			return null;
 		}
@@ -649,6 +651,43 @@ public class NumericFormatter {
 					return new BigInteger(str, radix);
 				}
 			}
+		} else {
+			return createNumber(str, typeExpr);
+		}
+	}
+
+	private static Number createNumber(String str, String typeExpr) {
+		String type = null;
+
+		if (typeExpr != null) {
+			if (typeExpr.startsWith(CastMode.API.symbol)) {
+				type = typeExpr.substring(1);
+			} else if (typeExpr.startsWith(CastMode.UP_BOUND.symbol)) {
+				type = typeExpr.substring(1);
+			} else {
+				type = typeExpr;
+			}
+		}
+
+		Class<? extends Number> nType = type == null ? null : FormatterContext.getNumberClass(type);
+		if (nType == null) {
+			return NumberUtils.createNumber(str);
+		} else if (nType.isAssignableFrom(Long.class)) {
+			return NumberUtils.createLong(str);
+		} else if (nType.isAssignableFrom(Integer.class)) {
+			return NumberUtils.createInteger(str);
+		} else if (nType.isAssignableFrom(Byte.class)) {
+			return NumberUtils.toByte(str);
+		} else if (nType.isAssignableFrom(Float.class)) {
+			return NumberUtils.createFloat(str);
+		} else if (nType.isAssignableFrom(Double.class)) {
+			return NumberUtils.createDouble(str);
+		} else if (nType.isAssignableFrom(Short.class)) {
+			return NumberUtils.toShort(str);
+		} else if (nType.isAssignableFrom(BigInteger.class)) {
+			return NumberUtils.createBigInteger(str);
+		} else if (nType.isAssignableFrom(BigDecimal.class)) {
+			return NumberUtils.createBigDecimal(str);
 		} else {
 			return NumberUtils.createNumber(str);
 		}
