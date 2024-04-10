@@ -30,7 +30,7 @@
     <artifactId>tnt4j-streams-otel</artifactId>
 
     <properties>
-        <opentelemetry.version>1.36.0</opentelemetry.version>
+        <opentelemetry.version>1.37.0</opentelemetry.version>
         <opentelemetry.proto.version>0.17.1</opentelemetry.proto.version>
     </properties>
 
