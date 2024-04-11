@@ -33,16 +33,6 @@ public class WsResponse<RQ, RS> extends WsRequest<RS> {
 	private WsRequest<RQ> originalRequest;
 
 	/**
-	 * Constructs a new WsResponse. Defines response data and tag as {@code null}.
-	 *
-	 * @param responseData
-	 *            response data package
-	 */
-	public WsResponse(RS responseData) {
-		super(responseData);
-	}
-
-	/**
 	 * Constructs a new WsResponse. Defines response data and tag.
 	 *
 	 * @param responseData

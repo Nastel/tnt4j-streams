@@ -312,23 +312,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.zeromq</groupId>
-            <artifactId>jeromq-jms</artifactId>
-            <version>${zeromq.version}</version>
-            <scope>provided</scope>
-            <!-- Instead of using variables jeromq pom file defines absolute path, so we exclude -->
-            <exclusions>
-                <exclusion>
-                    <groupId>com.sun.tools</groupId>
-                    <artifactId>tools</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.tools</groupId>
-                    <artifactId>jconsole</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-client</artifactId>
             <version>${rocketmq.version}</version>

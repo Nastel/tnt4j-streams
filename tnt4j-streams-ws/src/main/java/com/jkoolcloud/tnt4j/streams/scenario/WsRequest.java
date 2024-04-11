@@ -39,16 +39,6 @@ public class WsRequest<T> implements AutoIdGenerator, Cloneable {
 	private WsScenarioStep scenarioStep;
 
 	/**
-	 * Constructs a new WsRequest. Defines request data and tag as {@code null}.
-	 *
-	 * @param requestData
-	 *            request data package
-	 */
-	public WsRequest(T requestData) {
-		this(requestData, null);
-	}
-
-	/**
 	 * Constructs a new WsRequest. Defines request data and tag.
 	 *
 	 * @param requestData

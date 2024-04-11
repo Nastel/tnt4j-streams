@@ -91,21 +91,6 @@ public class WsScenarioStep extends WsScenarioEntity implements AutoIdGenerator 
 	}
 
 	/**
-	 * Adds request/command data for this step. Request tag is set to {@code null}.
-	 *
-	 * @param id
-	 *            request identifier
-	 * @param request
-	 *            request data
-	 * @return constructed request instance
-	 *
-	 * @see #addRequest(String, String, String...)
-	 */
-	public WsRequest<String> addRequest(String id, String request) {
-		return addRequest(id, request, null);
-	}
-
-	/**
 	 * Adds request/command data and tag for this step.
 	 *
 	 * @param id
