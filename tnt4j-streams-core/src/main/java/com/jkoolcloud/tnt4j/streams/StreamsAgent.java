@@ -405,13 +405,6 @@ public final class StreamsAgent {
 	}
 
 	/**
-	 * Restarts all streams within default streams thread group.
-	 */
-	public static void restartStreams() {
-		restartStreams(null);
-	}
-
-	/**
 	 * Restart set of streams within default streams thread group.
 	 *
 	 * @param streamNames
