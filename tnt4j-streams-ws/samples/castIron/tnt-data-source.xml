@@ -233,6 +233,7 @@
         <property name="ActivityDelim" value="EOF"/>
 
         <field name="EventType" value="NOOP"/>
+        <field name="@SplitRelatives@" value="true" transparent="true"/>
 
         <embedded-activity name="CIResponseXML" locator="$DATA$" locator-type="Label">
             <parser-ref name="LoginParser" aggregation="Merge">
@@ -375,7 +376,6 @@
     <!-- CastIron Jobs search dump TEST stream -->
     <!--<stream name="JobsFileStream" class="com.jkoolcloud.tnt4j.streams.inputs.CharacterStream">-->
     <!--<property name="FileName" value="./tnt4j-streams-ws/samples/castIron/responses/*.xml"/>-->
-    <!--<property name="SplitRelatives" value="true"/>-->
     <!--<property name="SendStreamStates" value="false"/>-->
 
     <!--<parser-ref name="CIBootstrapParser"/>-->

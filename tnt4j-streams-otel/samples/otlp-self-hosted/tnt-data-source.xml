@@ -23,7 +23,6 @@
 
     <stream name="OTLPStream" class="com.jkoolcloud.tnt4j.streams.inputs.HttpStream">
         <property name="HaltIfNoParser" value="false"/>
-        <property name="SplitRelatives" value="false"/>
         <property name="SendStreamStates" value="false"/>
         <property name="BuildSourceFQNFromStreamedData" value="false"/>
         <!--<property name="SourceFQN" value="DATACENTER=${DataCenter}#GENERIC=Streams"/>-->
@@ -46,7 +45,7 @@
         <property name="ExecutorRejectedTaskOfferTimeout" value="20"/>
 
         <tnt4j-properties>
-            <!-- Set your CloudWatch data center name -->
+            <!-- Set your OpenTelemetry data center name -->
             <property name="source.factory.DATACENTER" value="OTLP"/>
             <property name="source.factory.RootFQN" value="DATACENTER=?"/>
             <property name="tracker.default.snapshot.category" value="Opentelemetry-Monitored-Service"/>
@@ -64,7 +63,7 @@
             <property name="event.sink.factory.EventSinkFactory.xray" value="com.jkoolcloud.jesl.tnt4j.sink.JKCloudEventSinkFactory"/>
             <property name="event.sink.factory.EventSinkFactory.xray.LogSink"
                       value="slf4j:com.jkoolcloud.tnt4j.streams.activities_prod_log"/>
-            <property name="event.sink.factory.EventSinkFactory.xray.Url" value="https://data.jkoolcloud.com"/>
+            <property name="event.sink.factory.EventSinkFactory.xray.Url" value="https://stream.meshiq.com"/>
             <property name="event.sink.factory.EventSinkFactory.xray.Token" value="388ecd57-6332-4d19-aa0a-255a83a088b3"/>
 
             <property name="event.sink.factory.EventSinkFactory.xray.Formatter" value="com.jkoolcloud.tnt4j.format.JSONFormatter"/>

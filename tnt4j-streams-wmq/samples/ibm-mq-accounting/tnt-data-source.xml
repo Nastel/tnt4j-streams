@@ -13,7 +13,6 @@
     <stream name="WmqAccountingStream" class="com.jkoolcloud.tnt4j.streams.inputs.WmqStreamPCF">
         <property name="StripHeaders" value="false"/>
         <property name="RetryStateCheck" value="true"/>
-        <property name="SplitRelatives" value="true"/>
 
         <!-- Queue Manager name to which to connect -->
         <property name="QueueManager" value="[QMGR]"/>

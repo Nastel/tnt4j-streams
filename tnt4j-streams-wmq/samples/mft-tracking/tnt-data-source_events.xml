@@ -29,6 +29,8 @@
         <reference name="XMLFromMsgPreParser"/>
 
         <field name="EventType" value="ACTIVITY"/>
+        <field name="@SplitRelatives@" value="true" transparent="true"/>
+
         <field name="Correlator" value="/Workflow/processId" locator-type="Label"/>
         <embedded-activity name="Feedback" locator="/Workflow/XMOFTSFeedBackList/XMOFTSFeedBack" locator-type="Label">
             <parser-ref name="XMOFTSFeedBackParser" aggregation="Relate"/>
@@ -54,14 +56,11 @@
         <!-- and if you are using non IBM java on client side add sys property: -->
         <!--                             -Dcom.ibm.mq.cfg.useIBMCipherMappings=false -->
 
-        <property name="SplitRelatives" value="true"/>
-
         <parser-ref name="MFTWorkflowParser"/>
     </stream>
 
     <!--<stream name="WmqStream" class="com.jkoolcloud.tnt4j.streams.inputs.CharacterStream">-->
     <!--<property name="FileName" value="./tnt4j-streams-wmq/samples/mft-tracking/msg_arch_dest_list_fixit.xml"/>-->
-    <!--<property name="SplitRelatives" value="true"/>-->
 
     <!--<parser-ref name="MFTWorkflowParser"/>-->
     <!--</stream>-->

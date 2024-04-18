@@ -28,7 +28,6 @@
         <!--<property name="SourceFQN" value="DATACENTER=${DataCenter}"/>-->
         <property name="RetryStateCheck" value="true"/>
         <property name="RetryInterval" value="300"/>
-        <property name="SplitRelatives" value="false"/>
 
         <!-- Stream run HTTP server configuration -->
         <property name="Host" value="127.0.0.1"/>

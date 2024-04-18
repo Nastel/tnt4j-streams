@@ -256,6 +256,7 @@
         <reference name="MQMsgToStringPreParser"/>
 
         <field name="EventType" value="NOOP"/>
+        <field name="@SplitRelatives@" value="true" transparent="true"/>
 
         <field name="message-text" locator="/transaction" locator-type="Label" transparent="true">
             <parser-ref name="CompletedEventParser" aggregation="Merge">
@@ -276,9 +277,6 @@
         <property name="Channel" value="SYSTEM.DEF.SVRCONN"/>
         <property name="QueueManager" value="[QMGR]"/>
         <property name="Queue" value="FTE.TRANSFER.LOG"/>
-        <!-- SplitRelatives - flag indicating whether to send activity entity child entities independently merging data from both
-        parent and child entity fields. Default value - false. (Optional) -->
-        <property name="SplitRelatives" value="true"/>
 
         <parser-ref name="MsgSwitchParser"/>
 

@@ -23,7 +23,6 @@
 
     <stream name="AmazonMSKMetricsStream" class="com.jkoolcloud.tnt4j.streams.inputs.RestStream">
         <property name="HaltIfNoParser" value="false"/>
-        <property name="SplitRelatives" value="false"/>
         <property name="SendStreamStates" value="false"/>
         <property name="BuildSourceFQNFromStreamedData" value="true"/>
         <!-- Remove APPL token to have JMX and Node metrics right under broker node -->

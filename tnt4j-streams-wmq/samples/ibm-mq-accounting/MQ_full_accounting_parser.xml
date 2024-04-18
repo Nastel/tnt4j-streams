@@ -332,6 +332,8 @@
         <property name="TranslateNumValues" value="true"/>
 
         <field name="EventType" value="EVENT"/>
+        <field name="@SplitRelatives@" value="true" transparent="true"/>
+
         <field name="EventName" locator="MQCFH.Command" locator-type="Label"/>
 
         <!-- header fields -->

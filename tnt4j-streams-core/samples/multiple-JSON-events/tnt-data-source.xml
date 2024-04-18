@@ -22,7 +22,6 @@
         <property name="FileName" value="./tnt4j-streams-core/samples/multiple-JSON-events/message.json"/>
         <property name="ActivityDelim" value="EOF"/>
         <property name="StartFromLatest" value="false"/>
-        <property name="SplitRelatives" value="false"/>
 
         <parser-ref name="ResponseParser"/>
     </stream>

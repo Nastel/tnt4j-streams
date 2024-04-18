@@ -23,7 +23,6 @@
 
     <stream name="CloudWatchMetricsStream" class="com.jkoolcloud.tnt4j.streams.inputs.HttpStream">
         <property name="HaltIfNoParser" value="false"/>
-        <property name="SplitRelatives" value="false"/>
         <property name="SendStreamStates" value="false"/>
         <property name="BuildSourceFQNFromStreamedData" value="false"/>
         <!--<property name="SourceFQN" value="DATACENTER=${DataCenter}#GENERIC=Streams"/>-->
