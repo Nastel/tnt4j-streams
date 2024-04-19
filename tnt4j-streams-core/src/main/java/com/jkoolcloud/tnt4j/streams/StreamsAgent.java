@@ -307,7 +307,7 @@ public final class StreamsAgent {
 	 */
 	public static void waitForStreamsToComplete() {
 		if (streamThreads != null) {
-			boolean complete = false;
+			boolean complete = !isStreamsRunning();
 			while (!complete) {
 				try {
 					synchronized (streamThreads) {
