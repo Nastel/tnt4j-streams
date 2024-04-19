@@ -85,43 +85,45 @@ public class JMSStreamTest {
 		InitialContext initialContext = new InitialContext(env);
 		ConnectionFactory connectionFactory = (ConnectionFactory) initialContext.lookup(CONNECTION_FACTORY_JNDI_NAME);
 
-		Connection connection = connectionFactory.createConnection();
-		Session session = connection.createSession(false, SupportedProperty.SOL_CLIENT_ACKNOWLEDGE);
+		try (Connection connection = connectionFactory.createConnection();
+				Session session = connection.createSession(false, SupportedProperty.SOL_CLIENT_ACKNOWLEDGE)) {
+			connection.start();
 
-		String TOPIC_NAME = "Marius";
+			String TOPIC_NAME = "Marius";
 
-		TextMessage message = session.createTextMessage("Hello world!");
+			TextMessage message = session.createTextMessage("Hello world!");
 
-		Destination q1 = (Destination) initialContext.lookup("JMS\\T1");
-		Destination q2 = (Destination) initialContext.lookup("JMS\\T2");
-		MessageProducer producer = session.createProducer(q1);
+			Destination q1 = (Destination) initialContext.lookup("JMS\\T1");
+			Destination q2 = (Destination) initialContext.lookup("JMS\\T2");
+			MessageProducer producer = session.createProducer(q1);
 
-		CountDownLatch latch = new CountDownLatch(1);
-		MessageConsumer messageConsumer = session.createConsumer(q1);
+			CountDownLatch latch = new CountDownLatch(1);
+			MessageConsumer messageConsumer = session.createConsumer(q1);
 
-		messageConsumer.setMessageListener(new MessageListener() {
-			@Override
-			public void onMessage(Message message) {
-				try {
-					if (message instanceof TextMessage) {
-						System.out.printf("TextMessage received: '%s'%n", ((TextMessage) message).getText());
-					} else {
-						System.out.println("Message received.");
+			messageConsumer.setMessageListener(new MessageListener() {
+				@Override
+				public void onMessage(Message message) {
+					try {
+						if (message instanceof TextMessage) {
+							System.out.printf("TextMessage received: '%s'%n", ((TextMessage) message).getText());
+						} else {
+							System.out.println("Message received.");
+						}
+						System.out.printf("Message Content:%n%s%n", SolJmsUtility.dumpMessage(message));
+						latch.countDown(); // unblock the main thread
+					} catch (JMSException ex) {
+						System.out.println("Error processing incoming message.");
+						ex.printStackTrace();
 					}
-					System.out.printf("Message Content:%n%s%n", SolJmsUtility.dumpMessage(message));
-					latch.countDown(); // unblock the main thread
-				} catch (JMSException ex) {
-					System.out.println("Error processing incoming message.");
-					ex.printStackTrace();
 				}
-			}
-		});
+			});
 
-		connection.start();
-
-		producer.send(q1, message, DeliveryMode.NON_PERSISTENT, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
-		producer.send(q2, message, DeliveryMode.NON_PERSISTENT, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
-
-		latch.await();
+			producer.send(q1, message, DeliveryMode.NON_PERSISTENT, Message.DEFAULT_PRIORITY,
+					Message.DEFAULT_TIME_TO_LIVE);
+			producer.send(q2, message, DeliveryMode.NON_PERSISTENT, Message.DEFAULT_PRIORITY,
+					Message.DEFAULT_TIME_TO_LIVE);
+			producer.close();
+			latch.await();
+		}
 	}
 }

@@ -44,13 +44,15 @@ public class ClientInterceptorTest {
 				"./samples/artemis-interceptors/mybroker0/etc/tnt4j/tnt4j.properties");
 		System.setProperty("log4j2.configurationFile", "file:../config/log4j2.xml");
 
-		ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory( //
+		try (ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory( //
 				"tcp://localhost:61616?" //
 						+ "incomingInterceptorList=" + PacketInterceptor.class.getName() + "&" //
 						+ "outgoingInterceptorList=" + PacketInterceptor.class.getName() //
-		);
-		try (Connection connection = cf.createConnection()) {
-			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+		); //
+				Connection connection = cf.createQueueConnection(); //
+				Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)) {
+			connection.start();
+
 			Queue queue = session.createQueue("InterceptorsTestQueue");
 			MessageProducer producer = session.createProducer(queue);
 
@@ -83,9 +85,9 @@ public class ClientInterceptorTest {
 
 			// SessionSendMessage_V2
 			producer.send(message);
+			producer.close();
 
 			MessageConsumer messageConsumer = session.createConsumer(queue);
-			connection.start();
 
 			// SessionReceiveMessage
 			TextMessage messageReceived = (TextMessage) messageConsumer.receive(5000);
@@ -96,7 +98,6 @@ public class ClientInterceptorTest {
 
 			assertEquals("Received message text is unexpected", msgText, rcvMsgText);
 			assertEquals("Received property value is unexpected", pValue, rcvPValue);
-			connection.stop();
 		} finally {
 			StreamsAgent.waitForStreamsToComplete();
 		}
@@ -109,13 +110,16 @@ public class ClientInterceptorTest {
 				"./samples/artemis-interceptors/mybroker0/etc/tnt4j/tnt4j.properties");
 		System.setProperty("log4j2.configurationFile", "file:../config/log4j2.xml");
 
-		ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory( //
+		try (ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory( //
 				"tcp://localhost:61616?" //
 						+ "incomingInterceptorList=" + PacketInterceptor.class.getName() + "&" //
 						+ "outgoingInterceptorList=" + PacketInterceptor.class.getName() //
-		);
-		try (Connection connection = cf.createConnection()) {
-			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+		); //
+				Connection connection = cf.createConnection(); //
+				Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE) //
+		) {
+			connection.start();
+
 			Queue queue = session.createQueue("InterceptorsTestQueue2");
 			MessageProducer producer = session.createProducer(queue);
 
@@ -135,9 +139,9 @@ public class ClientInterceptorTest {
 
 			// SessionSendMessage_V2
 			producer.send(message);
+			producer.close();
 
 			MessageConsumer messageConsumer = session.createConsumer(queue);
-			connection.start();
 
 			// SessionReceiveMessage
 			MapMessage messageReceived = (MapMessage) messageConsumer.receive(5000);
@@ -150,7 +154,6 @@ public class ClientInterceptorTest {
 			assertEquals("Received message text is unexpected", msgText, rcvMsgText);
 			assertEquals("Received message int value is unexpected", 55645, rcvMsgInt);
 			assertEquals("Received property value is unexpected", pValue, rcvPValue);
-			connection.stop();
 		} finally {
 			StreamsAgent.waitForStreamsToComplete();
 		}
