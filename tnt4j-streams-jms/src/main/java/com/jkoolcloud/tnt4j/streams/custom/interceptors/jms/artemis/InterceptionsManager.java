@@ -190,14 +190,7 @@ public class InterceptionsManager {
 					}
 
 					CountDownLatch streamStartSignal = new CountDownLatch(jmsInterceptorStreams.size());
-					InputStreamEventsAdapter startupListener = new InputStreamEventsAdapter() {
-						@Override
-						public void onStatusChange(TNTInputStream<?, ?> stream, StreamStatus status) {
-							if (status.ordinal() >= StreamStatus.STARTED.ordinal()) {
-								streamStartSignal.countDown();
-							}
-						}
-					};
+					InputStreamEventsAdapter startupListener = new InterceptStreamEventsAdapter(streamStartSignal);
 					for (JMSInterceptorStream stream : jmsInterceptorStreams) {
 						stream.addStreamListener(startupListener);
 					}
@@ -428,5 +421,20 @@ public class InterceptionsManager {
 		 * Map shall be constructed by making dedicated value map for complex type properties.
 		 */
 		DEEP
+	}
+
+	private static class InterceptStreamEventsAdapter extends InputStreamEventsAdapter {
+		private final CountDownLatch streamStartSignal;
+
+		public InterceptStreamEventsAdapter(CountDownLatch streamStartSignal) {
+			this.streamStartSignal = streamStartSignal;
+		}
+
+		@Override
+		public void onStatusChange(TNTInputStream<?, ?> stream, StreamStatus status) {
+			if (status.ordinal() >= StreamStatus.STARTED.ordinal()) {
+				streamStartSignal.countDown();
+			}
+		}
 	}
 }

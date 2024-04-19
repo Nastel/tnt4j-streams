@@ -57,9 +57,16 @@ public class OpenWireInterceptor extends AbstractArtemisInterceptor<Command>
 
 	@Override
 	protected boolean isCloseMessage(Command packet) {
-		return (packet.isConnectionControl()
-				&& (((ConnectionControl) packet).isExit() || ((ConnectionControl) packet).isClose()))
-				|| packet.isShutdownInfo();
+		return isConnectionControlClose(packet) || packet.isShutdownInfo();
+	}
+
+	private boolean isConnectionControlClose(Command packet) {
+		if (!packet.isConnectionControl()) {
+			return false;
+		}
+
+		ConnectionControl ccPacket = (ConnectionControl) packet;
+		return ccPacket.isExit() || ccPacket.isClose();
 	}
 
 }

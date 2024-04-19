@@ -291,14 +291,28 @@ public class InterceptorUtils {
 
 	private static boolean isDrillableObject(Object obj) {
 		return obj != null //
-				&& !(obj instanceof Class) //
-				&& !ClassUtils.isPrimitiveOrWrapper(obj.getClass()) //
-				&& !ClassUtils.isAssignable(obj.getClass(), String.class) //
-				&& !obj.getClass().isEnum() //
-				&& !obj.getClass().isArray() //
-				&& !ClassUtils.isAssignable(obj.getClass(), Collection.class) //
-				&& !ClassUtils.isAssignable(obj.getClass(), Map.class) //
+				&& !isOfWrappingClass(obj) //
+				&& !isFromAssignableSet(obj, String.class, Collection.class, Map.class) //
 				&& !isStringWrapper(obj);
+	}
+
+	private static boolean isOfWrappingClass(Object obj) {
+		return obj instanceof Class //
+				|| ClassUtils.isPrimitiveOrWrapper(obj.getClass()) //
+				|| obj.getClass().isEnum() //
+				|| obj.getClass().isArray(); //
+	}
+
+	private static boolean isFromAssignableSet(Object obj, Class<?>... clzs) {
+		if (clzs == null) {
+			for (Class<?> cls : clzs) {
+				if (ClassUtils.isAssignable(obj.getClass(), cls)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private static boolean isStringWrapper(Object obj) {
