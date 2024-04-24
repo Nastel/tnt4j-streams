@@ -2198,14 +2198,57 @@ public class ActivityInfo {
 		for (List<ActivityInfo> children : ai.children.values()) {
 			if (children != null) {
 				for (ActivityInfo child : children) {
-					if (child.children == null) {
-						chList.add(child);
-					} else {
-						collectFinalChildren(child, chList);
+					ActivityInfo cai = getFinalChild(child);
+
+					if (cai != null && !chList.contains(cai)) {
+						chList.add(cai);
 					}
+
+					collectFinalChildren(child, chList);
 				}
 			}
 		}
+	}
+
+	// private static boolean isFinalChild(ActivityInfo ai) {
+	// return ai.children == null || isAllChildrenEmbeddable(ai);
+	// }
+	//
+	// private static boolean isAllChildrenEmbeddable(ActivityInfo ai) {
+	// if (ai.eventType == OpType.ACTIVITY || ai.eventType == OpType.EVENT) {
+	// boolean allEmbeddable = true;
+	// for (List<ActivityInfo> children : ai.children.values()) {
+	// if (children != null) {
+	// for (ActivityInfo child : children) {
+	// boolean embeddable = child.eventType == OpType.SNAPSHOT || child.eventType == OpType.DATASET
+	// || child.eventType == OpType.LOG;
+	// if (!embeddable) {
+	// allEmbeddable = false;
+	// break;
+	// }
+	// }
+	// }
+	// }
+	//
+	// return allEmbeddable;
+	// }
+	// return false;
+	// }
+
+	private static ActivityInfo getFinalChild(ActivityInfo ai) {
+		boolean embeddable = ai.eventType == OpType.SNAPSHOT || ai.eventType == OpType.DATASET
+				|| ai.eventType == OpType.LOG;
+		boolean canEmbed = ai.parent != null
+				&& (ai.parent.eventType == OpType.ACTIVITY || ai.parent.eventType == OpType.EVENT);
+		if (embeddable && canEmbed) {
+			return ai.parent;
+		}
+
+		if (ai.children == null) {
+			return ai;
+		}
+
+		return null;
 	}
 
 	/**
