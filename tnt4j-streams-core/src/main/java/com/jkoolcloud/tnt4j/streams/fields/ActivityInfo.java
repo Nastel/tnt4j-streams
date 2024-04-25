@@ -145,6 +145,14 @@ public class ActivityInfo {
 			return;
 		}
 
+		if (parent != null && field.getFieldTypeName().startsWith(StreamsConstants.PARENT_REFERENCE_PREFIX)) {
+			ActivityField pField = field.createTempField(null);
+			pField.setFieldTypeName(StreamsConstants.getParentFieldName(field.getFieldTypeName()));
+
+			parent.applyFieldValue(pField, value);
+			return;
+		}
+
 		if (!field.isTransparent()) {
 			setFieldValue(field, value);
 		} else {

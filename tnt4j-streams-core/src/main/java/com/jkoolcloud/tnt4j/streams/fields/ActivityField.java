@@ -707,7 +707,8 @@ public class ActivityField extends AbstractFieldEntity {
 	 */
 	public ActivityField createTempField(Map<String, Object> dValues) {
 		ActivityField tField = new ActivityField(fillDynamicAttr(fieldTypeName, dValues));
-		tField.locators = getTempFieldLocators(locators, (int) dValues.get(VALUE_INDEX_ENTRY_KEY));
+		tField.locators = getTempFieldLocators(locators,
+				dValues == null ? 0 : (int) dValues.get(VALUE_INDEX_ENTRY_KEY));
 		tField.separator = fillDynamicAttr(separator, dValues);
 		tField.formattingPattern = fillDynamicAttr(formattingPattern, dValues);
 		tField.requiredVal = requiredVal;

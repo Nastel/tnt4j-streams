@@ -28,6 +28,7 @@ import org.junit.Test;
 import com.jkoolcloud.tnt4j.config.TrackerConfig;
 import com.jkoolcloud.tnt4j.core.*;
 import com.jkoolcloud.tnt4j.streams.filters.DefaultValueFilter;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 import com.jkoolcloud.tnt4j.tracker.Tracker;
 import com.jkoolcloud.tnt4j.tracker.TrackingActivity;
@@ -518,14 +519,15 @@ public class ActivityInfoTest {
 		pai.addChild("G1", ai1);
 
 		// 6. Parent entity field value get over child instance call
-		assertEquals("Parent Activity", ai1.getFieldValue("^." + en.getFieldTypeName()));
-		assertEquals("pValue1", ai1.getFieldValue("^." + f1.getFieldTypeName()));
-		assertEquals("pValue2", ai1.getFieldValue("^." + f2.getFieldTypeName()));
+		assertEquals("Parent Activity",
+				ai1.getFieldValue(StreamsConstants.PARENT_REFERENCE_PREFIX + en.getFieldTypeName()));
+		assertEquals("pValue1", ai1.getFieldValue(StreamsConstants.PARENT_REFERENCE_PREFIX + f1.getFieldTypeName()));
+		assertEquals("pValue2", ai1.getFieldValue(StreamsConstants.PARENT_REFERENCE_PREFIX + f2.getFieldTypeName()));
 		// 7. Parent entity field value get over parent instance call - entity having no parent shall not resolve any
 		// value
-		assertEquals(null, pai.getFieldValue("^." + en.getFieldTypeName()));
-		assertEquals(null, pai.getFieldValue("^." + f1.getFieldTypeName()));
-		assertEquals(null, pai.getFieldValue("^." + f2.getFieldTypeName()));
+		assertEquals(null, pai.getFieldValue(StreamsConstants.PARENT_REFERENCE_PREFIX + en.getFieldTypeName()));
+		assertEquals(null, pai.getFieldValue(StreamsConstants.PARENT_REFERENCE_PREFIX + f1.getFieldTypeName()));
+		assertEquals(null, pai.getFieldValue(StreamsConstants.PARENT_REFERENCE_PREFIX + f2.getFieldTypeName()));
 
 		ActivityInfo ai2 = new ActivityInfo();
 		ai2.setFieldValue(en, "Another Free Activity");
@@ -559,9 +561,10 @@ public class ActivityInfoTest {
 		pai.addChild("G2", ai2);
 
 		// 12. Parent entity field value get over child instance call
-		assertEquals("Parent Activity", ai2.getFieldValue("^." + en.getFieldTypeName()));
-		assertEquals("pValue1", ai2.getFieldValue("^." + f1.getFieldTypeName()));
-		assertEquals("pValue2", ai2.getFieldValue("^." + f2.getFieldTypeName()));
+		assertEquals("Parent Activity",
+				ai2.getFieldValue(StreamsConstants.PARENT_REFERENCE_PREFIX + en.getFieldTypeName()));
+		assertEquals("pValue1", ai2.getFieldValue(StreamsConstants.PARENT_REFERENCE_PREFIX + f1.getFieldTypeName()));
+		assertEquals("pValue2", ai2.getFieldValue(StreamsConstants.PARENT_REFERENCE_PREFIX + f2.getFieldTypeName()));
 		// 13. Another child (by index) entity field value get over instance call
 		assertEquals("Free Activity", ActivityInfo.getFieldValue("^.child[0]." + en.getFieldTypeName(), "G1", ai2));
 		assertEquals("f1Value1", ActivityInfo.getFieldValue("^.child[0]." + f1.getFieldTypeName(), "G1", ai2));

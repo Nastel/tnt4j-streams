@@ -330,7 +330,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	private void validateDuplicateFields(ActivityField field) {
 		for (ActivityField aField : fieldList) {
 			StreamFieldType fieldType = aField.getFieldType();
-			if (aField.getFieldTypeName().equals(field.getFieldTypeName())
+			if (aField.getFieldTypeName().equals(StreamsConstants.getParentFieldName(field.getFieldTypeName()))
 					&& !Utils.isCollectionType(fieldType == null ? null : fieldType.getDataType())) {
 				throw new IllegalArgumentException(
 						StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
