@@ -1,5 +1,5 @@
 set KAFKA_HOME=C:\kafka\kafka_2.12-2.4.1
-set CLASSPATH=..\..\..\..\opt\tnt4j-streams-kafka-2.1.0-interceptor.jar
+set CLASSPATH=..\..\..\..\opt\tnt4j-streams-kafka-2.2.0-interceptor.jar
 set KAFKA_LOG4J_OPTS=-Dlog4j2.configurationFile=..\config\tools-log4j2.xml
 
 set KAFKA_OPTS=-Dtnt4j.config="..\config\tnt4j.properties" -Dinterceptors.config="..\config\interceptorsC.properties" -Dfile.encoding=UTF-8

@@ -32,7 +32,7 @@
         <!--property name="Host" value="localhost"/-->
         <property name="Port" value="443"/>
         <property name="UseSSL" value="false"/>
-        <property name="Keystore" value="file:///home/ubuntu/tnt4j-streams-2.1.0/samples/cloudwatch/clientkeystore"/>
+        <property name="Keystore" value="file:///home/ubuntu/tnt4j-streams-2.2.0/samples/cloudwatch/clientkeystore"/>
         <property name="KeyPass" value="pass123"/>
         <property name="KeystorePass" value="pass123"/>
 
