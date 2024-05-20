@@ -49,7 +49,8 @@ public class SampleStreamingApp {
 	 *
 	 * @param args
 	 *            program command-line arguments. Supported arguments:
-	 *            <table summary="TNT4J-Streams agent command line arguments">
+	 *            <table>
+	 *            <caption>TNT4J-Streams agent command line arguments</caption>
 	 *            <tr>
 	 *            <td>&nbsp;&nbsp;</td>
 	 *            <td>&nbsp;&lt;orders_log_file_path&gt;</td>

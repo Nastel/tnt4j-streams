@@ -52,7 +52,8 @@ public class ZKConfigInit {
 	 *
 	 * @param args
 	 *            command-line arguments. Supported arguments:
-	 *            <table summary="TNT4J-Streams configuration uploader to ZooKeeper command line arguments">
+	 *            <table>
+	 *            <caption>TNT4J-Streams configuration uploader to ZooKeeper command line arguments</caption>
 	 *            <tr>
 	 *            <td>&nbsp;&nbsp;</td>
 	 *            <td>&nbsp;-f:&lt;cfg_file_name&gt;</td>

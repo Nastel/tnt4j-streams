@@ -47,7 +47,8 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
  * </ul>
  * <p>
  * RegEx group names and log pattern tokens mapping:
- * <table summary="RegEx group names and log pattern tokens mapping">
+ * <table>
+ * <caption>RegEx group names and log pattern tokens mapping</caption>
  * <tr><th>RegEx group name</th><th>Format String</th><th>Description</th></tr>
  * <tr><td>address</td><td>%a</td><td>Client IP address of the request (see the mod_remoteip module).</td></tr>
  * <tr><td>localAddress</td><td>%A</td><td>Local IP-address.</td></tr>

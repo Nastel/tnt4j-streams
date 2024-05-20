@@ -130,7 +130,8 @@ public class StreamsDaemon implements Daemon {
 	 *
 	 * @param args
 	 *            command-line arguments. Supported arguments:
-	 *            <table summary="TNT4J-Streams daemon command line arguments">
+	 *            <table>
+	 *            <caption>TNT4J-Streams daemon command line arguments</caption>
 	 *            <tr>
 	 *            <td>&nbsp;&nbsp;</td>
 	 *            <td>&nbsp;command_name</td>

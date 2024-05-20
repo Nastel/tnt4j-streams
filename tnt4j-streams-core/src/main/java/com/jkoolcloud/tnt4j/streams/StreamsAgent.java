@@ -83,7 +83,8 @@ public final class StreamsAgent {
 	 *
 	 * @param args
 	 *            command-line arguments. Supported arguments:
-	 *            <table summary="TNT4J-Streams agent command line arguments">
+	 *            <table>
+	 *            <caption>TNT4J-Streams agent command line arguments</caption>
 	 *            <tr>
 	 *            <td>&nbsp;&nbsp;</td>
 	 *            <td>&nbsp;-f:&lt;cfg_file_name&gt;</td>
