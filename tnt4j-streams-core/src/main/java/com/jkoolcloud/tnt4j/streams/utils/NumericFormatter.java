@@ -698,7 +698,7 @@ public class NumericFormatter {
 	}
 
 	/**
-	 * Scales number value <tt>numValue</tt> by <tt>scale</tt> factor.
+	 * Scales number value {@code numValue} by {@code scale} factor.
 	 *
 	 * @param numValue
 	 *            number value to scale
@@ -798,7 +798,7 @@ public class NumericFormatter {
 		private NumberFormat format;
 
 		/**
-		 * Creates a number formatter context using defined format <tt>pattern</tt></> and default locale.
+		 * Creates a number formatter context using defined format {@code pattern}</> and default locale.
 		 * <p>
 		 * Pattern also can be one of number types enumerators: {@code "integer"}, {@code "int"}, {@code "long"},
 		 * {@code "double"}, {@code "float"}, {@code "short"}, {@code "byte"}, {@code "bigint"}, {@code "biginteger"},
@@ -822,7 +822,7 @@ public class NumericFormatter {
 		}
 
 		/**
-		 * Creates a number formatter context using defined format <tt>pattern</tt></> and <tt>locale</tt>.
+		 * Creates a number formatter context using defined format {@code pattern}</> and {@code locale}.
 		 * <p>
 		 * Pattern also can be one of number types enumerators: {@code "integer"}, {@code "int"}, {@code "long"},
 		 * {@code "double"}, {@code "float"}, {@code "short"}, {@code "byte"}, {@code "bigint"}, {@code "biginteger"},
@@ -886,7 +886,7 @@ public class NumericFormatter {
 
 		/**
 		 * Builds number format instance to parse number from string using general-purpose number format for default or
-		 * specified <tt>locale</tt>.
+		 * specified {@code locale}.
 		 *
 		 * @param locale
 		 *            locale for decimal format to use, or {@code null} if default locale shall be used

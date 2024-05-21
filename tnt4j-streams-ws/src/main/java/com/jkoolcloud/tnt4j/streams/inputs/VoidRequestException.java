@@ -41,7 +41,7 @@ public class VoidRequestException extends Exception {
 	 * @param message
 	 *            the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
 	 * @param cause
-	 *            the cause (which is saved for later retrieval by the {@link #getCause()} method). (A <tt>null</tt>
+	 *            the cause (which is saved for later retrieval by the {@link #getCause()} method). (A {@code null}
 	 *            value is permitted, and indicates that the cause is nonexistent or unknown.)
 	 */
 	public VoidRequestException(String message, Throwable cause) {
@@ -54,12 +54,12 @@ public class VoidRequestException extends Exception {
 	 * @param message
 	 *            the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
 	 * @param cause
-	 *            the cause (which is saved for later retrieval by the {@link #getCause()} method). (A <tt>null</tt>
+	 *            the cause (which is saved for later retrieval by the {@link #getCause()} method). (A {@code null}
 	 *            value is permitted, and indicates that the cause is nonexistent or unknown.)
 	 * @param enableSuppression
-	 *            whether or not suppression is enabled or disabled
+	 *            whether suppression is enabled or disabled
 	 * @param writableStackTrace
-	 *            whether or not the stack trace should be writable
+	 *            whether the stack trace should be writable
 	 */
 	public VoidRequestException(String message, Throwable cause, boolean enableSuppression,
 			boolean writableStackTrace) {

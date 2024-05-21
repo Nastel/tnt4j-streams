@@ -41,7 +41,7 @@ public final class StreamsResources {
 	/**
 	 * Initializes singleton instance of resource bundle for default locale if such is not available in bundles cache
 	 * map. After initialization bundle object is placed into cache map and retrieved from it on subsequent calls. Cache
-	 * map entry key is <tt>bundleName</tt>.
+	 * map entry key is {@code bundleName}.
 	 *
 	 * @param bundleName
 	 *            the base name of the resource bundle
@@ -60,9 +60,9 @@ public final class StreamsResources {
 	/**
 	 * Initializes singleton instance of resource bundle for default locale if such is not available in bundles cache
 	 * map. After initialization bundle object is placed into cache map and retrieved from it on subsequent calls. Cache
-	 * map entry key is <tt>bundleName</tt>.
+	 * map entry key is {@code bundleName}.
 	 * <p>
-	 * If no bundle is associated with given <tt>bundleName</tt>, then bundle associated with
+	 * If no bundle is associated with given {@code bundleName}, then bundle associated with
 	 * {@value RESOURCE_BUNDLE_NAME} is returned.
 	 *
 	 * @param bundleName

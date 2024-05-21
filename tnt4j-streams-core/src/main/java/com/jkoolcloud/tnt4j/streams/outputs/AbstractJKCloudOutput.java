@@ -154,8 +154,7 @@ public abstract class AbstractJKCloudOutput<T, O> extends AbstractTNTStreamOutpu
 	 *            property key
 	 * @param value
 	 *            property value
-	 * @return the previous value associated with <tt>key</tt>, or <tt>null</tt> if there was no mapping for
-	 *         <tt>key</tt>.
+	 * @return the previous value associated with {@code key}, or {@code null} if there was no mapping for {@code key}.
 	 */
 	public String addTNT4JProperty(String key, String value) {
 		if (tnt4jProperties == null) {

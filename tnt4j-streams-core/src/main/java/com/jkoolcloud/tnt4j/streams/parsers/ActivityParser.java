@@ -189,7 +189,7 @@ public abstract class ActivityParser implements NamedObject {
 	 * @param value
 	 *            value to apply for this field
 	 * @throws ParseException
-	 *             if an error occurs while parsing provided activity data <tt>value</tt>
+	 *             if an error occurs while parsing provided activity data {@code value}
 	 */
 	protected void applyFieldValue(ActivityInfo ai, ActivityField field, Object value) throws ParseException {
 		ai.applyField(field, value);
@@ -211,7 +211,7 @@ public abstract class ActivityParser implements NamedObject {
 	 * @throws IllegalStateException
 	 *             if parser has not been properly initialized
 	 * @throws ParseException
-	 *             if an error occurs while parsing provided activity data <tt>value</tt>
+	 *             if an error occurs while parsing provided activity data {@code value}
 	 * @see #parse(TNTInputStream, Object)
 	 */
 	protected void applyFieldValue(ActivityField field, Object value, ActivityParserContext cData)
@@ -254,7 +254,7 @@ public abstract class ActivityParser implements NamedObject {
 	}
 
 	/**
-	 * Applies stacked parser to parse provided activity data <tt>value</tt>.
+	 * Applies stacked parser to parse provided activity data {@code value}.
 	 *
 	 * @param field
 	 *            activity field providing data
@@ -266,7 +266,7 @@ public abstract class ActivityParser implements NamedObject {
 	 *            parsing context data package
 	 * @return {@code true} if referenced stacked parser was applied, {@code false} - otherwise
 	 * @throws ParseException
-	 *             if an error occurs while parsing provided activity data <tt>value</tt>
+	 *             if an error occurs while parsing provided activity data {@code value}
 	 */
 	protected boolean applyStackedParser(ActivityField field, ActivityField.FieldParserReference parserRef,
 			Object value, ActivityParserContext cData) throws ParseException {
@@ -339,7 +339,7 @@ public abstract class ActivityParser implements NamedObject {
 	}
 
 	/**
-	 * Checks if activity <tt>data</tt> package is supported by <tt>field</tt> referenced stacked parsers.
+	 * Checks if activity {@code data} package is supported by {@code field} referenced stacked parsers.
 	 *
 	 * @param field
 	 *            activity field to get stacked parsers

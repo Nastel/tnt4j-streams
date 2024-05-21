@@ -225,7 +225,7 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	}
 
 	/**
-	 * Checks if this locator type is equal to anny of provided locator <tt>types</tt>.
+	 * Checks if this locator type is equal to anny of provided locator {@code types}.
 	 *
 	 * @param types
 	 *            locator types to check against
@@ -246,9 +246,9 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	}
 
 	/**
-	 * Checks if fields <tt>locator key</tt> and <tt>constant value</tt> are empty.
+	 * Checks if fields {@code locator key} and {@code constant value} are empty.
 	 *
-	 * @return {@code true} if <tt>locator key</tt> and <tt>constant value</tt> are empty
+	 * @return {@code true} if {@code locator key} and {@code constant value} are empty
 	 */
 	public boolean isEmpty() {
 		return StringUtils.isEmpty(locator) && (cfgValue == null || StringUtils.isEmpty(Utils.toString(cfgValue)));

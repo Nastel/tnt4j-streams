@@ -29,17 +29,17 @@ import javax.xml.bind.annotation.*;
  * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="Scenario">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="property" type="{}Property" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="step" type="{}ScenarioStep" maxOccurs="unbounded"/>
- *       &lt;/sequence>
- *       &lt;attGroup ref="{}ScenarioEntityAttributes"/>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="Scenario"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="property" type="{}Property" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="step" type="{}ScenarioStep" maxOccurs="unbounded"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attGroup ref="{}ScenarioEntityAttributes"/&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 

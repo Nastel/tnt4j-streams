@@ -123,7 +123,7 @@ public final class StreamsXMLUtils {
 	}
 
 	/**
-	 * Parses <tt>is</tt> defined XML contents using <tt>dh</tt> SAX parser handler.
+	 * Parses {@code is} defined XML contents using {@code dh} SAX parser handler.
 	 *
 	 * 
 	 * @param is
@@ -145,7 +145,7 @@ public final class StreamsXMLUtils {
 	}
 
 	/**
-	 * Resolves XML Document DOM node defined namespace mappings and puts them to <tt>namespaces</tt> map.
+	 * Resolves XML Document DOM node defined namespace mappings and puts them to {@code namespaces} map.
 	 *
 	 * @param xmlDoc
 	 *            xml document DOM node to use

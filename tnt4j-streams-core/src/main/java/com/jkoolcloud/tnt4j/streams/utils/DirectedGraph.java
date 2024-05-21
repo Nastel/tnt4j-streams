@@ -41,7 +41,7 @@ public class DirectedGraph<T> implements Iterable<T> {
 	 *
 	 * @param node
 	 *            the node to add
-	 * @return whether or not the node was added
+	 * @return whether the node was added
 	 */
 	public boolean addNode(T node) {
 		/* If the node already exists, don't do anything. */

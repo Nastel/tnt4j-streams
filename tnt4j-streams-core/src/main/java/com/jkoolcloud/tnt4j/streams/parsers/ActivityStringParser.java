@@ -59,20 +59,18 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
  * <li>{@link com.jkoolcloud.tnt4j.streams.fields.ActivityFieldLocatorType#EnvVariable}</li>
  * </ul>
  * <p>
- * Here are some examples of how this parser can be used:
- * <p>
- * <blockquote>
+ * Here are some examples of how this parser can be used: <blockquote>
  * 
  * <pre>
- *  <parser name="StrRangesParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser">
- *      <field name="EventType" value="EVENT"/>
- *      <field name="EventName" value="SOCGEN_Msg_Data"/>
+ *  &lt;parser name="StrRangesParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityStringParser"&gt;
+ *      &lt;field name="EventType" value="EVENT"/&gt;
+ *      &lt;field name="EventName" value="SOCGEN_Msg_Data"/&gt;
  *
- * 		<field name= "TransID" field-locator locator="0:14" locator-type="Range"/>
- * 		<field name= "TransType" field-locator locator="20:36" locator-type="Range"/>
- * 		<field name= "TransValue"field-locator locator="70:90" locator-type="Range"/>
- * 		<field name= "UserData" field-locator locator="123:146" locator-type="Range"/>
- * 	</parser>
+ *      &lt;field name= "TransID" field-locator locator="0:14" locator-type="Range"/&gt;
+ *      &lt;field name= "TransType" field-locator locator="20:36" locator-type="Range"/&gt;
+ *      &lt;field name= "TransValue"field-locator locator="70:90" locator-type="Range"/&gt;
+ *      &lt;field name= "UserData" field-locator locator="123:146" locator-type="Range"/&gt;
+ *  &lt;/parser&gt;
  * </pre>
  * 
  * </blockquote>

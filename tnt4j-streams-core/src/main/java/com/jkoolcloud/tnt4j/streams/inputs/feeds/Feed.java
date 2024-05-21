@@ -39,21 +39,21 @@ public interface Feed<T> extends Closeable {
 	T getInput();
 
 	/**
-	 * Returns whether or not the input has been closed.
+	 * Returns whether the input has been closed.
 	 *
 	 * @return {@code true} if input is closed, {@code false} if still open
 	 */
 	boolean isClosed();
 
 	/**
-	 * Returns whether or not an error/exception occurred on the input access.
+	 * Returns whether an error/exception occurred on the input access.
 	 *
 	 * @return {@code true} if error/exception occurred, {@code false} if not
 	 */
 	boolean hasError();
 
 	/**
-	 * Returns whether or not the input has ended and no more data available to read.
+	 * Returns whether the input has ended and no more data available to read.
 	 * 
 	 * @return {@code true} if input has ended and no more data available to read, {@code false} - otherwise
 	 */

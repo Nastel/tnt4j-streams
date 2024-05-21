@@ -322,7 +322,7 @@ public final class StreamsScriptingUtils {
 	}
 
 	/**
-	 * Appends variable definition to expression description string builder <tt>sb</tt>.
+	 * Appends variable definition to expression description string builder {@code sb}.
 	 *
 	 * @param sb
 	 *            string builder to append
@@ -342,8 +342,8 @@ public final class StreamsScriptingUtils {
 	/**
 	 * Returns the appropriate string representation for the specified object.
 	 * <p>
-	 * If <tt>obj</tt> is {@link String}, it gets surrounded by {@code "} chars. If <tt>obj</tt> is {@link Character},
-	 * it gets surrounded by {@code '} character.
+	 * If {@code obj} is {@link String}, it gets surrounded by {@code "} chars. If {@code obj} is {@link Character}, it
+	 * gets surrounded by {@code '} character.
 	 *
 	 * @param obj
 	 *            object to convert to string representation

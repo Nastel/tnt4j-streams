@@ -605,7 +605,7 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 		}
 
 		/**
-		 * Returns time period in seconds from last activity provided <tt>timestamp</tt> value.
+		 * Returns time period in seconds from last activity provided {@code timestamp} value.
 		 *
 		 * @param timestamp
 		 *            timestamp value to calculate period
@@ -634,7 +634,11 @@ public abstract class AbstractFileLineStream<T> extends AbstractBufferedStream<A
 		 *            file name line is picked from
 		 */
 		public Line(String text, int lineNumber, String fileName) {
-			super(text, fillMetadata(lineNumber, fileName));
+			this(text, fillMetadata(lineNumber, fileName));
+		}
+
+		public Line(String text, Map<String, ?> metadata) {
+			super(text, metadata);
 		}
 
 		private static Map<String, Object> fillMetadata(int lineNumber, String fileName) {

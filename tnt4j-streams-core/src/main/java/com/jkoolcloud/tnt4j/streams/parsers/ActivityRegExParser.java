@@ -48,7 +48,7 @@ import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
  * {@link GenericActivityParser}):
  * <ul>
  * <li>Pattern - contains the regular expression pattern that each data item is assumed to match. (Required)</li>
- * <li>MatchStrategy - defines <tt>pattern</tt> created <tt>matcher</tt> comparison strategy used against input data
+ * <li>MatchStrategy - defines {@code pattern} created {@code matcher} comparison strategy used against input data
  * string. Value can be one of: {@code "MATCH"} - pattern should match complete input string, or {@code "FIND"} -
  * pattern has to match sub-sequence within input string. Default value - '{@code MATCH}'. (Optional)</li>
  * </ul>
@@ -179,7 +179,7 @@ public class ActivityRegExParser extends GenericActivityParser<Matcher> {
 	}
 
 	/**
-	 * Checks if <tt>matcher</tt> matches input data string using parser defined matching strategy.
+	 * Checks if {@code matcher} matches input data string using parser defined matching strategy.
 	 *
 	 * @param matcher
 	 *            matcher instance to use
@@ -422,7 +422,7 @@ public class ActivityRegExParser extends GenericActivityParser<Matcher> {
 	}
 
 	/**
-	 * Retrieves named groups map from <tt>regexPattern</tt>.
+	 * Retrieves named groups map from {@code regexPattern}.
 	 * <p>
 	 * Named groups map key is group name, value is group index.
 	 * 
