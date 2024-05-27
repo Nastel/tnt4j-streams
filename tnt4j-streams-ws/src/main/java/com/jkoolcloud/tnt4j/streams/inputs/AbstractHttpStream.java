@@ -17,10 +17,8 @@
 package com.jkoolcloud.tnt4j.streams.inputs;
 
 import java.security.GeneralSecurityException;
-import java.security.cert.X509Certificate;
 
-import javax.net.ssl.*;
-
+import com.jkoolcloud.jesl.net.http.HttpClient;
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.streams.configure.WsStreamProperties;
 import com.jkoolcloud.tnt4j.streams.scenario.WsRequest;
@@ -74,56 +72,19 @@ public abstract class AbstractHttpStream extends AbstractWsStream<String, String
 		super.applyProperties();
 
 		if (disableSSL) {
-			disableSslVerification();
+			try {
+				HttpClient.disableSslVerification();
+			} catch (GeneralSecurityException exc) {
+				Utils.logThrowable(logger(), OpLevel.WARNING,
+						StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME),
+						"WsStream.disable.ssl.failed", exc);
+			}
 		}
 	}
 
 	@Override
 	protected long getActivityItemByteSize(WsResponse<String, String> item) {
 		return item == null || item.getData() == null ? 0 : item.getData().getBytes().length;
-	}
-
-	/**
-	 * Disables SSL context verification.
-	 */
-	protected void disableSslVerification() {
-		try {
-			// Create a trust manager that does not validate certificate chains
-			TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-				@Override
-				public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-					return null;
-				}
-
-				@Override
-				public void checkClientTrusted(X509Certificate[] certs, String authType) {
-				}
-
-				@Override
-				public void checkServerTrusted(X509Certificate[] certs, String authType) {
-				}
-			} };
-
-			// Install the all-trusting trust manager
-			SSLContext sc = SSLContext.getInstance("TLS"); // NON-NLS
-			sc.init(null, trustAllCerts, new java.security.SecureRandom());
-			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-			// Create all-trusting host name verifier
-			HostnameVerifier allHostsValid = new HostnameVerifier() {
-				@Override
-				public boolean verify(String hostname, SSLSession session) {
-					return true;
-				}
-			};
-
-			// Install the all-trusting host verifier
-			HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-		} catch (GeneralSecurityException exc) {
-			Utils.logThrowable(logger(), OpLevel.WARNING,
-					StreamsResources.getBundle(WsStreamConstants.RESOURCE_BUNDLE_NAME), "WsStream.disable.ssl.failed",
-					exc);
-		}
 	}
 
 	/**
