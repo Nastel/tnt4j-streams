@@ -117,8 +117,7 @@ public class JKCloudActivityOutput extends AbstractJKCloudOutput<ActivityInfo, T
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
-	 * 
+	 *
 	 * @see ActivityInfo#buildTrackable(com.jkoolcloud.tnt4j.tracker.Tracker, java.util.Map)
 	 */
 	@Override

@@ -539,7 +539,6 @@ Sample:
     </parser>
 
     <stream name="SampleJMStream" class="com.jkoolcloud.tnt4j.streams.inputs.JMSStream">
-        <!--<property name="SplitRelatives" value="true"/>-->
         <.../>
         <parser-ref name="SampleJMSParser"/>
     </stream>
@@ -4369,7 +4368,7 @@ source.factory.RootSSN: tnt4j-streams
 
 tracker.factory: com.jkoolcloud.tnt4j.tracker.DefaultTrackerFactory
 dump.sink.factory: com.jkoolcloud.tnt4j.dump.DefaultDumpSinkFactory
-tracker.default.snapshot.category: TNT4J-Streams-event-snapshot
+tracker.default.snapshot.category: TNT4J-Streams-snapshot
 
 # event sink configuration: destination and data format
 <YOUR EVENT SINK CONFIGURATION: jKoolCloud, Kafka, MQTT, etc.>
