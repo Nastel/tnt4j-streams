@@ -17,8 +17,13 @@
 package com.jkoolcloud.tnt4j.streams.utils;
 
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
+
+import com.jkoolcloud.tnt4j.core.UsecTimestamp;
 
 /**
  * Provides functionality to calculate duration between two events in milliseconds.
@@ -26,6 +31,10 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
  * @version $Revision: 1 $
  */
 public class Duration {
+
+	// Define the regex pattern to match HH:mm:ss.SSSSSSSSS, where SSSSSSSSS length is variable
+	private static final Pattern HMS_DURATION_PATTERN = Pattern.compile("(\\d+):(\\d{2}):(\\d{2})\\.(\\d+)"); // NON-NLS
+
 	private long startTime;
 
 	private Duration() {
@@ -292,5 +301,121 @@ public class Duration {
 		}
 
 		return timeDiffMsec < 0 ? -timeDiffMsecAbs : timeDiffMsecAbs;
+	}
+
+	/**
+	 * Parses provided duration string {@code durationStr} to {@link java.time.Duration} instance.
+	 * <p>
+	 * Duration string shall be defined to match {@code HH:mm:ss.SSSSSSSSS} pattern, where {@code HH} and
+	 * {@code SSSSSSSSS} parts can be variable length.
+	 *
+	 * @param durationStr
+	 *            duration string to parse
+	 * @return duration instance parsed from provided duration string, or {@code null} if provided duration string is
+	 *         {@code null} or empty
+	 */
+	public static java.time.Duration parseHMSDuration(String durationStr) {
+		if (StringUtils.isEmpty(durationStr)) {
+			return null;
+		}
+
+		return parseHMSDuration(durationStr, HMS_DURATION_PATTERN);
+	}
+
+	/**
+	 * Parses provided duration string {@code durationStr} to {@link java.time.Duration} instance using defined duration
+	 * string format RegEx pattern string {@code ptrRegex}.
+	 *
+	 * @param durationStr
+	 *            duration string to parse
+	 * @param ptrRegex
+	 *            duration string format RegEx pattern string
+	 * @return duration instance parsed from provided duration string, or {@code null} if provided duration string is
+	 *         {@code null} or empty
+	 */
+	public static java.time.Duration parseHMSDuration(String durationStr, String ptrRegex) {
+		if (StringUtils.isEmpty(durationStr)) {
+			return null;
+		}
+
+		return parseHMSDuration(durationStr, Pattern.compile(ptrRegex));
+	}
+
+	private static java.time.Duration parseHMSDuration(String durationStr, Pattern pattern) {
+		Matcher matcher = pattern.matcher(durationStr);
+
+		if (!matcher.matches()) {
+			throw new IllegalArgumentException(StreamsResources
+					.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME, "Duration.invalid.format", durationStr)); // NON-NLS
+		}
+
+		// Extract and parse each component
+		int hours = Integer.parseInt(matcher.group(1));
+		int minutes = Integer.parseInt(matcher.group(2));
+		int seconds = Integer.parseInt(matcher.group(3));
+		String fractionalSecondsStr = matcher.group(4);
+
+		// Convert fractional seconds to nanoseconds
+		int nanoseconds = 0;
+		if (!fractionalSecondsStr.isEmpty()) {
+			// Ensure the fractional part has exactly 9 digits by padding with zeros if necessary
+			fractionalSecondsStr = String.format("%-9s", fractionalSecondsStr).replace(' ', '0'); // NON-NLS
+			nanoseconds = Integer.parseInt(fractionalSecondsStr);
+		}
+
+		// Convert hours, minutes, and seconds to total seconds
+		long totalSeconds = hours * 3600L + minutes * 60L + seconds;
+
+		// Create and return the Duration object
+		return java.time.Duration.ofSeconds(totalSeconds).plusNanos(nanoseconds);
+	}
+
+	/**
+	 * Parses provided duration string {@code durationStr} to {@link UsecTimestamp} instance.
+	 * <p>
+	 * Duration string shall be defined to match {@code HH:mm:ss.SSSSSSSSS} pattern, where {@code HH} and
+	 * {@code SSSSSSSSS} parts can be variable length.
+	 *
+	 * @param durationStr
+	 *            duration string to parse
+	 * @return timestamp instance parsed from provided duration string, or {@code null} if provided duration string is
+	 *         {@code null} or empty
+	 * 
+	 * @see #parseHMSDuration(String)
+	 */
+	public static UsecTimestamp parseHMSDurationToTimestamp(String durationStr) {
+		return durationToTimestamp(parseHMSDuration(durationStr));
+	}
+
+	/**
+	 * Parses provided duration string {@code durationStr} to {@link UsecTimestamp} instance using defined duration
+	 * string format RegEx pattern string {@code ptrRegex}.
+	 *
+	 * @param durationStr
+	 *            duration string to parse
+	 * @param ptrRegex
+	 *            duration string format RegEx pattern string
+	 * @return timestamp instance parsed from provided duration string, or {@code null} if provided duration string is
+	 *         {@code null} or empty
+	 *
+	 * @see #parseHMSDuration(String, String)
+	 */
+	public static UsecTimestamp parseHMSDurationToTimestamp(String durationStr, String ptrRegex) {
+		return durationToTimestamp(parseHMSDuration(durationStr, ptrRegex));
+	}
+
+	private static UsecTimestamp durationToTimestamp(java.time.Duration duration) {
+		if (duration == null) {
+			return null;
+		}
+
+		long nSec = duration.toNanos();
+
+		long mSec = TimeUnit.NANOSECONDS.toMillis(nSec);// nSec / 1_000_000L;
+		long uSec = TimeUnit.NANOSECONDS.toMicros(nSec % 1_000_000L);// / 1_000L;
+
+		UsecTimestamp dTime = new UsecTimestamp(mSec, uSec);
+
+		return dTime;
 	}
 }
