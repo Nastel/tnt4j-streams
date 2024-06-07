@@ -38,7 +38,7 @@ import com.jkoolcloud.tnt4j.core.UsecTimestamp;
  * <p>
  * This is based on {@link java.text.SimpleDateFormat}, but extends its support to recognize microsecond fractional
  * seconds. If number of fractional second characters is greater than 3, then it's assumed to be microseconds.
- * Otherwise, it's assumed to be milliseconds (as this is the behavior of {@link java.text.SimpleDateFormat}.
+ * Otherwise, it's assumed to be milliseconds (as this is the behavior of {@link java.text.SimpleDateFormat}).
  * <p>
  * Supports such pattern definitions:
  * <ul>
@@ -50,6 +50,7 @@ import com.jkoolcloud.tnt4j.core.UsecTimestamp;
  * @version $Revision: 1 $
  *
  * @see java.text.SimpleDateFormat
+ * @see FastDateFormat
  * @see com.jkoolcloud.tnt4j.core.UsecTimestamp
  */
 public class TimestampFormatter {
@@ -556,7 +557,7 @@ public class TimestampFormatter {
 				if (i == patterns.length - 1) {
 					ParseException dpe = new ParseException(
 							StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
-									"TimestampFormatter.failed.parsing2", dateStr, pattern),
+									"TimestampFormatter.failed.parsing2", dateStr, pattern, pe.getMessage()),
 							pe.getErrorOffset());
 					// dpe.initCause(pe);
 
