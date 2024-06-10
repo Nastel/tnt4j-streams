@@ -16,6 +16,10 @@
 
 package com.jkoolcloud.tnt4j.streams.utils;
 
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,9 +35,6 @@ import com.jkoolcloud.tnt4j.core.UsecTimestamp;
  * @version $Revision: 1 $
  */
 public class Duration {
-
-	// Define the regex pattern to match HH:mm:ss.SSSSSSSSS, where SSSSSSSSS length is variable
-	private static final Pattern HMS_DURATION_PATTERN = Pattern.compile("(\\d+):(\\d{2}):(\\d{2})\\.(\\d+)"); // NON-NLS
 
 	private long startTime;
 
@@ -72,7 +73,7 @@ public class Duration {
 	}
 
 	/**
-	 * Represents duration value in human readable form: {@code "hours:minutes:seconds.millis"}
+	 * Represents duration value in human-readable form: {@code "hours:minutes:seconds.millis"}
 	 *
 	 * @return human readable duration value string
 	 *
@@ -152,7 +153,7 @@ public class Duration {
 	}
 
 	/**
-	 * Represents duration value in human readable form: {@code "hours:minutes:seconds.millis"}
+	 * Represents duration value in human-readable form: {@code "hours:minutes:seconds.millis"}
 	 *
 	 * @param startTime
 	 *            duration period start time in milliseconds
@@ -319,17 +320,31 @@ public class Duration {
 			return null;
 		}
 
-		return parseHMSDuration(durationStr, HMS_DURATION_PATTERN);
+		return parseHMSDuration(durationStr, DurationParser.DEFAULT_HMS_DURATION_PATTERN);
 	}
 
 	/**
 	 * Parses provided duration string {@code durationStr} to {@link java.time.Duration} instance using defined duration
-	 * string format RegEx pattern string {@code ptrRegex}.
+	 * string format RegEx pattern string {@code ptrRegex} or date-time pattern using symbols from
+	 * {@link java.text.SimpleDateFormat}.
+	 * <p>
+	 * RegEx pattern string shall define these group names to properly resolve values:
+	 * <ul>
+	 * <li>years (date-time pattern token {@code yy}) - for years definition, assuming year has 365 days</li>
+	 * <li>months (date-time pattern token {@code MM}) - for months definition, assuming month has 30 days</li>
+	 * <li>weeks (date-time pattern token {@code ww}) - for weeks definition, assuming week has 7 days</li>
+	 * <li>days (date-time pattern token {@code dd}) - for days definition</li>
+	 * <li>hours (date-time pattern token {@code HH}) - for hours definition</li>
+	 * <li>minutes (date-time pattern token {@code mm}) - for minutes definition</li>
+	 * <li>seconds (date-time pattern token {@code ss}) - for seconds definition</li>
+	 * <li>fraction (date-time pattern token from {@code SS} to {@code SSSSSSSSS}) - for fractional pars of the second:
+	 * milliseconds, microsecond and nanoseconds</li>
+	 * </ul>
 	 *
 	 * @param durationStr
 	 *            duration string to parse
 	 * @param ptrRegex
-	 *            duration string format RegEx pattern string
+	 *            duration string format RegEx or date-time pattern string
 	 * @return duration instance parsed from provided duration string, or {@code null} if provided duration string is
 	 *         {@code null} or empty
 	 */
@@ -338,36 +353,7 @@ public class Duration {
 			return null;
 		}
 
-		return parseHMSDuration(durationStr, Pattern.compile(ptrRegex));
-	}
-
-	private static java.time.Duration parseHMSDuration(String durationStr, Pattern pattern) {
-		Matcher matcher = pattern.matcher(durationStr);
-
-		if (!matcher.matches()) {
-			throw new IllegalArgumentException(StreamsResources
-					.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME, "Duration.invalid.format", durationStr)); // NON-NLS
-		}
-
-		// Extract and parse each component
-		int hours = Integer.parseInt(matcher.group(1));
-		int minutes = Integer.parseInt(matcher.group(2));
-		int seconds = Integer.parseInt(matcher.group(3));
-		String fractionalSecondsStr = matcher.group(4);
-
-		// Convert fractional seconds to nanoseconds
-		int nanoseconds = 0;
-		if (!fractionalSecondsStr.isEmpty()) {
-			// Ensure the fractional part has exactly 9 digits by padding with zeros if necessary
-			fractionalSecondsStr = String.format("%-9s", fractionalSecondsStr).replace(' ', '0'); // NON-NLS
-			nanoseconds = Integer.parseInt(fractionalSecondsStr);
-		}
-
-		// Convert hours, minutes, and seconds to total seconds
-		long totalSeconds = hours * 3600L + minutes * 60L + seconds;
-
-		// Create and return the Duration object
-		return java.time.Duration.ofSeconds(totalSeconds).plusNanos(nanoseconds);
+		return DurationParser.parseHMSDuration(durationStr, ptrRegex);
 	}
 
 	/**
@@ -384,38 +370,148 @@ public class Duration {
 	 * @see #parseHMSDuration(String)
 	 */
 	public static UsecTimestamp parseHMSDurationToTimestamp(String durationStr) {
-		return durationToTimestamp(parseHMSDuration(durationStr));
+		return DurationParser.durationToTimestamp(parseHMSDuration(durationStr));
 	}
 
 	/**
 	 * Parses provided duration string {@code durationStr} to {@link UsecTimestamp} instance using defined duration
-	 * string format RegEx pattern string {@code ptrRegex}.
+	 * string format RegEx pattern string {@code ptrRegex} or date-time pattern using symbols from
+	 * {@link java.text.SimpleDateFormat}.
+	 * <p>
+	 * RegEx pattern string shall define these group names to properly resolve values:
+	 * <ul>
+	 * <li>years (date-time pattern token {@code yy}) - for years definition, assuming year has 365 days</li>
+	 * <li>months (date-time pattern token {@code MM}) - for months definition, assuming month has 30 days</li>
+	 * <li>weeks (date-time pattern token {@code ww}) - for weeks definition, assuming week has 7 days</li>
+	 * <li>days (date-time pattern token {@code dd}) - for days definition</li>
+	 * <li>hours (date-time pattern token {@code HH}) - for hours definition</li>
+	 * <li>minutes (date-time pattern token {@code mm}) - for minutes definition</li>
+	 * <li>seconds (date-time pattern token {@code ss}) - for seconds definition</li>
+	 * <li>fraction (date-time pattern token from {@code SS} to {@code SSSSSSSSS}) - for fractional pars of the second:
+	 * milliseconds, microsecond and nanoseconds</li>
+	 * </ul>
 	 *
 	 * @param durationStr
 	 *            duration string to parse
 	 * @param ptrRegex
-	 *            duration string format RegEx pattern string
+	 *            duration string format RegEx or date-time pattern string
 	 * @return timestamp instance parsed from provided duration string, or {@code null} if provided duration string is
 	 *         {@code null} or empty
 	 *
 	 * @see #parseHMSDuration(String, String)
 	 */
 	public static UsecTimestamp parseHMSDurationToTimestamp(String durationStr, String ptrRegex) {
-		return durationToTimestamp(parseHMSDuration(durationStr, ptrRegex));
+		return DurationParser.durationToTimestamp(parseHMSDuration(durationStr, ptrRegex));
 	}
 
-	private static UsecTimestamp durationToTimestamp(java.time.Duration duration) {
-		if (duration == null) {
-			return null;
+	private static class DurationParser {
+		private static final Map<String, String> regexMap = new LinkedHashMap<>(15);
+		static {
+			regexMap.put("yy", "(?<years>\\d+)"); // NON-NLS
+			regexMap.put("MM", "(?<months>\\d+)"); // NON-NLS
+			regexMap.put("ww", "(?<weeks>\\d+)"); // NON-NLS
+			regexMap.put("dd", "(?<days>\\d+)"); // NON-NLS
+			regexMap.put("HH", "(?<hours>\\d+)"); // NON-NLS
+			regexMap.put("mm", "(?<minutes>\\d{2})"); // NON-NLS
+			regexMap.put("ss", "(?<seconds>\\d{2})"); // NON-NLS
+			regexMap.put("SSSSSSSSS", "(?<fraction>\\d+)"); // NON-NLS
+			regexMap.put("SSSSSSSS", "(?<fraction>\\d+)"); // NON-NLS
+			regexMap.put("SSSSSSS", "(?<fraction>\\d+)"); // NON-NLS
+			regexMap.put("SSSSSS", "(?<fraction>\\d+)"); // NON-NLS
+			regexMap.put("SSSSS", "(?<fraction>\\d+)"); // NON-NLS
+			regexMap.put("SSSS", "(?<fraction>\\d+)"); // NON-NLS
+			regexMap.put("SSS", "(?<fraction>\\d+)"); // NON-NLS
+			regexMap.put("SS", "(?<fraction>\\d+)"); // NON-NLS
 		}
 
-		long nSec = duration.toNanos();
+		private static final String DEFAULT_HMS_DURATION_PATTERN = "HH:mm:ss.SSSSSSSSS"; // NON-NLS
+		private static final Map<String, Pattern> DURATION_PATTERNS_MAP = new HashMap<>(5);
+		static {
+			// Define the regex pattern to match HH:mm:ss.SSSSSSSSS, where SSSSSSSSS length is variable.
+			DURATION_PATTERNS_MAP.put(DEFAULT_HMS_DURATION_PATTERN,
+					translateDateTimePatternToRegEx(DEFAULT_HMS_DURATION_PATTERN));
+		}
 
-		long mSec = TimeUnit.NANOSECONDS.toMillis(nSec);// nSec / 1_000_000L;
-		long uSec = TimeUnit.NANOSECONDS.toMicros(nSec % 1_000_000L);// / 1_000L;
+		private static Pattern translateDateTimePatternToRegEx(String dtPattern) {
+			String regexPattern = dtPattern;
+			for (Map.Entry<String, String> entry : regexMap.entrySet()) {
+				regexPattern = regexPattern.replace(entry.getKey(), entry.getValue());
+			}
+			return Pattern.compile(regexPattern);
+		}
 
-		UsecTimestamp dTime = new UsecTimestamp(mSec, uSec);
+		private static java.time.Duration parseHMSDuration(String durationStr, String durationPtr) {
+			Pattern regEx = DURATION_PATTERNS_MAP.computeIfAbsent(durationPtr, s -> durationPtr.contains("(?<") // NON-NLS
+					? Pattern.compile(durationPtr) : translateDateTimePatternToRegEx(durationPtr));
 
-		return dTime;
+			return parseHMSDuration(durationStr, regEx);
+		}
+
+		private static java.time.Duration parseHMSDuration(String durationStr, Pattern pattern) {
+			Matcher matcher = pattern.matcher(durationStr);
+
+			if (!matcher.matches()) {
+				throw new IllegalArgumentException(StreamsResources.getStringFormatted(
+						StreamsResources.RESOURCE_BUNDLE_NAME, "Duration.invalid.format", durationStr)); // NON-NLS
+			}
+
+			// Extract and parse each component
+			int years = getFieldValue(matcher, ChronoUnit.YEARS.name().toLowerCase());
+			int months = getFieldValue(matcher, ChronoUnit.MONTHS.name().toLowerCase());
+			int weeks = getFieldValue(matcher, ChronoUnit.WEEKS.name().toLowerCase());
+			int days = getFieldValue(matcher, ChronoUnit.DAYS.name().toLowerCase());
+			int hours = getFieldValue(matcher, ChronoUnit.HOURS.name().toLowerCase());
+			int minutes = getFieldValue(matcher, ChronoUnit.MINUTES.name().toLowerCase());
+			int seconds = getFieldValue(matcher, ChronoUnit.SECONDS.name().toLowerCase());
+			String fractionalSecondsStr = matcher.group("fraction");
+
+			// Convert fractional seconds to nanoseconds
+			int nanoseconds = 0;
+			if (StringUtils.isNotEmpty(fractionalSecondsStr)) {
+				// Ensure the fractional part has exactly 9 digits by padding with zeros if necessary
+				fractionalSecondsStr = String.format("%-9s", fractionalSecondsStr).replace(' ', '0'); // NON-NLS
+				nanoseconds = Integer.parseInt(fractionalSecondsStr);
+			}
+
+			// Convert resolved temporal units to total seconds
+			long totalSeconds = TimeUnit.DAYS.toSeconds(years * 365L) //
+					+ TimeUnit.DAYS.toSeconds(months * 30L) //
+					+ TimeUnit.DAYS.toSeconds(weeks * 7L) //
+					+ TimeUnit.DAYS.toSeconds(days) //
+					+ TimeUnit.HOURS.toSeconds(hours) //
+					+ TimeUnit.MINUTES.toSeconds(minutes) //
+					+ seconds;
+
+			// Create and return the Duration object
+			return java.time.Duration.ofSeconds(totalSeconds).plusNanos(nanoseconds);
+		}
+
+		private static int getFieldValue(Matcher matcher, String field) {
+			try {
+				String fValue = matcher.group(field);
+				if (StringUtils.isNotEmpty(fValue)) {
+					return Integer.parseInt(fValue);
+				}
+			} catch (IllegalArgumentException exc) {
+				return 0;
+			}
+
+			return 0;
+		}
+
+		private static UsecTimestamp durationToTimestamp(java.time.Duration duration) {
+			if (duration == null) {
+				return null;
+			}
+
+			long nSec = duration.toNanos();
+
+			long mSec = TimeUnit.NANOSECONDS.toMillis(nSec);// nSec / 1_000_000L;
+			long uSec = TimeUnit.NANOSECONDS.toMicros(nSec % 1_000_000L);// / 1_000L;
+
+			UsecTimestamp dTime = new UsecTimestamp(mSec, uSec);
+
+			return dTime;
+		}
 	}
 }
