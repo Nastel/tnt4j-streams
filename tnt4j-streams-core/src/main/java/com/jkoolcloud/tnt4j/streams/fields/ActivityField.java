@@ -114,6 +114,7 @@ public class ActivityField extends AbstractFieldEntity {
 		ActivityFieldLocator loc = new ActivityFieldLocator(ActivityFieldLocatorType.Index, "0", dataType);
 		locators = new ArrayList<>(1);
 		locators.add(loc);
+		loc.setActivityField(this);
 	}
 
 	@Override
@@ -242,6 +243,7 @@ public class ActivityField extends AbstractFieldEntity {
 		}
 
 		dynamicLocators.put(id, locator);
+		locator.setActivityField(this);
 	}
 
 	private void addStaticLocator(ActivityFieldLocator locator) {
@@ -250,6 +252,7 @@ public class ActivityField extends AbstractFieldEntity {
 		}
 
 		locators.add(locator);
+		locator.setActivityField(this);
 	}
 
 	/**

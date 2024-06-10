@@ -60,6 +60,8 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	private Object mapCatchAll = null;
 	private boolean dynamicLocator = false;
 
+	private ActivityField field;
+
 	/**
 	 * Constructs a new activity field locator for either a built-in type or a custom type.
 	 *
@@ -496,6 +498,16 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	@Override
 	public String getName() {
 		return id;
+	}
+
+	/**
+	 * Binds this locator to parent activity field instance it belongs to.
+	 *
+	 * @param field
+	 *            field instance to bind
+	 */
+	void setActivityField(ActivityField field) {
+		this.field = field;
 	}
 
 	/**
