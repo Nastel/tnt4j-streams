@@ -189,6 +189,7 @@ public class ActivityJsonParser extends GenericActivityParser<DocumentContext> {
 	 * <li>{@link java.nio.ByteBuffer}</li>
 	 * <li>{@link java.io.Reader}</li>
 	 * <li>{@link java.io.InputStream}</li>
+	 * <li>{@link Map}</li>
 	 * </ul>
 	 *
 	 * @param data
@@ -197,7 +198,7 @@ public class ActivityJsonParser extends GenericActivityParser<DocumentContext> {
 	 */
 	@Override
 	protected boolean isDataClassSupportedByParser(Object data) {
-		return data instanceof DocumentContext || super.isDataClassSupportedByParser(data);
+		return data instanceof DocumentContext || data instanceof Map || super.isDataClassSupportedByParser(data);
 	}
 
 	@Override
@@ -214,6 +215,8 @@ public class ActivityJsonParser extends GenericActivityParser<DocumentContext> {
 				jsonDoc = (DocumentContext) data;
 			} else if (data instanceof InputStream) {
 				jsonDoc = JsonPath.parse((InputStream) data, parseConfiguration);
+			} else if (data instanceof Map) {
+				jsonDoc = JsonPath.parse(data, parseConfiguration);
 			} else {
 				jsonString = getNextActivityString(data);
 				if (StringUtils.isEmpty(jsonString)) {
