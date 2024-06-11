@@ -230,6 +230,7 @@ public class TimestampFormatter {
 	 * @param value
 	 *            value to convert
 	 * @return formatted value of timestamp
+	 *
 	 * @throws ParseException
 	 *             if an error parsing the specified value based timestamp pattern supported by this formatter
 	 *
@@ -249,8 +250,8 @@ public class TimestampFormatter {
 	 * Converts provided {@code value} to a {@link UsecTimestamp} without parsing.
 	 * <p>
 	 * If {@code value} is {@link UsecTimestamp}, {@link java.sql.Timestamp}, {@link Date}, {@link Calendar} or
-	 * {@link java.time.temporal.Temporal} then casted or new instance of {@link UsecTimestamp} is returned. Otherwise
-	 * {@code null} is returned.
+	 * {@link java.time.temporal.Temporal} then cast or new instance of {@link UsecTimestamp} is returned. {@code null}
+	 * is returned otherwise.
 	 *
 	 * @param value
 	 *            object value to convert
@@ -305,6 +306,7 @@ public class TimestampFormatter {
 	 * @param value
 	 *            value to convert
 	 * @return formatted value of timestamp
+	 *
 	 * @throws ParseException
 	 *             if an error parsing the specified value based timestamp pattern supported by this formatter
 	 *
@@ -357,6 +359,7 @@ public class TimestampFormatter {
 	 * @param value
 	 *            value to convert
 	 * @return microsecond timestamp
+	 *
 	 * @throws ParseException
 	 *             if an error parsing the specified value
 	 *
@@ -381,6 +384,7 @@ public class TimestampFormatter {
 	 *            time zone identifier to compensate produced timestamp offset, {@code null} - stands for
 	 *            {@link java.util.TimeZone#getDefault()}
 	 * @return microsecond timestamp
+	 *
 	 * @throws ParseException
 	 *             if an error parsing the specified value
 	 *
@@ -424,12 +428,12 @@ public class TimestampFormatter {
 			long uSecs = 0;
 			switch (units) {
 			case NANOSECONDS:
-				long scale = 1000000L;
+				long scale = 1_000_000L;
 				mSecs = time / scale;
-				uSecs = (time - mSecs * scale) / 1000L;
+				uSecs = (time - mSecs * scale) / 1_000L;
 				break;
 			case MICROSECONDS:
-				scale = 1000L;
+				scale = 1_000L;
 				mSecs = time / scale;
 				uSecs = time - mSecs * scale;
 				break;
@@ -483,7 +487,7 @@ public class TimestampFormatter {
 			case SECONDS:
 			case MILLISECONDS:
 			case MICROSECONDS:
-				dTime = dTime * 1000L;
+				dTime = dTime * 1_000L;
 				break;
 			case NANOSECONDS:
 			default:
@@ -542,6 +546,7 @@ public class TimestampFormatter {
 	 * @param locale
 	 *            locale for date format to use.
 	 * @return microsecond timestamp
+	 *
 	 * @throws ParseException
 	 *             if an error parsing the specified value based on pattern
 	 * @see java.util.TimeZone

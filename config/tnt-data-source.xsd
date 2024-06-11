@@ -51,6 +51,14 @@
                 </xs:annotation>
             </xs:enumeration>
 
+            <xs:enumeration value="Duration">
+                <xs:annotation>
+                    <xs:documentation>
+                        Field value is a duration as a temporal units number or expression with a specific string format.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
             <xs:enumeration value="Timestamp">
                 <xs:annotation>
                     <xs:documentation>

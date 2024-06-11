@@ -28,7 +28,7 @@ public enum ActivityFieldDataType {
 	String,
 
 	/**
-	 * Raw data value is interpreted as a numeric value, optionally in a particular format.
+	 * Raw data value is interpreted as a numeric value, optionally in a particular string format.
 	 */
 	Number,
 
@@ -38,9 +38,14 @@ public enum ActivityFieldDataType {
 	Binary,
 
 	/**
-	 * Raw data value is interpreted as a date, time, or date/time expression, optionally in a particular format.
+	 * Raw data value is interpreted as a date, time, or date/time expression, optionally in a particular string format.
 	 */
 	DateTime,
+
+	/**
+	 * Raw data value is interpreted as a duration defined as a temporal units number or in a particular string format.
+	 */
+	Duration,
 
 	/**
 	 * Raw data value is interpreted as a numeric timestamp, optionally in the specified units (assumed to be in

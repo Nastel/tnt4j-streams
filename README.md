@@ -192,6 +192,7 @@ Mapping of streamed data to activity event fields are performed by parser. To ma
         * `Binary`
         * `Number`
         * `DateTime`
+        * `Duration`
         * `Timestamp`
         * `Generic`
         * `AsInput`

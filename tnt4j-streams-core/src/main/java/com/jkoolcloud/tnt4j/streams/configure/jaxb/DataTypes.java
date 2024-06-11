@@ -35,6 +35,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="Binary"/&gt;
  *     &lt;enumeration value="Number"/&gt;
  *     &lt;enumeration value="DateTime"/&gt;
+ *     &lt;enumeration value="Duration"/&gt;
  *     &lt;enumeration value="Timestamp"/&gt;
  *     &lt;enumeration value="Generic"/&gt;
  *     &lt;enumeration value="AsInput"/&gt;
@@ -83,6 +84,15 @@ public enum DataTypes {
 	 */
 	@XmlEnumValue("DateTime")
 	DATE_TIME("DateTime"),
+
+	/**
+	 *
+	 * Field value is a duration as a temporal units number or expression with a specific string format.
+	 *
+	 *
+	 */
+	@XmlEnumValue("Duration")
+	Duration("Duration"),
 
 	/**
 	 * 

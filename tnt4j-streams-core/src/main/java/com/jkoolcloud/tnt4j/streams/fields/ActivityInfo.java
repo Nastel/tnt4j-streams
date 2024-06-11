@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.fields;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.text.ParseException;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -380,6 +381,8 @@ public class ActivityInfo {
 			case DateTime:
 			case Timestamp:
 				return getTimestampValue(fieldValue, field);
+			case Duration:
+				return getDurationValue(fieldValue, field);
 			case Generic:
 				return getPredictedValue(fieldValue, field);
 			case Binary:
@@ -441,6 +444,29 @@ public class ActivityInfo {
 
 		return TimestampFormatter.parse(fmLocator == null ? null : fmLocator.getFormat(),
 				getStringValue(fieldValue, field), tz, fmLocator == null ? null : fmLocator.getLocale());
+	}
+
+	private static long getDurationValue(Object fieldValue, ActivityField field) throws ParseException {
+		ActivityFieldLocator fmLocator = field.getMasterLocator();
+		TimeUnit units = ActivityFieldLocator.getLocatorUnits(fmLocator, TimeUnit.MILLISECONDS);
+		Duration duration = com.jkoolcloud.tnt4j.streams.utils.Duration.getDuration(fieldValue, units);
+		if (duration != null) {
+			return units.convert(duration);
+		}
+
+		if (!Utils.isObjArray(fieldValue)) {
+			try {
+				duration = com.jkoolcloud.tnt4j.streams.utils.Duration.parseDuration(fieldValue, fmLocator.getFormat());
+				if (duration != null) {
+					return units.convert(duration);
+				}
+			} catch (ParseException exc) {
+			}
+		}
+
+		duration = com.jkoolcloud.tnt4j.streams.utils.Duration.parseDuration(getStringValue(fieldValue, field),
+				fmLocator == null ? null : fmLocator.getFormat());
+		return duration == null ? 0 : units.convert(duration);
 	}
 
 	private static String substitute(String value, String newValue) {

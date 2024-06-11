@@ -338,7 +338,7 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	 * 
 	 * @param defaultUnits
 	 *            default time units
-	 * @return the locator built-in time units enumerator, or default units if locator has has no built-in units defined
+	 * @return the locator built-in time units enumerator, or default units if locator has no built-in units defined
 	 */
 	public TimeUnit getBuiltInUnits(TimeUnit defaultUnits) {
 		return builtInUnits == null ? defaultUnits : builtInUnits;
@@ -627,6 +627,9 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 			case Timestamp:
 				value = formatDateValue(value);
 				break;
+			case Duration:
+				value = formatDurationValue(value);
+				break;
 			case AsInput:
 			default:
 				break;
@@ -662,6 +665,14 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 			Object pValue = formatDateValue(value);
 			dataType = value instanceof Number || NumberUtils.isDigits(Utils.toString(value))
 					? ActivityFieldDataType.Timestamp : ActivityFieldDataType.DateTime;
+			return pValue;
+		} catch (ParseException exc) {
+		}
+
+		// is it a duration
+		try {
+			Object pValue = formatDurationValue(value);
+			dataType = ActivityFieldDataType.Duration;
 			return pValue;
 		} catch (ParseException exc) {
 		}
@@ -713,7 +724,7 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	 * <li>performs simple cast to {@link String} in all other cases</li>
 	 * </ul>
 	 * <p>
-	 * In all other cases raw field value conversion to string is performed using {@link Utils#toString(Object)} method.
+	 * In all other cases raw field value conversion to string performed using {@link Utils#toString(Object)} method.
 	 *
 	 * @param value
 	 *            raw field value
@@ -822,7 +833,7 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	 *
 	 * @param value
 	 *            raw field value
-	 * @return formatted field value as {@link UsecTimestamp}
+	 * @return formatted field value as {@link UsecTimestamp} instance
 	 * @throws ParseException
 	 *             if an error parsing the specified value based on the field definition (e.g. does not match defined
 	 *             format, etc.)
@@ -838,6 +849,27 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 						? TimestampFormatter.getInstance(getBuiltInUnits(TimeUnit.MILLISECONDS))
 						: TimestampFormatter.getInstance(format, timeZone, locale);
 		return timeParser.parse(value);
+	}
+
+	/**
+	 * Formats the value for the specified duration field based on the definition of the field locator.
+	 *
+	 * @param value
+	 *            raw field value
+	 * @return formatted field value as {@link java.time.Duration} instance, or {@code null} if provided value is
+	 *         {@code null} or empty
+	 * @throws ParseException
+	 *             if an error parsing the specified value based on the field definition (e.g. does not match defined
+	 *             format, etc.)
+	 */
+	protected java.time.Duration formatDurationValue(Object value) throws ParseException {
+		if (value instanceof Number) {
+			TimeUnit tUnit = getBuiltInUnits(TimeUnit.MILLISECONDS);
+
+			return Duration.getDuration(value, tUnit);
+		}
+
+		return Duration.parseDuration(value, format);
 	}
 
 	/**

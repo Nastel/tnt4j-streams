@@ -197,11 +197,10 @@ public class ActivityJDBCResultSetParser extends GenericActivityParser<ResultSet
 			if (dataType == ActivityFieldDataType.Timestamp || dataType == ActivityFieldDataType.DateTime) {
 				if (StringUtils.isEmpty(tz)) {
 					objVal = resultSet.getTimestamp(index);
-					valueResolved = true;
 				} else {
 					objVal = resultSet.getTimestamp(index, Calendar.getInstance(TimeZone.getTimeZone(tz)));
-					valueResolved = true;
 				}
+				valueResolved = true;
 			}
 		}
 

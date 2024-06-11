@@ -1092,7 +1092,8 @@ public class ConfigParserHandler extends DefaultHandler {
 		}
 
 		// make sure any fields that are required based on other fields are specified
-		if (ActivityFieldDataType.DateTime == currLocatorData.dataType) {
+		if (ActivityFieldDataType.DateTime == currLocatorData.dataType
+				|| ActivityFieldDataType.Duration == currLocatorData.dataType) {
 			if (currLocatorData.format == null) {
 				throw new SAXParseException(StreamsResources.getStringFormatted(StreamsResources.RESOURCE_BUNDLE_NAME,
 						"ConfigParserHandler.missing.attribute2", FIELD_LOC_ELMT, FORMAT_ATTR,

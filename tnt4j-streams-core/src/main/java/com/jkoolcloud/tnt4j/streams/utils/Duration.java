@@ -16,7 +16,9 @@
 
 package com.jkoolcloud.tnt4j.streams.utils;
 
+import java.text.ParseException;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -402,6 +404,83 @@ public class Duration {
 	 */
 	public static UsecTimestamp parseHMSDurationToTimestamp(String durationStr, String ptrRegex) {
 		return DurationParser.durationToTimestamp(parseHMSDuration(durationStr, ptrRegex));
+	}
+
+	/**
+	 * Converts provided {@code value} to a {@link java.time.Duration} without parsing.
+	 * <p>
+	 * If {@code value} is {@link Duration}, {@link java.time.Duration}, {@link Number} or
+	 * {@link java.time.temporal.TemporalAmount} then cast or new instance of {@link java.time.Duration} is returned.
+	 * {@code null} is returned otherwise.
+	 *
+	 * @param value
+	 *            object value to get duration
+	 * @param tUnit
+	 *            time units of the value
+	 * @return {@link java.time.Duration} built from provided {@code value}, or {@code null} if
+	 *         {@link java.time.Duration} can't be built
+	 */
+	public static java.time.Duration getDuration(Object value, TimeUnit tUnit) {
+		if (value instanceof Duration) {
+			long dValue = ((Duration) value).duration(tUnit);
+
+			return java.time.Duration.of(dValue, tUnit.toChronoUnit());
+		}
+		if (value instanceof java.time.Duration) {
+			return (java.time.Duration) value;
+		}
+		if (value instanceof Number) {
+			long dValue = ((Number) value).longValue();
+
+			return java.time.Duration.of(dValue, tUnit.toChronoUnit());
+		}
+		if (value instanceof TemporalAmount) {
+			return java.time.Duration.from((TemporalAmount) value);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Parses provided duration value {@code value} to {@link java.time.Duration} instance using defined duration format
+	 * RegEx pattern string {@code ptrRegex} or date-time pattern using symbols from {@link java.text.SimpleDateFormat}.
+	 * <p>
+	 * RegEx pattern string shall define these group names to properly resolve values:
+	 * <ul>
+	 * <li>years (date-time pattern token {@code yy}) - for years definition, assuming year has 365 days</li>
+	 * <li>months (date-time pattern token {@code MM}) - for months definition, assuming month has 30 days</li>
+	 * <li>weeks (date-time pattern token {@code ww}) - for weeks definition, assuming week has 7 days</li>
+	 * <li>days (date-time pattern token {@code dd}) - for days definition</li>
+	 * <li>hours (date-time pattern token {@code HH}) - for hours definition</li>
+	 * <li>minutes (date-time pattern token {@code mm}) - for minutes definition</li>
+	 * <li>seconds (date-time pattern token {@code ss}) - for seconds definition</li>
+	 * <li>fraction (date-time pattern token from {@code SS} to {@code SSSSSSSSS}) - for fractional pars of the second:
+	 * milliseconds, microsecond and nanoseconds</li>
+	 * </ul>
+	 *
+	 * @param value
+	 *            duration value to parse
+	 * @param format
+	 *            duration string format RegEx or date-time pattern string, can be {@code null} to use default
+	 *            {@code "HH:mm:ss.SSSSSSSSS"} formatting pattern
+	 * @return {@link java.time.Duration} instance parsed from provided value
+	 *
+	 * @throws ParseException
+	 *             if an error occurs while parsing the provided value based on provided pattern
+	 * 
+	 * @see #parseHMSDuration(String)
+	 * @see #parseHMSDuration(String, String)
+	 */
+	public static java.time.Duration parseDuration(Object value, String format) throws ParseException {
+		try {
+			if (StringUtils.isEmpty(format)) {
+				return Duration.parseHMSDuration(String.valueOf(value));
+			} else {
+				return Duration.parseHMSDuration(String.valueOf(value), format);
+			}
+		} catch (Exception exc) {
+			throw new ParseException(exc.getMessage(), 0);
+		}
 	}
 
 	private static class DurationParser {
