@@ -863,10 +863,10 @@ public class ActivityFieldLocator extends AbstractFieldEntity implements Cloneab
 	 *             format, etc.)
 	 */
 	protected java.time.Duration formatDurationValue(Object value) throws ParseException {
-		if (value instanceof Number) {
-			TimeUnit tUnit = getBuiltInUnits(TimeUnit.MILLISECONDS);
-
-			return Duration.getDuration(value, tUnit);
+		TimeUnit tUnit = getBuiltInUnits(TimeUnit.MILLISECONDS);
+		java.time.Duration duration = Duration.getDuration(value, tUnit);
+		if (duration != null) {
+			return duration;
 		}
 
 		return Duration.parseDuration(value, format);
