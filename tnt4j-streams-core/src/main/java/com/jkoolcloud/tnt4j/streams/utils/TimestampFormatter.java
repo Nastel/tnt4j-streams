@@ -17,9 +17,10 @@
 package com.jkoolcloud.tnt4j.streams.utils;
 
 import java.sql.Timestamp;
-import java.text.Format;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +28,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -36,21 +36,22 @@ import com.jkoolcloud.tnt4j.core.UsecTimestamp;
 /**
  * Provides methods for parsing objects into timestamps and for formatting timestamps as strings.
  * <p>
- * This is based on {@link java.text.SimpleDateFormat}, but extends its support to recognize microsecond fractional
- * seconds. If number of fractional second characters is greater than 3, then it's assumed to be microseconds.
- * Otherwise, it's assumed to be milliseconds (as this is the behavior of {@link java.text.SimpleDateFormat}).
+ * This is based on {@link DateTimeFormatter}. If number of fractional second characters is greater than 3, then it's
+ * assumed to be microseconds. Otherwise, it's assumed to be milliseconds (as this is the behavior of
+ * {@link Timestamp}).
  * <p>
  * Supports such pattern definitions:
  * <ul>
- * <li>{@link java.text.SimpleDateFormat} compliant pattern</li>
+ * <li>{@link DateTimeFormatter} compliant pattern</li>
  * <li>{@code null} to use default locale format</li>
- * <li>multiple {@link java.text.SimpleDateFormat} compliant patterns delimited using {@code "|"} symbol</li>
+ * <li>multiple {@link java.text.SimpleDateFormat} compliant patterns delimited using {@code "|"} symbol. Left for
+ * backward compatibility reasons. {@link DateTimeFormatter} has own optional parts notation.</li>
  * </ul>
  *
  * @version $Revision: 1 $
  *
  * @see java.text.SimpleDateFormat
- * @see FastDateFormat
+ * @see DateTimeFormatter
  * @see com.jkoolcloud.tnt4j.core.UsecTimestamp
  */
 public class TimestampFormatter {
@@ -60,7 +61,7 @@ public class TimestampFormatter {
 	private final TimeUnit units;
 	private final String locale;
 
-	private final Format formatter;
+	private final DateTimeFormatter formatter;
 
 	private static final Map<String, TimestampFormatter> FORMATTERS_MAP = new HashMap<>();
 	private static final Lock accessLock = new ReentrantLock();
@@ -191,16 +192,16 @@ public class TimestampFormatter {
 	}
 
 	/**
-	 * Initializes date/time format using provided pattern, timezone and locale.
+	 * Initializes date/time formatter using provided pattern, timezone and locale.
 	 * 
 	 * @return date/time format instance
 	 */
-	protected Format initFormatter() {
+	protected DateTimeFormatter initFormatter() {
 		return StringUtils.isEmpty(pattern) //
-				? FastDateFormat.getInstance() //
-				: FastDateFormat.getInstance(pattern,
-						StringUtils.isEmpty(timeZone) ? null : TimeZone.getTimeZone(timeZone),
-						StringUtils.isEmpty(locale) ? null : Utils.getLocale(locale));
+				? DateTimeFormatter.ISO_DATE_TIME //
+				: DateTimeFormatter.ofPattern(pattern) //
+						.withZone(StringUtils.isEmpty(timeZone) ? ZoneId.systemDefault() : ZoneId.of(timeZone)) //
+						.withLocale(StringUtils.isEmpty(locale) ? Locale.getDefault() : Utils.getLocale(locale));
 	}
 
 	/**
@@ -333,7 +334,7 @@ public class TimestampFormatter {
 	 *            date/time to format
 	 * @return date/time formatted as a string
 	 * 
-	 * @throws java.lang.IllegalArgumentException
+	 * @throws java.lang.IllegalStateException
 	 *             if this formatter is made for parsing
 	 */
 	public String format(Object value) {
@@ -342,7 +343,19 @@ public class TimestampFormatter {
 					"TimestampFormatter.invalid.format.state"));
 		}
 
-		return formatter.format(value);
+		long dt = 0;
+		if (value instanceof Date) {
+			dt = TimeUnit.MILLISECONDS.toNanos(((Date) value).getTime());
+		} else if (value instanceof UsecTimestamp) {
+			dt = TimeUnit.MICROSECONDS.toNanos(((UsecTimestamp) value).getTimeUsec());
+		} else if (value instanceof Number) {
+			dt = TimeUnit.MILLISECONDS.toNanos(((Number) value).longValue());
+		}
+
+		long ms = TimeUnit.NANOSECONDS.toMillis(dt);
+		long ns = dt % 1_000_000L;
+
+		return formatter.format(Instant.ofEpochMilli(ms).plusNanos(ns));
 	}
 
 	/**

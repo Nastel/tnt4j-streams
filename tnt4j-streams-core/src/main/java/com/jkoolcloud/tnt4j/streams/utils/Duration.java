@@ -583,14 +583,18 @@ public class Duration {
 				return null;
 			}
 
-			long nSec = duration.toNanos();
-
-			long mSec = TimeUnit.NANOSECONDS.toMillis(nSec);// nSec / 1_000_000L;
-			long uSec = TimeUnit.NANOSECONDS.toMicros(nSec % 1_000_000L);// / 1_000L;
-
-			UsecTimestamp dTime = new UsecTimestamp(mSec, uSec);
+			long[] fractions = splitFractions(duration.toNanos());
+			UsecTimestamp dTime = new UsecTimestamp(fractions[0], fractions[1]);
 
 			return dTime;
+		}
+
+		private static long[] splitFractions(long timeNanos) {
+			long[] secs = new long[2];
+			secs[0] = TimeUnit.NANOSECONDS.toMillis(timeNanos);// nSec / 1_000_000L;
+			secs[1] = TimeUnit.NANOSECONDS.toMicros(timeNanos % 1_000_000L);// / 1_000L;
+
+			return secs;
 		}
 	}
 }

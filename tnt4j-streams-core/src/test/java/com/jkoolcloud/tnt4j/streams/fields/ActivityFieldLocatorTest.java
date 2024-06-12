@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.fields;
 import static org.junit.Assert.*;
 
 import java.text.ParseException;
+import java.time.Duration;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -113,27 +114,73 @@ public class ActivityFieldLocatorTest {
 	}
 
 	@Test
-	public void testFormatDateValueFormat() throws ParseException {
+	public void testFormatTimeStringUsec() throws ParseException {
 		locator = new ActivityFieldLocator(1);
 		locator.setDataType(ActivityFieldDataType.DateTime);
-		locator.setFormat("HH:mm:ss.SSSSSS", null);
+		locator.setFormat("[HH:][H:]mm:ss.SSSSSS", null);
 		locator.setTimeZone("UTC");
 		UsecTimestamp fts = locator.formatDateValue("0:00:04.570829");
 		assertEquals(4570829, fts.getTimeUsec());
 	}
 
-	@Test(expected = ParseException.class)
-	public void testFormatDateValueFormatExc() throws ParseException {
+	@Test
+	public void testFormatTimeStringNano() throws ParseException {
 		locator = new ActivityFieldLocator(1);
 		locator.setDataType(ActivityFieldDataType.DateTime);
-		locator.setFormat("HH:mm:ss.SSSSSSSSS", null);
+		locator.setFormat("[HH:][H:]mm:ss.SSSSSSSSS", null);
 		locator.setTimeZone("UTC");
 		UsecTimestamp fts = locator.formatDateValue("0:00:04.570829300");
-		assertEquals(4570829300L, fts.getTimeUsec());
+		assertEquals(4570829L, fts.getTimeUsec());
 	}
 
 	@Test
-	public void testDateAsStringFormatting() throws ParseException {
+	public void testFormatDurationString() throws ParseException {
+		locator = new ActivityFieldLocator(1);
+		locator.setDataType(ActivityFieldDataType.Duration);
+		locator.setFormat("HH:mm:ss.SSSSSSSSS", null);
+		locator.setUnits("Microseconds");
+		Duration duration = locator.formatDurationValue("0:00:04.570829300");
+		assertEquals(4570829300L, duration.toNanos());
+	}
+
+	@Test
+	public void testFormatDateTimeString() throws ParseException {
+		locator = new ActivityFieldLocator(1);
+		locator.setDataType(ActivityFieldDataType.DateTime);
+		locator.setFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS", null);
+		locator.setTimeZone("UTC");
+		UsecTimestamp ftsUTC = locator.formatDateValue("2024-06-06 22:45:15.093750000");
+		long tUTC = ftsUTC.getTimeUsec();
+		assertEquals(1717713915093750L, tUTC);
+
+		locator.setTimeZone("EET");
+		UsecTimestamp ftsEEST = locator.formatDateValue("2024-06-06 22:45:15.093750000");
+		long tEEST = ftsEEST.getTimeUsec();
+		assertEquals(1717703115093750L, tEEST);
+
+		assertEquals(3, TimeUnit.MICROSECONDS.toHours(tUTC - tEEST));
+
+		locator.setFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS Z", null);
+		locator.setTimeZone("UTC");
+		UsecTimestamp ftsZ = locator.formatDateValue("2024-06-06 22:45:15.093750000 +0100");
+		long tZ = ftsZ.getTimeUsec();
+		assertEquals(1717710315093750L, tZ);
+
+		assertEquals(1, TimeUnit.MICROSECONDS.toHours(tUTC - tZ));
+	}
+
+	@Test
+	public void testFormatTimestamp() throws ParseException {
+		locator = new ActivityFieldLocator(1);
+		locator.setDataType(ActivityFieldDataType.Number);
+		locator.setFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS Z", null);
+		locator.setTimeZone("UTC");
+		String ftsUTC = locator.formatStringValue(new UsecTimestamp(1717713915093L, 750));
+		assertEquals("2024-06-06 22:45:15.093750000 +0000", ftsUTC);
+	}
+
+	@Test
+	public void testFormatDateString() throws ParseException {
 		locator = new ActivityFieldLocator("TestField", "", ActivityFieldDataType.String);
 		locator.setFormat("yyyy-MM-dd", null);
 		locator.setTimeZone("UTC");
@@ -173,15 +220,21 @@ public class ActivityFieldLocatorTest {
 		locator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "NONE"); // NON-NLS
 		locator.setDataType(ActivityFieldDataType.Generic);
 		locator.setFormat(null, "lt-LT");
-		assertEquals(-5896456.7898658, locator.formatValue("-5896456,7898658")); // NON-NLS
+		assertEquals(-5896456.7898658, locator.formatValue("−5896456,7898658")); // NON-NLS //NOTE: minus sign is not
+																					// ordinary "-"
 
 		locator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "NONE"); // NON-NLS
 		locator.setDataType(ActivityFieldDataType.Generic);
+		assertEquals(25L, locator.formatValue("25")); // NON-NLS
+
+		locator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "NONE"); // NON-NLS
+		locator.setDataType(ActivityFieldDataType.Generic);
+		locator.setFormat("int", null);
 		assertEquals(25, locator.formatValue("25")); // NON-NLS
 
 		locator = new ActivityFieldLocator(ActivityFieldLocatorType.Label, "NONE"); // NON-NLS
 		locator.setDataType(ActivityFieldDataType.String);
-		locator.setFormat("yyyy-MM-dd", null);
+		locator.setFormat("yyyy-MM-dd", "en-US");
 		assertEquals("yyyy-MM-dd25", locator.formatValue(25)); // NON-NLS
 	}
 

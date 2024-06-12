@@ -27,7 +27,6 @@ import javax.script.ScriptException;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.FastDateFormat;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -964,9 +963,9 @@ public abstract class AbstractWsStream<RQ, RS> extends AbstractBufferedStream<Ws
 			if (cValue instanceof UsecTimestamp) {
 				return ((UsecTimestamp) cValue).toString(format, tz);
 			} else if (cValue instanceof Date) {
-				FastDateFormat df = FastDateFormat.getInstance(format,
-						StringUtils.isEmpty(tz) ? null : TimeZone.getTimeZone(tz));
-				return df.format(cValue);
+				return UsecTimestamp.getTimeStamp(format,
+						StringUtils.isEmpty(tz) ? TimeZone.getDefault() : TimeZone.getTimeZone(tz),
+						((Date) cValue).getTime(), 0);
 			} else if (cValue instanceof Number) {
 				DecimalFormat df = new DecimalFormat(format);
 				return df.format(cValue);
