@@ -30,7 +30,7 @@ public interface AgentMBean {
 
 	/**
 	 * Pauses set of running streams. Names for multiple streams can be provided using delimiter symbol
-	 * {@value com.jkoolcloud.tnt4j.streams.utils.Utils#TAG_DELIM}.
+	 * {@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#DEFAULT_VALUES_DELIM}.
 	 * 
 	 * @param names
 	 *            set of stream names to pause
@@ -44,7 +44,7 @@ public interface AgentMBean {
 
 	/**
 	 * Stops set of running streams. Names for multiple streams can be provided using delimiter symbol
-	 * {@value com.jkoolcloud.tnt4j.streams.utils.Utils#TAG_DELIM}.
+	 * {@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#DEFAULT_VALUES_DELIM}.
 	 * 
 	 * @param names
 	 *            set of stream names to stop
@@ -58,7 +58,7 @@ public interface AgentMBean {
 
 	/**
 	 * Restarts set of running streams. Names for multiple streams can be provided using delimiter symbol
-	 * {@value com.jkoolcloud.tnt4j.streams.utils.Utils#TAG_DELIM}.
+	 * {@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#DEFAULT_VALUES_DELIM}.
 	 * 
 	 * @param names
 	 *            set of stream names to restart

@@ -63,7 +63,6 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  */
 public class JMSStream extends AbstractBufferedStream<Message> {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(JMSStream.class);
-	private static final String DEFINITION_DELIMITER = ",";// NON-NLS
 
 	// Stream properties
 	private String[] queueNames = null;
@@ -89,10 +88,10 @@ public class JMSStream extends AbstractBufferedStream<Message> {
 	@Override
 	public Object getProperty(String name) {
 		if (StreamProperties.PROP_QUEUE_NAME.equalsIgnoreCase(name)) {
-			return StringUtils.join(queueNames, DEFINITION_DELIMITER);
+			return StringUtils.join(queueNames, StreamsConstants.DEFAULT_VALUES_DELIM);
 		}
 		if (StreamProperties.PROP_TOPIC_NAME.equalsIgnoreCase(name)) {
-			return StringUtils.join(topicNames, DEFINITION_DELIMITER);
+			return StringUtils.join(topicNames, StreamsConstants.DEFAULT_VALUES_DELIM);
 		}
 		if (JMSStreamProperties.PROP_JMS_CONN_FACTORY.equalsIgnoreCase(name)) {
 			return jmsConnFactory;
@@ -111,9 +110,9 @@ public class JMSStream extends AbstractBufferedStream<Message> {
 		super.setProperty(name, value);
 
 		if (StreamProperties.PROP_QUEUE_NAME.equalsIgnoreCase(name)) {
-			queueNames = value.split(DEFINITION_DELIMITER);
+			queueNames = value.split(StreamsConstants.DEFAULT_VALUES_DELIM);
 		} else if (StreamProperties.PROP_TOPIC_NAME.equalsIgnoreCase(name)) {
-			topicNames = value.split(DEFINITION_DELIMITER);
+			topicNames = value.split(StreamsConstants.DEFAULT_VALUES_DELIM);
 		} else if (JMSStreamProperties.PROP_JMS_CONN_FACTORY.equalsIgnoreCase(name)) {
 			jmsConnFactory = value;
 		} else if (!StreamsConstants.isStreamCfgProperty(name, JMSStreamProperties.class)) {

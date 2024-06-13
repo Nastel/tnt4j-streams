@@ -74,11 +74,6 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
 public abstract class GenericActivityParser<T> extends ActivityParser {
 
 	/**
-	 * Constant for default values delimiter symbol used by parsers.
-	 */
-	protected static final String DEFAULT_DELIM = ","; // NON-NLS
-
-	/**
 	 * Constant defining locator placeholder {@value}, used to resolve complete activity data package. It is useful to
 	 * redirect complete activity data to stacked parser.
 	 */
@@ -1036,7 +1031,7 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		int valuesCount = IterableUtils.size(fValues);
 		List<ActivityField> tFieldsList = new ArrayList<>(valuesCount);
 		for (int vi = 0; vi < valuesCount; vi++) {
-			dValMap.put(ActivityField.VALUE_INDEX_ENTRY_KEY, vi);
+			dValMap.put(StreamsConstants.VALUE_INDEX_ENTRY_KEY, vi);
 			ActivityField tField = field.createTempField(dValMap);
 			tFieldsList.add(tField);
 		}

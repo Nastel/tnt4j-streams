@@ -32,9 +32,9 @@ import com.jkoolcloud.tnt4j.source.DefaultSourceFactory;
 import com.jkoolcloud.tnt4j.source.Source;
 import com.jkoolcloud.tnt4j.source.SourceFactory;
 import com.jkoolcloud.tnt4j.streams.configure.OutputProperties;
-import com.jkoolcloud.tnt4j.streams.fields.ActivityField;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 import com.jkoolcloud.tnt4j.tracker.Tracker;
 import com.jkoolcloud.tnt4j.tracker.TrackingActivity;
@@ -49,10 +49,10 @@ import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
  * <ul>
  * <li>ResolveServerFromDNS - flag indicating whether to resolve activity entity host name/IP from DNS server. Default
  * value - {@code false}. (Optional, deprecated - use * parser metadata field
- * {@value ActivityField#META_FIELD_RESOLVE_SERVER} to set value for individual entities)</li>
+ * {@value StreamsConstants#META_FIELD_RESOLVE_SERVER} to set value for individual entities)</li>
  * <li>SplitRelatives - flag indicating whether to send activity entity child entities independently merging data from
  * both parent and child entity fields into produced entity. Default value - {@code false}. (Optional, deprecated - use
- * parser metadata field {@value ActivityField#META_FIELD_SPLIT_RELATIVES} to set value for individual entities)</li>
+ * parser metadata field {@value StreamsConstants#META_FIELD_SPLIT_RELATIVES} to set value for individual entities)</li>
  * <li>BuildSourceFQNFromStreamedData - flag indicating whether to set streamed activity entity {@link Source} FQN build
  * from activity fields data instead of default on configured in 'tnt4j.properties'. Default value - {@code true}.
  * (Optional)</li>
@@ -125,11 +125,12 @@ public class JKCloudActivityOutput extends AbstractJKCloudOutput<ActivityInfo, T
 		super.logItem(ai);
 		try {
 			Tracker tracker = getTracker();
-			ai.resolveServer(getBooleanValue(ai.getFieldValue(ActivityField.META_FIELD_RESOLVE_SERVER), resolveServer));
+			ai.resolveServer(
+					getBooleanValue(ai.getFieldValue(StreamsConstants.META_FIELD_RESOLVE_SERVER), resolveServer));
 			String aiFQN = buildFQNFromData ? StringUtils.isEmpty(sourceFQN) ? DEFAULT_SOURCE_FQN : sourceFQN : null;
 
 			Map<Trackable, ActivityInfo> childMap = new LinkedHashMap<>();
-			if (getBooleanValue(ai.getFieldValue(ActivityField.META_FIELD_SPLIT_RELATIVES), splitRelatives)
+			if (getBooleanValue(ai.getFieldValue(StreamsConstants.META_FIELD_SPLIT_RELATIVES), splitRelatives)
 					&& ai.hasChildren()) {
 				ai.buildSplitRelatives(tracker, childMap);
 			} else {

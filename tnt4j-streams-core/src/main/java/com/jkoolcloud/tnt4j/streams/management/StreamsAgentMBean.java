@@ -28,6 +28,7 @@ import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.sink.EventSink;
 import com.jkoolcloud.tnt4j.streams.StreamsAgent;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
@@ -114,7 +115,7 @@ public class StreamsAgentMBean extends StandardMBean implements AgentMBean {
 	}
 
 	private static String[] splitNames(String names) {
-		String[] na = names.split(Utils.TAG_DELIM);
+		String[] na = names.split(StreamsConstants.DEFAULT_VALUES_DELIM);
 
 		for (int i = 0; i < na.length; i++) {
 			na[i] = na[i].trim();

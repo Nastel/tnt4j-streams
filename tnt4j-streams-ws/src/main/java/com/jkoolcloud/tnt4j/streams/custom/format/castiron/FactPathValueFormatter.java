@@ -24,6 +24,7 @@ import com.jkoolcloud.tnt4j.core.Operation;
 import com.jkoolcloud.tnt4j.core.Property;
 import com.jkoolcloud.tnt4j.core.Snapshot;
 import com.jkoolcloud.tnt4j.core.Trackable;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.utils.Utils;
 
 /**
@@ -168,7 +169,7 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 			Object value = p.getValue();
 
 			nvString.append(getKeyStr(sName, pKey));
-			nvString.append(EQ).append(getValueStr(value)).append(FIELD_SEP);
+			nvString.append(EQ).append(getValueStr(value)).append(StreamsConstants.DEFAULT_VALUES_DELIM);
 		}
 		return nvString;
 	}

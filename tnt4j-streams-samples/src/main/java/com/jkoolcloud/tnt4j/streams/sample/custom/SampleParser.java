@@ -32,6 +32,7 @@ import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 import com.jkoolcloud.tnt4j.streams.parsers.GenericActivityParser;
 import com.jkoolcloud.tnt4j.streams.parsers.data.ActivityData;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 
 /**
  * Sample custom parser.
@@ -44,7 +45,7 @@ public class SampleParser extends GenericActivityParser<String[]> {
 	/**
 	 * Defines field separator.
 	 */
-	protected String fieldDelim = DEFAULT_DELIM;
+	protected String fieldDelim = StreamsConstants.DEFAULT_VALUES_DELIM;
 
 	/**
 	 * Constructs an SampleParser.

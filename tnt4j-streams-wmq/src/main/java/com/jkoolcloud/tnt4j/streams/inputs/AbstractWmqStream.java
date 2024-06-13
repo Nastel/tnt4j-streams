@@ -107,10 +107,6 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 	protected static final String FORCE_OPEN_OPTION = "!"; // NON-NLS
 
 	/**
-	 * QM connections (hosts) delimiter symbol.
-	 */
-	protected static final String CONN_DELIM = ","; // NON-NLS
-	/**
 	 * QM connection host and port delimiter symbol.
 	 */
 	protected static final String PORT_DELIM = ":"; // NON-NLS
@@ -328,7 +324,7 @@ public abstract class AbstractWmqStream<T> extends TNTParseableInputStream<T> {
 		connections.clear();
 
 		if (StringUtils.isNotEmpty(connection)) {
-			String[] connStrs = connection.split(CONN_DELIM);
+			String[] connStrs = connection.split(StreamsConstants.DEFAULT_VALUES_DELIM);
 
 			for (String connStr : connStrs) {
 				Pair<String, Integer> conn;

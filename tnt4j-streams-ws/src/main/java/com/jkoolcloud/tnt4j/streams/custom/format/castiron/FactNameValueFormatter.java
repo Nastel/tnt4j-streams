@@ -24,6 +24,7 @@ import com.jkoolcloud.tnt4j.core.*;
 import com.jkoolcloud.tnt4j.format.DefaultFormatter;
 import com.jkoolcloud.tnt4j.source.Source;
 import com.jkoolcloud.tnt4j.streams.fields.StreamFieldType;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 import com.jkoolcloud.tnt4j.tracker.TrackingActivity;
 import com.jkoolcloud.tnt4j.tracker.TrackingEvent;
@@ -70,10 +71,6 @@ public class FactNameValueFormatter extends DefaultFormatter {
 	 * Carriage-return symbol {@value}.
 	 */
 	protected static final String CR = "\r"; // NON-NLS
-	/**
-	 * Field separator symbol {@value}.
-	 */
-	protected static final String FIELD_SEP = ","; // NON-NLS
 	/**
 	 * Formatted data package end symbol {@value}.
 	 */
@@ -126,7 +123,8 @@ public class FactNameValueFormatter extends DefaultFormatter {
 
 		nvString.append("OBJ:"); // NON-NLS
 		// ------------------------------------------------------------- name
-		toString(nvString, event.getSource()).append(PATH_DELIM).append("Events").append(FIELD_SEP); // NON-NLS
+		toString(nvString, event.getSource()).append(PATH_DELIM).append("Events")
+				.append(StreamsConstants.DEFAULT_VALUES_DELIM); // NON-NLS
 
 		toString(nvString, getTrackableKey(event, StreamFieldType.EventName.name()), event.getOperation().getName());
 		toString(nvString, getTrackableKey(event, StreamFieldType.Severity.name()), event.getSeverity());
@@ -177,7 +175,8 @@ public class FactNameValueFormatter extends DefaultFormatter {
 		StringBuilder nvString = new StringBuilder(1024);
 
 		nvString.append("OBJ:"); // NON-NLS
-		toString(nvString, activity.getSource()).append(PATH_DELIM).append("Activities").append(FIELD_SEP); // NON-NLS
+		toString(nvString, activity.getSource()).append(PATH_DELIM).append("Activities")
+				.append(StreamsConstants.DEFAULT_VALUES_DELIM); // NON-NLS
 
 		toString(nvString, getTrackableKey(activity, StreamFieldType.EventName.name()), activity.getName());
 		toString(nvString, getTrackableKey(activity, StreamFieldType.Severity.name()), activity.getSeverity());
@@ -236,7 +235,8 @@ public class FactNameValueFormatter extends DefaultFormatter {
 
 		// ------------------------------------------------------ category, id or name
 		nvString.append("OBJ:");
-		toString(nvString, snapshot.getSource()).append(PATH_DELIM).append(snapshot.getCategory()).append(FIELD_SEP); // NON-NLS
+		toString(nvString, snapshot.getSource()).append(PATH_DELIM).append(snapshot.getCategory())
+				.append(StreamsConstants.DEFAULT_VALUES_DELIM); // NON-NLS
 		toString(nvString, (Trackable) null, snapshot).append(END_SEP);
 
 		return nvString.toString();
@@ -247,9 +247,9 @@ public class FactNameValueFormatter extends DefaultFormatter {
 		StringBuilder nvString = new StringBuilder(1024);
 
 		nvString.append("OBJ:"); // NON-NLS
-		toString(nvString, source).append(PATH_DELIM).append("Message").append(FIELD_SEP); // NON-NLS
+		toString(nvString, source).append(PATH_DELIM).append("Message").append(StreamsConstants.DEFAULT_VALUES_DELIM); // NON-NLS
 		nvString.append(SELF_SNAP_NAME).append(PATH_DELIM).append("level"); // NON-NLS
-		formatValue(nvString, level, FIELD_SEP);
+		formatValue(nvString, level, StreamsConstants.DEFAULT_VALUES_DELIM);
 		nvString.append(SELF_SNAP_NAME).append(PATH_DELIM).append("msg-text"); // NON-NLS
 		formatValue(nvString, Utils.format(msg, args), END_SEP);
 		return nvString.toString();
@@ -382,7 +382,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 				nvString.append(getAPValueType(value));
 			}
 			nvString.append(getKeyStr(sName, pKey));
-			formatValue(nvString, value, FIELD_SEP);
+			formatValue(nvString, value, StreamsConstants.DEFAULT_VALUES_DELIM);
 		}
 		return nvString;
 	}
@@ -424,7 +424,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 	 */
 	protected StringBuilder toString(StringBuilder nvString, String key, Object value) {
 		nvString.append(key);
-		nvString.append(EQ).append(getValueStr(value)).append(FIELD_SEP);
+		nvString.append(EQ).append(getValueStr(value)).append(StreamsConstants.DEFAULT_VALUES_DELIM);
 		return nvString;
 	}
 
@@ -572,7 +572,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 	 * <li>{@code "\""} to {@code "'"}</li>
 	 * <li>{@code "/"} to {@code "%"}</li>
 	 * <li>{@value #EQ} to {@value #PATH_DELIM}</li>
-	 * <li>{@value #FIELD_SEP} to {@value #FS_REP}</li>
+	 * <li>{@value StreamsConstants#DEFAULT_VALUES_DELIM} to {@value #FS_REP}</li>
 	 * </ul>
 	 */
 	protected void initDefaultKeyReplacements() {
@@ -580,7 +580,7 @@ public class FactNameValueFormatter extends DefaultFormatter {
 		keyReplacements.put("\"", "'"); // NON-NLS
 		keyReplacements.put("/", "%"); // NON-NLS
 		keyReplacements.put(EQ, PATH_DELIM);
-		keyReplacements.put(FIELD_SEP, FS_REP);
+		keyReplacements.put(StreamsConstants.DEFAULT_VALUES_DELIM, FS_REP);
 	}
 
 	/**

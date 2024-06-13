@@ -77,10 +77,6 @@ import groovy.util.CharsetToolkit;
  */
 public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 
-	/**
-	 * Tags collection string token delimiter.
-	 */
-	public static final String TAG_DELIM = ","; // NON-NLS
 	private static final String VALUE_DELIM = "\\|"; // NON-NLS
 	private static final String HEX_PREFIX = "0x"; // NON-NLS
 	private static final Pattern LINE_ENDINGS_PATTERN = Pattern.compile("(\\r\\n|\\r|\\n)"); // NON-NLS
@@ -461,10 +457,11 @@ public final class Utils extends com.jkoolcloud.tnt4j.utils.Utils {
 		}
 
 		// in case it is matrix array, flatten to single level array
-		arrayString = arrayString.replace("][", TAG_DELIM).replace("][", TAG_DELIM); // NON-NLS
+		arrayString = arrayString.replace("][", StreamsConstants.DEFAULT_VALUES_DELIM).replace("][",
+				StreamsConstants.DEFAULT_VALUES_DELIM); // NON-NLS
 		arrayString = arrayString.replace("[", "").replace("]", ""); // NON-NLS
 
-		String[] tags = arrayString.split(TAG_DELIM);
+		String[] tags = arrayString.split(StreamsConstants.DEFAULT_VALUES_DELIM);
 
 		for (int i = 0; i < tags.length; i++) {
 			if (tags[i] != null) {

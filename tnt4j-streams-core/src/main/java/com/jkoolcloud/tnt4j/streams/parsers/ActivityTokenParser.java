@@ -40,6 +40,7 @@ import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 import com.jkoolcloud.tnt4j.streams.parsers.data.ActivityData;
 import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
@@ -51,7 +52,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * This parser supports the following configuration properties (in addition to those supported by
  * {@link GenericActivityParser}):
  * <ul>
- * <li>FieldDelim - fields separator. Default value - {@value DEFAULT_DELIM}. (Optional)</li>
+ * <li>FieldDelim - fields separator. Default value - {@value StreamsConstants#DEFAULT_VALUES_DELIM}. (Optional)</li>
  * <li>Pattern - pattern used to determine which types of activity data string this parser supports. When {@code null},
  * all strings are assumed to match the format supported by this parser. (Optional)</li>
  * <li>StripQuotes - whether surrounding double quotes should be stripped off. Default value - {@code true}.
@@ -80,9 +81,10 @@ public class ActivityTokenParser extends GenericActivityParser<String[]> {
 
 	/**
 	 * Contains the field separator (set by {@code FieldDelim} property) - default:
-	 * {@value com.jkoolcloud.tnt4j.streams.parsers.GenericActivityParser#DEFAULT_DELIM}
+	 * {@value StreamsConstants#DEFAULT_VALUES_DELIM}
 	 */
-	protected StringMatcher fieldDelim = StringMatcherFactory.INSTANCE.charSetMatcher(DEFAULT_DELIM);
+	protected StringMatcher fieldDelim = StringMatcherFactory.INSTANCE
+			.charSetMatcher(StreamsConstants.DEFAULT_VALUES_DELIM);
 
 	/**
 	 * Indicates whether surrounding double quotes should be stripped from extracted data values (set by

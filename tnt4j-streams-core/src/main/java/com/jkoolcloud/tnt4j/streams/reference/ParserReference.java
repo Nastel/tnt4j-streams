@@ -72,7 +72,8 @@ public class ParserReference implements Reference<ActivityParser> {
 	}
 
 	/**
-	 * Sets activity parser tags string. Tags are split into array using {@value Utils#TAG_DELIM}.
+	 * Sets activity parser tags string. Tags are split into array using
+	 * {@value com.jkoolcloud.tnt4j.streams.utils.StreamsConstants#DEFAULT_VALUES_DELIM}.
 	 *
 	 * @param tags
 	 *            tags string

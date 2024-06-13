@@ -137,6 +137,23 @@ public final class StreamsConstants {
 	 */
 	public static final String CTX_PARENT_CTX_KEY = "CTX_PARENT_CONTEXT"; // NON-NLS
 
+	/**
+	 * Constant for default delimiter symbol used to delimit multiple field values.
+	 */
+	public static final String DEFAULT_VALUES_DELIM = ","; // NON-NLS
+	/**
+	 * Constant defining entry key for dynamic locators resolved values map to store processed value index.
+	 */
+	public static final String VALUE_INDEX_ENTRY_KEY = "$ValueIndex$"; // NON-NLS
+	/**
+	 * Constant defining entity metadata built-in field name {@value}.
+	 */
+	public static final String META_FIELD_RESOLVE_SERVER = "@ResolveServerFromDNS@"; // NON-NLS
+	/**
+	 * Constant defining entity metadata built-in field name {@value}.
+	 */
+	public static final String META_FIELD_SPLIT_RELATIVES = "@SplitRelatives@"; // NON-NLS
+
 	private StreamsConstants() {
 	}
 

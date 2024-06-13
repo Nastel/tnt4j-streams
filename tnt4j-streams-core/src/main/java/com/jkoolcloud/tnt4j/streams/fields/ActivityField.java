@@ -47,25 +47,6 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
 public class ActivityField extends AbstractFieldEntity {
 	private static final EventSink LOGGER = LoggerUtils.getLoggerSink(ActivityField.class);
 
-	/**
-	 * Constant for default delimiter symbol used to delimit multiple field values.
-	 */
-	public static final String DEFAULT_FIELD_VALUES_DELIM = ","; // NON-NLS
-
-	/**
-	 * Constant defining entry key for dynamic locators resolved values map to store processed value index.
-	 */
-	public static final String VALUE_INDEX_ENTRY_KEY = "$ValueIndex$"; // NON-NLS
-
-	/**
-	 * Constant defining entity metadata built-in field name {@value}.
-	 */
-	public static final String META_FIELD_RESOLVE_SERVER = "@ResolveServerFromDNS@"; // NON-NLS
-	/**
-	 * Constant defining entity metadata built-in field name {@value}.
-	 */
-	public static final String META_FIELD_SPLIT_RELATIVES = "@SplitRelatives@"; // NON-NLS
-
 	private static final Pattern METADATA_FIELD_NAME_PATTERN = Pattern.compile("@\\S+@");
 
 	private String fieldTypeName;
@@ -419,7 +400,7 @@ public class ActivityField extends AbstractFieldEntity {
 	 * @return the string being used to separate raw values
 	 */
 	public String getSeparator() {
-		return separator == null ? DEFAULT_FIELD_VALUES_DELIM : separator;
+		return separator == null ? StreamsConstants.DEFAULT_VALUES_DELIM : separator;
 	}
 
 	/**
@@ -711,7 +692,7 @@ public class ActivityField extends AbstractFieldEntity {
 	public ActivityField createTempField(Map<String, Object> dValues) {
 		ActivityField tField = new ActivityField(fillDynamicAttr(fieldTypeName, dValues));
 		tField.locators = getTempFieldLocators(locators,
-				dValues == null ? 0 : (int) dValues.get(VALUE_INDEX_ENTRY_KEY));
+				dValues == null ? 0 : (int) dValues.get(StreamsConstants.VALUE_INDEX_ENTRY_KEY));
 		tField.separator = fillDynamicAttr(separator, dValues);
 		tField.formattingPattern = fillDynamicAttr(formattingPattern, dValues);
 		tField.requiredVal = requiredVal;
@@ -731,7 +712,7 @@ public class ActivityField extends AbstractFieldEntity {
 		String tAttr = dAttr;
 
 		if (isDynamicAttr(dAttr) && MapUtils.isNotEmpty(dValMap)) {
-			int valueIndex = (int) dValMap.get(VALUE_INDEX_ENTRY_KEY);
+			int valueIndex = (int) dValMap.get(StreamsConstants.VALUE_INDEX_ENTRY_KEY);
 			tAttr = dAttr = dAttr.replace(StreamsConstants.VALUE_ORDINAL_INDEX, String.valueOf(valueIndex));
 			List<String> vars = new ArrayList<>();
 			Utils.resolveCfgVariables(vars, dAttr);
