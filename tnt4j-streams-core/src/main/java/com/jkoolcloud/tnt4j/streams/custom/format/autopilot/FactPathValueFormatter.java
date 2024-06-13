@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.jkoolcloud.tnt4j.core.Operation;
 import com.jkoolcloud.tnt4j.core.Property;
 import com.jkoolcloud.tnt4j.core.Snapshot;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
 /**
@@ -150,7 +151,7 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 			} else {
 				nvString.append(getKeyStr(sName, pKey));
 			}
-			nvString.append(EQ).append(getValueStr(value)).append(FIELD_SEP);
+			nvString.append(EQ).append(getValueStr(value)).append(StreamsConstants.DEFAULT_VALUES_DELIM);
 		}
 		return nvString;
 	}
@@ -278,7 +279,7 @@ public class FactPathValueFormatter extends FactNameValueFormatter {
 		String propsStr = objCanonName.substring(ddIdx + 1);
 
 		if (!propsStr.isEmpty()) {
-			propsStr = Utils.replace(propsStr, FIELD_SEP, LF);
+			propsStr = Utils.replace(propsStr, StreamsConstants.DEFAULT_VALUES_DELIM, LF);
 			try (Reader rdr = new StringReader(propsStr)) {
 				props.load(rdr);
 			} catch (IOException exc) {

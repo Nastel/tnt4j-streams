@@ -138,6 +138,11 @@ public final class StreamsConstants {
 	public static final String CTX_PARENT_CTX_KEY = "CTX_PARENT_CONTEXT"; // NON-NLS
 
 	/**
+	 * The constant defining streams internally used value type for {@code "embedded-activity"} fields.
+	 */
+	public static final String EMBEDDED_ACTIVITY_FIELD_VALUE_TYPE = "@EmBeDdEd@AcTiViTy@"; // NON-NLS
+
+	/**
 	 * Constant for default delimiter symbol used to delimit multiple field values.
 	 */
 	public static final String DEFAULT_VALUES_DELIM = ","; // NON-NLS

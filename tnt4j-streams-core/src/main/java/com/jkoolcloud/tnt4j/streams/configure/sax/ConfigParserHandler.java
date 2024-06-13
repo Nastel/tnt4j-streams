@@ -1014,6 +1014,7 @@ public class ConfigParserHandler extends DefaultHandler {
 		af.setRequired(reqVal);
 		af.setTransparent(true);
 		af.setSplitCollection(split);
+		af.setValueType(StreamsConstants.EMBEDDED_ACTIVITY_FIELD_VALUE_TYPE);
 	}
 
 	/**

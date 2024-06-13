@@ -157,7 +157,8 @@ public class ActivityInfo {
 		if (!field.isTransparent()) {
 			setFieldValue(field, value);
 		} else {
-			addActivityProperty(field.getFieldTypeName(), getAggregatedFieldValue(value, field), true);
+			addActivityProperty(field.getFieldTypeName(), getAggregatedFieldValue(value, field), field.getValueType(),
+					field.isTransparent());
 		}
 	}
 
@@ -570,8 +571,6 @@ public class ActivityInfo {
 	 * @return previous property value replaced by {@code propValue} or {@code null} if there was no such activity
 	 *         property set
 	 *
-	 * @see java.util.Map#put(Object, Object)
-	 * @see #buildTrackable(com.jkoolcloud.tnt4j.tracker.Tracker, java.util.Map)
 	 * @see #addActivityProperty(String, Object, boolean)
 	 */
 	public Object addActivityProperty(String propName, Object propValue) {
@@ -591,13 +590,10 @@ public class ActivityInfo {
 	 * @return previous property value replaced by {@code propValue} or {@code null} if there was no such activity
 	 *         property set
 	 *
-	 * @see java.util.Map#put(Object, Object)
-	 * @see #buildTrackable(com.jkoolcloud.tnt4j.tracker.Tracker, java.util.Map)
-	 * @see com.jkoolcloud.tnt4j.core.Property#Property(String, Object, boolean)
-	 * @see #addActivityProperty(com.jkoolcloud.tnt4j.core.Property)
+	 * @see #addActivityProperty(String, Object, String, boolean)
 	 */
 	public Object addActivityProperty(String propName, Object propValue, boolean transient_) {
-		return addActivityProperty(new Property(propName, propValue, transient_));
+		return addActivityProperty(propName, propValue, null, transient_);
 	}
 
 	/**
@@ -613,15 +609,36 @@ public class ActivityInfo {
 	 * @return previous property value replaced by {@code propValue} or {@code null} if there was no such activity
 	 *         property set
 	 *
+	 * @see #addActivityProperty(String, Object, String, boolean)
+	 */
+	public Object addActivityProperty(String propName, Object propValue, String valueType) {
+		return addActivityProperty(propName, propValue, valueType, false);
+	}
+
+	/**
+	 * Adds activity item property to item properties map. Properties from map are transferred as tracking event
+	 * properties when {@link #buildTrackable(com.jkoolcloud.tnt4j.tracker.Tracker, java.util.Map)} is invoked.
+	 *
+	 * @param propName
+	 *            activity item property key
+	 * @param propValue
+	 *            activity item property value
+	 * @param valueType
+	 *            activity item property value type from {@link com.jkoolcloud.tnt4j.core.ValueTypes} set
+	 * @param transient_
+	 *            flag indicating whether property is transient
+	 * @return previous property value replaced by {@code propValue} or {@code null} if there was no such activity
+	 *         property set
+	 *
 	 * @see java.util.Map#put(Object, Object)
 	 * @see #buildTrackable(com.jkoolcloud.tnt4j.tracker.Tracker, java.util.Map)
-	 * @see com.jkoolcloud.tnt4j.core.Property#Property(String, Object, String)
+	 * @see com.jkoolcloud.tnt4j.core.Property#Property(String, Object, String, boolean)
 	 * @see #addActivityProperty(com.jkoolcloud.tnt4j.core.Property)
 	 * @see com.jkoolcloud.tnt4j.core.ValueTypes
 	 */
-	public Object addActivityProperty(String propName, Object propValue, String valueType) {
+	public Object addActivityProperty(String propName, Object propValue, String valueType, boolean transient_) {
 		return addActivityProperty(new Property(propName, propValue,
-				StringUtils.isEmpty(valueType) ? getDefaultValueType(propValue) : valueType));
+				StringUtils.isEmpty(valueType) ? getDefaultValueType(propValue) : valueType, transient_));
 	}
 
 	/**
@@ -985,7 +1002,9 @@ public class ActivityInfo {
 					}
 					event.getOperation().addSnapshot((Snapshot) ap.getValue());
 				} else {
-					event.addProperty(ap);
+					if (!StreamsConstants.EMBEDDED_ACTIVITY_FIELD_VALUE_TYPE.equals(ap.getValueType())) {
+						event.addProperty(ap);
+					}
 				}
 			}
 		}
@@ -1077,7 +1096,9 @@ public class ActivityInfo {
 					}
 					activity.add((Trackable) ap.getValue());
 				} else {
-					activity.addProperty(ap);
+					if (!StreamsConstants.EMBEDDED_ACTIVITY_FIELD_VALUE_TYPE.equals(ap.getValueType())) {
+						activity.addProperty(ap);
+					}
 				}
 			}
 		}
@@ -1408,7 +1429,9 @@ public class ActivityInfo {
 
 		if (activityProperties != null) {
 			for (Property ap : activityProperties.values()) {
-				snapshot.addProperty(ap);
+				if (!StreamsConstants.EMBEDDED_ACTIVITY_FIELD_VALUE_TYPE.equals(ap.getValueType())) {
+					snapshot.addProperty(ap);
+				}
 			}
 		}
 	}

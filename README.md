@@ -508,7 +508,7 @@ forwarded to another parser to make more detailed parsing: envelope-message appr
 
 To define stacked parser(s) you have to define `parser-ref` tag(s) under parser `field` or `embedded-activity` definition.
 
-**NOTE:** `embeded-activity` is tag `field` alias, used to define set of locator resolved data transparent to parent activity, but useful to
+**NOTE:** `embedded-activity` is tag `field` alias, used to define set of locator resolved data transparent to parent activity, but useful to
 make separate set of related child activities.
 
 **NOTE:** if upper level parser resolved data is incompatible with stacked parser, stacked parser is not applied to parse that data.

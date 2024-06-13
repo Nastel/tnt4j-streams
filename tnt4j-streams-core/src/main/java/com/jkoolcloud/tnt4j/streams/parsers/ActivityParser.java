@@ -31,6 +31,7 @@ import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTParseableInputStream;
 import com.jkoolcloud.tnt4j.streams.parsers.data.ActivityData;
 import com.jkoolcloud.tnt4j.streams.parsers.data.CommonActivityData;
+import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
 import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
 import com.jkoolcloud.tnt4j.streams.utils.Utils;
 
@@ -218,7 +219,9 @@ public abstract class ActivityParser implements NamedObject {
 			throws IllegalStateException, ParseException {
 
 		ActivityInfo ai = cData.getActivity();
-		applyFieldValue(ai, field, value);
+		if (!StreamsConstants.EMBEDDED_ACTIVITY_FIELD_VALUE_TYPE.equals(field.getValueType())) {
+			applyFieldValue(ai, field, value);
+		}
 
 		if (value != null && CollectionUtils.isNotEmpty(field.getStackedParsers())) {
 			boolean applied = false;
