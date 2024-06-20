@@ -30,7 +30,6 @@ import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import com.jkoolcloud.tnt4j.core.OpLevel;
 import com.jkoolcloud.tnt4j.streams.configure.ParserProperties;
@@ -54,8 +53,16 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  * software, remove this property form stream parser configuration. Default value - '{@code false}'. (Optional)</li>
  * <li>ActivityDelim - defines activities delimiter symbol/token used by parsers. Value can be one of: {@code "EOL"} -
  * end of line, or {@code "EOF"} - end of file/stream. Default value - '{@code EOL}'. (Optional)</li>
- * <li>IncludeDelimiter - flag indicating whether RAW activity data text string shall include customly defined activity
- * delimiter symbol/token. Default value - '{@code true}'. (Optional)</li>
+ * <li>DelimiterRule - defines activities delimiter handling rules:
+ * <ul>
+ * <li>BEGINNING - delimiter marks beginning of raw activity data. Delimiter itself gets included into raw activity
+ * data. Aliases - {@code "BEGIN", "STARTING", "START" "FROM"}</li>
+ * <li>TERMINATING - delimiter marks end of RAW activity data. Delimiter itself gets included into raw activity data.
+ * Aliases - {@code "TERMINATE", "ENDING", "END", "STOP", "TO"}</li>
+ * <li>DELIMITING - delimiter is ordinary data chunks separator. Delimiter itself gets ommited from raw activity data.
+ * Aliases - {@code "SPLIT", "DELIM", "DELIMIT", "SEPARATE", "DIVIDE", "DIV"}</li>
+ * </ul>
+ * Default value - '{@code TERMINATE}'. (Optional)</li>
  * <li>RequireDefault - indicates that all parser fields/locators by default requires to resolve non-null value. Default
  * value - {@code false}. (Optional)</li>
  * <li>AutoArrangeFields - flag indicating parser fields shall be automatically ordered by parser to ensure references
@@ -69,7 +76,7 @@ import com.jkoolcloud.tnt4j.streams.utils.*;
  *
  * @param <T>
  *            the type of handled activity data
- * @version $Revision: 2 $
+ * @version $Revision: 3 $
  */
 public abstract class GenericActivityParser<T> extends ActivityParser {
 
@@ -108,10 +115,9 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 	protected String activityDelim = ActivityDelim.EOL.name();
 
 	/**
-	 * Flag indicating whether RAW activity data text string shall include customly defined activity delimiter
-	 * symbol/token.
+	 * Defines activities delimiter handling rules: {@code "BEGINNING"}, {@code "TERMINATING"} or {@code "DELIMITING"}.
 	 */
-	protected boolean includeDelimiter = true;
+	protected DelimitedReader.DelimRule delimiterRule = DelimitedReader.DelimRule.TERMINATING;
 
 	/**
 	 * Property defining activities composite data (like map) field path tokens delimiter. Default value is
@@ -175,8 +181,8 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"ActivityParser.setting", name, value);
 			}
-		} else if (ParserProperties.PROP_INCLUDE_DELIM.equalsIgnoreCase(name)) {
-			includeDelimiter = Utils.toBoolean(value);
+		} else if (ParserProperties.PROP_DELIMITER_RULE.equalsIgnoreCase(name)) {
+			delimiterRule = DelimitedReader.DelimRule.valueOfAny(value.toUpperCase());
 
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityParser.setting", name, value);
@@ -211,8 +217,8 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		if (ParserProperties.PROP_ACTIVITY_DELIM.equalsIgnoreCase(name)) {
 			return activityDelim;
 		}
-		if (ParserProperties.PROP_INCLUDE_DELIM.equalsIgnoreCase(name)) {
-			return includeDelimiter;
+		if (ParserProperties.PROP_DELIMITER_RULE.equalsIgnoreCase(name)) {
+			return delimiterRule;
 		}
 		if (ParserProperties.PROP_REQUIRE_ALL.equalsIgnoreCase(name)) {
 			return requireAll;
@@ -622,6 +628,8 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		return readNextActivity(rdr);
 	}
 
+	private DelimitedReader delimitedReader;
+
 	/**
 	 * Reads RAW activity data string (line) from {@link BufferedReader}.
 	 *
@@ -640,7 +648,10 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 				} else if (ActivityDelim.EOF.name().equals(activityDelim)) {
 					str = Utils.readAll(rdr);
 				} else {
-					str = scanReader(rdr, activityDelim, includeDelimiter);
+					if (delimitedReader == null) {
+						delimitedReader = new DelimitedReader();
+					}
+					str = delimitedReader.readDelimited(rdr, activityDelim, delimiterRule);
 				}
 			} catch (EOFException eof) {
 				Utils.logThrowable(logger(), OpLevel.DEBUG,
@@ -656,31 +667,6 @@ public abstract class GenericActivityParser<T> extends ActivityParser {
 		}
 
 		return str;
-	}
-
-	private ImmutablePair<BufferedReader, Scanner> scannerPair;
-
-	private String scanReader(BufferedReader rdr, String delimiter, boolean includeDelim) throws IOException {
-		Scanner scanner;
-		if (scannerPair == null || scannerPair.getLeft().hashCode() != rdr.hashCode()) {
-			scanner = new Scanner(rdr);
-			scanner.useDelimiter(delimiter);
-
-			scannerPair = new ImmutablePair<>(rdr, scanner);
-		} else {
-			scanner = scannerPair.getRight();
-		}
-
-		if (scanner.hasNext()) {
-			String str = scanner.next();
-			if (includeDelim) {
-				String dStr = scanner.findWithinHorizon(delimiter, 100);
-				str += dStr;
-			}
-			return str;
-		} else {
-			return Utils.readAll(rdr);
-		}
 	}
 
 	private static final String[] ACTIVITY_DATA_TYPES = { "TEXT" }; // NON-NLS

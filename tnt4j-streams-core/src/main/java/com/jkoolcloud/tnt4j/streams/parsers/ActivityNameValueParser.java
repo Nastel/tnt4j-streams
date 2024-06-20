@@ -54,7 +54,7 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * all strings are assumed to match the format supported by this parser. (Optional)</li>
  * <li>StripQuotes - whether surrounding double quotes should be stripped off. Default value - {@code true}.
  * (Optional)</li>
- * <li>EntryPattern - pattern used to to split data into name/value pairs. It should define two RegEx groups named
+ * <li>EntryPattern - pattern used to split data into name/value pairs. It should define two RegEx groups named
  * {@code "key"} and {@code "value"} used to map data contained values to name/value pair. NOTE: this parameter takes
  * preference on {@code "FieldDelim"} and {@code "ValueDelim"} properties. (Optional)</li>
  * </ul>
@@ -92,7 +92,7 @@ public class ActivityNameValueParser extends AbstractActivityMapParser {
 	protected boolean stripQuotes = true;
 
 	/**
-	 * Contains the pattern used to to split data into name/value pairs. It should define two RegEx groups named
+	 * Contains the pattern used to split data into name/value pairs. It should define two RegEx groups named
 	 * {@code "key"} and {@code "value"} used to map data contained values to name/value pair. NOTE: this parameter
 	 * takes preference on {@link #fieldDelim} and {@link #valueDelim} parameters.
 	 */

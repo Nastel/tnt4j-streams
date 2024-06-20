@@ -977,7 +977,7 @@
             <xs:enumeration value="EntryPattern">
                 <xs:annotation>
                     <xs:documentation>
-                        Property defines pattern used to to split data into name/value pairs. It should define two RegEx groups named "key"
+                        Property defines pattern used to split data into name/value pairs. It should define two RegEx groups named "key"
                         and "value" used to map data contained values to name/value pair. NOTE: this parameter takes preference on
                         "FieldDelim" and "ValueDelim" properties.
                     </xs:documentation>
@@ -989,6 +989,21 @@
                     <xs:documentation>
                         Property indicates the delimiter of activity RAW data entries. Can be "EOL" (end-of-line), or "EOF"
                         (end-of-file/stream).
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+
+            <xs:enumeration value="DelimiterRule">
+                <xs:annotation>
+                    <xs:documentation>
+                        Property defines activities delimiter handling rules:
+                        * BEGINNING - delimiter marks beginning of raw activity data. Delimiter itself gets included into raw activity data.
+                        Aliases - "BEGIN", "STARTING", "START" "FROM"
+                        * TERMINATING - delimiter marks end of RAW activity data. Delimiter itself gets included into raw activity data.
+                        Aliases - "TERMINATE", "ENDING", "END", "STOP", "TO"
+                        * DELIMITING - delimiter is ordinary data chunks separator. Delimiter itself gets ommited from raw activity data.
+                        Aliases - "SPLIT", "DELIM", "DELIMIT", "SEPARATE", "DIVIDE", "DIV"
+                        Default value - "TERMINATE".
                     </xs:documentation>
                 </xs:annotation>
             </xs:enumeration>

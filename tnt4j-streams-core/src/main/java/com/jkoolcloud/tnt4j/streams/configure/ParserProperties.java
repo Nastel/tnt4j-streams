@@ -118,5 +118,5 @@ public interface ParserProperties {
 	/**
 	 * Constant for name of built-in {@value} property.
 	 */
-	String PROP_INCLUDE_DELIM = "IncludeDelimiter"; // NON-NLS
+	String PROP_DELIMITER_RULE = "DelimiterRule"; // NON-NLS
 }

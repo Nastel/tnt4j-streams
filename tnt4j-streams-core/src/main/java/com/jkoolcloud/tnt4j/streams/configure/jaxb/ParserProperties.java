@@ -149,8 +149,8 @@ public enum ParserProperties {
 
 	/**
 	 *
-	 * Property defines pattern used to to split data into name/value pairs. It should define two RegEx groups named
-	 * "key" and "value" used to map data contained values to name/value pair. NOTE: this parameter takes preference on
+	 * Property defines pattern used to split data into name/value pairs. It should define two RegEx groups named "key"
+	 * and "value" used to map data contained values to name/value pair. NOTE: this parameter takes preference on
 	 * "FieldDelim" and "ValueDelim" properties.
 	 *
 	 *

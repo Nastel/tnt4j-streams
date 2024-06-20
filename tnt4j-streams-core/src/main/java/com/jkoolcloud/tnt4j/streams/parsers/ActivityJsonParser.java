@@ -150,7 +150,8 @@ public class ActivityJsonParser extends GenericActivityParser<DocumentContext> {
 		super.setProperty(name, value);
 
 		if (ParserProperties.PROP_READ_LINES.equalsIgnoreCase(name)) {
-			activityDelim = Utils.toBoolean(value) ? ActivityDelim.EOL.name() : ActivityDelim.EOF.name();
+			super.setProperty(ParserProperties.PROP_ACTIVITY_DELIM,
+					Utils.toBoolean(value) ? ActivityDelim.EOL.name() : ActivityDelim.EOF.name());
 
 			logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 					"ActivityParser.setting", name, value);

@@ -5749,8 +5749,14 @@ Sample:
   configuration. Default value - `false`. (Optional)
 * `ActivityDelim` - defines activities delimiter symbol/token used by parsers. Value can be one of: `EOL` - end of line, or `EOF` - end of
   file/stream. Default value - `EOL`. (Optional)
-* `IncludeDelimiter` - flag indicating whether RAW activity data text string shall include customly defined activity delimiter symbol/token.
-  Default value - `true`. (Optional)
+* `DelimiterRule` - defines activities delimiter handling rules:
+    * `BEGINNING` - delimiter marks beginning of raw activity data. **Delimiter itself gets included into raw activity data**. Aliases - 
+      `BEGIN`, `STARTING`, `START` `FROM`
+    * `TERMINATING` - delimiter marks end of RAW activity data. **Delimiter itself gets included into raw activity data**. Aliases - 
+      `TERMINATE`, `ENDING`, `END`, `STOP`, `TO`
+    * `DELIMITING` - delimiter is ordinary data chunks separator. **Delimiter itself gets ommited from raw activity data**. Aliases - 
+      `SPLIT`, `DELIM`, `DELIMIT`, `SEPARATE`, `DIVIDE`, `DIV`
+  Default value - `TERMINATE`. (Optional)
 * `RequireDefault` - indicates that all parser fields/locators by default are required to resolve to non-null values. Default value -
   `false`. (Optional). The `field` attribute `required="true"` (or `false`) may be used to take precedence over the `RequireDefault`
   property. See `required` attribute definition in ['TNT4J Events field mappings'](#tnt4j-events-field-mappings).
