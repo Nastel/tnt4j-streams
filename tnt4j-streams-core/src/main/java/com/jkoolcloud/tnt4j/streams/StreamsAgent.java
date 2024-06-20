@@ -433,6 +433,15 @@ public final class StreamsAgent {
 		try {
 			loadConfigAndRun(new CfgStreamsBuilder().setConfig(reader).setNames(streamNames));
 		} catch (Throwable exc) {
+			notifyStreamThreadsCompleted();
+		}
+	}
+
+	/**
+	 * Notifies stream threads group it can wake up from wait.
+	 */
+	public static void notifyStreamThreadsCompleted() {
+		if (streamThreads != null) {
 			synchronized (streamThreads) {
 				streamThreads.notifyAll();
 			}

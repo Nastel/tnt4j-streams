@@ -134,6 +134,8 @@ public class StreamThread extends StreamsThread {
 	 * Notifies this thread, that running stream has completed.
 	 * 
 	 * @see StreamThreadGroup#shutdownStatics()
+	 * @see StreamsAgent#complete()
+	 * @see StreamsAgent#notifyStreamThreadsCompleted()
 	 */
 	public void notifyCompleted() {
 		synchronized (completionLatchSet) {
@@ -146,11 +148,15 @@ public class StreamThread extends StreamsThread {
 		instances.remove(this);
 
 		if (instances.isEmpty()) {
-			StreamsAgent.complete();
-			if (getThreadGroup() instanceof StreamThreadGroup) {
-				StreamThreadGroup stg = (StreamThreadGroup) getThreadGroup();
-				stg.shutdownStatics();
-				stg.stopPendingJunkThreads();
+			try {
+				StreamsAgent.complete();
+				if (getThreadGroup() instanceof StreamThreadGroup) {
+					StreamThreadGroup stg = (StreamThreadGroup) getThreadGroup();
+					stg.shutdownStatics();
+					stg.stopPendingJunkThreads();
+				}
+			} finally {
+				StreamsAgent.notifyStreamThreadsCompleted();
 			}
 		}
 	}
