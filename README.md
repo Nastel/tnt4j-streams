@@ -5792,9 +5792,9 @@ Sample:
 * `Pattern` - pattern used to determine which types of activity data string this parser supports. When `null`, all strings are assumed to
   match the format supported by this parser. Default value - `null`. (Optional)
 * `StripQuotes` - whether surrounding double quotes should be stripped off. Default value - `true`. (Optional)
-* `EntryPattern` - pattern used to split data into name/value pairs. It should define two RegEx groups named `key` and `value` used to
-  map data contained values to name/value pair. **NOTE:** this parameter takes preference on `FieldDelim` and `ValueDelim` parameters.
-  (Optional)
+* `EntryPattern` - pattern used to split data into name/value pairs. It should define two RegEx groups named `key` and `value` used to map
+  data contained values to name/value pair. If any other named groups are defined, then group name is used as the key for the map entry.
+  **NOTE:** this parameter takes preference on `FieldDelim` and `ValueDelim` parameters. (Optional)
 
 Sample:
 ```xml

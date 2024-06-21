@@ -19,6 +19,7 @@ package com.jkoolcloud.tnt4j.streams.parsers;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,10 +36,7 @@ import com.jkoolcloud.tnt4j.streams.configure.ParserProperties;
 import com.jkoolcloud.tnt4j.streams.fields.ActivityInfo;
 import com.jkoolcloud.tnt4j.streams.inputs.TNTInputStream;
 import com.jkoolcloud.tnt4j.streams.parsers.data.ActivityData;
-import com.jkoolcloud.tnt4j.streams.utils.LoggerUtils;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsConstants;
-import com.jkoolcloud.tnt4j.streams.utils.StreamsResources;
-import com.jkoolcloud.tnt4j.streams.utils.Utils;
+import com.jkoolcloud.tnt4j.streams.utils.*;
 
 /**
  * Implements an activity data parser that assumes each activity data item is a token-separated string of fields, where
@@ -55,8 +53,9 @@ import com.jkoolcloud.tnt4j.streams.utils.Utils;
  * <li>StripQuotes - whether surrounding double quotes should be stripped off. Default value - {@code true}.
  * (Optional)</li>
  * <li>EntryPattern - pattern used to split data into name/value pairs. It should define two RegEx groups named
- * {@code "key"} and {@code "value"} used to map data contained values to name/value pair. NOTE: this parameter takes
- * preference on {@code "FieldDelim"} and {@code "ValueDelim"} properties. (Optional)</li>
+ * {@code "key"} and {@code "value"} used to map data contained values to name/value pair. If any other named groups are
+ * defined, then group name is used as the key for the map entry. NOTE: this parameter takes preference on
+ * {@code "FieldDelim"} and {@code "ValueDelim"} properties. (Optional)</li>
  * </ul>
  *
  * @version $Revision: 2 $
@@ -93,10 +92,16 @@ public class ActivityNameValueParser extends AbstractActivityMapParser {
 
 	/**
 	 * Contains the pattern used to split data into name/value pairs. It should define two RegEx groups named
-	 * {@code "key"} and {@code "value"} used to map data contained values to name/value pair. NOTE: this parameter
-	 * takes preference on {@link #fieldDelim} and {@link #valueDelim} parameters.
+	 * {@code "key"} and {@code "value"} used to map data contained values to name/value pair. If any other named groups
+	 * are defined, then group name is used as the key for the map entry. NOTE: this parameter takes preference on
+	 * {@link #fieldDelim} and {@link #valueDelim} parameters.
 	 */
 	protected Pattern entryPattern = null;
+	/**
+	 * List of RegEx group names found in entry pattern. Predefined {@code "key"} and {@code "value"} names are
+	 * excluded.
+	 */
+	protected List<String> groupNames = null;
 
 	/**
 	 * String tokenizer instance used to tokenize input string into name/value pairs. It uses {@link #fieldDelim} as
@@ -155,6 +160,7 @@ public class ActivityNameValueParser extends AbstractActivityMapParser {
 				entryPattern = Pattern.compile(value);
 				logger().log(OpLevel.DEBUG, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
 						"ActivityParser.setting", name, value);
+				groupNames = RegExUtils.getNamedGroups(entryPattern, "key", "value"); // NON-NLS;
 			}
 		}
 	}
@@ -288,12 +294,26 @@ public class ActivityNameValueParser extends AbstractActivityMapParser {
 			String key = matcher.group("key"); // NON-NLS
 			String value = matcher.group("value"); // NON-NLS
 			if (!StringUtils.isAllEmpty(key, value)) {
-				nameValues.put(key, value == null ? "" : value.trim());
-				logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
-						"ActivityNameValueParser.found.regex", key, value);
+				putToMap(key, value, nameValues);
+			} else {
+				for (String gName : groupNames) {
+					try {
+						value = matcher.group(gName);
+						if (value != null) {
+							putToMap(gName, value, nameValues);
+						}
+					} catch (IllegalArgumentException exc) {
+					}
+				}
 			}
 		}
 
 		return nameValues;
+	}
+
+	private void putToMap(String key, String value, Map<String, String> map) {
+		map.put(key, value == null ? "" : value.trim());
+		logger().log(OpLevel.TRACE, StreamsResources.getBundle(StreamsResources.RESOURCE_BUNDLE_NAME),
+				"ActivityNameValueParser.found.regex", key, value);
 	}
 }
