@@ -542,15 +542,7 @@ public class Duration {
 			int hours = getFieldValue(matcher, ChronoUnit.HOURS.name().toLowerCase());
 			int minutes = getFieldValue(matcher, ChronoUnit.MINUTES.name().toLowerCase());
 			int seconds = getFieldValue(matcher, ChronoUnit.SECONDS.name().toLowerCase());
-			String fractionalSecondsStr = matcher.group("fraction");
-
-			// Convert fractional seconds to nanoseconds
-			int nanoseconds = 0;
-			if (StringUtils.isNotEmpty(fractionalSecondsStr)) {
-				// Ensure the fractional part has exactly 9 digits by padding with zeros if necessary
-				fractionalSecondsStr = String.format("%-9s", fractionalSecondsStr).replace(' ', '0'); // NON-NLS
-				nanoseconds = Integer.parseInt(fractionalSecondsStr);
-			}
+			int nanoseconds = getFieldValue(matcher, "fraction"); // NON-NLS
 
 			// Convert resolved temporal units to total seconds
 			long totalSeconds = TimeUnit.DAYS.toSeconds(years * 365L) //
@@ -569,6 +561,11 @@ public class Duration {
 			try {
 				String fValue = matcher.group(field);
 				if (StringUtils.isNotEmpty(fValue)) {
+					if ("fraction".equals(field)) { // NON-NLS
+						// Ensure the fractional part has exactly 9 digits by padding with zeros if necessary
+						fValue = String.format("%-9s", fValue).replace(' ', '0'); // NON-NLS
+					}
+
 					return Integer.parseInt(fValue);
 				}
 			} catch (IllegalArgumentException exc) {
