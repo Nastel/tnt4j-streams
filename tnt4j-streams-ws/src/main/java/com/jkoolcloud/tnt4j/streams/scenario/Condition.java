@@ -18,6 +18,7 @@ package com.jkoolcloud.tnt4j.streams.scenario;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -60,9 +61,7 @@ public class Condition {
 	 *             if provided resolution is {@code null}
 	 */
 	public Condition(String id, Resolution resolution) {
-		if (resolution == null) {
-			throw new NullPointerException("Resolution is null"); // NON-NLS
-		}
+		Objects.requireNonNull(resolution, "Resolution is null"); // NON-NLS
 
 		this.id = id;
 		this.resolution = resolution;
