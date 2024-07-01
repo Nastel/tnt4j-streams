@@ -14,7 +14,7 @@
     <artifactId>tnt4j-streams-kafka</artifactId>
 
     <properties>
-        <kafka.clients.version>3.7.0</kafka.clients.version>
+        <kafka.clients.version>3.7.1</kafka.clients.version>
         <kafka.sink.version>3.3-SNAPSHOT</kafka.sink.version>
     </properties>
 
