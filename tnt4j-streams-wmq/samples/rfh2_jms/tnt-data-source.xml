@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <tnt-data-source
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-wmq/config/tnt-data-source-wmq_pcf.xsd">
 
     <parser name="RFH2FoldersParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityXmlParser">
         <field name="PayloadDataType" locator="/rfh2Folders/mcd/Msd" locator-type="Label"/>
@@ -15,7 +15,6 @@
 
     <parser name="RFH2Parser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityRFH2Parser">
         <property name="TranslateNumValues" value="true"/>
-        <property name="UseActivityDataAsMessageForUnset" value="false"/>
 
         <field name="EventType" value="EVENT"/>
         <field name="EventName" value="IBM MQ RFH2/JMS Payload"/>
