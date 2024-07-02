@@ -17,7 +17,7 @@
 
 <tnt-data-source
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-ws/config/tnt-data-source-ws.xsd">
 
     <parser name="PropsParser" class="com.jkoolcloud.tnt4j.streams.parsers.ActivityNameValueParser">
         <property name="FieldDelim" value=","/>
