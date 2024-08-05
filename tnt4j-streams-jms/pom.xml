@@ -17,7 +17,7 @@
         <jakarta.jms.version>2.0.3</jakarta.jms.version> <!-- 3.0.x changes javax packages to jakarta -->
         <artemis.version>2.35.0</artemis.version>
 
-        <activemq.version>5.18.4</activemq.version>
+        <activemq.version>5.18.5</activemq.version>
         <solace.version>10.24.1</solace.version>
         <rabbitmq.version>2.9.0</rabbitmq.version> <!-- 3.0.x changes javax packages to jakarta -->
         <zeromq.version>3.0.1-RELEASE</zeromq.version>
