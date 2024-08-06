@@ -1,7 +1,10 @@
 
 # Azure SB metrics streaming over TNT4J
 
-## Set up Azure SB Monitoring Application Service Principal
+## Set up Azure SB Monitoring Application Service Principal (SPN)
+
+**NOTE:** This part is not needed is you already have your service principal set to access Azure SB metrics or using Azure Managed 
+Identities for it.
 
 * Create a service principal and assign the Reader role to the service principal. This can be done using these CLI commands:
   ```bash
@@ -42,14 +45,33 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
     <property name="event.sink.factory.EventSinkFactory.ap.Port" value="6060"/>
     ```
 * Configure your Azure SB namespace access: 
-  * Set your REST API access service principal credentials. (These are the credentials provided by the `az ad sp create-for-rbac` command 
-    executed above):
-    ```xml
-    <property name="AzureTenant" value="5029a0f1-xxxx-xxxx-xxxx-xxxxxxxxxx78"/>
-    <property name="AzureAppId" value="ec599183-xxxx-xxxx-xxxx-xxxxxxxxxc8f"/>
-    <property name="AzureSecret" value="FGixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxubwF"/>
-    ```
-  * Set your Azure SB cluster info to collect metrics:
+  * Set configuration to obtain Azure SB  metrics access token (only one of `GetAPITokenSPN`, `GetAPITokenIMDS` steps shall be enabled):
+    * Set your REST API access service principal (SPN) credentials (step `GetAPITokenSPN`). (These are the credentials provided by the 
+      `az ad sp create-for-rbac` command executed above):
+      ```xml
+      <property name="AzureTenant" value="5029a0f1-xxxx-xxxx-xxxx-xxxxxxxxxx78"/>
+      <property name="AzureAppId" value="ec599183-xxxx-xxxx-xxxx-xxxxxxxxxc8f"/>
+      <property name="AzureSecret" value="FGixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxubwF"/>
+      ```
+    * Set your configuration to obtain Azure Managed Identities (MI) token from Azure Instance Metadata Service (IMDS):
+      * Set your IMDS URL:
+        ```xml
+        <request id="GetTokenIMDS"><![CDATA[
+            http://169.254.169.254/metadata/identity/oauth2/token
+        ]]>
+        ```
+      * Set request parameter `api-version` to match one run by your IMDS service:
+        ```xml
+        <!-- may be one of: `2018-02-01`, `2018-11-01`, `2019-06-01`, `2019-08-01`, `2020-06-01`, `2021-05-01`, `2021-12-13`, `2022-08-01`, `2023-01-01` -->
+        <req-param id="api-version" value="2020-06-01"/>
+        ```
+      * Set optional request parameter if needed:
+        ```xml
+        <req-param id="object_id" value="xxxxxxx"/>
+        <req-param id="client_id" value="xxxxxxx"/>
+        <req-param id="msi_res_id" value="xxxxxxx"/>
+        ```
+  * Set your Azure SB cluster info to collect metrics (step `GetAzureSBMetrics`):
     ```xml
     <property name="AzureSubscriptionId" value="c3cbb071-xxxx-xxxx-xxxx-xxxxxxxxxxf8"/>
     <property name="AzureResourceGroup" value="AndriusSB-RG"/>
@@ -123,6 +145,7 @@ Execute shell script:
 ### Create token to access Azure Rest API
 
 See [How to get access token to pull Azure Monitor metrics for a specific subscription?](https://stackoverflow.com/questions/60516007/how-to-get-access-token-to-pull-azure-monitor-metrics-for-a-specific-subscriptio)
+See [How to use managed identities for Azure resources on an Azure VM to acquire an access token](https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/how-to-use-vm-token)
 
 ### Setup Microsoft Entra ID (formerly Azure Active Directory)
 
@@ -133,4 +156,4 @@ See [Get Microsoft Entra ID (formerly Azure AD) tokens for service principals](h
 See [Monitoring Azure Service Bus data reference](https://learn.microsoft.com/en-us/azure/service-bus-messaging/monitor-service-bus-reference#metrics).
 See [Monitoring metrics documentation](https://learn.microsoft.com/en-us/rest/api/monitor/metrics/list?tabs=HTTP).
 See [Metrics List](https://learn.microsoft.com/en-us/azure/azure-monitor/reference/supported-metrics/microsoft-servicebus-namespaces-metrics).
-See[Azure monitoring REST API walkthrough](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/rest-api-walkthrough?tabs=portal).
+See [Azure monitoring REST API walkthrough](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/rest-api-walkthrough?tabs=portal).
