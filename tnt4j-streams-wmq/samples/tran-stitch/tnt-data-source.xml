@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <tnt-data-source
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/config/tnt-data-source.xsd">
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Nastel/tnt4j-streams/master/tnt4j-streams-wmq/config/tnt-data-source-wmq_pcf.xsd">
 
     <parser name="WmqMsgOpXmlParser" class="com.jkoolcloud.tnt4j.streams.parsers.MessageActivityXmlParser">
         <field name="Message" locator="/messaging_operation/MsgData" locator-type="Label" datatype="String" format="string"/>
