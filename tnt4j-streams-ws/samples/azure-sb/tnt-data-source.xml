@@ -90,21 +90,26 @@
         </tnt4j-properties>
 
         <scenario name="Azure SB monitoring">
-            <property name="AzureTenant" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
-            <property name="AzureAppId" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
-            <property name="AzureSecret" value="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"/>
+            <property name="AzureResource" value="https://management.azure.com"/>
 
-            <step name="GetAPIToken"
+            <!-- Step to obtain Azure Service Principal (SPN) token. Enabled by default (see `Enabled` property value) -->
+            <!-- If Managed Identities authentication is needed, disable this step -->
+            <step name="GetAPITokenSPN"
                   url="https://login.windows.net/${AzureTenant}/oauth2/token"
                   method="POST">
 
+                <property name="Enabled" value="true"/>
                 <property name="SynchronizeRequests" value="true"/>
+
+                <property name="AzureTenant" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
+                <property name="AzureAppId" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"/>
+                <property name="AzureSecret" value="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"/>
 
                 <!--<schedule-cron expression="0 0/5 * * * ?"/>-->
                 <schedule-simple interval="5" units="Minutes" startDelay="0" startDelayUnits="Seconds" repeatCount="-1"/>
 
-                <request id="GetToken"><![CDATA[
-                   grant_type=client_credentials&resource=https://management.azure.com&client_id=${AzureAppId}&client_secret=${AzureSecret}
+                <request id="GetTokenSPN"><![CDATA[
+                   grant_type=client_credentials&resource=${AzureResource}&client_id=${AzureAppId}&client_secret=${AzureSecret}
                 ]]>
 
                     <req-param id="H:Content-Type" value="application/x-www-form-urlencoded"/>
@@ -115,6 +120,44 @@
                             && ${TokenExpires} > 0
                             && (${TokenExpires} - System.currentTimeMillis ()) > TimeUnit.MINUTES.toMillis(5)
                        ]]></matchExp>
+                    </condition>
+
+                    <parser-ref name="AzureTokenParser"/>
+                </request>
+            </step>
+            <!-- Step to obtain Azure Managed Identities (MI) token from Azure Instance Metadata Service (IMDS). -->
+            <!-- Disabled by default (see `Enabled` property value). -->
+            <!-- If Managed Identities authentication is needed, enable this step, and disable `GetAPITokenSPN` step -->
+            <step name="GetAPITokenIMDS"
+                  method="GET">
+
+                <property name="Enabled" value="false"/>
+                <property name="SynchronizeRequests" value="true"/>
+
+                <!--<schedule-cron expression="0 0/5 * * * ?"/>-->
+                <schedule-simple interval="5" units="Minutes" startDelay="0" startDelayUnits="Seconds" repeatCount="-1"/>
+
+                <!-- NOTE: DO NOT FORGET TO CHANGE Your Azure Instance Metadata Service (IMDS) URL! -->
+                <request id="GetTokenIMDS"><![CDATA[
+                   http://169.254.169.254/metadata/identity/oauth2/token
+                ]]>
+
+                    <req-param id="H:Metadata" value="true"/>
+
+                    <req-param id="resource" value="${AzureResource}"/>
+                    <!-- may be one of: `2018-02-01`, `2018-11-01`, `2019-06-01`, `2019-08-01`, `2020-06-01`, `2021-05-01`, `2021-12-13`, `2022-08-01`, `2023-01-01` -->
+                    <req-param id="api-version" value="2020-06-01"/>
+                    <!-- OPTIONAL params -->
+                    <!--req-param id="object_id" value=""/-->
+                    <!--req-param id="client_id" value=""/-->
+                    <!--req-param id="msi_res_id" value=""/-->
+
+                    <condition id="TokenStillValidCondition" resolution="SKIP">
+                        <matchExp><![CDATA[
+                               StringUtils.isNotEmpty(${Token})
+                            && ${TokenExpires} > 0
+                            && (${TokenExpires} - System.currentTimeMillis ()) > TimeUnit.MINUTES.toMillis(5)
+                        ]]></matchExp>
                     </condition>
 
                     <parser-ref name="AzureTokenParser"/>

@@ -311,8 +311,9 @@
         <field name="EventType" value="NOOP"/>
 
         <field name="Token" locator="$.access_token" locator-type="Label" datatype="String"/>
+        <field name="TokenClientId" locator="$.client_id" locator-type="Label" datatype="String"/>
         <field name="TokenExpiresSec" locator="$.expires_in" locator-type="Label" datatype="Number" format="int"/>
-        <field name="ExtTokenExpiresSec" locator="$.ext_expires_in" locator-type="Label" datatype="Number" format="int"/>
+        <field name="TokenExpiresExtSec" locator="$.ext_expires_in" locator-type="Label" datatype="Number" format="int"/>
         <field name="TokenExpiresOn" locator="$.expires_on" locator-type="Label" datatype="Number" format="int"/>
         <field name="TokenExpiresNotBefore" locator="$.not_before" locator-type="Label" datatype="Number" format="int"/>
         <field name="TokenResource" locator="$.resource" locator-type="Label" datatype="String"/>
