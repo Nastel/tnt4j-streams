@@ -144,16 +144,16 @@ Execute shell script:
 
 ### Create token to access Azure Rest API
 
-See [How to get access token to pull Azure Monitor metrics for a specific subscription?](https://stackoverflow.com/questions/60516007/how-to-get-access-token-to-pull-azure-monitor-metrics-for-a-specific-subscriptio)
-See [How to use managed identities for Azure resources on an Azure VM to acquire an access token](https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/how-to-use-vm-token)
+* See [How to get access token to pull Azure Monitor metrics for a specific subscription?](https://stackoverflow.com/questions/60516007/how-to-get-access-token-to-pull-azure-monitor-metrics-for-a-specific-subscriptio)
+* See [How to use managed identities for Azure resources on an Azure VM to acquire an access token](https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/how-to-use-vm-token)
 
 ### Setup Microsoft Entra ID (formerly Azure Active Directory)
 
-See [Get Microsoft Entra ID (formerly Azure AD) tokens for service principals](https://learn.microsoft.com/en-us/azure/databricks/dev-tools/service-prin-aad-token).
+* See [Get Microsoft Entra ID (formerly Azure AD) tokens for service principals](https://learn.microsoft.com/en-us/azure/databricks/dev-tools/service-prin-aad-token).
 
 ### REST API call configuration
 
-See [Monitoring Azure Service Bus data reference](https://learn.microsoft.com/en-us/azure/service-bus-messaging/monitor-service-bus-reference#metrics).
-See [Monitoring metrics documentation](https://learn.microsoft.com/en-us/rest/api/monitor/metrics/list?tabs=HTTP).
-See [Metrics List](https://learn.microsoft.com/en-us/azure/azure-monitor/reference/supported-metrics/microsoft-servicebus-namespaces-metrics).
-See [Azure monitoring REST API walkthrough](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/rest-api-walkthrough?tabs=portal).
+* See [Monitoring Azure Service Bus data reference](https://learn.microsoft.com/en-us/azure/service-bus-messaging/monitor-service-bus-reference#metrics).
+* See [Monitoring metrics documentation](https://learn.microsoft.com/en-us/rest/api/monitor/metrics/list?tabs=HTTP).
+* See [Metrics List](https://learn.microsoft.com/en-us/azure/azure-monitor/reference/supported-metrics/microsoft-servicebus-namespaces-metrics).
+* See [Azure monitoring REST API walkthrough](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/rest-api-walkthrough?tabs=portal).
