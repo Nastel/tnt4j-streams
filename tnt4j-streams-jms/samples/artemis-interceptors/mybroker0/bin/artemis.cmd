@@ -1,20 +1,20 @@
 @echo off
-rem Licensed to the Apache Software Foundation (ASF) under one
-rem or more contributor license agreements.  See the NOTICE file
-rem distributed with this work for additional information
-rem regarding copyright ownership.  The ASF licenses this file
-rem to you under the Apache License, Version 2.0 (the
-rem "License"); you may not use this file except in compliance
-rem with the License.  You may obtain a copy of the License at
-rem
-rem   http://www.apache.org/licenses/LICENSE-2.0
-rem
-rem Unless required by applicable law or agreed to in writing,
-rem software distributed under the License is distributed on an
-rem "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-rem KIND, either express or implied.  See the License for the
-rem specific language governing permissions and limitations
-rem under the License.
+:: Licensed to the Apache Software Foundation (ASF) under one
+:: or more contributor license agreements.  See the NOTICE file
+:: distributed with this work for additional information
+:: regarding copyright ownership.  The ASF licenses this file
+:: to you under the Apache License, Version 2.0 (the
+:: "License"); you may not use this file except in compliance
+:: with the License.  You may obtain a copy of the License at
+::
+::   http://www.apache.org/licenses/LICENSE-2.0
+::
+:: Unless required by applicable law or agreed to in writing,
+:: software distributed under the License is distributed on an
+:: "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+:: KIND, either express or implied.  See the License for the
+:: specific language governing permissions and limitations
+:: under the License.
 
 setlocal
 
@@ -44,22 +44,22 @@ echo.
 
 :RUN_JAVA
 
-rem "Load Profile Config"
+:: "Load Profile Config"
 set ARTEMIS_INSTANCE_ETC="D:\tmp\apache-artemis-2.19.1\bin\mybroker0\etc"
 call %ARTEMIS_INSTANCE_ETC%\artemis.profile.cmd %*
 
-rem "Set Defaults."
-rem set ARTEMIS_LOGGING_CONF=%ARTEMIS_INSTANCE_ETC_URI%/logging.properties
+:: "Set Defaults."
+:: set ARTEMIS_LOGGING_CONF=%ARTEMIS_INSTANCE_ETC_URI%/logging.properties
 set ARTEMIS_LOGGING_CONF=%ARTEMIS_INSTANCE_ETC_URI%/tnt4j/logging.properties
 set ARTEMIS_LOG_MANAGER=org.jboss.logmanager.LogManager
 
 if not exist "%ARTEMIS_OOME_DUMP%" goto NO_ARTEMIS_OOME_DUMP
-rem "Backup the last OOME heap dump"
+:: "Backup the last OOME heap dump"
 move /Y "%ARTEMIS_OOME_DUMP%" "%ARTEMIS_OOME_DUMP%.bkp"
 
 :NO_ARTEMIS_OOME_DUMP
 
-rem "Create full JVM Args"
+:: "Create full JVM Args"
 set JVM_ARGS=%JAVA_ARGS%
 if not "%ARTEMIS_CLUSTER_PROPS%"=="" set JVM_ARGS=%JVM_ARGS% %ARTEMIS_CLUSTER_PROPS%
 set JVM_ARGS=%JVM_ARGS% -classpath %ARTEMIS_HOME%\lib\artemis-boot.jar

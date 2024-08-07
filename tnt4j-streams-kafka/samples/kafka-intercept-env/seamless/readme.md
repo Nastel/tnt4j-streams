@@ -25,7 +25,7 @@ absolute path. Check and change it accordingly.
     ```
 
     The change we made is needed to reduce final Kafka command parameters length. While for *nix systems it is more or less optional, for 
-    windows systems it is recommended, since Windows has limitation for commands length.
+    Windows systems it is recommended, since Windows has limitation for commands length.
 
     That's it - no more changes in Kafka environment needed!
 

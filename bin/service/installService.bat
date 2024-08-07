@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-rem #### service variables initialization ####
+:: #### service variables initialization ####
 
 set /p OS_ARC= Java architecture? ([win32]/win64)
 IF ["%OS_ARC%"] NEQ ["win64"] (
@@ -16,20 +16,20 @@ if exist %JAVA_HOME%bin\client\jvm.dll (
 	set DLL_LOC=jre\bin\server
 )
 
-rem ### When x64 preferred to use ###
-rem set OS_ARC=win64
+:: ### When x64 preferred to use ###
+:: set OS_ARC=win64
 set /p NAME=Enter your service name ([TNT4JSteams]): 
 IF ["%NAME%"] EQU [""] set NAME=TNT4JSteams
 set DESCRIPTION=TNT4J-Streams data stream service
 set RUNDIR=%~dp0
 set FILE_PATH=%RUNDIR%..\..
 set LOG_PATH=%FILE_PATH%\logs
-rem ### When using JRE from JDK ###
-rem set JVM_DLL_PATH=%JAVA_HOME%\jre\bin\server
-rem ### General use case standalone JRE###
+:: ### When using JRE from JDK ###
+:: set JVM_DLL_PATH=%JAVA_HOME%\jre\bin\server
+:: ### General use case standalone JRE###
 set /p JVM_DLL_PATH= Enter the path of jvm.dll ([%JAVA_HOME%%DLL_LOC%]): 
 IF ["%JVM_DLL_PATH%"] EQU [""] set JVM_DLL_PATH=%JAVA_HOME%%DLL_LOC%
-rem ### Use stream configuration from default config dir or define custom one
+:: ### Use stream configuration from default config dir or define custom one
 
 set /p PARSER_CONFIG=Enter parser configuration file path ([%FILE_PATH%\config\tnt-data-source.xml]): 
 IF ["%PARSER_CONFIG%"] EQU [""] set PARSER_CONFIG="%FILE_PATH%\config\tnt-data-source.xml"
@@ -50,7 +50,7 @@ echo JvmOptions             -Dlog4j2.configurationFile=%LOG4J_CONFIG%;-Dtnt4j.co
 SET /P AREYOUSURE=Are you sure (Y/[N])?
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO END
 
-rem #### installing service ####
+:: #### installing service ####
 
 %SERVICE_PROVIDER% //IS//%NAME%    ^
  --Description  "%DESCRIPTION%"  ^
@@ -72,7 +72,7 @@ rem #### installing service ####
  --JvmMs 128      ^
  --JvmMx 512
 
-rem #### making service uninstall script ####
+:: #### making service uninstall script ####
 
 echo "%SERVICE_PROVIDER%"  //DS//%NAME% > uninstallService.bat
 

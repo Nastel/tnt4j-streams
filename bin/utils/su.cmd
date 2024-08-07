@@ -14,5 +14,5 @@ IF ["%JAVA_HOME%"] EQU [""] (
   set JAVA_EXEC="%JAVA_HOME%\bin\java"
 )
 
-@echo on
+@echo off
 %JAVA_EXEC% -classpath "%LIBPATH%" %MAINCLASS% %*

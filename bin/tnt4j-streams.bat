@@ -3,14 +3,14 @@ setlocal
 
 set RUNDIR=%~dp0
 set LIBPATH=%LIBPATH%;%RUNDIR%..\*;%RUNDIR%..\lib\*
-rem tnt4j property override
+:: tnt4j property override
 IF ["%TNT4J_PROPERTIES%"] EQU [""] set TNT4J_PROPERTIES=%RUNDIR%..\config\tnt4j.properties
 set TNT4JOPTS=-Dtnt4j.config="%TNT4J_PROPERTIES%"
-rem log4j property override
+:: log4j property override
 IF ["%LOG4J_PROPERTIES%"] EQU [""] set LOG4J_PROPERTIES=%RUNDIR%..\config\log4j2.xml
 set LOG4JOPTS=-Dlog4j2.configurationFile="%LOG4J_PROPERTIES%"
-REM set LOGBACK_PROPERTIES=%RUNDIR%..\config\logback.xml
-REM set LOGBACKOPTS=-Dlogback.configurationFile="%LOGBACK_PROPERTIES%"
+:: set LOGBACK_PROPERTIES=%RUNDIR%..\config\logback.xml
+:: set LOGBACKOPTS=-Dlogback.configurationFile="%LOGBACK_PROPERTIES%"
 set STREAMSOPTS=%STREAMSOPTS% %LOG4JOPTS% %TNT4JOPTS% -Dfile.encoding=UTF-8
 
 IF ["%MAINCLASS%"] EQU [""] (
@@ -25,5 +25,5 @@ IF ["%JAVA_HOME%"] EQU [""] (
   set JAVA_EXEC="%JAVA_HOME%\bin\java"
 )
 
-@echo on
+@echo off
 %JAVA_EXEC% %STREAMSOPTS% -classpath "%LIBPATH%" %MAINCLASS% %*

@@ -18,6 +18,6 @@ IF ["%JAVA_HOME%"] EQU [""] (
   set JAVA_EXEC="%JAVA_HOME%\bin\java"
 )
 
-@echo on
+@echo off
 %JAVA_EXEC% %STREAMSOPTS% -classpath "%LIBPATH%" com.jkoolcloud.tnt4j.streams.custom.interceptors.kafka.InterceptorsTest
 pause
