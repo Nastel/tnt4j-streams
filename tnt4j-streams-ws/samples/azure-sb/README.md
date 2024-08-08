@@ -45,8 +45,9 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
     <property name="event.sink.factory.EventSinkFactory.ap.Port" value="6060"/>
     ```
 * Configure your Azure SB namespace access:
-  * Set configuration to obtain Azure SB  metrics access token (only one of `GetAPITokenSPN`, `GetAPITokenIMDS` steps shall be enabled):
-    * Set your REST API access service principal (SPN) credentials (step `GetAPITokenSPN`). (These are the credentials provided by the
+  * Set configuration to obtain Azure SB  metrics access token (enable either the `GetAPITokenSPN` step or the `GetAPITokenIMDS` step, but
+    not both):
+    * Set your REST API access service principal (SPN) credentials (`GetAPITokenSPN` step). (These are the credentials provided by the
       `az ad sp create-for-rbac` command executed above):
       ```xml
       <property name="AzureTenant" value="5029a0f1-xxxx-xxxx-xxxx-xxxxxxxxxx78"/>
@@ -71,7 +72,7 @@ All required configuration shall be done in [tnt-data-source.xml](tnt-data-sourc
         <req-param id="client_id" value="xxxxxxx"/>
         <req-param id="msi_res_id" value="xxxxxxx"/>
         ```
-  * Set your Azure SB cluster info to collect metrics (step `GetAzureSBMetrics`):
+  * Set your Azure SB cluster info to collect metrics (`GetAzureSBMetrics` step):
     ```xml
     <property name="AzureSubscriptionId" value="c3cbb071-xxxx-xxxx-xxxx-xxxxxxxxxxf8"/>
     <property name="AzureResourceGroup" value="AndriusSB-RG"/>
